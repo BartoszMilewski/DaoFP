@@ -1,14 +1,16 @@
 \documentclass[DaoFP]{subfiles}
 \begin{document}
-\setcounter{chapter}{2}
+\setcounter{chapter}{3}
 
 \chapter{Sum Types}
 
 \section{Bool}
 
-Now that we know how to compose arrows, it's time to think about composing objects. We've already defined $0$ (the initial object) and $1$ (the terminal object), so how would we go about defining $2$? The obvious answer is that $2$ is $1$ plus $1$, but how do we add objects? 
+We know how to compose arrows. But how do we compose objects?
 
-A $2$ should be an object with two elements: two arrows coming from $1$. Let's call one arrow \hask{True} and the other \hask{False}. Don't confuse these names with the logical interpretations of the initial and the terminal objects. These two are \emph{arrows}. 
+ We have defined $0$ (the initial object) and $1$ (the terminal object). What is $2$ if not $1$ plus $1$?
+ 
+A $2$ is an object with two elements: two arrows coming from $1$. Let's call one arrow \hask{True} and the other \hask{False}. Don't confuse those names with the logical interpretations of the initial and the terminal objects. These two are \emph{arrows}. 
 
 \[
  \begin{tikzcd}
@@ -22,7 +24,6 @@ A $2$ should be an object with two elements: two arrows coming from $1$. Let's c
 \]
 
 This simple idea can be immediately expressed in Haskell as the definition of a type, traditionally called \hask{Bool}, after its inventor George Bool (1815-1864).
-False
 
 \begin{haskell}
 data Bool where
@@ -60,7 +61,7 @@ The functions \hask{True} and \hask{False} that we used in the definition of \ha
 
 Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it. We have to be able to define arrows that go out of \hask{Bool}---the \emph{mappings ou}t of \hask{Bool}. 
 
-The first observation is that, if we have an arrow \hask{h} from \hask{Bool} to some type \hask{A} then we automatically get two arrows $x$ and $y$ from unit to \hask{A}, just by composition.
+The first observation is that, if we have an arrow \hask{h} from \hask{Bool} to some type \hask{A} then we automatically get two arrows $x$ and $y$ from unit to \hask{A}, just by composition. The following diagram commutes:
 
 \[
  \begin{tikzcd}
@@ -102,25 +103,25 @@ We are now ready to complete our definition of \hask{Bool} by adding the conditi
 
 What this means is that we can interpret the diagram above in two ways: Given \hask{h}, we can easily get \hask{x} and \hask{y}. But the converse is also true: a pair of elements \hask{x} and \hask{y} uniquely \emph{defines} \hask{h}.
 
-Using the painting analogy, if we assigned a different color to every pair $(x, y)$, we would be able to transfer this color to the corresponding $h$, and each $h$ would be painted differently. 
+We have another ``buddy system,'' or a bijection, at work here. This time it's a two-way mapping between a pair of elements $(x, y)$ and an arrow $h$. 
 
 In Haskell, this definition of \hask{h} is encapsulated in the \hask{if}, \hask{then}, \hask{else} construct. Given
 \begin{haskell}
 x :: A
 y :: A
 \end{haskell}
-we get
+we define the mapping out
 \begin{haskell}
 h :: Bool -> A
 h b = if b then x else y
 \end{haskell}
 Here, \hask{b} is a term of type \hask{Bool}. 
 
-In general, a data type is created using \emph{introduction} rules and deconstructed using \emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and the other using \hask{False}. The \hask{if}, \hask{then}, \hask{else} defines the elimination rule. 
+In general, a data type is created using \emph{introduction} rules and deconstructed using \emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and the other using \hask{False}. The \hask{if}, \hask{then}, \hask{else} construct defines the elimination rule. 
 
-The fact that, given \hask{h}, we can reconstruct the two terms used to define it, is called the \emph{computation} rule. It tells us how to compute \hask{h}. If the argument evaluates to \hask{True}, then the result is \hask{x}, otherwise it's \hask{y}.
+The fact that, given \hask{h}, we can reconstruct the two terms used to define it, is called the \emph{computation} rule. It tells us how to compute the result of \hask{h}. If the argument evaluates to \hask{True}, then the result is \hask{x}, otherwise it's \hask{y}.
 
-We should never lose sight of the purpose of programming: to decompose complex problems into a series of simpler ones. The definition of \hask{Bool} illustrates this idea. Whenever we have to construct a mapping out of \hask{Bool}, we decompose it into two smaller tasks of constructing elements of the target type. We traded one problem for two simpler ones.
+We should never lose sight of the purpose of programming: to decompose complex problems into a series of simpler ones. The definition of \hask{Bool} illustrates this idea. Whenever we have to construct a mapping out of \hask{Bool}, we decompose it into two smaller tasks of constructing a pair of elements of the target type. We traded one larger problem for two simpler ones.
 
 \subsection{Examples}
 
@@ -146,13 +147,13 @@ The interesting case is functions from \hask{Bool} to \hask{Bool}. Let's plug \h
 \text{Bool}
  \end{tikzcd}
 \]
-How many pairs of functions from \hask{()} to \hask{Bool} do we have at our disposal? There are only two such functions, \hask{True} and \hask{False}, so we can form four pairs. These are $(True, True)$, $(False, False)$, $(True, False)$, and $(False, True)$. Therefore there can only be four functions from \hask{Bool} to \hask{Bool}. We can write them in Haskell using the  \hask{if}, \hask{then}, \hask{else} construct. For instance, the last one, which we'll call \hask{not} is:
+How many pairs of functions from \hask{()} to \hask{Bool} do we have at our disposal? There are only two such functions, \hask{True} and \hask{False}, so we can form four pairs. These are $(True, True)$, $(False, False)$, $(True, False)$, and $(False, True)$. Therefore there can only be four functions from \hask{Bool} to \hask{Bool}. We can write them in Haskell using the  \hask{if}, \hask{then}, \hask{else} construct. For instance, the last one, which we'll call \hask{not} is defined as:
 \begin{haskell}
 not :: Bool -> Bool
 not b = if b then False else True
 \end{haskell}
 
-We can also consider the functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential $A^2$, where $2$ is the \hask{Bool} object. Accoording to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra.
+We can also consider the functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential $A^2$, where $2$ is the \hask{Bool} object. Accoording to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra, where numbers actually mean numbers.
 
 \section{Enumerations}
 
@@ -163,7 +164,7 @@ data RGB where
   Green :: RGB
   Blue  :: RGB
 \end{haskell}
-If you're tired of repeating the same thing over and over, there is a shorthand for this type of definitions:
+If you're tired of repeating the same thing over and over, there is a shorthand for this type of definition:
 
 \begin{haskell}
 data RGB = Red | Green | Blue
@@ -297,7 +298,7 @@ h (Left  a) = f a
 h (Right b) = g b
 \end{haskell}
 
-Read these equations right to left and you will see the computation rules for sum types. The two functions that were used to define \hask{h} can be recovered by applying \hask{h} to terms constructed using \hask{Left} and \hask{Right}. 
+Read these equations right to left, and you will see the computation rules for sum types. The two functions that were used to define \hask{h} can be recovered by applying \hask{h} to terms constructed using \hask{Left} and \hask{Right}. 
 
 You can also use the \hask{case} syntax to define \hask{h}:
 \begin{haskell}
@@ -309,6 +310,10 @@ h e = case e of
 In logic, the proposition $A + B$ is called the alternative, or \emph{logical or}. You can prove it by providing the proof of $A$ or the proof of $B$. Either one will suffice. 
 
 If you want to prove that $C$ follows from $A+B$, you have to be prepared for two eventualities: either the proof of $A+B$ was obtained by proving $A$ or by proving $B$. In the first case, you need a proof that $C$ follows from $A$. In the second case you need a proof that $C$ follows from $B$. These are the arrows in the definition of $A+B$.
+
+\section{Co-Cartesian Categories}
+
+
 
 \section{Properties of Sums}
 
@@ -337,5 +342,22 @@ Look at the definition of $1 + 0$ and it's mapping out to any object $A$. It's d
 \]
 There is only one \hask{absurd}, but there can be many elements of \hask{A}, and each \hask{a} defines a different \hask{h}. We see that the two objects $1$ and $1 + 0$ have the same set of outgoing arrows to any object $A$. 
 
+Initial object as zero 
+
+cocartesian category
+
+functoriality
+
+naturality
+
+\section{notes}
+
+logical interpretation  of + 
+
+$0 + a \cong a$
+
+$a + b \cong b + a$
+ 
+$(a + b) + c \cong a + (b + c)$
 
 \end{document}

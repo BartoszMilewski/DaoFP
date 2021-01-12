@@ -28,7 +28,7 @@ There may be more than one arrow between two types, so we need to name them. For
 
 One way to interpret this is to say that the function $ f$ takes an argument of type $A$ and produces a result of type $B$. Or that $ f$ is a proof that if $A$ is true then $B$ is also true.
 
-Note: The connection between type theory, lambda calcululus (which is the foundation of programming), logic, and category theory is known as Curry-Howard-Lambek isomorphism.
+Note: The connection between type theory, lambda calculus (which is the foundation of programming), logic, and category theory is known as Curry-Howard-Lambek isomorphism.
 
 \section{Yin and Yang}
 
@@ -59,7 +59,7 @@ In logic, the terminal object signifies the ultimate truth, symbolized by $T$ or
 
 Dually, the initial object signifies logical falsehood, contradiction, or a counterfactual. It's written as  False and symbolized by an upside down T, $ \bot$. The fact that there is an arrow from it to any object means that you can prove anything starting from false premises. 
 
-In English, there is special grammatical construct for counterfactual implications. When we say, "If wishes were horses, beggars would ride," we mean that the equality between wishes and horses implies that beggars be able to ride. But we know that the premise is false.
+In English, there is special grammatical construct for counterfactual implications. When we say, ``If wishes were horses, beggars would ride,'' we mean that the equality between wishes and horses implies that beggars be able to ride. But we know that the premise is false.
 
 A programming language lets us communicate with each other and with computers. Some languages are easier for the computer to understand, others are closer to the theory. We will use Haskell as a compromise.
 
@@ -97,7 +97,7 @@ In category theory we say that $ x$ is a \emph{global element} of $ A$ if it's a
 
 \[ 1 \xrightarrow x A \]
 
-We'll often simply call it an element (omitting "global").
+We'll often simply call it an element (omitting ``global'').
 
 In logic, such $ x$ is called the proof of $ A$, since it corresponds to the implication $ \top \to A$ (if \textbf{True} is true then \textbf{A} is true). Notice that there may be many different proofs of $A$.
 
@@ -134,11 +134,11 @@ is equivalent to
 
 \[ 1 \xrightarrow f B^A\]
 
-In logic, an arrow $ A \to B$ is an implication: it states the fact that "if A then B." An exponential object $ B^A$ is the corresponding proposition. It could be true or it could be false, we don't know. You have to prove it. Such a proof is an element of $ B^A$. 
+In logic, an arrow $ A \to B$ is an implication: it states the fact that ``if A then B.'' An exponential object $ B^A$ is the corresponding proposition. It could be true or it could be false, we don't know. You have to prove it. Such a proof is an element of $ B^A$. 
 
 Show me an element of $ B^A$ and I'll know that $ B$ follows from $ A$.
 
-Consider again the statement, "If wishes were horses, beggars would ride"---this time as an object. It's not an empty object, because you can point at a proof of it---something along the lines: "A person who has a horse rides it. Beggars have wishes. Since wishes are horses, beggars have horses. Therefore beggars ride." But, even though you have a proof of this statement, it's of no use to you, because you can never prove its premise: "wish = horse". 
+Consider again the statement, ``If wishes were horses, beggars would ride''---this time as an object. It's not an empty object, because you can point at a proof of it---something along the lines: ``A person who has a horse rides it. Beggars have wishes. Since wishes are horses, beggars have horses. Therefore beggars ride.'' But, even though you have a proof of this statement, it's of no use to you, because you can never prove its premise: ``wish = horse''. 
 
 
 \end{document}
