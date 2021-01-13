@@ -95,13 +95,15 @@ We can combine these two mappings (see exercise \ref{ex-yoneda-composition}) to 
 
 Similarly, the round trip induced by $f \circ f^{-1}$ leaves the arrows $X \to B$ unchanged. 
 
-This creates a ``buddy system'' between the two groups of arrows. Imagine each arrow sending a message to its buddy, as determined by $f$ or $f^{-1}$. Each arrow would then received exactly one message, and it would be a message from its buddy. No arrow would be left behind, and no arrow would receive more than one message. Mathematicians call this kind of buddy system a \emph{bijection}.
+This creates a ``buddy system'' between the two groups of arrows. Imagine each arrow sending a message to its buddy, as determined by $f$ or $f^{-1}$. Each arrow would then received exactly one message, and it would be a message from its buddy. No arrow would be left behind, and no arrow would receive more than one message. Mathematicians call this kind of buddy system a \emph{bijection} or one-to-one correspondence.
 
 Therefore, arrow by arrow, the two objects $A$ and $B$ look exactly the same from the perspective of $X$. Arrow-wise, there is no difference between the two objects. 
 
-In particular, if you replace $X$ with the terminal object $1$, you'll see that the two objects have the same elements. For every element $x \colon 1 \to A$ there is a corresponding element $y \colon 1 \to B$, namely $y = f \circ x$, and vice versa. There is a bijection between the elements of the isomorphic objects.
+In particular, if you replace $X$ with the terminal object $1$, you'll see that the two objects have the same elements. For every element $x \colon 1 \to A$ there is a corresponding element $y \colon 1 \to B$, namely $y = f \circ x$, and vice versa. There is a bijection between the elements of isomorphic objects.
 
-Such indistinguishable objects are called \emph{isomorphic}, meaning ``the same shape.'' You've seen one, you've seen them all. We write this isomorphism as:
+Such indistinguishable objects are called \emph{isomorphic} because they have ``the same shape.'' You've seen one, you've seen them all. 
+
+We write this isomorphism as:
 
 \[A \cong B\]
 
@@ -109,10 +111,10 @@ When dealing with objects, we use isomorphism in place of equality.
 
 In programming, two isomorphic types have the same external behavior. One type can be implemented in terms of the other and vice versa. One can be replaced by the other without changing the behavior of the system (except, possibly, the performance). 
 
-In classical logic, if B follows from A and A follows from B then A and B are logically equivalent. We often say that B is true ``if and only if'' A is true. However, unlike previous parallels between logic and type theory, this one is not as straightforward if you consider proofs to be relevant. In fact, it led to the development of a new branch of fundamental mathematics, the homotopy type theory, or HoTT for short.
+In classical logic, if B follows from A and A follows from B then A and B are logically equivalent. We often say that B is true ``if and only if'' A is true. However, unlike previous parallels between logic and type theory, this one is not as straightforward if you consider proofs to be relevant. In fact, it led to the development of a new branch of fundamental mathematics, homotopy type theory, or HoTT for short.
 
 \begin{exercise}
-Make an argument that there is also a bijection between arrows \emph{outgoing} from two isomorphic objects. Draw the corresponding diagrams.
+Make an argument that there is a bijection between arrows that are \emph{outgoing} from two isomorphic objects. Draw the corresponding diagrams.
 \end{exercise}
 
 
@@ -166,28 +168,47 @@ Similarly, an arrow $h'$ probing $B$ from $X$ corresponds to the arrow $h' \circ
  \arrow[ll, bend left,  "f^{-1}"]
  \end{tikzcd}
 \]
-In both cases, we change perspective from $X$ to $Y$ by applying $(- \circ g)$.
+In both cases, we change perspective from $X$ to $Y$ by applying precomposition $(- \circ g)$.
 
-The important observation is that the change of perspective preserves the buddy system established by the isomorphism. If two arrows were buddies from the perspective of $X$, they are still buddies from the perspective of $Y$. This is as simple as saying that it doesn't matter if you first pre-compose with $g$ (switch perspective) and then post-compose with $f$ (switch focus), or first post-compose with $f$ and then pre-compose with $g$. Symbolically, we can write it as:
+The important observation is that the change of perspective preserves the buddy system established by the isomorphism. If two arrows were buddies from the perspective of $X$, they are still buddies from the perspective of $Y$. This is as simple as saying that it doesn't matter if you first pre-compose with $g$ (switch perspective) and then post-compose with $f$ (switch focus), or first post-compose with $f$ and then pre-compose with $g$. Symbolically, we write it as:
 
 \[(- \circ g) \circ (f \circ -) = (f \circ -) \circ (- \circ g)\]
-The meaning of this equation is revealed when you apply it to a morphism $h \colon X \to A$. Both sides evaluate to $f \circ h \circ g$. 
-\[
+and we call it a \emph{naturality} condition.
+
+The meaning of this equation is revealed when you apply it to a morphism $h \colon X \to A$. Both sides evaluate to $f \circ h \circ g$.  \[
  \begin{tikzcd}
  Y \arrow[r, "g"] &X \arrow[r, "h"] & A \arrow[r, "f"] & B
 \end{tikzcd}
 \]
 
+Here, the naturality condition is just an identity, but we'll soon see it generalized to less trivial circumstances.
 
-We call this a \emph{naturality} condition. Here it is an identity, but we'll soon see it generalized to less trivial circumstances.
 
-Naturality tells us that all objects get a consistent view of our isomorphism. Arrows are used to broadcast information about the isomorphism, and it's important that the result be not path-dependent. 
+Naturality tells us that all objects get a consistent view of an isomorphism. Arrows are used to broadcast information about the isomorphism, and it's important that the result not be path-dependent. 
 
-\begin{exercise}
-Write a naturality condition for $(f^{-1} \circ -)$. Use this diagram for guidance:
+We can also reverse the roles of observers and subjects. For instance, using an arrow $h \colon A \to X$, the object $A$ can probe an arbitrary object $X$. If there is an arrow $g \colon X \to Y$, it can switch focus to $Y$. Switching the perspective to $B$ is done by precomposition with $f^{-1}$.
 \[
  \begin{tikzcd}
- Y \arrow[r, "g"] &X \arrow[r, "h'"] & B \arrow[r, "f^{-1}"] & A
+ A
+ \arrow[rr, "f"]
+ \arrow[d, "h"']
+ \arrow[rrd, "g\circ h"]
+ && B
+  \arrow[ll, bend right,  "f^{-1}"']
+ \\
+ X
+ \arrow[rr, "g"']
+  && Y
+ \end{tikzcd}
+\]
+Again, we have the naturality condition, this time from the point of view of the isomorphic pair:
+\[(- \circ f^{-1}) \circ (g \circ -) = (g \circ -) \circ (- \circ f^{-1}) \]
+
+\begin{exercise}
+Show that both sides of the naturality condition for $f^{-1}$, when acting on $h$, reduce to:
+\[
+ \begin{tikzcd}
+ Y \arrow[r, "g"] &X \arrow[r, "h"] & B \arrow[r, "f^{-1}"] & A
 \end{tikzcd}
 \]
 
@@ -203,7 +224,7 @@ If two objects are isomorphic, they also have the same set of outgoing arrows.
 
 If you want to see if two objects are isomorphic, at the arrows look!
 
-Suppose that you don't know if two objects are isomorphic but you were able, for any observer $X$, to establish an invertible mapping $\alpha_X$ of arrows $X \to A$ to arrows $X \to B$. 
+Suppose that you don't know if two objects are isomorphic but you were able to, for any observer $X$, establish an invertible mapping $\alpha_X$ of arrows $X \to A$ to arrows $X \to B$. 
 \[
  \begin{tikzcd}
  X
@@ -252,7 +273,7 @@ In both cases we end up looking at $B$ from the perspective of $Y$. We've done t
 \[ \alpha_Y \circ (- \circ g) = (- \circ g) \circ \alpha_X \]
 Or, when acting on some arrow $h \colon X \to A$:
 \[\alpha_Y(h \circ g) = (\alpha_X h) \circ g \]
-This way, if we replace all $\alpha$s with $(f \circ -)$, it will all work out. 
+This way, if we replace all $\alpha$s with $(f \circ -)$, this will all work out. 
 
 And indeed it does! In fact, we can proceed to reconstruct $f$ from the $\alpha$s. Since $\alpha_X$ is defined for any object $X$, it is also defined for $A$. By definition, $\alpha_A$ takes a morphism $A \to A$ to a morphism $A \to B$. We know for sure that there is at least one such morphism, namely the identity $id_A$. The isomorphism $f$ we are seeking is
 \[f = \alpha_A (id_A)\]
@@ -267,15 +288,40 @@ or, pictorially,
   && B
  \end{tikzcd}
 \]
-But if this is an isomorphism that our $\alpha_X$ should be equal to  $(f \circ -)$. And indeed it is! Let's rewrite the naturality condition replacing $X$ with $A$. We get
+But if this is indeed an isomorphism then our $\alpha_X$ should be equal to  $(f \circ -)$. And indeed it is! Let's rewrite the naturality condition replacing $X$ with $A$. We get
 \[\alpha_Y(h \circ g) = (\alpha_A h) \circ g \]
 Since both the source and the target of $h$ is now $A$, we can pick $id_A$ in its place
 \[\alpha_Y (id_A \circ g) = (\alpha_A (id_A)) \circ g \]
 But this is simply
-\[\alpha_Y g = f \circ g \]
+\[\alpha_Y g = f \circ g = (f \circ -) g\]
 In other words, $\alpha_Y = (f \circ -)$ for every object $Y$ and every morphism $g \colon Y \to A$
 
-Even though $\alpha_X$ was defined for every $X$ and for every arrow $X \to A$, it turned out to be completely determined by its value at a single identity arrow. This is the strength of naturality.
+Even though $\alpha_X$ was separately defined for every $X$ and for every arrow $X \to A$, it turned out to be completely determined by its value at a single identity arrow. This is the strength of naturality.
+\subsection{Reversing the Arrows}
+As Lao Tzu would say, an observer cannot exist without the observed, and this duality cannot be complete unless the observer is allowed to switch roles the observed. 
+
+Again, we want to show that two objects $A$ and $B$ are isomorphic, but this time we treat them as observers. An arrow $h \colon A \to X$ probes an arbitrary object $X$ from the perspective of $A$. When we knew the two objects were isomorphic, we were able to switch perspective to $B$ using $(- \circ f^{-1})$. This time we have at our disposal a transformation $\beta_X$ instead.
+\[
+ \begin{tikzcd}
+ A
+ \arrow[d, "h"']
+ && B
+ \arrow[lld, "\beta_X h"]
+ \\
+ X
+  \end{tikzcd}
+\]
+Similarly, if we observe another object, $Y$, we use $\beta_Y$ to switch perspectives between $A$ and $B$, and so on. If the two objects $X$ and $Y$ are connected by an arrow $g \colon X \to Y$ then we also have an option of switching focus using $(g \circ -)$. If we want to switch perspective and switch focus, there are two ways of doing it. Naturality demands that the results be equal
+\[ (g \circ -) \circ \beta_X = \beta_Y \circ (g \circ -) \]
+Indeed, if we replace $\beta$ with $(- \circ f^{-1})$, we recover the original naturality condition for an isomorphism. 
+
+\begin{exercise}
+Use the trick with the identity morphism to recover $f^{-1}$ from the family of mappings, $\beta$.
+\end{exercise}
+\begin{exercise}
+Using $f^{-1}$ from the previous exercise, evaluate $\beta_Y g$ for an arbitrary object $Y$ and an arrow $g \colon A \to Y$.
+\end{exercise}
+
 
 As Lao Tzu would say, To show an isomorphism, it is often easier to define a natural transformation between ten thousand arrows than it is to find a pair of arrows between two objects.
 
