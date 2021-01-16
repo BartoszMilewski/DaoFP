@@ -530,14 +530,45 @@ This code can also be displayed in diagrammatical form. Here's the left hand sid
  \end{tikzcd}
 \]
 \subsection{Functoriality}
+Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the foci of the arrows that define the product. But what happens when we move the sources of those arrows? Suppose that we have arrows that map $A$ and $B$ to some $A'$ and $B'$:
+\[f \colon A \to A' \]
+\[g \colon B \to B'\]
+The composition of these arrows with the constructors $\text{Left}$ and $\text{Right}$, respectively, can be used to define the mapping of the sums:
+\[
+ \begin{tikzcd}
+ A
+ \arrow[d, "f"]
+ \arrow[dr,  bend left, "\text{Left}"']
+  && B
+ \arrow[d, "g"]
+ \arrow[dl, bend right, "\text{Right}"]
+ \\
+ A'
+ \arrow[rd, "\text{Left}"']
+&A + B
+\arrow[d, dashed, "h"]
+& B'
+\arrow[ld, "\text{Right}"]
+\\
+& A' + B'
+ \end{tikzcd}
+\]
+This property of the sum is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the sum. 
 
+\begin{exercise}
+Show that functoriality preserves composition. Hint: take two composable arrows, $g \colon B \to B'$ and $g' \colon B' \to B''$ and show that applying $g' \circ g$ gives the same result as first applying $g$ to transform $A + B$ to $A + B'$ and then applying $g'$ to transform $A + B'$ to $A + B''$.
+\end{exercise}
+
+\begin{exercise}
+Show that functoriality preserves identity. Hint: use $id_B$ and show that it is mapped to $id_{A+B}$.
+\end{exercise}
 
 \subsection{Symmetric Monoidal Category}
 Let's list the laws satisfied by the sum type:
 \[A + 0 \cong A\]
 \[A + B \cong B + A \]
 \[(A + B) + C \cong A + (B + C) \]
-
+You might wonder why
 
 
 \section{notes}
