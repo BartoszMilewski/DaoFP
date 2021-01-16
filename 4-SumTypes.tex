@@ -489,23 +489,56 @@ Implement, in Haskell, the function that witnesses the isomorphism between \hask
 
 \subsection{Associativity}
 
+Just like in arithmetic, the sum that we have defined is associative:
+\[(A + B) + C \cong A + (B + C) \]
+It's easy to write the mapping out for the left hand side:
+\begin{haskell}
+h :: Either (Either a b) c -> x
+h (Left (Left a))  = f1 a
+h (Left (Right b)) = f2 b
+h (Right c)        = f3 c
+\end{haskell}
+Notice the use of nested patterns like \hask{(Left (Left a))}, etc. The mapping is fully defined by a triple of functions. The same functions can be used to define the mapping out of the right hand side:
+\begin{haskell}
+h' :: Either a (Either b c) -> x
+h' (Left a)          = f1 a
+h' (Right (Left b))  = f2 b
+h' (Right (Right c)) = f3 c
+\end{haskell}
+This establishes a one-to-one mapping between triples of functions that define the two mappings out. This mapping is natural because all changes of focus are done using post-composition. Therefore the two sides are isomorphic.
+
+This code can also be displayed in diagrammatical form. Here's the left hand side diagram.
 \[
  \begin{tikzcd}
  A
- \arrow[dr,  bend left, "\text{Left}"']
- \arrow[ddr, bend right, "f"']
+ \arrow[rd, "L"']
+ \arrow[rrddd, bend right, red, "f_1"']
  && B
- \arrow[dl, bend right, "\text{Right}"]
- \arrow[ddl, bend left, "g"]
+ \arrow[ld, "R"]
+ \arrow[ddd, bend left=60, red, "f_2"]
+&&C
+ \arrow[lldd, "R"]
+ \arrow[llddd, bend left, red, "f_3"]
  \\
-&A + B
-\arrow[d, dashed, "h"]
+ & A + B
+  \arrow[rd, "L"']
+ \\
+&&(A + B) + C
+ \arrow[d, dashed, "h"]
 \\
-& X
+&& X
  \end{tikzcd}
 \]
-
 \subsection{Functoriality}
+
+
+\subsection{Symmetric Monoidal Category}
+Let's list the laws satisfied by the sum type:
+\[A + 0 \cong A\]
+\[A + B \cong B + A \]
+\[(A + B) + C \cong A + (B + C) \]
+
+
 
 \section{notes}
 
