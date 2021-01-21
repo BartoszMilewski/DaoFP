@@ -23,7 +23,7 @@ A $2$ is an object with two elements: two arrows coming from $1$. Let's call one
  \end{tikzcd}
 \]
 
-This simple idea can be immediately expressed in Haskell as the definition of a type, traditionally called \hask{Bool}, after its inventor George Bool (1815-1864). (If you want to compile this code, see \emph{Haskell Digression} at the end of this section.)
+This simple idea can be immediately expressed in Haskell as the definition of a type, traditionally called \hask{Bool}, after its inventor George Bool (1815-1864).
 
 \begin{haskell}
 data Bool where
@@ -553,6 +553,8 @@ The composition of these arrows with the constructors $\text{Left}$ and $\text{R
 & A' + B'
  \end{tikzcd}
 \]
+The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon A + B \to A' + B'$.
+
 This property of the sum is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the sum. 
 
 \begin{exercise}
@@ -564,19 +566,17 @@ Show that functoriality preserves identity. Hint: use $id_B$ and show that it is
 \end{exercise}
 
 \subsection{Symmetric Monoidal Category}
-Let's list the laws satisfied by the sum type:
+When a child learns addition we call it arithmetics. When a grownup learns addition we call it a cocartesian category.
+
+Whether we are adding numbers, composing arrows, or constructing sums of objects, we are re-using the same idea of decomposing complex things into their simpler components.  
+
+When things come together to form a new thing; and the operation is associative, and it has a neutral element, we know how to deal with ten thousand things.
+
+The sum type we have defined satisfies these properties:
 \[A + 0 \cong A\]
 \[A + B \cong B + A \]
 \[(A + B) + C \cong A + (B + C) \]
-You might wonder why
-
-
-\section{notes}
-
-\begin{exercise}
-\end{exercise}
-\begin{haskell}
-\end{haskell}
+and it's functorial. A category with this type of operation is called \emph{symmetric monoidal}. When the operation is the sum (coproduct), it's called \emph{cocartesian}. In the next chapter we'll see another monoidal structure that's called called \emph{cartesian} without the ``co.''
 
 
 \end{document}
