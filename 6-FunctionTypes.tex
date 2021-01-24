@@ -4,6 +4,38 @@
 
 \chapter{Function Types}
 
+There is one kind of composition that is at heart of functional programming. It happens when you pass a function as an argument to another function. If we model functions as arrows between objects, what does it mean to have a function as an argument? We need a way to objectify functions. We need an ``object of arrows'' that can serve as a source for another arrow. We also need arrows whose target is the object of arrows. These will model functions that return other functions.
+
+The defining quality of a function is that it can be applied to an argument to produce the result. We defined function application in terms of composition:
+
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[d, "a"']
+ \arrow[rd, "b"]
+ \\
+ A
+ \arrow[r, "f"']
+& B
+ \end{tikzcd}
+\]
+Here $f$ is represented as an arrow from $A$ to $B$, but we would like to work with $f$ as an element of the object of arrows, or the exponential $B^A$. Given an element $f$ of $B^A$ and an element $a$ of $A$, the application should produce an element $b$ of $B$. A pair of elements is equivalent to an element of a product, so we'd like to define the application as an arrow:
+\[\text{app} \colon B^A \times A \to B\]
+This way, well have:
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[d, "{(f, a)}"']
+ \arrow[rd, "b"]
+ \\
+ B^A \times A
+ \arrow[r, "\text{app}"']
+& B
+ \end{tikzcd}
+\]
+
+
+
 \section{notes}
 
 

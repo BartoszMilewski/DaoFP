@@ -212,7 +212,7 @@ Again, we have the naturality condition, this time from the point of view of the
 Show that both sides of the naturality condition for $f^{-1}$, when acting on $h$, reduce to:
 \[
  \begin{tikzcd}
- Y \arrow[r, "g"] &X \arrow[r, "h"] & B \arrow[r, "f^{-1}"] & A
+ B \arrow[r, "f^{-1}"] &A \arrow[r, "h"] & X \arrow[r, "g"] & Y
 \end{tikzcd}
 \]
 
@@ -230,18 +230,72 @@ If you want to see if two objects are isomorphic, at the arrows look!
 
 \medskip
 
-Suppose that you don't know if two objects are isomorphic but you were able to, for any observer $X$, establish an invertible mapping $\alpha_X$ of arrows $X \to A$ to arrows $X \to B$. 
+When two objects $A$ and $B$ are isomorphic, the isomorphism $f$ induces a one-to-one mapping $(f \circ -)$ between corresponding sets of arrows.  
+
+
+Suppose that we don't know if the objects are isomorphic, but we know that there is an invertible mapping, $\alpha_X$, between sets of arrows impinging on $A$ and $B$ from every object $X$. 
+\[
+ \begin{tikzcd}
+ \node(x) at (0, 2) {X};
+ \node(a) at (-2, 0) {A};
+ \node(b) at (2, 0) {B};
+ \node(c1) at (-1, 1.5) {};
+ \node(c2) at (-1.5, 1) {};
+ \node(c3) at (-1, 2) {};
+ \node(c4) at (-2, 1) {};
+ \node(d1) at (1, 1.5) {};
+ \node(d2) at (1.5, 1) {};
+ \node(d3) at (1, 2) {};
+ \node(d4) at (2, 1) {};
+\node (aa) at (-1, 0.75) {};
+ \node (bb) at (1, 0.75) {};
+ \draw[->] (x) .. controls (c1)  and (c2) .. (a); % bend
+ \draw[->, green] (x) .. controls (c3)  and (c4) .. (a); % bend
+ \draw[->, blue] (x) -- (a); 
+  \draw[->] (x) .. controls (d1)  and (d2) .. (b); % bend
+ \draw[->, green] (x) .. controls (d3)  and (d4) .. (b); % bend
+ \draw[->, blue] (x) -- (b); 
+ \draw[->, red, dashed] (aa) -- node[above]{(f \circ -)} (bb);
+\draw[->] (a) -- node[below]{f} (b);
+ \end{tikzcd}
+ \qquad
+ \begin{tikzcd}
+ \node(x) at (0, 2) {X};
+ \node(a) at (-2, 0) {A};
+ \node(b) at (2, 0) {B};
+ \node(c1) at (-1, 1.5) {};
+ \node(c2) at (-1.5, 1) {};
+ \node(c3) at (-1, 2) {};
+ \node(c4) at (-2, 1) {};
+ \node(d1) at (1, 1.5) {};
+ \node(d2) at (1.5, 1) {};
+ \node(d3) at (1, 2) {};
+ \node(d4) at (2, 1) {};
+\node (aa) at (-1, 0.75) {};
+ \node (bb) at (1, 0.75) {};
+ \draw[->] (x) .. controls (c1)  and (c2) .. (a); % bend
+ \draw[->, green] (x) .. controls (c3)  and (c4) .. (a); % bend
+ \draw[->, blue] (x) -- (a); 
+  \draw[->] (x) .. controls (d1)  and (d2) .. (b); % bend
+ \draw[->, green] (x) .. controls (d3)  and (d4) .. (b); % bend
+ \draw[->, blue] (x) -- (b); 
+ \draw[->, red, dashed] (aa) -- node[above]{\alpha_X} (bb);
+ \end{tikzcd}
+\]
+Does it mean that the two objects are isomorphic? Can we reconstruct the isomorphism $f$ from the family of mappings $\alpha_X$?
+
+Here's the action of $\alpha_X$ on a particular arrow $h$. 
 \[
  \begin{tikzcd}
  X
  \arrow[d, "h"']
- \arrow[rrd, "\alpha_X h"]
+ \arrow[rrd, red, "\alpha_X h"]
   \\
  A
   && B
  \end{tikzcd}
 \]
-This mapping, along with its inverse $\alpha^{-1}_X$, which takes arrows $X \to B$ to arrows $X \to A$, would play the role of $(f \circ -)$ and $(f^{-1} \circ -)$, if those morphisms existed. So the family of maps $\alpha$ describes an ``artificial'' way of switching focus between our two objects.
+This mapping, along with its inverse $\alpha^{-1}_X$, which takes arrows $X \to B$ to arrows $X \to A$, would play the role of $(f \circ -)$ and $(f^{-1} \circ -)$, if there was indeed an isomorphism $f$. The family of maps $\alpha$ describes an ``artificial'' way of switching focus between our two objects.
 
 Here's the same situation from the point of view of another observer $Y$:
 \[
@@ -249,13 +303,15 @@ Here's the same situation from the point of view of another observer $Y$:
  X
   && Y
  \arrow[lld, "h'"']
- \arrow[d, "\alpha_Y h'"]
+ \arrow[d, red, "\alpha_Y h'"]
  \\
  A
   && B
  \end{tikzcd}
 \]
-Notice that $Y$ is using the mapping $\alpha_Y$ to switch focus from $A$ to $B$. These two mappings, $\alpha_X$ and $\alpha_Y$, become entangled whenever there is a morphism $g \colon Y \to X$. In that case, pre-composition with $g$ allows us to switch perspective from $X$ to $Y$ (notice the direction)
+Notice that $Y$ is using the mapping $\alpha_Y$ to switch focus from $A$ to $B$. 
+
+These two mappings, $\alpha_X$ and $\alpha_Y$, become entangled whenever there is a morphism $g \colon Y \to X$. In that case, pre-composition with $g$ allows us to switch perspective from $X$ to $Y$ (notice the direction)
 
 \[
  \begin{tikzcd}
@@ -275,36 +331,54 @@ But now, starting with some $h$, we can either apply $(- \circ g)$ to switch to 
 \[ \alpha_Y \circ (- \circ g) \]
 or we can first let $X$ switch focus to $B$ using $\alpha_X$, and then switch perspective using $(- \circ g)$
 \[ (- \circ g) \circ \alpha_X \]
-In both cases we end up looking at $B$ from $Y$. We've done this exercise before, when we had an isomorphism between $A$ and $B$, and we've found out that the results were the same. We called it the naturality condition. So if we want the $\alpha$s to give us an isomorphism, we should impose the equivalent naturality condition:
+In both cases we end up looking at $B$ from $Y$. We've done this exercise before, when we had an isomorphism between $A$ and $B$, and we've found out that the results were the same. We called it the naturality condition. 
+
+If we want the $\alpha$s to give us an isomorphism, we have to impose the equivalent naturality condition:
 \[ \alpha_Y \circ (- \circ g) = (- \circ g) \circ \alpha_X \]
 Or, when acting on some arrow $h \colon X \to A$:
 \[\alpha_Y(h \circ g) = (\alpha_X h) \circ g \]
 This way, if we replace all $\alpha$s with $(f \circ -)$, things will work out. 
 
-And indeed they do! In fact, we can proceed to reconstruct $f$ from the $\alpha$s. Since $\alpha_X$ is defined for any object $X$, it is also defined for $A$. By definition, $\alpha_A$ takes a morphism $A \to A$ to a morphism $A \to B$. We know for sure that there is at least one such morphism, namely the identity $id_A$. The isomorphism $f$ we are seeking is
+And indeed they do! This is called the Yoneda trick. It's a way to reconstruct $f$ from the $\alpha$s. Since $\alpha_X$ is defined for any object $X$, it is also defined for $A$. By definition, $\alpha_A$ takes a morphism $A \to A$ to a morphism $A \to B$. We know for sure that there is at least one such morphism, namely the identity $id_A$. The isomorphism $f$ we are seeking is
 \[f = \alpha_A (id_A)\]
 or, pictorially,
 \[
  \begin{tikzcd}
- A
+X = A
  \arrow[d, "id_A"']
- \arrow[rrd, "f = \alpha_A (id_A)"]
+ \arrow[rrd, red, "f = \alpha_A (id_A)"]
   \\
  A
   && B
  \end{tikzcd}
 \]
-But if this is indeed an isomorphism then our $\alpha_X$ should be equal to  $(f \circ -)$ for any $X$. And indeed it is! Let's rewrite the naturality condition replacing $X$ with $A$. We get
+If this is indeed an isomorphism then our $\alpha_X$ should be equal to  $(f \circ -)$ for any $X$. To see that, let's rewrite the naturality condition replacing $X$ with $A$. We get
 \[\alpha_Y(h \circ g) = (\alpha_A h) \circ g \]
-Since both the source and the target of $h$ is $A$, we are free to pick $id_A$
+as illustrated in the following diagram
+\[
+ \begin{tikzcd}
+ X = A
+ \arrow[d, "h"']
+ \arrow[rrd,  red, "\alpha_A (h)"']
+ && Y
+ \arrow[ll, "g"']
+ \arrow[d, red, "\alpha_Y (h \circ g)"]
+   \\
+ A
+  && B
+ \end{tikzcd}
+\]
+
+
+Since both the source and the target of $h$ is $A$, this equality must also be true for $h = id_A$
 \[\alpha_Y (id_A \circ g) = (\alpha_A (id_A)) \circ g \]
-But this is simply
+But $\alpha_A(id_A)$ is our $f$, so we get
 \[\alpha_Y g = f \circ g = (f \circ -) g\]
 In other words, $\alpha_Y = (f \circ -)$ for every object $Y$ and every morphism $g \colon Y \to A$
 
-Even though $\alpha_X$ was defined individually for every $X$ and every arrow $X \to A$, it turned out to be completely determined by its value at a single identity arrow. This is the strength of naturality!
+Even though $\alpha_X$ was defined individually for every $X$ and every arrow $X \to A$, it turned out to be completely determined by its value at a single identity arrow. This is the power of naturality!
 \subsection{Reversing the Arrows}
-As Lao Tzu would say, an observer cannot exist without the observed, and this duality cannot be complete unless the observer is allowed to switch roles the observed. 
+As Lao Tzu would say, the duality between the observer and the observed cannot be complete unless the observer is allowed to switch roles with the observed. 
 
 Again, we want to show that two objects $A$ and $B$ are isomorphic, but this time we want to treat them as observers. An arrow $h \colon A \to X$ probes an arbitrary object $X$ from the perspective of $A$. When we knew that the two objects were isomorphic, we were able to switch perspective to $B$ using $(- \circ f^{-1})$. This time we have at our disposal a transformation $\beta_X$ instead.
 \[
@@ -312,7 +386,7 @@ Again, we want to show that two objects $A$ and $B$ are isomorphic, but this tim
  A
  \arrow[d, "h"']
  && B
- \arrow[lld, "\beta_X h"]
+ \arrow[lld, blue, "\beta_X h"]
  \\
  X
   \end{tikzcd}
@@ -331,6 +405,6 @@ Using $f^{-1}$ from the previous exercise, evaluate $\beta_Y g$ for an arbitrary
 \end{exercise}
 
 
-As Lao Tzu would say, To show an isomorphism, it is often easier to define a natural transformation between ten thousand arrows than it is to find a pair of arrows between two objects.
+As Lao Tzu would say: To show an isomorphism, it is often easier to define a natural transformation between ten thousand arrows than it is to find a pair of arrows between two objects.
 
 \end{document}

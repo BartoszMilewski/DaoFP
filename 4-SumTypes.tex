@@ -352,7 +352,23 @@ h e = case e of
 \end{haskell}
 
 So what is the essence of a data type? It is but a recipe for manipulating arrows.
-\bigskip
+
+\subsection{Maybe}
+
+A very useful data type, \hask{Maybe} is defined as a sum $1 + A$, for any $A$. This is its definition in Haskell:
+\begin{haskell}
+data Maybe a where
+  Nothing :: () -> Maybe a
+  Just    ::  a -> Maybe a
+\end{haskell}
+The data constructor \hask{Nothing} is an arrow from the unit type, and \hask{Just} constructs \hask{Maybe a} from \hask{a}. \hask{Maybe a} is isomorphic to \hask{Either () a}. It can also be defined using the shorthand notation
+\begin{haskell}
+data Maybe a = Nothing | Just a
+\end{haskell}
+
+\hask{Maybe} is mostly used to encode the return type of partial functions: ones that are undefined for some values of their arguments. In that case, instead of failing, such functions return \hask{Nothing}. In other programming languages partial functions are often implemented using exceptions.
+
+\subsection{Logic}
 
 In logic, the proposition $A + B$ is called the alternative, or \emph{logical or}. You can prove it by providing the proof of $A$ or the proof of $B$. Either one will suffice. 
 
