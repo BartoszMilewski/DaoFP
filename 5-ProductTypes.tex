@@ -6,7 +6,7 @@
 
 We can use sum types to enumerate possible values of a given type, but the encoding can be wasteful. We needed ten constructors just to encode numbers between zero and nine.
 \begin{haskell}
-data Digit = One | Two | Three | ... | Nine
+data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 But if we combine two digits into a single data structure, a two-digit decimal number, we'll able to encode a hundred numbers. Or, as Lao Tzu would say, with just four digits you can encode ten thousand numbers.
 

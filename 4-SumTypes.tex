@@ -23,7 +23,7 @@ A $2$ is an object with two elements: two arrows coming from $1$. Let's call one
  \end{tikzcd}
 \]
 
-This simple idea can be immediately expressed in Haskell as the definition of a type, traditionally called \hask{Bool}, after its inventor George Bool (1815-1864).
+This simple idea can be immediately expressed in Haskell as the definition of a type, traditionally called \hask{Bool}, after its inventor George Boole (1815-1864).
 
 \begin{haskell}
 data Bool where
@@ -125,9 +125,9 @@ We should never lose sight of the purpose of programming: to decompose complex p
 
 \subsection{Examples}
 
-Let's do a few examples. We haven't defined many types yet, so we'll be limited to mappings out from \hask{Bool} to either \hask{Void}, \hask{()}, or \hask{Bool}. 
+Let's do a few examples. We haven't defined many types yet, so we'll be limited to mappings out from \hask{Bool} to either \hask{Void}, \hask{()}, or \hask{Bool}. Such edge cases, however, may offer new insights into well known results.
 
-We have decided that there can be no functions with \hask{Void} as a target, so we don't expect any functions from \hask{Bool} to \hask{Void}. And indeed, we have zero pairs of elements of \hask{Void}. 
+We have decided that there can be no functions (other than identity) with \hask{Void} as a target, so we don't expect any functions from \hask{Bool} to \hask{Void}. And indeed, we have zero pairs of elements of \hask{Void}. 
 
 What about functions from \hask{Bool} to \hask{()}? Since \hask{()} is terminal, there can be only one function from \hask{Bool} to it. And, indeed, this function corresponds to the single possible pair of functions from \hask{()} to \hask{()}---both being identities. So far so good.
 
@@ -147,7 +147,9 @@ The interesting case is functions from \hask{Bool} to \hask{Bool}. Let's plug \h
 \text{Bool}
  \end{tikzcd}
 \]
-How many pairs of functions from \hask{()} to \hask{Bool} do we have at our disposal? There are only two such functions, \hask{True} and \hask{False}, so we can form four pairs. These are $(True, True)$, $(False, False)$, $(True, False)$, and $(False, True)$. Therefore there can only be four functions from \hask{Bool} to \hask{Bool}. We can write them in Haskell using the  \hask{if}, \hask{then}, \hask{else} construct. For instance, the last one, which we'll call \hask{not} is defined as:
+How many pairs of functions from \hask{()} to \hask{Bool} do we have at our disposal? There are only two such functions, \hask{True} and \hask{False}, so we can form four pairs. These are $(True, True)$, $(False, False)$, $(True, False)$, and $(False, True)$. Therefore there can only be four functions from \hask{Bool} to \hask{Bool}. 
+
+We can write them in Haskell using the  \hask{if}, \hask{then}, \hask{else} construct. For instance, the last one, which we'll call \hask{not} is defined as:
 \begin{haskell}
 not :: Bool -> Bool
 not b = if b then False else True
@@ -185,7 +187,9 @@ h Red   = x
 h Green = y
 h Blue  = z
 \end{haskell}
-This is just one function whose definition is split into three cases. It's possible to use the same syntax for \hask{Bool} as well, in place of \hask{if}, \hask{then}, \hask{else}:
+This is just one function whose definition is split into three cases. 
+
+It's possible to use the same syntax for \hask{Bool} as well, in place of \hask{if}, \hask{then}, \hask{else}:
 \begin{haskell}
 h :: Bool -> A
 h True  = x
@@ -209,7 +213,7 @@ You can use any of these at your convenience when programming.
 
 These patterns will also work for types with four, five, and more data constructors. For instance, a decimal digit is one of:
 \begin{haskell}
-data Digit = One | Two | Three | ... | Nine
+data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 
 There is a giant enumeration of Unicode characters called \hask{Char}. Their constructors are given special names: you write the character itself between two apostrophes, e.g.,
@@ -217,7 +221,9 @@ There is a giant enumeration of Unicode characters called \hask{Char}. Their con
 c :: Char
 c = 'a'
 \end{haskell}
-A pattern of ten thousand things would take many years to complete, therefore people came up with the wildcard pattern, the underscore, which matches everything. Because the patterns are matched in order, you should make the wildcard pattern the last:
+A pattern of ten thousand things would take many years to complete, therefore people came up with the wildcard pattern, the underscore, which matches everything. 
+
+Because the patterns are matched in order, you should make the wildcard pattern the last:
 \begin{haskell}
 yesno :: Char -> Bool
 yesno c = case c of
@@ -232,7 +238,7 @@ In practice, the types \hask{Char} for Unicode characters, \hask{Int} for fixed-
 
 These are not infinite types. Their elements can be enumerated, even if it takes ten thousand years. The type \hask{Integer} is infinite, though.
 
-\subsection{Haskell Digression}
+\subsection{Short Haskell Digression}
 
 Since we are going to write more Haskell code, we have to establish some preliminaries. To define data types using functions, we need to use the language pragma called \hask{GADTs} (it stands for \emph{Generalized Algebraic Data Types}). The pragma has to be put at the top of the source file. For instance:
 
@@ -272,7 +278,7 @@ import Prelude hiding (Either, Left, Right)
 
 \section{Sum Types}
 
-The \hask{Bool} type could be seen as the sum $2 = 1 + 1$. But nothing stops us from replacing $1$ with another type, or even replacing each of the $1$s with a different type. We can define a type $A + B$ using two arrows. Let's call them \hask{Left} and \hask{Right}. The defining diagram is the introduction rule:
+The \hask{Bool} type could be seen as the sum $2 = 1 + 1$. But nothing stops us from replacing $1$ with another type, or even replacing each of the $1$s with different types. We can define a new type $A + B$ by using two arrows. Let's call them \hask{Left} and \hask{Right}. The defining diagram is the introduction rule:
 \[
  \begin{tikzcd}
  A
@@ -410,7 +416,9 @@ Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's d
 \]
 We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \text{absurd}_X)$, we can simply map it to the arrow $x$ originating in $1$. Since there is only one $\text{absurd}_X$, the mapping is a bijection. 
 
-So our $\beta_X$ maps any pair $(x, \text{absurd}_X)$ to $x$. Conversely, $\beta^{-1}_X$ maps $x$ to the pair $(x, \text{absurd}_X)$. But is is a natural transformation? To answer that, we need to consider what happens when we change focus from $X$ to some $Y$ that is connected to it through an arrow $g \colon X \to Y$. We have two options now:
+So our $\beta_X$ maps any pair $(x, \text{absurd}_X)$ to $x$. Conversely, $\beta^{-1}_X$ maps $x$ to the pair $(x, \text{absurd}_X)$. But is it a natural transformation? 
+
+To answer that, we need to consider what happens when we change focus from $X$ to some $Y$ that is connected to it through an arrow $g \colon X \to Y$. We have two options now:
 \begin{itemize}
 \item Make $h$ switch focus by post-composing both $x$ and $\text{absurd}_X$ with $g$. We get a new pair $(y = g \circ x, \text{absurd}_Y)$. Follow it by $\beta_Y$.
 \item Use $\beta_X$ to map $(x, \text{absurd}_X)$ to $x$. Follow it with the post-composition $(g \circ -)$. 
@@ -586,7 +594,7 @@ When a child learns addition we call it arithmetics. When a grownup learns addit
 
 Whether we are adding numbers, composing arrows, or constructing sums of objects, we are re-using the same idea of decomposing complex things into their simpler components.  
 
-When things come together to form a new thing; and the operation is associative, and it has a neutral element, we know how to deal with ten thousand things.
+When things come together to form a new thing, and the operation is associative, and it has a neutral element, we know how to deal with ten thousand things.
 
 The sum type we have defined satisfies these properties:
 \[A + 0 \cong A\]
