@@ -4,7 +4,124 @@
 
 \chapter{Recursion}
 
-When you step between two mirrors, you see the infinite. You see your reflection, the reflection of your reflection, and so on. Each reflection is defined in terms of the previous reflection.
+When you step between two mirrors, you see your reflection, the reflection of your reflection, the reflection of that reflection, and so on. Each reflection is defined in terms of the previous reflection, but together they produce infinity.
+
+Recursion is a decomposition pattern that splits a single task into many steps, the number of which is unbounded.  
+
+Recursion is based on suspension of disbelief. You are faced with a task that may take arbitrarily many steps. You tentatively assume that you know how to solve it. Then you ask the question: "How would I make the last step if I had the solution to everything \emph{but} the last step?"
+
+\section{Natural Numbers}
+
+An object of natural numbers $N$ does not contain numbers. Objects have no internal structure. Structure is defined by arrows. 
+
+We can use an arrow from the terminal object to define one special element. By convention, we'll call this arrow $Z$ for ``zero.''
+\[ Z \colon 1 \to N \]
+But we have to be able to define infinitely many arrows to account for the fact that, for every natural number, there is another number that is larger than it, at least by one. 
+
+We can formalize this statement by saying: Suppose that we know how to create a natural number $n \colon 1 \to N$. How do we make the next step, the step that will point us to the next number---the successor? 
+
+The simplest thing is to post-compose $n$ with an arrow that loops back to $N$. This arrow can't be the identity, because we want the successor of a number to be different from the original. But a single such arrow, which we'll call $S$  for ``successor'' will suffice. The element corresponding to the successor of $n$ is given by the composition:
+\[ 1 \xrightarrow{n} N \xrightarrow{S} N\]
+We often draw the same object multiple times in a single diagram in order to straighten the looping arrows.
+
+In particular, we can define $One$ as the successor of $Z$:
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[rr, bend left, "One"]
+ \arrow[r, "Z"]
+ &N
+  \arrow[r, "S"]
+&N
+  \end{tikzcd}
+\]
+and $Two$ as the successor of the successor of $Z$
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[rrr, bend left, "Two"]
+ \arrow[r, "Z"]
+ &N
+  \arrow[r, "S"]
+&N
+  \arrow[r, "S"]
+ &N
+ \end{tikzcd}
+\]
+and so on.
+
+\subsection{Introduction Rules}
+
+The two arrows, $Z$ and $S$, serve as the introduction rules for the natural number object $N$. The twist is that one of them is recursive: $S$ uses $N$ as its source as well as the target.
+
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[r, "Z"]
+ &N
+ \arrow[loop, "S"']
+ \end{tikzcd}
+\]
+The introduction rules translate directly to Haskell
+
+
+\begin{haskell}
+data Nat where
+  Z :: Nat
+  S :: Nat -> Nat
+\end{haskell}
+They can be used to define, tediously, arbitrary natural numbers; for instance:
+
+\begin{haskell}
+zero, one, two :: Nat
+zero = Z
+one  = S zero
+two  = S one
+\end{haskell}
+
+This definition of natural number type is not very useful in practice. However, it's often used in defining type-level naturals, where each number is its own type. You may encounter them under the name of \emph{Peano arithmetic}.
+
+\subsection{Elimination Rules}
+
+The fact that the introduction rules are recursive complicates the matters slightly when it comes to defining the elimination rules for natural numbers. We will follow the pattern of assuming first that we are given a mapping out of $N$:
+\[ h \colon N \to A \]
+and see what we can deduce from there. 
+
+
+Let's plug $h$ into the definition of $N$
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[r, "Z"]
+ \arrow[rd, "\text{init}"']
+ &N
+  \arrow[r, "S"]
+\arrow[d, dashed, "h"]
+&N
+\arrow[d, dashed, "h"]
+\\
+& A
+\arrow[r, "\text{step}"]
+& A
+  \end{tikzcd}
+\]
+
+and obtain two new functions by composition. The first one is:
+\[\text{init} \colon 1 \to A \]
+\[\text{init} = h \circ Z \]
+and the second one is:
+\[f \colon A \to A \]
+A mapping out of $N$ defines a \emph{sequence} of elements of $A$. Indeed, we can define the zeroth element as:
+\[a_0 = h \circ Z \]
+the first element as
+\[a_1 = h \circ S \circ Z \]
+and so on, increasing the numbers of $S$'s following the $Z$.
+
+\[f \circ q = h \circ S \circ Z \]
+
+\subsection{Induction}
+
+\section{Lists}
 
 \begin{haskell}
 data List a where

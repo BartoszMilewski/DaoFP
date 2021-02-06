@@ -469,10 +469,11 @@ Implement, in Haskell, the two functions that form the isomorphism between \hask
 \end{exercise}
 
 We could use a similar argument to show that $0 + A \cong A$, but there is a more general property of sum types that obviates that.
-
 \subsection{Commutativity}
 
-There is a nice left-right symmetry in the diagrams that define the sum type which suggests that it satisfies the commutativity rule, $A + B \cong B + A$. Let's consider mappings out of both sides. You can easily see that, for every $h$ that is determined by a pair $(f, g)$ on the left, there is a corresponding $h'$ given by a pair $(g, f)$ on the right. That establishes the bijection of arrows.
+There is a nice left-right symmetry in the diagrams that define the sum type which suggests that it satisfies the commutativity rule, $A + B \cong B + A$. 
+
+Let's consider mappings out of both sides. You can easily see that, for every $h$ that is determined by a pair $(f, g)$ on the left, there is a corresponding $h'$ given by a pair $(g, f)$ on the right. That establishes the bijection of arrows.
 
 \[
  \begin{tikzcd}
@@ -554,7 +555,9 @@ This code can also be displayed in diagrammatical form. Here's the left hand sid
  \end{tikzcd}
 \]
 \subsection{Functoriality}
-Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the foci of the arrows that define the product. But what happens when we move the sources of those arrows? Suppose that we have arrows that map $A$ and $B$ to some $A'$ and $B'$:
+Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the foci of the arrows that define the product. But what happens when we move the sources of those arrows? 
+
+Suppose that we have arrows that map $A$ and $B$ to some $A'$ and $B'$:
 \[f \colon A \to A' \]
 \[g \colon B \to B'\]
 The composition of these arrows with the constructors $\text{Left}$ and $\text{Right}$, respectively, can be used to define the mapping of the sums:
