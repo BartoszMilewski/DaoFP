@@ -68,15 +68,19 @@ In particular, the mapping out of the terminal object is used in Haskell to defi
 \end{haskell}
 The built-in syntax for products is just that: a pair of parentheses and a comma in between. It works both for defining the product of two types \hask{(A, B)} and the data constructor \hask{(a, b)} that takes two elements and pairs them together. 
 
-We should never lose sight of the purpose of programming: to decompose complex problems into a series of simpler ones. We see it again in the definition of the product. Whenever we have to construct a mapping \emph{into} a product, we decompose it into two smaller tasks of constructing a pair of functions into the components of the product. This is as simple as saying that, in order to implement a function that returns a pair of values, it's enough to implement two functions, each returning one of the elements of the pair.
+We should never lose sight of the purpose of programming: to decompose complex problems into a series of simpler ones. We see it again in the definition of the product. Whenever we have to construct a mapping \emph{into} the product, we decompose it into two smaller tasks of constructing a pair of functions, each mapping into one of the components of the product. This is as simple as saying that, in order to implement a function that returns a pair of values, it's enough to implement two functions, each returning one of the elements of the pair.
 
 \subsection{Logic}
 
-In logic, a product type corresponds to logical conjunction. In order to prove $A \times B$ ($A$ and $B$), you need to provide the proofs of both $A$ and $B$. These are the arrows targeting $A$ and $B$. The elimination rule says that if you have a proof of $A \times B$, then you can get the proof of $A$ (through $\text{fst}$) and the proof of $B$ (through $\text{snd}$).
+In logic, a product type corresponds to logical conjunction. In order to prove $A \times B$ ($A$ and $B$), you need to provide the proofs of \emph{both} $A$ and $B$. These are the arrows targeting $A$ and $B$. The elimination rule says that if you have a proof of $A \times B$, then you can get the proof of $A$ (through $\text{fst}$) and the proof of $B$ (through $\text{snd}$).
 
 \subsection{Tuples and Records}
 
-As Lao Tzu would say, a product of ten thousand objects is just an object with ten thousand projections. We can form such products in Haskell using tuple notation. For instance, a product of three types is written as \hask{(A, B, C)} and can be constructed from three elements: \hask{(a, b, c)}. In what mathematicians call ``abuse of notation'', a product of zero types is written as \hask{()}, an empty tuple, which happens to be the same as the terminal object, or unit type. This is because the product behaves very much like multiplication of numbers, with the terminal object playing the role of unit.
+As Lao Tzu would say, a product of ten thousand objects is just an object with ten thousand projections. 
+
+We can form such products in Haskell using the tuple notation. For instance, a product of three types is written as \hask{(A, B, C)}. A term of this type can be constructed from three elements: \hask{(a, b, c)}. 
+
+In what mathematicians call ``abuse of notation'', a product of zero types is written as \hask{()}, an empty tuple, which happens to be the same as the terminal object, or unit type. This is because the product behaves very much like multiplication of numbers, with the terminal object playing the role of unit.
 
 In Haskell, rather than defining separate projections for all tuples, we use the pattern-matching syntax. For instance, to extract the third component from a triple we would write
 
@@ -86,7 +90,7 @@ thrd (_, _, c) = c
 \end{haskell}
 We use wildcards for the components that we want to ignore.
 
-As Lao Tzu said: ``Naming is the origin of all particular things.'' In programming, keeping track of the meaning of the components of a particular tuple is difficult without giving them names. Record syntax allows us to give names to projections. This is the definition of a product written in this style:
+Lao Tzu said that ``Naming is the origin of all particular things.'' In programming, keeping track of the meaning of the components of a particular tuple is difficult without giving them names. Record syntax allows us to give names to projections. This is the definition of a product written in record style:
 \begin{haskell}
 data Product a b = Pair { fst :: a, snd :: b }
 \end{haskell}
@@ -100,7 +104,7 @@ ic = Pair 10 'A'
 
 \section{Cartesian Category}
 
-In Haskell, we can define a product of any two types. A category in which all products exists, and the terminal object exists, is called \emph{cartesian}. 
+In Haskell, we can define a product of any two types. A category in which all products exist, and the terminal object exists, is called \emph{cartesian}. 
 
 \subsection{Tuple Arithmetic}
 
@@ -134,7 +138,9 @@ B && A
   \end{tikzcd}
 \]
 
-They show that, for any object $X$ the arrows to $A \times B$ are in one-to-one correspondence with arrows to $B \times A$. This is because each of these arrows is determined by the same pair $f$ and $g$. You can check that the naturality condition is satisfied since, when you shift the perspective using $k \colon X' \to X$, all arrows originating in $X$ are shifted by pre-composition $(- \circ k)$.
+They show that, for any object $X$ the arrows to $A \times B$ are in one-to-one correspondence with arrows to $B \times A$. This is because each of these arrows is determined by the same pair $f$ and $g$. 
+
+You can check that the naturality condition is satisfied because, when you shift the perspective using $k \colon X' \to X$, all arrows originating in $X$ are shifted by pre-composition $(- \circ k)$.
 
 In Haskell, this isomorphism can be implemented as a function which is its own inverse:
 \begin{haskell}
@@ -185,6 +191,28 @@ lunit :: ((), a) -> a
 lunit (_, a) = a
 \end{haskell}
 
+\begin{exercise}
+Show that the bijection in the proof of left unit is natural. Hint, change focus using an arrow $g \colon A \to B$.
+\end{exercise}
+
+\begin{exercise}
+Construct an arrow 
+\[ h \colon B + A \times B \to (1 + A) \times B \]
+Is this arrow unique?
+
+Hint: It's a mapping into a product, so it's given by a pair of arrow. These arrows, in turn, map out of a sum, so each is given by a pair of arrows. 
+
+Hint: The mapping $B \to 1 + A$ is given by $(\text{Left} \, \circ \, !)$
+\end{exercise}
+
+\begin{exercise}
+Re-do the previous exercise, this time treating $h$ as a mapping \emph{out} of a sum. 
+\end{exercise}
+
+\begin{exercise}
+Implement a Haskell function \hask{maybeAB :: Either b (a, b) -> (Maybe a, b)}. Is this function uniquely defined by its type signature or is there some leeway?
+\end{exercise}
+
 \subsection{Functoriality}
 
 Suppose that we have arrows that map $A$ and $B$ to some $A'$ and $B'$:
@@ -232,7 +260,7 @@ A category can have multiple monoidal structures at the same time. When you don'
 
 When a child sees an arrow, it knows which end points at the source, and which points at the target
 \[A \to B \]
-But maybe this is just a preconception. Would the Universe be very different if we called $B$ the source and $A$ the target? 
+But maybe this is just a pre-conception. Would the Universe be very different if we called $B$ the source and $A$ the target? 
 
 We would still be able to compose this arrow with this one
 \[B \to C\]
@@ -258,7 +286,7 @@ Now consider this diagram that we used to define the sum object:
 & C
  \end{tikzcd}
 \]
-In the new interpretation, the arrow $h$ maps ``from'' an arbitrary object $C$ to the object we call $A + B$. This arrow is uniquely defined by a pair of arrows $(f, g)$ whose ``source'' is $C$. If we rename $\text{Left}$ to $\text{fst}$ and $\text{Right}$ to $\text{snd}$, we will get  the defining diagram of a product. 
+In the new interpretation, the arrow $h$ maps ``from'' an arbitrary object $C$ ``to'' the object we call $A + B$. This arrow is uniquely defined by a pair of arrows $(f, g)$ whose ``source'' is $C$. If we rename $\text{Left}$ to $\text{fst}$ and $\text{Right}$ to $\text{snd}$, we will get  the defining diagram for a product. 
 
 A product is the sum with arrows reversed. 
 
@@ -272,6 +300,6 @@ Every construction in category theory has its dual.
 
 If the direction of arrows is just a matter of interpretation, then what makes sum types so different from product types in programming? The difference goes back to one assumption we made at the start: There are no incoming arrows to the initial object (other than the identity arrow). This is in contrast with the terminal object having lots of outgoing arrows, which we used to define (global) elements. In fact, we assume that every object of interest has elements, and the ones that don't are isomorphic to \hask{Void}. 
 
-We'll see even deeper difference when we talk about function types.
+We'll see an even deeper difference when we talk about function types.
 
 \end{document}

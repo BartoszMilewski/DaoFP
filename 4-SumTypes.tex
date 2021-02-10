@@ -506,7 +506,7 @@ Let's consider mappings out of both sides. You can easily see that, for every $h
 \]
 
 \begin{exercise}
-Show that the bijection defined above is natural. Hint: Both $f$ and $g$ change focus by post-composition with $g \colon X \to Y$.
+Show that the bijection defined above is natural. Hint: Both $f$ and $g$ change focus by post-composition with $k \colon X \to Y$.
 \end{exercise}
 \begin{exercise}
 Implement, in Haskell, the function that witnesses the isomorphism between \hask{Either a b} and \hask{Either b a}. Notice that this function is its own inverse.
@@ -603,7 +603,7 @@ The sum type we have defined satisfies these properties:
 \[A + 0 \cong A\]
 \[A + B \cong B + A \]
 \[(A + B) + C \cong A + (B + C) \]
-and it's functorial. A category with this type of operation is called \emph{symmetric monoidal}. When the operation is the sum (coproduct), it's called \emph{cocartesian}. In the next chapter we'll see another monoidal structure that's called called \emph{cartesian} without the ``co.''
+and it's functorial. A category with this type of operation is called \emph{symmetric monoidal}. When the operation is the sum (coproduct), it's called \emph{cocartesian}. In the next chapter we'll see another monoidal structure that's called \emph{cartesian} without the ``co.''
 
 
 \end{document}
