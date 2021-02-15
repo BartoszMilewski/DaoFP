@@ -4,7 +4,7 @@
 
 \chapter{Function Types}
 
-There is one other kind of composition that is at the heart of functional programming. It happens when you pass a function as an argument to another function. 
+There is another kind of composition that is at the heart of functional programming. It happens when you pass a function as an argument to another function. The outer function can then use this argument as a pluggable part of its own machinery. It lets you implement, for instance, a generic sorting algorithm that accepts an arbitrary comparison function. 
 
 If we model functions as arrows between objects, then what does it mean to have a function as an argument? 
 
@@ -60,9 +60,9 @@ To complete the definition of the function object, we also need the introduction
 First, suppose that there is a way of constructing a function object $B^A$ from some other object $C$. It means that there is an arrow
 \[h \colon C \to B^A\]
 We know that we can eliminate the result of $h$ using $\varepsilon_{A, B}$, but we have to first multiply it by $A$. So let's first multiply $C$ by $A$ and the use functoriality to map it to $B^A \times A$. Functoriality lets us apply a pair of arrows to a product to get another product. Here, the pair of arrows is $(h, id_A)$ (we want to turn $C$ into $B^A$, but we're not interested in modifying $A$)
-\[ C \times A \xrightarrow{(h, id_A)} B^A \times A \]
+\[ C \times A \xrightarrow{} B^A \times A \]
 We can now follow this with function application to get to $B$
-\[ C \times A \xrightarrow{(h, id_A)} B^A \times A \xrightarrow{\varepsilon_{A, B}} B\]
+\[ C \times A \xrightarrow{h \times id_A} B^A \times A \xrightarrow{\varepsilon_{A, B}} B\]
 This composite arrow defines a mapping we'll call $f$:
 \[f \colon C \times A \to B\]
 Here's the corresponding diagram
@@ -70,7 +70,7 @@ Here's the corresponding diagram
 \[
  \begin{tikzcd}
  C \times A
- \arrow[d, dashed, "{(h, id_A)}"']
+ \arrow[d, dashed, "h \times id_A"']
  \arrow[rd, "f"]
  \\
  B^A \times A
@@ -110,7 +110,7 @@ Of course, written this way, the types of \hask{curry} and \hask{uncurry} corres
 \[
  \begin{tikzcd}
  1 \times A
- \arrow[d, dashed, "{(h, id_A)}"']
+ \arrow[d, dashed, "h \times id_A"']
  \arrow[rd, "f"]
  \\
  B^A \times A
@@ -162,7 +162,7 @@ This is a mapping-out from a product, so we can use it to construct a function o
 \[
  \begin{tikzcd}
  \Gamma \times \mathbb{C}
- \arrow[d, dashed, "{(h, id_{\mathbb{C}})}"']
+ \arrow[d, dashed, "h \times id_{\mathbb{C}}"']
  \arrow[rd, "e"]
  \\
  \mathbb{C}^{\mathbb{C}} \times \mathbb{C}
@@ -185,7 +185,7 @@ The defining diagram for the function object becomes
 \[
  \begin{tikzcd}
  \Gamma \times A
- \arrow[d, dashed, "{( \lambda\,  (x \colon A) . e, \,id_A)}"']
+ \arrow[d, dashed, "{(\lambda x  . e) \times id_A}"']
  \arrow[rd, "e"]
  \\
  B^A \times A
@@ -379,7 +379,7 @@ we should draw the diagram that has $k$ as a mapping into $B'^{A'}$. We get this
 \[
  \begin{tikzcd}
  B^A \times A'
- \arrow[d, dashed, "{(k, id_A)}"']
+ \arrow[d, dashed, "k \times id_A"']
  \arrow[rd, "g"]
  \\
  B'^{A'} \times A'
@@ -495,7 +495,7 @@ A mapping out of a product is in one to one correspondence with a mapping into t
 \[
  \begin{tikzcd}
  C \times A
- \arrow[d, dashed, "{(h, id_A)}"']
+ \arrow[d, dashed, "h \times id_A"']
  \arrow[rd, "f"]
  \\
  B^A \times A
@@ -507,7 +507,7 @@ If we want to replace $f$ with \hask{undist}, we need to do the following substi
 \[
  \begin{tikzcd}
  (B+C) \times A
- \arrow[d, dashed, "{(h, id_A)}"']
+ \arrow[d, dashed, "h \times id_A"']
  \arrow[rd, "\text{undist}"]
  \\
  (B \times A + C \times A)^A \times A
@@ -548,5 +548,12 @@ Combining all these functions into one formula gives us:
 undist = uncurry (either (curry Left) (curry Right))
 \end{haskell}
 This may not be the most readable implementation, but it underscores the fact that we need the exponential: we use both \hask{curry} and \hask{uncurry} to implement the mapping.
+
+\begin{exercise}
+Show that:
+\[ 2 \times A \cong A + A \]
+where $2$ is the Boolean type. Do the proof diagrammatically first, and then implement two Haskell functions witnessing the isomorphism.
+\end{exercise}
+
 
 \end{document}

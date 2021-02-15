@@ -238,13 +238,15 @@ A
 A' && B'
  \end{tikzcd}
 \]
+The shorthand notation for this diagram is:
+\[ A \times B \xrightarrow{f \times g} A' \times B' \]
 
 This property of the product is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the product. 
 
 \subsection{Symmetric Monoidal Category}
 
 We have seen that the product satisfies these simple rules:
-\[A \times 1 \cong A\]
+\[1 \times A \cong A\]
 \[A \times B \cong B \times A \]
 \[(A \times B) \times C \cong A \times (B \times C) \]
 and is functorial. 
@@ -252,9 +254,11 @@ and is functorial.
 A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen this structure before when working with sums and the initial object. 
 
 A category can have multiple monoidal structures at the same time. When you don't want to name your monoidal structure, you replace the plus sign or the product sign with a tensor sign, and the neutral element with the letter $I$. The rules of a symmetric monoidal category can then be written as:
-\[A \otimes I \cong A\]
+\[I \otimes A \cong A\]
 \[A \otimes B \cong B \otimes A \]
 \[(A \otimes B) \otimes C \cong A \otimes (B \otimes C) \]
+
+You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, but it requires both objects $A$ and $B$; and it has no elimination rule---no projections. Some interesting examples of tensor products are not even symmetric. 
 
 \section{Duality}
 

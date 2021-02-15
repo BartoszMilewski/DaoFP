@@ -6,7 +6,7 @@
 
 When you step between two mirrors, you see your reflection, the reflection of your reflection, the reflection of that reflection, and so on. Each reflection is defined in terms of the previous reflection, but together they produce infinity.
 
-Recursion is a decomposition pattern that splits a single task into many steps, the number of which is unbounded.  
+Recursion is a decomposition pattern that splits a single task into many steps, the number of which is potentially unbounded.  
 
 Recursion is based on suspension of disbelief. You are faced with a task that may take arbitrarily many steps. You tentatively assume that you know how to solve it. Then you ask the question: "How would I make the last step if I had the solution to everything \emph{but} the last step?"
 
@@ -20,11 +20,11 @@ But we have to be able to define infinitely many arrows to account for the fact 
 
 We can formalize this statement by saying: Suppose that we know how to create a natural number $n \colon 1 \to N$. How do we make the next step, the step that will point us to the next number---the successor? 
 
-This next step doesn't have to be more complex than just post-composing $n$ with an arrow that loops back to $N$. This arrow can't be the identity, because we want the successor of a number to be different from the original. But a single such arrow, which we'll call $S$  for ``successor'' will suffice. 
+This next step doesn't have to be more complex than just post-composing $n$ with an arrow that loops from $N$ to $N$. This arrow should not be the identity, because we want the successor of a number to be different from that number. But a single such arrow, which we'll call $S$  for ``successor'' will suffice. 
 
 The element corresponding to the successor of $n$ is given by the composition:
 \[ 1 \xrightarrow{n} N \xrightarrow{S} N\]
-We often draw the same object multiple times in a single diagram if we want to straighten the looping arrows.
+(We sometimes draw the same object multiple times in a single diagram, if we want to straighten the looping arrows.)
 
 In particular, we can define $One$ as the successor of $Z$:
 \[
@@ -72,7 +72,7 @@ data Nat where
   Z :: Nat
   S :: Nat -> Nat
 \end{haskell}
-They can be used (tediously) to define arbitrary natural numbers; for instance:
+They can be used to define arbitrary natural numbers; for instance:
 
 \begin{haskell}
 zero, one, two :: Nat
@@ -81,7 +81,9 @@ one  = S zero
 two  = S one
 \end{haskell}
 
-This definition of natural number type is not very useful in practice. However, it's often used in defining type-level naturals, where each number is its own type. You may encounter them under the name of \emph{Peano arithmetic}.
+This definition of natural number type is not very useful in practice. However, it's often used in defining type-level naturals, where each number is its own type. 
+
+You may encounter this construction under the name of \emph{Peano arithmetic}.
 
 \subsection{Elimination Rules}
 
@@ -89,7 +91,7 @@ The fact that the introduction rules are recursive complicates the matters sligh
 \[ h \colon N \to A \]
 and see what we can deduce from there. 
 
-Previously, we were immediately able to decompose such an $h$ into simpler mappings (pairs of mappings for sum and product, a mapping out of a product for the exponential). 
+Previously, we were able to decompose such an $h$ into simpler mappings (pairs of mappings for sum and product, a mapping out of a product for the exponential). 
 
 The introduction rules for $N$ look similar to those for the sum, so we would expect that $h$ could be split into two arrows corresponding to two introduction rules. And, indeed, we can easily get the first one by composing $h \circ Z$. This is an arrow that picks an element of $A$. We call $init$:
 \[\text{init} \colon 1 \to A \]
@@ -118,13 +120,13 @@ Let's try to plug $h$ into the definition of $N$.
   \end{tikzcd}
 \]
 
-The intuition is that an arrow from $N$ to $A$ represents a \emph{sequence} of elements of $A$. The zeroth element is given by $a_0=init$. The next element is
+The intuition is that an arrow from $N$ to $A$ represents a \emph{sequence} $a_n$ of elements of $A$. The zeroth element is given by $a_0=init$. The next element is
 \[a_1 = h \circ S \circ Z \]
 followed by
 \[a_2 = h \circ S \circ S \circ Z \]
 and so on.
 
-We have replaced one arrow $h$ with infinitely many arrows $a_n$. Granted, the new arrows are simpler, since they represent elements of $A$, but there are infinitely many of them. 
+We have thus replaced one arrow $h$ with infinitely many arrows $a_n$. Granted, the new arrows are simpler, since they represent elements of $A$, but there are infinitely many of them. 
 
 The problem is that, no matter how you look at it, an arbitrary mapping out of $N$ contains infinite amount of information.
 
@@ -145,17 +147,22 @@ We have to drastically simplify the problem. Since we used a single arrow $S$ to
 & A
   \end{tikzcd}
 \]
-The mappings out of $N$ that are generated by such pairs, $init$ and $step$, are called \emph{recursive}. 
+The mappings out of $N$ that are generated by such pairs, $init$ and $step$, are called \emph{recursive}. Not all mappings out of $N$ are recursive. In fact very few are; but recursive mappings are enough to define the object of natural numbers. 
 
-We use the above diagram as the elimination rule. Every recursive mapping out of $N$ is defined by a pair $init$ and $step$. 
+We use the above diagram as the elimination rule. Every recursive mapping out of $N$ is in one-to-one correspondence with a pair $init$ and $step$. 
 
-Not all mappings are recursive (in fact, very few are), but recursive mappings are enough to define the object of natural numbers. 
 
-This means that the evaluation rule cannot be formulated for an arbitrary arrow $h \colon N \to A$, only for recursive arrows that were defined using a pair $(init, step)$. The arrow $init$ can be simply recovered by composing $h \circ Z$. The arrow $step$ is a solution to the equation:
+This means that the \emph{evaluation rule} (extracting $(init, step)$ for a given $h$) cannot be formulated for an arbitrary arrow $h \colon N \to A$, only for recursive arrows that have been defined using a pair $(init, step)$. 
+
+The arrow $init$ can be always recovered by composing $h \circ Z$. The arrow $step$ is a solution to the equation:
 \[ step \circ h = h \circ S \]
 If $h$ was defined using some $init$ and $step$, then this equation obviously has a solution. 
 
-The important part is that we demand that this solution be unique. Two different pairs $(init, step)$ cannot generate the same recursive function $h$.  Only if this uniqueness condition is satisfied, can we call $N$ the natural number object. 
+The important part is that we demand that this solution be \emph{unique}. 
+
+Intuitively, the pair $init$ and $step$ generate the sequence of elements $a_0$, $a_1$, $a_2$, ... If two arrows $h$ and $h'$ are given by the same pair $(init, step)$, it means that the sequences they generate are the same. 
+
+So if $h$ were different from $h'$, it would mean that $N$ contains more than just the sequence of elements $Z$, $S Z$, $S(S Z)$, ... For instance, if we added $-1$ to $N$ (that is, made $Z$ somebody's successor), we could have $h$ and $h'$ differ at $-1$ and yet be generated by the same $init$ and $step$. Uniqueness means there are no natural number before, after, or in between the numbers generated by $Z$ and $S$.
 
 \subsection{In Programming}
 
@@ -169,7 +176,7 @@ rec init step = \n ->
     (S m) -> step (rec init step m)
 \end{haskell}
 
-This single function is enough to implement all recursive functions of natural numbers. For instance, this is how we could implement addition:
+This single function, which is called a \emph{recursor}, is enough to implement all recursive functions of natural numbers. For instance, this is how we could implement addition:
 
 \begin{haskell}
 plus :: Nat -> Nat -> Nat
@@ -186,15 +193,19 @@ plus n m = case m of
   Z -> n
   (S k) -> S (plus k n)
 \end{haskell}
-It can be read as: If \hask{m} is zero then the result is \hask{n}. Otherwise, if \hask{m} is a successor of some \hask{k} then the result is the successor of  \hask{k + n}. This is exactly the same as saying that \hask{init = n} and \hask{step = S}.
+It can be read as: If \hask{m} is zero then the result is \hask{n}. Otherwise, if \hask{m} is a successor of some \hask{k}, then the result is the successor of  \hask{k + n}. This is exactly the same as saying that \hask{init = n} and \hask{step = S}.
 
-In imperative languages recursion is usually replaced by equivalent looping constructs. 
+In imperative languages recursion is often replaced by iteration. Conceptually, iteration seems to be easier to understand, as it corresponds to sequential decomposition. The steps in the sequence usually follow some natural order. This is in contrast with recursive decomposition, where we assume that we have done all the work up to the $n$'th step, and we have to combine that result with the next consecutive step. 
+
+On the other hand, recursion is more natural when processing recursively defined data structures, such as lists or trees. 
+
+The two approaches are equivalent, and compilers often convert recursive functions to loops in what is called \emph{tail recursion optimization}.
 
 \begin{exercise}
 Implement a curried version of addition as a mapping out of $N$ into the function object $N^N$. Hint: use these types in the recursor:
 \begin{haskell}
-    init :: Nat -> Nat
-    step :: (Nat -> Nat) -> (Nat -> Nat)
+init :: Nat -> Nat
+step :: (Nat -> Nat) -> (Nat -> Nat)
 \end{haskell}
 
 \end{exercise}
@@ -204,20 +215,159 @@ Implement a curried version of addition as a mapping out of $N$ into the functio
 
 The elimination pattern for the natural number object is reminiscent of proof by induction. The arrow $init$ looks like the proof of the base case, and $step$ looks like the induction step. Except that, in the propositions as types interpretation, we would interpret the target $A$ as a single proposition. 
 
-The principle of induction corresponds to the elimination pattern that involves \emph{dependent types}. Instead of a single type $A$, it uses a whole family of types parameterized by natural numbers $A(n)$. The $init$ arrow is an element of $A(Z)$, and $step$ is a dependent function that maps $A(n)$ to $A(S\, n)$.
+Instead, the principle of induction corresponds to the elimination pattern that involves \emph{dependent types}. Instead of a single type $A$, it uses a whole family of types parameterized by natural numbers $A(n)$. The dependent function $h$ maps each natural number $n$ to a value of type $A(n)$. The function $h$ corresponds to the proof of a proposition: $A(n)$ is true for all $n$. 
+
+The $init$ value is an element of $A(Z)$, and $step$ is a dependent function that maps $A(n)$ to $A(S\, n)$. They correspond to the proof of the base case and the proof of the inductive step, respectively.
 
 \section{Lists}
 
+A list of things is either empty or a thing followed by a list of things. 
+
+This recursive definition translates to two introduction rules for the type $L_A$, the list of $A$: 
+\[ \text{Nil} \colon 1 \to L_A \]
+\[ \text{Cons} \colon A \times L_A \to L_A \]
+The $Nil$ element describes an empty list, and $Cons$ constructs a list from a head and a tail. 
+
+The following diagram depicts the relationship between projections and list constructors. The projections extract the head and the tail of the list that is constructed using $Cons$.
+\[
+ \begin{tikzcd}
+ & A \times L_A
+ \arrow[ld, "fst"]
+ \arrow[rd, bend right, "snd"']
+ \arrow[rd, bend left, red, "\text{Cons}"]
+ && 1
+ \arrow[ld, red, "\text{Nil}"]
+ \\
+ A
+&&L_A
+  \end{tikzcd}
+\]
+
+This description can be immediately translated to Haskell:
 \begin{haskell}
 data List a where
-  Nil :: List a
-  Cons :: a -> List a -> List a
+  Nil  :: List a
+  Cons :: (a, List a) -> List a
 \end{haskell}
 
 
+
+\subsection{Elimination Rule}
+
+Given a mapping out, $h \colon L_A \to C$, from a list of $A$ to some arbitrary type $C$, this is how we can plug it into the definition of the list:
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[r, "Nil"]
+ \arrow[rd, "\text{init}"']
+ &L_A
+\arrow[d, dashed, "h"]
+&A \times L_A
+  \arrow[l, "Cons"']
+\arrow[d, dashed, "id_A \times h"]
+\\
+& C
+& A \times C
+\arrow[l, "\text{step}"]
+  \end{tikzcd}
+\]
+We used the functoriality of the product to apply the pair $(id_A, h)$ to the product $A \times L_A$.
+
+Similar to the natural number object, we can try to define two arrows, $init = h \circ Nil$ and $step$. The arrow $step$ is a solution to:
+\[ step \circ (id_A \times h) = h \circ Cons \]
+Again, not every $h$ can be reduced to such a pair of arrows.
+
+However, given $init$ and $step$, we can define an $h$. Such a function is called a \emph{fold}, or a list catamorphism. 
+
+This is the list recursor in Haskell:
+\begin{haskell}
+recList :: c -> ((a, c) -> c) -> (List a -> c)
+recList init step = \as ->
+  case as of 
+    Nil          -> init
+    Cons (a, as) -> step (a, recList init step as)
+\end{haskell}
+Given \hask{init} and \hask{step}, it produces a mapping out of a list.
+
+A list is such a basic data type that Haskell has a built-in syntax for it. The type \hask{List a} is written as \hask{[a]}. The \hask{Nil} constructor is an empty pair of square brackets, \hask{[]}, and the \hask{Cons} constructor is an infix colon \hask{:}.
+
+We can pattern match on these constructors. A generic mapping out of a list has the form:
+\begin{haskell}
+h :: [a] -> c
+h []      = -- empty-list case
+h (a: as) = -- case for the head and the tail of a non-empty list
+\end{haskell}
+
+Corresponding to the recursor, here's the type signature of the library function \hask{foldl} (fold \emph{left}) which is defined in the standard library:
+\begin{haskell}
+foldl :: (c -> a -> c) -> c -> [a] -> c
+\end{haskell}
+Here's a possible implementation:
+\begin{haskell}
+foldl step init = \as ->
+  case as of
+    [] -> init
+    a : as -> step (fold step init as) a
+\end{haskell}
+
+We can, for instance, use \hask{foldl} to calculate the sum of the elements of a list of natural numbers:
+\begin{haskell}
+sum :: [Nat] -> Nat
+sum = foldl plus Z
+\end{haskell}
+
+
+\begin{exercise}
+Consider what happens when you replace $A$ in the definition of list with the initial object. Hint: What is base-one encoding of natural numbers?
+\end{exercise}
+\begin{exercise}
+How many mappings $h \colon L_A \to 1 + A$ are there? Can we get all of them using a list recursor? How about Haskell functions of the signature:
+\begin{haskell}
+h :: [a] -> Maybe a
+\end{haskell}
+\end{exercise}
+\begin{exercise}
+Implement a function that extracts the third element from a list, if the list is long enough. Hint: Use \hask{Mabe a} for result type.
+\end{exercise}
+
+\section{Functoriality}
+
+Functoriality means, roughly, the ability to transform the ``contents'' of a data structure. The contents of a list $L_A$ is of the type $A$. Given an arrow $f \colon A \to B$, can we define a mapping of lists $h \colon L_A \to L_B$?
+
+Lists are defined by the mapping out property, so let's replace the target $C$ of the elimination rule by $L_B$. We get:
+
+\[
+ \begin{tikzcd}
+ 1
+ \arrow[r, "Nil_A"]
+ \arrow[rd, "\text{init}"']
+ &L_A
+\arrow[d, dashed, "h"]
+&A \times L_A
+  \arrow[l, "Cons_A"']
+\arrow[d, dashed, "id_A \times h"]
+\\
+& L_B
+& A \times L_B
+\arrow[l, "\text{step}"]
+  \end{tikzcd}
+\]
+Since we are dealing with two different lists here, we have to distinguish between their constructors. For instance, we have: 
+\[\text{Nil}_A \colon 1 \to L_A \]
+\[\text{Nil}_B \colon 1 \to L_B \]
+and similarly for $Cons$.
+
+The only candidate for $init$ is $Nil_B$, which is to say that $h$ acting on an empty list of $A$s produces an empty list of $B$s:
+\[ h \circ Nil_A = Nil_B \]
+
+What remains is to define the arrow:
+\[\text{step} \colon A \times L_B \to L_B\]
+The simplest choice would be $snd$, but it doesn't work, because it doesn't satisfy the commuting condition:
+\[ \text{step} \circ (id_a \times h) = h \circ \text{Cons}_A \]
+We can easily check it by 
+
 \section{notes}
 
-lists of unit as nats
 
 \begin{exercise}
 \end{exercise}
