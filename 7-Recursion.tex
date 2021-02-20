@@ -362,9 +362,31 @@ The only candidate for $init$ is $Nil_B$, which is to say that $h$ acting on an 
 
 What remains is to define the arrow:
 \[\text{step} \colon A \times L_B \to L_B\]
-The simplest choice would be $snd$, but it doesn't work, because it doesn't satisfy the commuting condition:
-\[ \text{step} \circ (id_a \times h) = h \circ \text{Cons}_A \]
-We can easily check it by 
+\[ \text{step} = \text{Cons}_B \circ (f \times id_{L_B}) \]
+
+This corresponds to the Haskell function:
+
+\begin{haskell}
+mapList :: (a -> b) -> List a -> List b
+mapList f = recList init step
+  where
+    init = Nil
+    step (a, bs) = Cons (f a, bs)
+\end{haskell}
+or, using the built-in list syntax and inlining the recursor,
+\begin{haskell}
+map :: (a -> b) -> [a] -> [b]
+map f [] = []
+map f (a : as) = f a : map f as
+\end{haskell}
+
+In principle we could have implemented $step = snd$, resulting in:
+\begin{haskell}
+badMap :: (a -> b) -> [a] -> [b]
+badMap f [] = []
+badMap f (a : as) = badMap f as
+\end{haskell}
+We'll see, in the next chapter, why this is a bad choice. (Hint: What happens when we apply \hask{badMap} to $id$?)
 
 \section{notes}
 

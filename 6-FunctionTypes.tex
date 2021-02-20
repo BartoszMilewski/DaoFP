@@ -33,6 +33,7 @@ Given an element of $B^A$ and an element of $A$, function application should pro
 it should produce an element
 \[b \colon 1 \to B \]
 
+Keep in mind that, here, $f$ denotes an element of $B^A$. Previously, it was an arrow from $A$ to $B$.
 
 We know that a pair of elements $(f, a)$ is equivalent to an element of a product $B^A \times A$. We can therefore define function application as a single arrow:
 \[\varepsilon_{A, B} \colon B^A \times A \to B\]
@@ -52,15 +53,15 @@ Function application is the \emph{elimination rule} for function type.
 
 When somebody gives you an element of the function object, the only thing you can do with it is to apply it to an element of the argument type using $\varepsilon$. 
 
-We've seen that product was defined using its mapping-in property. Function application, on the other hand, is defined as a \emph{mapping out} of a product. 
-
 \subsection{Introduction Rule}
 To complete the definition of the function object, we also need the introduction rule. 
 
 First, suppose that there is a way of constructing a function object $B^A$ from some other object $C$. It means that there is an arrow
 \[h \colon C \to B^A\]
-We know that we can eliminate the result of $h$ using $\varepsilon_{A, B}$, but we have to first multiply it by $A$. So let's first multiply $C$ by $A$ and the use functoriality to map it to $B^A \times A$. Functoriality lets us apply a pair of arrows to a product to get another product. Here, the pair of arrows is $(h, id_A)$ (we want to turn $C$ into $B^A$, but we're not interested in modifying $A$)
-\[ C \times A \xrightarrow{} B^A \times A \]
+We know that we can eliminate the result of $h$ using $\varepsilon_{A, B}$, but we have to first multiply it by $A$. So let's first multiply $C$ by $A$ and the use functoriality to map it to $B^A \times A$. 
+
+Functoriality lets us apply a pair of arrows to a product to get another product. Here, the pair of arrows is $(h, id_A)$ (we want to turn $C$ into $B^A$, but we're not interested in modifying $A$)
+\[ C \times A \xrightarrow{h \times id_A} B^A \times A \]
 We can now follow this with function application to get to $B$
 \[ C \times A \xrightarrow{h \times id_A} B^A \times A \xrightarrow{\varepsilon_{A, B}} B\]
 This composite arrow defines a mapping we'll call $f$:
@@ -82,6 +83,8 @@ This commuting diagram tells us that, given an $h$, we can construct an $f$; but
 
 We can use this property, this one-to-one correspondence between two sets of arrows, to define the exponential object. This is the \emph{introduction rule} for the function object. 
 
+We've seen that product was defined using its mapping-in property. Function application, on the other hand, is defined as a \emph{mapping out} of a product. 
+
 \subsection{Currying}
 
 There are several ways of looking at this definition. One is to see it as an example of currying. 
@@ -94,7 +97,9 @@ f :: (C, A) -> B
 \begin{haskell}
 h :: C -> (A -> B)
 \end{haskell}
-Currying is the isomorphism between these two types. This isomorphism can be represented in Haskell by a pair of (higher-order) functions. Since, in Haskell, currying works for any types, these functions are written using type variables---they are \emph{polymorphic}:
+Currying is the isomorphism between these two types. 
+
+This isomorphism can be represented in Haskell by a pair of (higher-order) functions. Since, in Haskell, currying works for any types, these functions are written using type variables---they are \emph{polymorphic}:
 \begin{haskell}
 curry   :: ((c, a) -> b)   -> (c -> (a -> b))
 \end{haskell}

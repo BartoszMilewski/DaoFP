@@ -1,0 +1,346 @@
+\documentclass[DaoFP]{subfiles}
+\begin{document}
+\setcounter{chapter}{7}
+
+\chapter{Functors}
+\section{Categories}
+
+So far we've only seen one category---that of types and functions. So let's quickly gather the essential info about a category.
+
+A category is a collection of objects and arrows that go between them. Every pair of composable arrows can be composed. The composition is associative, and there is an identity arrow looping back on every object.
+
+The fact that types and functions form a category can be expressed in Haskell by defining composition as:
+\begin{haskell}
+(.) :: (b -> c) -> (a -> b) -> (a -> c)
+g . f = \x -> g (f x)
+\end{haskell}
+The composition of two functions \hask{g} after \hask{f} is a new function that first applies \hask{f} to its argument and then applies \hask{g} to the result.
+
+The identity is a polymorphic ``do nothing'' function:
+\begin{haskell}
+id :: a -> a
+id x = x
+\end{haskell}
+You can easily convince yourself that such composition is associative, and composing with \hask{id} does nothing to a function.
+
+Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call stick-figure categories.
+
+ In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
+ 
+One such category is called the \emph{opposite} category. This is the category in which all the original arrows are inverted: what is called the source of an arrow on the original category is now called its target, and vice versa. 
+
+The opposite to a category $\mathbb{C}$ is called $\mathbb{C}^{op}$. We've had a glimpse of this category when we discussed duality. The terminal object in  $\mathbb{C}$ is the initial object in $\mathbb{C}^{op}$, the product in  $\mathbb{C}$ is the sum in $\mathbb{C}^{op}$, and so on. 
+
+Given two categories $\mathbb{C}$ and $\mathbb{D}$, we can construct a product category $\mathbb{C} \times \mathbb{D}$. The objects in this category are pairs of objects $(C, D)$, and the arrows are pairs of arrows. 
+
+If we have an arrow $f \colon C \to C'$ in $\mathbb{C}$ and an arrow $g \colon D \to D'$ in $\mathbb{D}$ then there is a corresponding arrow $(f, g)$ in $\mathbb{C} \times \mathbb{D}$.  This arrow goes from $(C, D)$ to $(C', D')$, which are objects in $\mathbb{C} \times \mathbb{D}$. Two such arrows can be composed if their components are composable in, respectively, $\mathbb{C}$ and $\mathbb{D}$. An identity arrow is a pair of identity arrows.
+
+The two product categories we're most interested in are $\mathbb{C} \times \mathbb{C}$ and $\mathbb{C}^{op} \times \mathbb{C}$, where $\mathbb{C}$ is our familiar category of types and functions.
+
+In both of these categories, objects are pairs of objects from $\mathbb{C}$. In the first category, $\mathbb{C} \times \mathbb{C}$, a morphism from $(A, B)$ to $(A', B')$ is a pair $(f \colon A \to A', g \colon B \to B')$. In the second category, $\mathbb{C}^{op} \times \mathbb{C}$, a morphism is a pair $(f \colon A' \to A, g \colon B \to B')$, in which the first arrow goes in the opposite direction.
+
+\section{Functors}
+
+We've seen examples of functoriality when discussing algebraic data types. The idea was that such a data type 	``remembers'' the way it was created, and we can manipulate this memory by applying an arrow to its ``contents.'' 
+
+In some cases this intuition is very convincing: we think of a product type as a pair that ``contains'' its ingredients. After all, we can retrieve them using projections. 
+
+This is less obvious in the case of function objects. You can visualize a function object as secretly storing all possible results and using the function argument to index them. A function of \hask{Bool} is obviously equivalent to a pair of values, one for \hask{True} and one for \hask{False}. It's a known programming trick to implement some functions as lookup tables. It's called \emph{memoization}. 
+
+Even though it's not practical to memoize functions that take, say, natural numbers as arguments; we can still conceptualize them as (infinite, or even uncountable) lookup tables.
+
+If you can think of a data type as a container of values, it makes sense to apply a function to transform all these values and create a transformed container. When this is possible, we call the data type functorial. 
+
+Again, function types require some more suspension of disbelief. You visualize a function object as a lookup table, keyed by some type. If you want to use another type as your key, you need a function that translates the new key to the original key. This is why functoriality of the function object has one of the arrows reversed:
+\begin{haskell}
+dimap :: (a' -> a) -> (b -> b') -> (a -> b) -> (a' -> b')
+dimap f g h = g . h . f
+\end{haskell}
+You are dealing with a function \hask{h :: a -> b} that has a ``receptor'' that responds to values of type \hask{a}. You want to use it to process input of type \hask{a'}. This is possible if you have a converter from \hask{a'} to \hask{a}, namely \hask{f :: a' -> a}.
+
+
+The idea of a data type ``containing'' values of another type can be also expressed by saying that one data type is paremeterized by another. For instance, the type \hask{List a} is parameterized by the type \hask{a}. 
+
+In other words, \hask{List} maps the type \hask{a} to the type \hask{List a}. \hask{List} by itself, without the argument, is called a \emph{type constructor}. 
+
+\subsection{Functors between categories}
+In category theory, a type constructor is modeled as a mapping of objects to objects. It's a function on objects. This is not to be confused with arrows between objects, which are part of the structure of the category. 
+
+In fact, it's easier to imagine a mapping \emph{between} categories. Every object in the source category is mapped to an object in the target category. If $A$ is an object in $\mathbb{C}$, there is a corrsponding object $F A$ in $\mathbb{D}$.
+
+A functorial mapping, or a \emph{functor}, not only maps objects but also the arrows between them. Every arrow 
+\[ f \colon A \to B\]
+in the first category has a corresponding arrow in the second category:
+\[ F f \colon F A \to F B\]
+
+
+\[
+ \begin{tikzcd}
+ A 
+ \arrow[d, blue, "f"]
+\arrow[rr, dashed]
+ && F A
+  \arrow[d, red, "F f"]
+ \\
+ B 
+ \arrow[rr, dashed]
+&& F B
+  \end{tikzcd}
+\]
+We use the same letter, here $F$, to name both, the mapping of objects and the mapping of arrows. 
+
+If categories distill the essence of \emph{structure}, then functors are mappings that preserve this structure. Objects that are related in the source category are related in the target category. 
+
+The structure of a category is defined by arrows and their composition. Therefore a functor must preserve composition. What is composed in one category:
+\[ h = g \circ f \]
+remains composed in the second category:
+\[ F h = F (g \circ f) = F g \circ F f \]
+We can either compose two arrows in $\mathbb{C}$ and map the composite to $\mathbb{D}$, or we can map individual arrows and then compose them in $\mathbb{D}$. We demand that the result be the same.
+\[
+ \begin{tikzcd}
+ A 
+ \arrow[d, "f"]
+\arrow[rrr, dashed]
+\arrow[dd, bend right = 70, blue, "g \circ f"']
+ &&& F A
+  \arrow[d, "F f"]
+  \arrow[dd, bend left = 70, "F g \circ F f"]
+  \arrow[dd, bend right = 70, red, "F (g \circ f)"']
+ \\
+ B 
+ \arrow[d, "g"]
+&&& F B
+ \arrow[d, "F g"]
+ \\
+ C
+ \arrow[rrr, dashed]
+&&& F C
+  \end{tikzcd}
+\]
+
+Finally, a functor must preserve identity arrows:
+\[ F\, id_A = id_{F a} \]
+
+\[
+ \begin{tikzcd}
+ A 
+  \arrow[loop, blue,  "id_A"']
+\arrow[rr, dashed]
+ && F A
+  \arrow[loop, red, "F \, id_{A}"']
+  \arrow[loop, controls={+(2.5, 2.6) and +(-2, 2.5)}, "id_{F A}"']
+  \end{tikzcd}
+\]
+
+These conditions taken together define what it means for a functor to preserve the structure of a category.
+
+It's also important to realize what conditions are \emph{not} part of the definition. For instance, a functor is allowed to map multiple objects into the same object. It can also map multiple arrows into the same arrow, as long as the endpoints match. 
+
+In the extreme, any category can be mapped to a singleton category with one object and one arrow.
+
+Also, not all object or arrows in the target category must be covered by a functor. In the extreme, we can have a functor from the singleton category to any (non-empty) category. Such a functor picks a single object together with its identity arrow.
+
+In category theory, functors are often used for creating models of one category inside another. The fact that they can merge multiple objects and arrows into one means that they produce simplified views of the source category. They ``abstract'' some aspects of the source category.
+
+The fact that they may only cover parts of the target category means that the models can be seen as embedded in a larger environment.
+
+Functors from some minimalistic, stick-figure, categories can be used to define patterns in larger categories.
+
+\begin{exercise}
+Describe a functor whose source is the ``walking arrow'' category. It's a stick-figure category with two objects and a single arrow between them (plus the mandatory identity arrows).
+\[
+ \begin{tikzcd}
+ A 
+  \arrow[loop,  "id_A"']
+\arrow[r, "f"]
+ & B
+  \arrow[loop, "id_{B}"']
+  \end{tikzcd}
+\]
+\end{exercise}
+\begin{exercise}
+The ``walking iso'' category is just like the ``walking arrow'' category, plus one more arrow going back from $B$ to $A$. Show that a functor from this category always picks an isomorphism in the target category. 
+\end{exercise}
+
+\section{Functors in programming}
+
+Endofunctors are the class of functors that are the easiest to express in a programming language. These are functors that map a category (here, the category of types and functions) to itself. 
+
+\subsection{Endofunctors}
+The first part of the endofunctor is the mapping of types to types. This is done using type constructors, which are type-level functions. 
+
+The list type constructor, \hask{List}, maps an arbitrary type \hask{a} to the type \hask{List a}.
+
+The \hask{Maybe} type constructor maps \hask{a} to \hask{Maybe a}.
+
+The second part of an endofunctor is the mapping of arrows. Given a function \hask{a -> b}, we want to be able to define a function \hask{List a -> List b}, or \hask{Maybe a -> Maybe b}. This is the ``functoriality'' property of these data types that we have discussed before. Functoriality let's us \emph{lift} an arbitrary function to a function between transformed types.
+
+Functoriality can be expressed in Haskell using a \emph{typeclass}. In this case, the typeclass is parameterized by a type constructor \hask{f}. We say that \hask{f} is a \hask{Functor} if there is a corresponding mapping of functions called \hask{fmap}:
+\begin{haskell}
+class Functor f where
+  fmap :: (a -> b) -> (f a -> f b)
+\end{haskell}
+The compiler knows that \hask{f} is a type constructor because it is applied to types, as in \hask{f a} and \hask{f b}.
+
+To prove to the compiler that a particular type constructor is a \hask{Functor}, we have to provide the implementation of \hask{fmap} for it. This is done by defining an \emph{instance} of the typeclass \hask{Functor}. For example:
+\begin{haskell}
+instance Functor Maybe where
+  fmap g Nothing  = Nothing
+  fmap g (Just a) = Just (g a)
+\end{haskell}
+
+A functor must also satisfy some laws: it must preserve composition and identity. These laws cannot be expressed in Haskell, but should be checked by the programmer. We have previously seen a definition of \hask{badMap} that didn't satisfy the identity laws, yet it would be accepted by the compiler. It would define an ``unlawful'' instance of \hask{Functor} for the list type constructor \hask{[]}.
+
+\begin{exercise}
+Show that \hask{WithInt} is a functor
+\begin{haskell}
+data WithInt a = WithInt a Int
+\end{haskell}
+\end{exercise}
+
+There are some elementary functors that might seem trivial, but they serve as building blocks for other functors. 
+
+We have the identity endofunctor that maps all objects to themselves, and all arrows to themselves. 
+\begin{haskell}
+data Id a = Id a
+\end{haskell}
+\begin{exercise}
+Show that \hask{Id} is a \hask{Functor}.
+\end{exercise}
+
+
+We also have a constant functor that maps all objects to a single designated object, and all arrows to the identity arrow for this object. In Haskell, it's a family of functors parameterized by the target object \hask{a}:
+\begin{haskell}
+data Const a b = Const a
+\end{haskell}
+This type constructor ignores its second argument.
+
+
+\begin{exercise}
+Show that \hask{(Const a)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but here it's partially applied to the first argument. It is functorial in the second argument.
+\end{exercise}
+
+
+\subsection{Bifunctors}
+
+We have also seen data constructors that take two types as arguments: the product and the sum constructors. They were functorial as well, but instead of lifting a single function, they lifted a pair of functions. In category theory, we would define these as functors from the product category $\mathbb{C} \times \mathbb{C}$ to $\mathbb{C}$.
+
+Such functors map a pair of objects to an object, and a pair of arrows to an arrow. 
+
+In Haskell, we treat such functors as members of a separate class called a \hask{Bifunctor}.
+
+\begin{haskell}
+class Bifunctor f where
+  bimap :: (a -> a') -> (b -> b') -> (f a b -> f a' b')
+\end{haskell}
+Again, the compiler deduces that \hask{f} is a two-argument type constructor because it sees it applied to two types, e.g., \hask{f a b}.
+
+To prove to the compiler that a particular type constructor is a \hask{Bifunctor}, we define an instance. For example, bifunctoriality of a pair can be defined as:
+\begin{haskell}
+instance Bifunctor (,) where
+  bimap g h (a, b) = (g a, h b)
+\end{haskell}
+
+\begin{exercise}
+Show that \hask{MoreThanA} is a bifunctor.
+\begin{haskell}
+data MoreThanA a b = More a (Maybe b)
+\end{haskell}
+\end{exercise}
+
+
+\subsection{Profunctors}
+
+We've seen that the function type is also functorial. It lifts two functions at a time, just like \hask{Bifunctor}, except that one of the functions goes in the opposite direction. In category theory this corresponds to a functor from a product of two categories, one of them being the opposite category: its a functor from $\mathbb{C}^{op} \times \mathbb{C}$ to $\mathbb{C}$. Functors from $\mathbb{C}^{op} \times \mathbb{C}$ are called \emph{profunctors}.
+
+In Haskell, profunctors form a typeclass:
+\begin{haskell}
+class Profunctor f where
+  dimap :: (a' -> a) -> (b -> b') -> (f a b -> f a' b')
+\end{haskell}
+
+The function type, which can be written as an infix operator \hask{(->)}, is an instance of \hask{Profunctor}
+\begin{haskell}
+instance Profunctor (->) where
+  dimap f g h = g . h . f
+\end{haskell}
+
+In programming, all non-trivial profunctors are variations on the function type. 
+
+\subsection{Contravariant functors}
+
+Functors from the opposite category $\mathbb{C}^{op}$ are called \emph{contravariant}. They have the property of lifting arrows that go in the opposite direction. Regular functors are sometimes called \emph{covariant}.
+
+In Haskell, contravariant functors form the typeclass \hask{Contravariant}:
+\begin{haskell}
+class Contravariant f where
+  contramap :: (b -> a) -> (f a -> f b)
+\end{haskell}
+
+A predicate is a function returning \hask{True} or \hask{False}:
+\begin{haskell}
+data Predicate a = Predicate (a -> Bool)
+\end{haskell}
+It's easy to see that it's a contravariant functor:
+\begin{haskell}
+instance Contravariant Predicate where
+  contramap f (Predicate h) = Predicate (h . f)
+\end{haskell}
+
+The only non-trivial examples of contravariant functors are variations on the theme of function objects. 
+
+One way to recognize them is by assigning polarities to types that define a function type. We say that the return type is in a \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then the polarities get reversed. 
+
+Consider this data type:
+\begin{haskell}
+data Tester a = Tester ((a -> Bool) -> Bool)
+\end{haskell}
+It has \hask{a} in a double-negative, therefore a positive position. This is why it's a covariant \hask{Functor}. Indeed:
+
+\begin{haskell}
+instance Functor Tester where
+  fmap f (Tester g) = Tester g'
+    where g' h = g (h . f)
+\end{haskell}
+
+Notice that parentheses are important here. A similar function \hask{a -> Bool -> Bool} has \hask{a} in a \emph{negative} position. This is because it's a function of \hask{a} returning a function \hask{(Bool -> Bool)}. Equivalently, you can uncurry it to get a function that takes a pair: \hask{(a, Bool) -> Bool}.
+
+\section{Functor Composition}
+
+Just like we can compose functions, we can compose functors. Two functors are composable if the target category of one is the source category of the other.
+
+ On objects, functor composition of $G$ after $F$ first applies $F$ to an object, then applies $G$ to the result; and similarly on arrows.
+ 
+ Notice that any two endofunctors can be composed, since their target category is the same as the source category.
+ 
+ In Haskell, a functor is a parameterized data type, so the composition of two functors is again a parameterized data type. On objects, we define:
+ \begin{haskell}
+data Compose g f a = Compose (g (f a))
+\end{haskell}
+The compiler figures out that \hask{f} and \hask{g} must be type constructors because they are applied to types. 
+
+Any two type constructors can be composed this way. There is no requirement, at this point, that they be functors. 
+
+However, if we want to lift a function using the composition of \hask{g} after \hask{f}, then they must be functors. This requirement is expressed as a constraint in the instantiation:
+\begin{haskell}
+instance (Functor g, Functor f) => Functor (Compose g f) where
+  fmap h (Compose gfa) = Compose (fmap (fmap h) gfa)
+\end{haskell}
+The constraint \hask{(Functor g, Functor f)} expresses the condition that both type constructors are instances of \hask{Functor}. The constraints are followed by the double arrow. The type constructor in question is \hask{Compose f g}, which is a partial application of \hask{Compose} to the two functors. 
+
+In the implementation of \hask{fmap}, we pattern match on the data constructor \hask{Compose}. Its argument \hask{gfa} is of the type \hask{g (f a)}. We use one \hask{fmap} to get ``under'' \hask{g}. Then we use another \hask{fmap h} to get under \hask{f}. The compiler knows which \hask{fmap} to use by analyzing the types. 
+
+You may visualize a composite functor as a container of containers. For instance, the composition of \hask{[]} with \hask{Maybe} is a list of optional values. 
+
+\begin{exercise}
+Define a composition of a \hask{Functor} after \hask{Contravariant}. Hint: You can reuse \hask{Compose}, but you have to change the instance.
+\end{exercise}
+
+
+\subsection{Category of categories}
+
+We can look at functors as arrows between categories. We have defined composition of functors. It's easy to check that this composition is associative. We also have an identity (endo-) functor for every category. So categories themselves seem to form a category, let's call it $\mathbf{Cat}$, with functors as arrows. 
+
+And this is where mathematicians start worrying about ``size'' issues. It's a shorthand for saying that there are paradoxes lurking around. So the correct incantation is that $\mathbf{Cat}$ is a category of \emph{small} categories. But as long as we are not engaged in proofs of existence, we can ignore size problems.
+
+\end{document}
