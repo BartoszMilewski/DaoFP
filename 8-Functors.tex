@@ -25,6 +25,8 @@ You can easily convince yourself that such composition is associative, and compo
 
 Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call stick-figure categories.
 
+We can also strip a category from all arrows, except for the identity arrows. Such a bare-object category is called a \emph{disctrete} category or a \emph{set}\footnote{I'm ignoring ``size issues.''}. So a set is a category with no structure. 
+
  In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
  
 One such category is called the \emph{opposite} category. This is the category in which all the original arrows are inverted: what is called the source of an arrow on the original category is now called its target, and vice versa. 
@@ -305,41 +307,66 @@ instance Functor Tester where
 
 Notice that parentheses are important here. A similar function \hask{a -> Bool -> Bool} has \hask{a} in a \emph{negative} position. This is because it's a function of \hask{a} returning a function \hask{(Bool -> Bool)}. Equivalently, you can uncurry it to get a function that takes a pair: \hask{(a, Bool) -> Bool}.
 
+\section{The Hom Functor}
+
+
 \section{Functor Composition}
 
 Just like we can compose functions, we can compose functors. Two functors are composable if the target category of one is the source category of the other.
 
  On objects, functor composition of $G$ after $F$ first applies $F$ to an object, then applies $G$ to the result; and similarly on arrows.
  
- Notice that any two endofunctors can be composed, since their target category is the same as the source category.
+ You can only compose composable functors. However all \emph{endofunctors} are composable, since their target category is the same as the source category.
  
  In Haskell, a functor is a parameterized data type, so the composition of two functors is again a parameterized data type. On objects, we define:
  \begin{haskell}
 data Compose g f a = Compose (g (f a))
 \end{haskell}
-The compiler figures out that \hask{f} and \hask{g} must be type constructors because they are applied to types. 
+The compiler figures out that \hask{f} and \hask{g} must be type constructors because they are applied to types: \hask{f} is applied to the type parameter \hask{a}, and \hask{g} is applied to the resulting type.
+
+Alternatively, you can tell the compiler that the first two arguments to \hask{Compose} are type constructors. You do this by providing a \emph{kind signature}, which requires a language extension \hask{KindSignatures} that you put at the top of the source file:
+\begin{haskell}
+{-# language KindSignatures #-}
+\end{haskell}
+You should also import the \hask{Data.Kind} library that defines \hask{Type}:
+\begin{haskell}
+import Data.Kind
+\end{haskell}
+
+A kind signature is just like a type signature, except that it can be used to describe functions on types. Regular types have the kind \hask{Type}. Type constructors have the kind \hask{Type -> Type}, since they map types to types. \hask{Compose} takes two type constructors and produces a type constructor, so its kind signature is:
+\begin{haskell}
+(Type -> Type) -> (Type -> Type) -> (Type -> Type) 
+\end{haskell}
+and the full definition is:
+\begin{haskell}
+data Compose :: (Type -> Type) -> (Type -> Type) -> (Type -> Type) 
+  where
+    Compose :: (g (f a)) -> Compose g f a
+\end{haskell}
 
 Any two type constructors can be composed this way. There is no requirement, at this point, that they be functors. 
 
-However, if we want to lift a function using the composition of \hask{g} after \hask{f}, then they must be functors. This requirement is expressed as a constraint in the instantiation:
+However, if we want to lift a function using the composition of type constructors, \hask{g} after \hask{f}, then they must be functors. This requirement is expressed as a constraint in the instance declaration:
 \begin{haskell}
 instance (Functor g, Functor f) => Functor (Compose g f) where
   fmap h (Compose gfa) = Compose (fmap (fmap h) gfa)
 \end{haskell}
-The constraint \hask{(Functor g, Functor f)} expresses the condition that both type constructors are instances of \hask{Functor}. The constraints are followed by the double arrow. The type constructor in question is \hask{Compose f g}, which is a partial application of \hask{Compose} to the two functors. 
+The constraint \hask{(Functor g, Functor f)} expresses the condition that both type constructors be instances of the \hask{Functor} class. The constraints are followed by a double arrow. 
 
-In the implementation of \hask{fmap}, we pattern match on the data constructor \hask{Compose}. Its argument \hask{gfa} is of the type \hask{g (f a)}. We use one \hask{fmap} to get ``under'' \hask{g}. Then we use another \hask{fmap h} to get under \hask{f}. The compiler knows which \hask{fmap} to use by analyzing the types. 
+The type constructor in question is \hask{Compose f g}, which is a partial application of \hask{Compose} to two functors. 
+
+In the implementation of \hask{fmap}, we pattern match on the data constructor \hask{Compose}. Its argument \hask{gfa} is of the type \hask{g (f a)}. We use one \hask{fmap} to ``get under'' \hask{g}. Then we use \hask{(fmap h)} to get under \hask{f}. The compiler knows which \hask{fmap} to use by analyzing the types. 
 
 You may visualize a composite functor as a container of containers. For instance, the composition of \hask{[]} with \hask{Maybe} is a list of optional values. 
 
 \begin{exercise}
-Define a composition of a \hask{Functor} after \hask{Contravariant}. Hint: You can reuse \hask{Compose}, but you have to change the instance.
+Define a composition of a \hask{Functor} after \hask{Contravariant}. Hint: You can reuse \hask{Compose}, but you have to provide a different instance declaration.
 \end{exercise}
 
 
 \subsection{Category of categories}
 
-We can look at functors as arrows between categories. We have defined composition of functors. It's easy to check that this composition is associative. We also have an identity (endo-) functor for every category. So categories themselves seem to form a category, let's call it $\mathbf{Cat}$, with functors as arrows. 
+We can look at functors as arrows between categories. As we've just seen, functors are composable and it's easy to check that this composition is associative. We also have an identity (endo-) functor for every category. So categories themselves seem to form a category, let's call it $\mathbf{Cat}$, in which arrows are functors. 
 
 And this is where mathematicians start worrying about ``size'' issues. It's a shorthand for saying that there are paradoxes lurking around. So the correct incantation is that $\mathbf{Cat}$ is a category of \emph{small} categories. But as long as we are not engaged in proofs of existence, we can ignore size problems.
 
