@@ -24,10 +24,23 @@ id x = x
 You can easily convince yourself that such composition is associative, and composing with \hask{id} does nothing to a function.
 
 Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call stick-figure categories.
+\subsection{Category of sets}
 
-We can also strip a category from all arrows, except for the identity arrows. Such a bare-object category is called a \emph{disctrete} category or a \emph{set}\footnote{I'm ignoring ``size issues.''}. So a set is a category with no structure. 
+We can also strip a category of all arrows (except for the identity arrows). Such a bare-object category is called a \emph{disctrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
 
- In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
+Sets form their own category called $\mathbf{Set}$\footnote{Again, ignoring ``size'' issues, in particular the non-existence of the set of all sets.}. The objects in that category are sets, and the arrows are functions between sets. Such functions are defined as special kind of relations, which themselves are defined as sets of pairs.
+
+To first approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. 
+
+lots of concepts in category theory are derived from set theory
+
+elements
+
+assembly language of mathematics
+
+
+\subsection{Derived categories}
+In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
  
 One such category is called the \emph{opposite} category. This is the category in which all the original arrows are inverted: what is called the source of an arrow on the original category is now called its target, and vice versa. 
 
