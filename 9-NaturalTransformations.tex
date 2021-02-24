@@ -4,11 +4,134 @@
 
 \chapter{Natural Transformations}
 
+We've seen that, when two objects $A$ and $B$ are isomorphic, they generate bijections between sets of arrows, which we can now express as isomorphisms between hom-sets:
+\[\mathcal{C}(A, X) \cong \mathcal{C}(B, X)\]
+\[\mathcal{C}(X, A) \cong \mathcal{C}(X, B)\]
+The converse is not true, though. An isomorphism between hom-sets does not result in an isomorphism between object unless additional naturality conditions are satisfied. We'll now re-formulate these naturality conditions in terms of hom-functors.
+
+\section{Natural Transformations Between Hom-Functors}
+
+An isomorphism between two objects can be established directly with a pair of arrows, one the inverse of the other. But quite often it's easier to do it indirectly, by defining bijections between arrows, either the ones impinging on the objects, or the ones emanating from the objects. 
+
+For instance, as we've seen before, we may have an invertible mapping of arrows $\alpha_X$.
+\[
+ \begin{tikzcd}
+ \node(x) at (0, 2) {X};
+ \node(a) at (-2, 0) {A};
+ \node(b) at (2, 0) {B};
+ \node(c1) at (-1, 1.5) {};
+ \node(c2) at (-1.5, 1) {};
+ \node(c3) at (-1, 2) {};
+ \node(c4) at (-2, 1) {};
+ \node(d1) at (1, 1.5) {};
+ \node(d2) at (1.5, 1) {};
+ \node(d3) at (1, 2) {};
+ \node(d4) at (2, 1) {};
+\node (aa) at (-1, 0.75) {};
+ \node (bb) at (1, 0.75) {};
+ \draw[->] (x) .. controls (c1)  and (c2) .. (a); % bend
+ \draw[->, green] (x) .. controls (c3)  and (c4) .. (a); % bend
+ \draw[->, blue] (x) -- (a); 
+  \draw[->] (x) .. controls (d1)  and (d2) .. (b); % bend
+ \draw[->, green] (x) .. controls (d3)  and (d4) .. (b); % bend
+ \draw[->, blue] (x) -- (b); 
+ \draw[->, red, dashed] (aa) -- node[above]{\alpha_X} (bb);
+ \end{tikzcd}
+\]
+In other words, for every $X$, there is a mapping of hom-sets:
+\[ \alpha_X \colon \mathcal{C}(X, A) \to \mathcal{C}(X, B) \]
+Since $X$ is arbitrary, we are effectively dealing with a mapping between two (contravariant) functors:  $\mathcal{C}(-, A)$ and $\mathcal{C}(-, B)$. 
+
+The functor $\mathcal{C}(-, A)$ describes the way the worlds sees $A$, and the functor $\mathcal{C}(-, B)$ describes the way the world sees $B$. 
+
+The transformation $\alpha$ switches back and forth between these two views. Every \emph{component} of $\alpha$, $\alpha_X$ shows that the view of $A$ from $X$ is isomorphic to the view of $B$ from $X$. 
+
+The naturality condition we discussed before was the condition:
+
+\[ \alpha_Y \circ (- \circ g) = (- \circ g) \circ \alpha_X \]
+It related components of $\alpha$ taken at different objects, or the perspective views from different (but related) observers. 
+
+We can now say that both sides of this equation map hom-sets to hom-sets, more precisely:
+\[\mathcal{C}(X, A) \to \mathcal{C}(Y, B)\]
+Precomposition with $g \colon Y \to X$ is also a mapping of hom-sets. In fact it is the lifting of $g$ by the contravariant hom-functor. The naturality condition can be rewritten as:
+\[ \alpha_Y \circ \mathcal{C}(g, A) = \mathcal{C}(g, B) \circ \alpha_X \]
+Or it can be illustrated by this commuting diagram:
+\[
+ \begin{tikzcd}
+ \mathcal{C}(X, A)
+ \arrow[d, "\alpha_X"]
+ \arrow[r, "{\mathcal{C}(g, A)}"]
+ &
+ \mathcal{C}(Y, A)
+  \arrow[d, "\alpha_Y"]
+ \\
+ \mathcal{C}(X, B)
+ \arrow[r, "{\mathcal{C}(g, B)}"]
+& \mathcal{C}(Y, B)
+ \end{tikzcd}
+\]
+
+An invertible transformation $\alpha$ between the functors $\mathcal{C}(-, A)$ and $\mathcal{C}(-, B)$ that satisfies the naturality condition tells us that there is an isomorphism between $A$ and $B$.
+
+We can follow exactly the same reasoning to translate the case of the outgoing arrows. This time we start with a transformation $\beta$ whose components are:
+\[ \beta_X \colon \mathcal{C}(A, X) \to \mathcal{C}(B, X) \]
+The two (covariant) functors $\mathcal{C}(A, -)$ and $\mathcal{C}(B, -)$ describe the view of the world from the perspective of $A$ and $B$, respectively. The invertible transformation $\beta$ tells us that these two views are equivalent, and the naturality condition 
+\[ (g \circ -) \circ \beta_X = \beta_Y \circ (g \circ -) \]
+tells us that they behave nicely when we switch focus.
+
+This is the commuting diagram illustrates the naturality condition:
+\[
+ \begin{tikzcd}
+ \mathcal{C}(A, X)
+ \arrow[d, "\beta_X"]
+ \arrow[r, "{\mathcal{C}(A, g)}"]
+ &
+ \mathcal{C}(A, Y)
+  \arrow[d, "\beta_Y"]
+ \\
+ \mathcal{C}(B, X)
+ \arrow[r, "{\mathcal{C}(B, g)}"]
+& \mathcal{C}(B, Y)
+ \end{tikzcd}
+\]
+
+Again, such an invertible natural transformation $\beta$ establishes the isomorphism between $A$ and $B$.
+
+\section{Natural Transformation Between Functors}
+
+We have explored naturality in the context of a transformation between two hom-functors. 
+
+\[
+ \begin{tikzcd}
+ F X
+ \arrow[d, "\alpha_X"]
+ \arrow[r, "F g"]
+ &
+F Y
+  \arrow[d, "\alpha_Y"]
+ \\
+G X
+ \arrow[r, "G g"]
+& G Y
+ \end{tikzcd}
+\]
+
+
+natural isomorphism
+
+\section{The Yoneda Lemma}
+
+\section{Composition of Natural Transformations}
+
 \section{notes}
 
 product/coproduct
 
+mapping between models
 
+composition
+
+polymorphic functions
 
 \begin{exercise}
 \end{exercise}

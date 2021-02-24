@@ -26,33 +26,30 @@ You can easily convince yourself that such composition is associative, and compo
 Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call stick-figure categories.
 \subsection{Category of sets}
 
-We can also strip a category of all arrows (except for the identity arrows). Such a bare-object category is called a \emph{disctrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
+We can also strip a category of all arrows (except for the identity arrows). Such a bare-object category is called a \emph{discrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
 
 Sets form their own category called $\mathbf{Set}$\footnote{Again, ignoring ``size'' issues, in particular the non-existence of the set of all sets.}. The objects in that category are sets, and the arrows are functions between sets. Such functions are defined as special kind of relations, which themselves are defined as sets of pairs.
 
-To first approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. 
+To lowest approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. There's nothing wrong with that. In fact all of categorical construction we've described so far have their set-theoretical roots. The categorical product is a generalization of the cartesian product of sets, the sum is the disjoint union, and so on. 
 
-lots of concepts in category theory are derived from set theory
+What category theory offers is more precision: the fine distinction between the structure that is absolutely necessary, and the superfluous details. 
 
-elements
-
-assembly language of mathematics
-
+A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Functions must have underlying algorithms because they have to be computable by some physical systems, be it a computers or a human brains. 
 
 \subsection{Derived categories}
 In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
  
 One such category is called the \emph{opposite} category. This is the category in which all the original arrows are inverted: what is called the source of an arrow on the original category is now called its target, and vice versa. 
 
-The opposite to a category $\mathbb{C}$ is called $\mathbb{C}^{op}$. We've had a glimpse of this category when we discussed duality. The terminal object in  $\mathbb{C}$ is the initial object in $\mathbb{C}^{op}$, the product in  $\mathbb{C}$ is the sum in $\mathbb{C}^{op}$, and so on. 
+The opposite to a category $\mathcal{C}$ is called $\mathcal{C}^{op}$. We've had a glimpse of this category when we discussed duality. The terminal object in  $\mathcal{C}$ is the initial object in $\mathcal{C}^{op}$, the product in  $\mathcal{C}$ is the sum in $\mathcal{C}^{op}$, and so on. 
 
-Given two categories $\mathbb{C}$ and $\mathbb{D}$, we can construct a product category $\mathbb{C} \times \mathbb{D}$. The objects in this category are pairs of objects $(C, D)$, and the arrows are pairs of arrows. 
+Given two categories $\mathcal{C}$ and $\mathcal{D}$, we can construct a product category $\mathcal{C} \times \mathcal{D}$. The objects in this category are pairs of objects $(C, D)$, and the arrows are pairs of arrows. 
 
-If we have an arrow $f \colon C \to C'$ in $\mathbb{C}$ and an arrow $g \colon D \to D'$ in $\mathbb{D}$ then there is a corresponding arrow $(f, g)$ in $\mathbb{C} \times \mathbb{D}$.  This arrow goes from $(C, D)$ to $(C', D')$, which are objects in $\mathbb{C} \times \mathbb{D}$. Two such arrows can be composed if their components are composable in, respectively, $\mathbb{C}$ and $\mathbb{D}$. An identity arrow is a pair of identity arrows.
+If we have an arrow $f \colon C \to C'$ in $\mathcal{C}$ and an arrow $g \colon D \to D'$ in $\mathcal{D}$ then there is a corresponding arrow $(f, g)$ in $\mathcal{C} \times \mathcal{D}$.  This arrow goes from $(C, D)$ to $(C', D')$, which are objects in $\mathcal{C} \times \mathcal{D}$. Two such arrows can be composed if their components are composable in, respectively, $\mathcal{C}$ and $\mathcal{D}$. An identity arrow is a pair of identity arrows.
 
-The two product categories we're most interested in are $\mathbb{C} \times \mathbb{C}$ and $\mathbb{C}^{op} \times \mathbb{C}$, where $\mathbb{C}$ is our familiar category of types and functions.
+The two product categories we're most interested in are $\mathcal{C} \times \mathcal{C}$ and $\mathcal{C}^{op} \times \mathcal{C}$, where $\mathcal{C}$ is our familiar category of types and functions.
 
-In both of these categories, objects are pairs of objects from $\mathbb{C}$. In the first category, $\mathbb{C} \times \mathbb{C}$, a morphism from $(A, B)$ to $(A', B')$ is a pair $(f \colon A \to A', g \colon B \to B')$. In the second category, $\mathbb{C}^{op} \times \mathbb{C}$, a morphism is a pair $(f \colon A' \to A, g \colon B \to B')$, in which the first arrow goes in the opposite direction.
+In both of these categories, objects are pairs of objects from $\mathcal{C}$. In the first category, $\mathcal{C} \times \mathcal{C}$, a morphism from $(A, B)$ to $(A', B')$ is a pair $(f \colon A \to A', g \colon B \to B')$. In the second category, $\mathcal{C}^{op} \times \mathcal{C}$, a morphism is a pair $(f \colon A' \to A, g \colon B \to B')$, in which the first arrow goes in the opposite direction.
 
 \section{Functors}
 
@@ -81,7 +78,7 @@ In other words, \hask{List} maps the type \hask{a} to the type \hask{List a}. \h
 \subsection{Functors between categories}
 In category theory, a type constructor is modeled as a mapping of objects to objects. It's a function on objects. This is not to be confused with arrows between objects, which are part of the structure of the category. 
 
-In fact, it's easier to imagine a mapping \emph{between} categories. Every object in the source category is mapped to an object in the target category. If $A$ is an object in $\mathbb{C}$, there is a corrsponding object $F A$ in $\mathbb{D}$.
+In fact, it's easier to imagine a mapping \emph{between} categories. Every object in the source category is mapped to an object in the target category. If $A$ is an object in $\mathcal{C}$, there is a corrsponding object $F A$ in $\mathcal{D}$.
 
 A functorial mapping, or a \emph{functor}, not only maps objects but also the arrows between them. Every arrow 
 \[ f \colon A \to B\]
@@ -110,7 +107,7 @@ The structure of a category is defined by arrows and their composition. Therefor
 \[ h = g \circ f \]
 remains composed in the second category:
 \[ F h = F (g \circ f) = F g \circ F f \]
-We can either compose two arrows in $\mathbb{C}$ and map the composite to $\mathbb{D}$, or we can map individual arrows and then compose them in $\mathbb{D}$. We demand that the result be the same.
+We can either compose two arrows in $\mathcal{C}$ and map the composite to $\mathcal{D}$, or we can map individual arrows and then compose them in $\mathcal{D}$. We demand that the result be the same.
 \[
  \begin{tikzcd}
  A 
@@ -177,7 +174,7 @@ Describe a functor whose source is the ``walking arrow'' category. It's a stick-
 The ``walking iso'' category is just like the ``walking arrow'' category, plus one more arrow going back from $B$ to $A$. Show that a functor from this category always picks an isomorphism in the target category. 
 \end{exercise}
 
-\section{Functors in programming}
+\section{Functors in Programming}
 
 Endofunctors are the class of functors that are the easiest to express in a programming language. These are functors that map a category (here, the category of types and functions) to itself. 
 
@@ -238,7 +235,7 @@ Show that \hask{(Const a)} is a \hask{Functor}. Hint: The type constructor takes
 
 \subsection{Bifunctors}
 
-We have also seen data constructors that take two types as arguments: the product and the sum constructors. They were functorial as well, but instead of lifting a single function, they lifted a pair of functions. In category theory, we would define these as functors from the product category $\mathbb{C} \times \mathbb{C}$ to $\mathbb{C}$.
+We have also seen data constructors that take two types as arguments: the product and the sum constructors. They were functorial as well, but instead of lifting a single function, they lifted a pair of functions. In category theory, we would define these as functors from the product category $\mathcal{C} \times \mathcal{C}$ to $\mathcal{C}$.
 
 Such functors map a pair of objects to an object, and a pair of arrows to an arrow. 
 
@@ -266,7 +263,7 @@ data MoreThanA a b = More a (Maybe b)
 
 \subsection{Profunctors}
 
-We've seen that the function type is also functorial. It lifts two functions at a time, just like \hask{Bifunctor}, except that one of the functions goes in the opposite direction. In category theory this corresponds to a functor from a product of two categories, one of them being the opposite category: its a functor from $\mathbb{C}^{op} \times \mathbb{C}$ to $\mathbb{C}$. Functors from $\mathbb{C}^{op} \times \mathbb{C}$ are called \emph{profunctors}.
+We've seen that the function type is also functorial. It lifts two functions at a time, just like \hask{Bifunctor}, except that one of the functions goes in the opposite direction. In category theory this corresponds to a functor from a product of two categories, one of them being the opposite category: its a functor from $\mathcal{C}^{op} \times \mathcal{C}$ to $\mathcal{C}$. Functors from $\mathcal{C}^{op} \times \mathcal{C}$ are called \emph{profunctors}.
 
 In Haskell, profunctors form a typeclass:
 \begin{haskell}
@@ -284,7 +281,7 @@ In programming, all non-trivial profunctors are variations on the function type.
 
 \subsection{Contravariant functors}
 
-Functors from the opposite category $\mathbb{C}^{op}$ are called \emph{contravariant}. They have the property of lifting arrows that go in the opposite direction. Regular functors are sometimes called \emph{covariant}.
+Functors from the opposite category $\mathcal{C}^{op}$ are called \emph{contravariant}. They have the property of lifting arrows that go in the opposite direction. Regular functors are sometimes called \emph{covariant}.
 
 In Haskell, contravariant functors form the typeclass \hask{Contravariant}:
 \begin{haskell}
@@ -321,6 +318,44 @@ instance Functor Tester where
 Notice that parentheses are important here. A similar function \hask{a -> Bool -> Bool} has \hask{a} in a \emph{negative} position. This is because it's a function of \hask{a} returning a function \hask{(Bool -> Bool)}. Equivalently, you can uncurry it to get a function that takes a pair: \hask{(a, Bool) -> Bool}.
 
 \section{The Hom Functor}
+
+Arrows between any two objects form a set. This set is called a hom-set and is usually written using the name of the category followed by the names of the objects:
+\[ \mathcal{C}(A, B) \]
+
+We can look at the hom-set $\mathcal{C}(A, B)$ as all the ways $B$ can be observed from $A$. 
+
+Another way of looking at hom-sets is that they define a mapping that assigns a set $\mathcal{C}(A, B)$ to every pair of objects. Sets themselves are objects in the category $\mathbf{Set}$. So we have a mapping between categories.
+
+This mapping is functorial. To see that, let's consider what happens when we transform the two objects $A$ and $B$. We are interested in a transformation that would map the set $\mathcal{C}(A, B)$ to the set $\mathcal{C}(A', B')$. Arrows in $\mathbf{Set}$ are regular functions, so it's enough to define their action on individual elements of a set. 
+
+An element of $\mathcal{C}(A, B)$ is an arrow $h \colon A \to B$ and an element of $\mathcal{C}(A', B')$ is an arrow $h' \colon A' \to B'$. We know how to transform one into another: we need to pre-compose $h$ with an arrow $g' \colon A' \to A$ and post-compose it with an arrow $g \colon B \to B'$. 
+
+In other words, the mapping that takes a pair $(A, B)$ to the set $\mathcal{C}(A, B)$ is a \emph{profunctor}:
+\[ \mathcal{C}^{op} \times \mathcal{C} \to \mathbf{Set} \]
+
+Frequently we are interested in varying only one of the objects, keeping the other fixed. When we fix the source object and vary the target, the result is a functor  that is written as:
+\[ \mathcal{C}(A, -) \colon \mathcal{C} \to \mathbf{Set} \]
+The action of this functor on an arrow $g \colon B \to B'$
+\[ \mathcal{C}(A, g) \colon \mathcal{C}(A, B) \to \mathcal{C}(A, B') \]
+is given by post-composition:
+\[\mathcal{C}(A, g) = (g \circ -) \]
+
+Varying $B$ means switching focus from one object to another. The functor $\mathcal{C}(A, -)$ combines all the arrows emanating from $A$ into a complete coherent view of the category from the perspective of $A$. It is ``the world according to $A$.''
+
+Conversely, when we fix the target and vary the source of the hom-profunctor, we get a contravariant functor:
+\[ \mathcal{C}(-, B) \colon \mathcal{C}^{op} \to \mathbf{Set} \]
+whose action on an arrow $g' \colon A' \to A$
+\[ \mathcal{C}(g', B) \colon \mathcal{C}(A, B) \to \mathcal{C}(A', B) \]
+is given by pre-composition:
+\[\mathcal{C}(g', B) = (- \circ g') \]
+
+The functor $\mathcal{C}(-, B)$ organizes all the arrows pointing at $B$ into one coherent view. It is the picture of $B$ ``as seen by the world.''
+
+We can now reformulate the results from the chapter on isomorphisms. If two objects $A$ and $B$ are isomorphic, than their hom-sets are also isomorphic. In particular:
+\[\mathcal{C}(A, X) \cong \mathcal{C}(B, X)\]
+and 
+\[\mathcal{C}(X, A) \cong \mathcal{C}(X, B)\]
+We'll discuss naturality conditions in the next chapter.
 
 
 \section{Functor Composition}

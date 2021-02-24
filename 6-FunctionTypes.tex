@@ -155,7 +155,7 @@ pairWithTen = pair 10 -- partial application of pair
 
 \subsection{Relation to Lambda Calculus}
 
-Another way of looking at the definition of the function object is to consider $C$ the type of the environment in which $f$ is defined. In that case it's customary to call it $\Gamma$. The arrow is interpreted as an expression. 
+Another way of looking at the definition of the function object is to consider $C$ the type of the environment in which $f$ is defined. In that case it's customary to call it $\Gamma$. The arrow is interpreted as an expression that can be defined in the environment $\Gamma$. 
 
 Consider a simple example, the expression
 \[a x^2 + b x + c\]
@@ -199,7 +199,7 @@ The defining diagram for the function object becomes
  \end{tikzcd}
 \]
 
-The environment $\Gamma$ that provides free parameters for the expression $e$ is a product of multiple objects representing the types of the parameters (in our example, it was $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$). An empty environment is represented by the terminal object, the unit of the product. In that case, $h$ simply picks an element from the function object. 
+The environment $\Gamma$ that provides free parameters for the expression $e$ is a product of multiple objects representing the types of the parameters (in our example, it was $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$). An empty environment is represented by the terminal object, the unit of the product. In the latter case, $h$ simply picks an element from the function object. 
 
 It's important to keep in mind that, in general, a function object represents functions that depend on external parameters. Such functions are called \emph{closures}. Closures are functions that capture values from their environment.
 
@@ -217,7 +217,7 @@ quadratic a b c x = a * x^2 + b * x + c
 
 \subsection{Modus Ponens}
 
-In logic, the function object corresponds to a an implication. An arrow from the terminal object to the function object is the proof of an implication. Function application $\varepsilon$ corresponds to what logicians call \emph{modus ponens}: if you have a proof of the implication $A \Rightarrow B$ and a proof of $A$ then this constitutes the proof of $B$.
+In logic, the function object corresponds to an implication. An arrow from the terminal object to the function object is the proof of an implication. Function application $\varepsilon$ corresponds to what logicians call \emph{modus ponens}: if you have a proof of the implication $A \Rightarrow B$ and a proof of $A$ then this constitutes the proof of $B$.
 
 \section{Sum and Product Revisited}
 
