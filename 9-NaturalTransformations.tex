@@ -11,7 +11,7 @@ The converse is not true, though. An isomorphism between hom-sets does not resul
 
 \section{Natural Transformations Between Hom-Functors}
 
-An isomorphism between two objects can be established directly with a pair of arrows, one the inverse of the other. But quite often it's easier to do it indirectly, by defining bijections between arrows, either the ones impinging on the objects, or the ones emanating from the objects. 
+One way an isomorphism can be established is by directly providing two arrows---one the inverse of the other. But quite often it's easier to do it indirectly, by defining bijections between arrows, either the ones impinging on the objects, or the ones emanating from the objects. 
 
 For instance, as we've seen before, we may have an invertible mapping of arrows $\alpha_X$.
 \[
@@ -44,16 +44,18 @@ Since $X$ is arbitrary, we are effectively dealing with a mapping between two (c
 
 The functor $\mathcal{C}(-, A)$ describes the way the worlds sees $A$, and the functor $\mathcal{C}(-, B)$ describes the way the world sees $B$. 
 
-The transformation $\alpha$ switches back and forth between these two views. Every \emph{component} of $\alpha$, $\alpha_X$ shows that the view of $A$ from $X$ is isomorphic to the view of $B$ from $X$. 
+The transformation $\alpha$ switches back and forth between these two views. Every \emph{component} of $\alpha$, the bijection $\alpha_X$, shows that the view of $A$ from $X$ is isomorphic to the view of $B$ from $X$. 
 
 The naturality condition we discussed before was the condition:
 
 \[ \alpha_Y \circ (- \circ g) = (- \circ g) \circ \alpha_X \]
-It related components of $\alpha$ taken at different objects, or the perspective views from different (but related) observers. 
+It relates components of $\alpha$ taken at different objects. It relates the perspective views between different observers $X$ and $Y$, connected by the arrow $g \colon Y \to X$. 
 
-We can now say that both sides of this equation map hom-sets to hom-sets, more precisely:
+We can now see that both sides of this equation map hom-sets to hom-sets, more precisely:
 \[\mathcal{C}(X, A) \to \mathcal{C}(Y, B)\]
-Precomposition with $g \colon Y \to X$ is also a mapping of hom-sets. In fact it is the lifting of $g$ by the contravariant hom-functor. The naturality condition can be rewritten as:
+Precomposition with $g \colon Y \to X$ is also a mapping of hom-sets. In fact it is the lifting of $g$ by the contravariant hom-functor. 
+
+The naturality condition can therefore be rewritten as:
 \[ \alpha_Y \circ \mathcal{C}(g, A) = \mathcal{C}(g, B) \circ \alpha_X \]
 Or it can be illustrated by this commuting diagram:
 \[
@@ -71,7 +73,7 @@ Or it can be illustrated by this commuting diagram:
  \end{tikzcd}
 \]
 
-An invertible transformation $\alpha$ between the functors $\mathcal{C}(-, A)$ and $\mathcal{C}(-, B)$ that satisfies the naturality condition tells us that there is an isomorphism between $A$ and $B$.
+As we've seen before, an invertible transformation $\alpha$ between the functors $\mathcal{C}(-, A)$ and $\mathcal{C}(-, B)$ that satisfies the naturality condition is equivalent to an isomorphism between $A$ and $B$.
 
 We can follow exactly the same reasoning to translate the case of the outgoing arrows. This time we start with a transformation $\beta$ whose components are:
 \[ \beta_X \colon \mathcal{C}(A, X) \to \mathcal{C}(B, X) \]
@@ -99,27 +101,127 @@ Again, such an invertible natural transformation $\beta$ establishes the isomorp
 
 \section{Natural Transformation Between Functors}
 
-We have explored naturality in the context of a transformation between two hom-functors. 
+The two hom-functors from the previous section were
+\[ F X =   \mathcal{C}(A, X)\]
+\[ G X =   \mathcal{C}(B, X)\]
+They both map the category $\mathcal{C}$ to  $\mathbf{Set}$. We can say, they create two different \emph{models} of $\mathcal{C}$ inside $\mathbf{Set}$. 
+
+A natural transformation is a structure-preserving mapping between models. 
+
+This idea naturally extends to functors between any pair of categories. Any two functors
+\[ F \colon \mathcal{C} \to \mathcal{D} \]
+\[ G \colon \mathcal{C} \to \mathcal{D} \]
+may be seen as two different models of $\mathcal{C}$ inside $\mathcal{D}$. 
+
+To transform one model into another we connect the corresponding dots using arrows in $\mathcal{D}$. 
+
+For every object $X$ in $\mathcal{C}$ we pick an arrow that goes from $F X$ to $G X$:
+\[ \alpha_X \colon F X \to G X \]
+
+However, the structure of the models is defined by arrows. For every arrow $f \colon X \to Y$ in $\mathcal{C}$, there are two corresponding arrows in $\mathcal{D}$:
+\[ F f \colon F X \to F Y\]
+\[ G f \colon G X \to G Y \]
+These are the two liftings of $f$. You can use them to move within the bounds of each of the two models. And then there are the components of $\alpha$ which let you switch between the models. 
+
+Naturality imposes the condition that it shouldn't matter whether you first move inside the first model and then jump to the second one, or first jump to the second model and then move within it. This is illustrated by the commuting \emph{naturality square}:
 
 \[
  \begin{tikzcd}
  F X
  \arrow[d, "\alpha_X"]
- \arrow[r, "F g"]
+ \arrow[r, "F f"]
  &
 F Y
   \arrow[d, "\alpha_Y"]
  \\
 G X
- \arrow[r, "G g"]
+ \arrow[r, "G f"]
 & G Y
  \end{tikzcd}
 \]
 
+A family of arrows $\alpha_X$ that satisfies the naturality condition is called a \emph{natural transformation}. 
 
-natural isomorphism
+If every component $\alpha_X$ of a natural transformation is an isomorphism, $\alpha$ is called a \emph{natural isomorphism}. 
+
+We can now restate the main result about isomorphisms: Two objects are isomorphic if and only if there is a natural isomorphism between their hom-functors (either the covariant, or the contravariant ones).
+
+Natural transformations provide a very convenient higher-order way of expressing commuting conditions in a variety of situations. We'll use them in this capacity to reformulate the definitions of algebraic data types.
+
+\section{Natural Transformations in Programming}
+
+A natural transformation is a family of arrows parameterized by objects. In programming, this corresponds to a family of functions parameterized by types, that is a \emph{polymorphic function}. 
+
+The type of the argument to a natural transformation is constructed by one functor, and the return type by another. 
+
+In Haskell, we can define a data type that accepts two type constructors representing two functors, and producing a new type of natural transformation:
+
+\begin{haskell}
+data Natural :: (Type -> Type) -> (Type -> Type) -> Type where
+  Natural :: (forall a. f a -> g a) -> Natural f g
+\end{haskell}
+The \hask{forall} quantifier tells the compiler that the function is polymorphic---that is, it's defined for every type \hask{a}. As long as \hask{f} and \hask{g} are functors, this formula defines a natural transformation. 
+
+The types defined by \hask{forall} are very special, though. The are polymorphic in the sense of \emph{parametric polymorphism}. It means that a single formula is used for all types. We've seen the example of the identity function, which can be written as:
+\begin{haskell}
+id :: forall a. a -> a
+id x = x
+\end{haskell}
+The body of this function is very simple, just the variable \hask{x}. It doesn't matter what type \hask{x} is, the formula remains the same.
+
+This is in contrast to \emph{ad-hoc polymorphism}. An ad-hoc polymorphic function may use different implementations for different types. An example of such a function is \hask{fmap}, the member function of the \hask{Functor} typeclass. There is one implementation of \hask{fmap} for lists, a different one for \hask{Maybe}, and so on, case by case. 
+
+It turns out that limiting the type of a natural transformation to adhere to parametric polymorphism has far reaching consequences. Such a function automatically satisfies the naturality condition. This is an example of parametricity producing so called \emph{theorems for free}. 
+
+The standard definition of a (parametric) natural transformation in Haskell uses a \emph{type synonym:}
+\begin{haskell}
+type Natural f g = forall a. f a -> g a
+\end{haskell}
+A \hask{type} declaration introduces an alias, a shorthand, for the right-hand-side.
+
+Here's an example of a useful function that is a natural transformation between the list functor and the \hask{Maybe} functor:
+\begin{haskell}
+safeHead :: Natural [] Maybe
+safeHead [] = Nothing
+safeHead (a : as) = Just a
+\end{haskell}
+(The standard library \hask{head} function is ``unsafe'' in that it faults when given an empty list.)
+
+A useful intuition for understanding natural transformations builds on the idea that functors acts like containers of data. There are two completely orthogonal things that you can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure of moving ``stuff'' between containers with no way of knowing what kind of ``stuff'' it is. 
+
+Naturality condition enforces the orthogonality of these two operations. It doesn't matter if you first modify the data and then move it to another container; or first move it, and then modify. 
+
+This is another example of successfully decomposing a complex problem into a sequence of simpler ones. Keep in mind, though, that not every operation with containers of data can be decomposed in that way. Filtering, for instance, requires both examining the data, as well as changing the size or even the shape of the container. 
+
+On the other hand, almost every parametrically polymorphic function is a natural transformation. In some cases you may have to consider the identity or the constant functor as either source or the target. For instance, the polymorphic identity function can be though of as a natural transformation between two identity functors.
+
+\section{Universal Constructions}
+
+We've seen definitions of sums, products, exponentials, natural numbers, and lists. 
+
+The traditional approach to defining such data types is to explore their internals. This is the set-theory way: we look at how the elements of new sets are constructed from the elements of old sets. An element of a sum is either an element of the first set, or the second set. An element of a product is a pair of elements. And so on. We are looking at objects from the engineering point of view.
+
+In category theory we take the opposite approach. We are not interested in what's inside the object or how it's implemented. We are interested in the purpose of the object, how it can be used, and how it interacts with other objects. We are looking at objects from the user's point of view.
+
+Both approaches have their advantages. The categorical approach came later because you need to study a lot of examples before clear patterns emerge. But once you see the patterns, you discover unexpected connections between things: like the duality between sums and products.
+
+Defining particular objects through their connection requires looking at possibly infinite numbers of objects. 
+
+Tell me your place in the Universe, and I'll tell you who you are.
+
+Defining an object by its mappings-out or mappings-in with respect to all objects in the category is called a \emph{universal construction}. 
+
+Since most universal constructions involve commuting diagrams, they can be reformulated at a higher level using natural transformations.
+
+\subsection{Picking objects}
+
+\subsection{Sums}
+
+
 
 \section{The Yoneda Lemma}
+
+Yoneda embedding
 
 \section{Composition of Natural Transformations}
 
@@ -129,7 +231,9 @@ product/coproduct
 
 mapping between models
 
-composition
+composition (also, isomorphism as composition to identity NT)
+
+2-category Cat
 
 polymorphic functions
 

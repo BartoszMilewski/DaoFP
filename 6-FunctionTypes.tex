@@ -10,7 +10,7 @@ If we model functions as arrows between objects, then what does it mean to have 
 
 We need a way to objectify functions in order to define arrows that have an ``object of arrows'' as a source or as a target. A function that takes a function as an argument or returns a function is called a \emph{higher-order} function.
 
-\subsection{Elimination Rule}
+\subsection{Elimination rule}
 
 The defining quality of a function is that it can be applied to an argument to produce the result. We have defined function application in terms of composition:
 
@@ -53,7 +53,7 @@ Function application is the \emph{elimination rule} for function type.
 
 When somebody gives you an element of the function object, the only thing you can do with it is to apply it to an element of the argument type using $\varepsilon$. 
 
-\subsection{Introduction Rule}
+\subsection{Introduction rule}
 To complete the definition of the function object, we also need the introduction rule. 
 
 First, suppose that there is a way of constructing a function object $B^A$ from some other object $C$. It means that there is an arrow
@@ -153,7 +153,7 @@ pairWithTen = pair 10 -- partial application of pair
 
 
 
-\subsection{Relation to Lambda Calculus}
+\subsection{Relation to lambda calculus}
 
 Another way of looking at the definition of the function object is to consider $C$ the type of the environment in which $f$ is defined. In that case it's customary to call it $\Gamma$. The arrow is interpreted as an expression that can be defined in the environment $\Gamma$. 
 
@@ -215,7 +215,7 @@ quadratic a b c x = a * x^2 + b * x + c
 \end{haskell}
 
 
-\subsection{Modus Ponens}
+\subsection{Modus ponens}
 
 In logic, the function object corresponds to an implication. An arrow from the terminal object to the function object is the proof of an implication. Function application $\varepsilon$ corresponds to what logicians call \emph{modus ponens}: if you have a proof of the implication $A \Rightarrow B$ and a proof of $A$ then this constitutes the proof of $B$.
 
@@ -223,7 +223,7 @@ In logic, the function object corresponds to an implication. An arrow from the t
 
 When functions gain the same status as elements of other types, we have the tools to directly translate diagrams into code. 
 
-\subsection{Sum Types}
+\subsection{Sum types}
 
 Let's start with the definition of the sum.
 \[
@@ -274,7 +274,7 @@ unEither h = (h . Left, h . Right)
 \end{haskell}
 
 
-\subsection{Product Types}
+\subsection{Product types}
 
 Product types are dually defined by their mapping-in property.
 \[
@@ -308,7 +308,7 @@ fork h = (fst . h, snd . h)
 \end{haskell}
 which also closely follows the reading of the diagram.
 
-\subsection{Functoriality Revisited}
+\subsection{Functoriality revisited}
 
 Both sum and product are functorial, which means that we can apply functions to their contents. We are ready to translate those diagrams into code. 
 
