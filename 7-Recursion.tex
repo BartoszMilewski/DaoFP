@@ -8,7 +8,7 @@ When you step between two mirrors, you see your reflection, the reflection of yo
 
 Recursion is a decomposition pattern that splits a single task into many steps, the number of which is potentially unbounded.  
 
-Recursion is based on suspension of disbelief. You are faced with a task that may take arbitrarily many steps. You tentatively assume that you know how to solve it. Then you ask the question: "How would I make the last step if I had the solution to everything \emph{but} the last step?"
+Recursion is based on suspension of disbelief. You are faced with a task that may take arbitrarily many steps. You tentatively assume that you know how to solve it. Then you ask yourself the question: "How would I make the last step if I had the solution to everything \emph{but} the last step?"
 
 \section{Natural Numbers}
 
@@ -18,9 +18,9 @@ We can use an arrow from the terminal object to define one special element. By c
 \[ Z \colon 1 \to N \]
 But we have to be able to define infinitely many arrows to account for the fact that, for every natural number, there is another number that is one larger than it. 
 
-We can formalize this statement by saying: Suppose that we know how to create a natural number $n \colon 1 \to N$. How do we make the next step, the step that will point us to the next number---the successor? 
+We can formalize this statement by saying: Suppose that we know how to create a natural number $n \colon 1 \to N$. How do we make the next step, the step that will point us to the next number---its successor? 
 
-This next step doesn't have to be more complex than just post-composing $n$ with an arrow that loops from $N$ to $N$. This arrow should not be the identity, because we want the successor of a number to be different from that number. But a single such arrow, which we'll call $S$  for ``successor'' will suffice. 
+This next step doesn't have to be any more complex than just post-composing $n$ with an arrow that loops back from $N$ to $N$. This arrow should not be the identity, because we want the successor of a number to be different from that number. But a single such arrow, which we'll call $S$  for ``successor'' will suffice. 
 
 The element corresponding to the successor of $n$ is given by the composition:
 \[ 1 \xrightarrow{n} N \xrightarrow{S} N\]
@@ -54,7 +54,7 @@ and so on.
 
 \subsection{Introduction Rules}
 
-The two arrows, $Z$ and $S$, serve as the introduction rules for the natural number object $N$. The twist is that one of them is recursive: $S$ uses $N$ as its source as well as the target.
+The two arrows, $Z$ and $S$, serve as the introduction rules for the natural number object $N$. The twist is that one of them is recursive: $S$ uses $N$ as its source as well as its target.
 
 \[
  \begin{tikzcd}
@@ -64,7 +64,7 @@ The two arrows, $Z$ and $S$, serve as the introduction rules for the natural num
  \arrow[loop, "S"']
  \end{tikzcd}
 \]
-The introduction rules translate directly to Haskell
+The two introduction rules translate directly to Haskell
 
 
 \begin{haskell}
@@ -87,13 +87,13 @@ You may encounter this construction under the name of \emph{Peano arithmetic}.
 
 \subsection{Elimination Rules}
 
-The fact that the introduction rules are recursive complicates the matters slightly when it comes to defining the elimination rules. We will follow the pattern from previous chapters of first assuming that we are given a mapping out of $N$:
+The fact that the introduction rules are recursive complicates the matters slightly when it comes to defining elimination rules. We will follow the pattern from previous chapters of first assuming that we are given a mapping out of $N$:
 \[ h \colon N \to A \]
 and see what we can deduce from there. 
 
-Previously, we were able to decompose such an $h$ into simpler mappings (pairs of mappings for sum and product, a mapping out of a product for the exponential). 
+Previously, we were able to decompose such an $h$ into simpler mappings (pairs of mappings for sum and product; a mapping out of a product for the exponential). 
 
-The introduction rules for $N$ look similar to those for the sum, so we would expect that $h$ could be split into two arrows corresponding to two introduction rules. And, indeed, we can easily get the first one by composing $h \circ Z$. This is an arrow that picks an element of $A$. We call $init$:
+The introduction rules for $N$ look similar to those for the sum, so we would expect that $h$ could be split into two arrows corresponding to two introduction rules. And, indeed, we can easily get the first one by composing $h \circ Z$. This is an arrow that picks an element of $A$. We call it $init$:
 \[\text{init} \colon 1 \to A \]
 But there is no obvious way to find the second one. 
 
@@ -187,7 +187,7 @@ plus n = rec init step
 \end{haskell}
 This function takes \hask{n} as an argument and produces a function (a closure) that takes another number and adds  \hask{n} to it. 
 
-In practice, programmers prefer to implement recursion directly---an approach that is equivalent to inlining the recursor \hask{rec}. The following implementation is arguably easier to analyze:
+In practice, programmers prefer to implement recursion directly---an approach that is equivalent to inlining the recursor \hask{rec}. The following implementation is arguably easier to understand:
 \begin{haskell}
 plus n m = case m of
   Z -> n
@@ -195,7 +195,7 @@ plus n m = case m of
 \end{haskell}
 It can be read as: If \hask{m} is zero then the result is \hask{n}. Otherwise, if \hask{m} is a successor of some \hask{k}, then the result is the successor of  \hask{k + n}. This is exactly the same as saying that \hask{init = n} and \hask{step = S}.
 
-In imperative languages recursion is often replaced by iteration. Conceptually, iteration seems to be easier to understand, as it corresponds to sequential decomposition. The steps in the sequence usually follow some natural order. This is in contrast with recursive decomposition, where we assume that we have done all the work up to the $n$'th step, and we have to combine that result with the next consecutive step. 
+In imperative languages recursion is often replaced by iteration. Conceptually, iteration seems to be easier to understand, as it corresponds to sequential decomposition. The steps in the sequence usually follow some natural order. This is in contrast with recursive decomposition, where we assume that we have done all the work up to the $n$'th step, and we combine that result with the next consecutive step. 
 
 On the other hand, recursion is more natural when processing recursively defined data structures, such as lists or trees. 
 
@@ -213,9 +213,9 @@ step :: (Nat -> Nat) -> (Nat -> Nat)
 
 \subsection{Induction}
 
-The elimination pattern for the natural number object is reminiscent of proof by induction. The arrow $init$ looks like the proof of the base case, and $step$ looks like the induction step. Except that, in the propositions as types interpretation, we would interpret the target $A$ as a single proposition. 
+The elimination pattern for the natural number object is reminiscent of proof by induction. The arrow $init$ looks like the proof of the base case, and $step$ looks like the induction step. However, in the propositions as types interpretation, the target $A$ is a single proposition. 
 
-Instead, the principle of induction corresponds to the elimination pattern that involves \emph{dependent types}. Instead of a single type $A$, it uses a whole family of types parameterized by natural numbers $A(n)$. The dependent function $h$ maps each natural number $n$ to a value of type $A(n)$. The function $h$ corresponds to the proof of a proposition: $A(n)$ is true for all $n$. 
+Instead, the principle of induction corresponds to the elimination pattern that involves \emph{dependent types}. Rather than a single type $A$, it uses a whole family of types parameterized by natural numbers $A(n)$. The dependent function $h$ maps each natural number $n$ to a value of type $A(n)$. The function $h$ corresponds to the proof of a proposition $A(n)$ for all $n$. 
 
 The $init$ value is an element of $A(Z)$, and $step$ is a dependent function that maps $A(n)$ to $A(S\, n)$. They correspond to the proof of the base case and the proof of the inductive step, respectively.
 
@@ -223,7 +223,7 @@ The $init$ value is an element of $A(Z)$, and $step$ is a dependent function tha
 
 A list of things is either empty or a thing followed by a list of things. 
 
-This recursive definition translates to two introduction rules for the type $L_A$, the list of $A$: 
+This recursive definition translates into two introduction rules for the type $L_A$, the list of $A$: 
 \[ \text{Nil} \colon 1 \to L_A \]
 \[ \text{Cons} \colon A \times L_A \to L_A \]
 The $Nil$ element describes an empty list, and $Cons$ constructs a list from a head and a tail. 
@@ -298,7 +298,7 @@ h []      = -- empty-list case
 h (a: as) = -- case for the head and the tail of a non-empty list
 \end{haskell}
 
-Corresponding to the recursor, here's the type signature of the library function \hask{foldl} (fold \emph{left}) which is defined in the standard library:
+Corresponding to the recursor, here's the type signature of the library function \hask{foldl} (fold \emph{left}), which you can find in the standard library:
 \begin{haskell}
 foldl :: (c -> a -> c) -> c -> [a] -> c
 \end{haskell}
@@ -310,7 +310,7 @@ foldl step init = \as ->
     a : as -> step (fold step init as) a
 \end{haskell}
 
-We can, for instance, use \hask{foldl} to calculate the sum of the elements of a list of natural numbers:
+As an example, we can use \hask{foldl} to calculate the sum of the elements of a list of natural numbers:
 \begin{haskell}
 sum :: [Nat] -> Nat
 sum = foldl plus Z
@@ -332,7 +332,7 @@ Implement a function that extracts the third element from a list, if the list is
 
 \section{Functoriality}
 
-Functoriality means, roughly, the ability to transform the ``contents'' of a data structure. The contents of a list $L_A$ is of the type $A$. Given an arrow $f \colon A \to B$, can we define a mapping of lists $h \colon L_A \to L_B$?
+Functoriality means, roughly, the ability to transform the ``contents'' of a data structure. The contents of a list $L_A$ is of the type $A$. Given an arrow $f \colon A \to B$, we need to define a mapping of lists $h \colon L_A \to L_B$?
 
 Lists are defined by the mapping out property, so let's replace the target $C$ of the elimination rule by $L_B$. We get:
 
@@ -380,7 +380,7 @@ map f [] = []
 map f (a : as) = f a : map f as
 \end{haskell}
 
-In principle we could have implemented $step = snd$, resulting in:
+You might wonder what prevents us from choosing $step = snd$, resulting in:
 \begin{haskell}
 badMap :: (a -> b) -> [a] -> [b]
 badMap f [] = []

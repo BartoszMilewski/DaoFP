@@ -152,6 +152,8 @@ In the extreme, any category can be mapped to a singleton category with one obje
 
 Also, not all object or arrows in the target category must be covered by a functor. In the extreme, we can have a functor from the singleton category to any (non-empty) category. Such a functor picks a single object together with its identity arrow.
 
+A \emph{constant functor} $\Delta_C$ is an example of a functor that maps all objects from the source category to a single object $C$ in the target category, and all arrows from the source category to a single identity arrow $id_C$.
+
 In category theory, functors are often used for creating models of one category inside another. The fact that they can merge multiple objects and arrows into one means that they produce simplified views of the source category. They ``abstract'' some aspects of the source category.
 
 The fact that they may only cover parts of the target category means that the models can be seen as embedded in a larger environment.
@@ -221,15 +223,15 @@ Show that \hask{Id} is a \hask{Functor}.
 \end{exercise}
 
 
-We also have a constant functor that maps all objects to a single designated object, and all arrows to the identity arrow for this object. In Haskell, it's a family of functors parameterized by the target object \hask{a}:
+We also have a constant functor $\Delta_C$ that maps all objects to a single object $C$, and all arrows to the identity arrow for this object. In Haskell, it's a family of functors parameterized by the target object \hask{c}:
 \begin{haskell}
-data Const a b = Const a
+data Const c a = Const c
 \end{haskell}
 This type constructor ignores its second argument.
 
 
 \begin{exercise}
-Show that \hask{(Const a)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but here it's partially applied to the first argument. It is functorial in the second argument.
+Show that \hask{(Const c)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but here it's partially applied to the first argument. It is functorial in the second argument.
 \end{exercise}
 
 
