@@ -460,18 +460,21 @@ Combining all these together, we get:
 \begin{haskell}
 dist = either f g
   where
-    f   :: (b, a) -> (Either b c, a)
     f   = f' &&& f''
-    g   :: (c, a) -> (Either b c, a)
-    g   = g' &&& g''
-    f'  :: (b, a) -> Either b c
     f'  = Left . fst
-    f'' :: (b, a) -> a
     f'' = snd
-    g'  :: (c, a) -> Either b c
+    g   = g' &&& g''
     g'  = Right . fst
-    g'' :: (c, a) -> a
     g'' = snd
+\end{haskell}
+These are the type signatures of the helper functions:
+\begin{haskell}
+    f   :: (b, a) -> (Either b c, a)
+    g   :: (c, a) -> (Either b c, a)
+    f'  :: (b, a) -> Either b c
+    f'' :: (b, a) -> a
+    g'  :: (c, a) -> Either b c
+    g'' :: (c, a) -> a
 \end{haskell}
 They can also be inlined to produce this terse form:
 \begin{haskell}
@@ -491,7 +494,23 @@ undist (Right c, a) = Right (c, a)
 \end{haskell}
 but this is because of implicit currying. 
 
-More explicitly, the morphism:
+Here's the point-free version of this function:
+\begin{haskell}
+undist = uncurry (either (curry Left) (curry Right))
+\end{haskell}
+This may not be the most readable implementation, but it underscores the fact that we need the exponential: we use both \hask{curry} and \hask{uncurry} to implement the mapping.
+
+We'll come back to this identity and construct a simpler proof of it in the chapter on adjunctions.
+
+\begin{exercise}
+Show that:
+\[ 2 \times A \cong A + A \]
+where $2$ is the Boolean type. Do the proof diagrammatically first, and then implement two Haskell functions witnessing the isomorphism.
+\end{exercise}
+
+\subsection{Digression: Derivation used in the proof of distributivity}
+
+The morphism:
 \[(B + C) \times A \to B \times A + C \times A\]
 is a mapping \emph{out} of a product, so we have to call the definition of the function object to the rescue.  
 
@@ -508,7 +527,7 @@ A mapping out of a product is in one to one correspondence with a mapping into t
 & B
  \end{tikzcd}
 \]
-If we want to replace $f$ with \hask{undist}, we need to do the following substitutions. Replace $B$ with our result type: $B \times A + C \times A$. Replace $C$ with $B + C$,:
+If we want to replace $f$ with \hask{undist}, we need to do the following substitutions. Replace $B$ with our result type: $B \times A + C \times A$. Replace $C$ with $B + C$:
 \[
  \begin{tikzcd}
  (B+C) \times A
@@ -552,13 +571,7 @@ Combining all these functions into one formula gives us:
 \begin{haskell}
 undist = uncurry (either (curry Left) (curry Right))
 \end{haskell}
-This may not be the most readable implementation, but it underscores the fact that we need the exponential: we use both \hask{curry} and \hask{uncurry} to implement the mapping.
 
-\begin{exercise}
-Show that:
-\[ 2 \times A \cong A + A \]
-where $2$ is the Boolean type. Do the proof diagrammatically first, and then implement two Haskell functions witnessing the isomorphism.
-\end{exercise}
 
 
 \end{document}
