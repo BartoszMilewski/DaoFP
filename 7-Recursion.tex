@@ -228,7 +228,7 @@ This recursive definition translates into two introduction rules for the type $L
 \[ \text{Cons} \colon A \times L_A \to L_A \]
 The $Nil$ element describes an empty list, and $Cons$ constructs a list from a head and a tail. 
 
-The following diagram depicts the relationship between projections and list constructors. The projections extract the head and the tail of the list that is constructed using $Cons$.
+The following diagram depicts the relationship between projections and list constructors. The projections extract the head and the tail of the list that was constructed using $Cons$.
 \[
  \begin{tikzcd}
  & A \times L_A
@@ -298,7 +298,7 @@ h []      = -- empty-list case
 h (a: as) = -- case for the head and the tail of a non-empty list
 \end{haskell}
 
-Corresponding to the recursor, here's the type signature of the library function \hask{foldl} (fold \emph{left}), which you can find in the standard library:
+Corresponding to the recursor, here's the type signature of the function \hask{foldl} (fold \emph{left}), which you can find in the standard library:
 \begin{haskell}
 foldl :: (c -> a -> c) -> c -> [a] -> c
 \end{haskell}
@@ -318,7 +318,7 @@ sum = foldl plus Z
 
 
 \begin{exercise}
-Consider what happens when you replace $A$ in the definition of list with the initial object. Hint: What is base-one encoding of natural numbers?
+Consider what happens when you replace $A$ in the definition of a list with the initial object. Hint: What is base-one encoding of natural numbers?
 \end{exercise}
 \begin{exercise}
 How many mappings $h \colon L_A \to 1 + A$ are there? Can we get all of them using a list recursor? How about Haskell functions of the signature:
@@ -327,12 +327,12 @@ h :: [a] -> Maybe a
 \end{haskell}
 \end{exercise}
 \begin{exercise}
-Implement a function that extracts the third element from a list, if the list is long enough. Hint: Use \hask{Mabe a} for result type.
+Implement a function that extracts the third element from a list, if the list is long enough. Hint: Use \hask{Mabe a} for the result type.
 \end{exercise}
 
 \section{Functoriality}
 
-Functoriality means, roughly, the ability to transform the ``contents'' of a data structure. The contents of a list $L_A$ is of the type $A$. Given an arrow $f \colon A \to B$, we need to define a mapping of lists $h \colon L_A \to L_B$?
+Functoriality means, roughly, the ability to transform the ``contents'' of a data structure. The contents of a list $L_A$ is of the type $A$. Given an arrow $f \colon A \to B$, we need to define a mapping of lists $h \colon L_A \to L_B$.
 
 Lists are defined by the mapping out property, so let's replace the target $C$ of the elimination rule by $L_B$. We get:
 
@@ -362,6 +362,7 @@ The only candidate for $init$ is $Nil_B$, which is to say that $h$ acting on an 
 
 What remains is to define the arrow:
 \[\text{step} \colon A \times L_B \to L_B\]
+We can take:
 \[ \text{step} = \text{Cons}_B \circ (f \times id_{L_B}) \]
 
 This corresponds to the Haskell function:
