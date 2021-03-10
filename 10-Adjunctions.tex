@@ -6,18 +6,30 @@
 
 
 
-\section{notes}
+\section{The Currying Adjunction}
 
+\[  \mathcal{C}(A \times B, C ) \cong  \mathcal{C} (A, C^B)  \]
+
+\[ (- \times B) \dashv (-)^B \]
+
+\section{The Sum and Product Adjunctions}
+
+
+\subsection{Diagonal functor}
 diagonal functor vs. constant functor
 
+\subsection{The sum adjunction}
 \[  \mathcal{C} (A + B, X) \cong (\mathcal{C} \times \mathcal{C})( \langle A, B \rangle , \Delta_X)\]
 \[  \mathcal{C} (A + B, X) \cong \mathcal{C}( A , X) \times \mathcal{C}( B , X)\]
+
+\subsection{The product adjunction}
 
 \[  (\mathcal{C} \times \mathcal{C})( \Delta_X,  \langle A, B \rangle ) \cong  \mathcal{C} (X, A \times B)  \]
 \[  \mathcal{C} (X, A) \times \mathcal{C}(X, B) \cong  \mathcal{C} (X, A \times B)  \]
 
-\[  \mathcal{C}(A \times B, C ) \cong  \mathcal{C} (A, C^B)  \]
+\section{Unit and Counit of Adjunction}
 
+\section{Distributivity}
 
 Natural isomorphism:
 
@@ -31,6 +43,12 @@ Proof by Yoneda:
 \[  \mathcal{C}(B, X^A) \times \mathcal{C}(C, X^A) \cong \mathcal{C}(B \times A, X) \times \mathcal{C}(C \times A, X)\]
 
 \[ \mathcal{C}(B \times A, X) \times \mathcal{C}(C \times A, X) \cong \mathcal{C}(B \times A + C \times A, X) \]
+
+\section{notes}
+
+
+
+
 
 \begin{exercise}
 \end{exercise}

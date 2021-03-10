@@ -318,7 +318,7 @@ sum = foldl plus Z
 
 
 \begin{exercise}
-Consider what happens when you replace $A$ in the definition of a list with the initial object. Hint: What is base-one encoding of natural numbers?
+Consider what happens when you replace $A$ in the definition of a list with the terminal object. Hint: What is base-one encoding of natural numbers?
 \end{exercise}
 \begin{exercise}
 How many mappings $h \colon L_A \to 1 + A$ are there? Can we get all of them using a list recursor? How about Haskell functions of the signature:
@@ -327,7 +327,7 @@ h :: [a] -> Maybe a
 \end{haskell}
 \end{exercise}
 \begin{exercise}
-Implement a function that extracts the third element from a list, if the list is long enough. Hint: Use \hask{Mabe a} for the result type.
+Implement a function that extracts the third element from a list, if the list is long enough. Hint: Use \hask{Maybe a} for the result type.
 \end{exercise}
 
 \section{Functoriality}
