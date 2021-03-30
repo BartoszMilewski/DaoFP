@@ -4,50 +4,468 @@
 
 \chapter{Adjunctions}
 
+A sculptor subtracts irrelevant stone until a sculpture emerges. A mathematician abstracts irrelevant details until a pattern emerges.
 
+We were able to define a lot of constructions using their mapping-in and mapping-out properties. Those, in turn, could be compactly written as isomorphisms between hom-sets. This pattern of natural isomorphisms between hom-sets is called the adjunction and, once recognized, pops up virtually everywhere.
 
 \section{The Currying Adjunction}
 
+The definition of the exponential is the classic example of an adjunction that relates mappings-out and mappings-in. Every mapping out of a product corresponds to a unique mapping into the exponential:
 \[  \mathcal{C}(A \times B, C ) \cong  \mathcal{C} (A, C^B)  \]
+The objects $A$ and $C$ take the roles of the observer and the focus. On the left, $A$ is mapped to a product $A \times B$, and $C$ acts as the focus. On the right, $C$ is exponentiated, and $A$ acts as the observer. 
+
+We can spot two functors at play. They are both parameterized by $B$. On the left we have the functor $(- \times B)$ acting on $A$. On the right we have the functor $(-)^B$ acting on $C$. 
+
+If we write these functors as:
+\[ L_B A = A \times B \]
+\[ R_B C = C^B \]
+then the natural isomorphism
+\[ \mathcal{C}(L_B A, C) \cong \mathcal{C}(A, R_B C) \]
+is called the adjunction between them. 
+
+The shorthand notation for the adjunction is $L \dashv R$. Substituting the product functor for $L$ and the exponential functor for $R$, we can write the currying adjunction concisely as:
 
 \[ (- \times B) \dashv (-)^B \]
 
-\section{The Sum and Product Adjunctions}
+\section{The Sum and the Product Adjunctions}
+
+The currying adjunction related two endofunctors, but an adjunction can be easily generalized to functors that go between categories. Let's see some examples first.
+
+\subsection{The diagonal functor}
+
+The sum and the product types were defined using bijections where one of the sides was a single arrow and the other was a pair of arrows. A pair of arrows can be seen as a single arrow in the product category. 
+
+To explore this idea, we need to define the diagonal functor $\Delta$, which is a particular mapping from $\mathcal{C}$ to $\mathcal{C} \times \mathcal{C}$. It takes an object $X$ and duplicates it, producing a pair of objects $\langle X, X \rangle$. It also takes an arrow $f$ and duplicates it $\langle f, f \rangle$
+
+Interestingly, this functor is related to the constant functor we've seen previously. The constant functor can be though of as a functor of two variables---it just ignores the second one. We've seen this in the Haskell definition:
+\begin{haskell}
+data Const c a = Const c
+\end{haskell}
+
+To see the connection, let's look at the product category $\mathcal{C} \times \mathcal{C}$ as a functor category $[ \mathbf{2}, \mathcal{C}]$, in other words, the exponential object $\mathcal{C}^{ \mathbf{2}}$ in $\mathbf{Cat}$. Indeed, a functor from $\mathbf{2}$ picks a pair of objects---which is a single object in the product category.
 
 
-\subsection{Diagonal functor}
-diagonal functor vs. constant functor
+A functor $\mathcal{C} \to [\mathbf{2}, \mathcal{C}]$ can be curried to $\mathcal{C} \times \mathbf{2} \to  \mathcal{C}$. If we do this to the diagonal functor, we see that it ignores the second argument, the one coming from $\mathbf{2}$: it does the same whether the second argument is $1$ or $2$. But that's exactly what the constant functor does. This is why we use the same symbol $\Delta$ for both.
+
+Incidentally, this argument can be easily generalized to any indexing category, not just $\mathbf{2}$.
 
 \subsection{The sum adjunction}
-\[  \mathcal{C} (A + B, X) \cong (\mathcal{C} \times \mathcal{C})( \langle A, B \rangle , \Delta_X)\]
+
+Recall that the sum is defined by its mapping out property. There is one-to one correspondence between the arrows coming out of the sum $A + B$ and pairs of arrows coming from $A$ and $B$ separately. In terms of hom-sets, we can write it as:
 \[  \mathcal{C} (A + B, X) \cong \mathcal{C}( A , X) \times \mathcal{C}( B , X)\]
+where the product on the right-hand side is just a cartesian product of sets, that is the set of pairs. Moreover, we've seen earlier that this bijection is natural in $X$.
+
+We know that a pair of arrows is a single arrow in the product category. We can, therefore, look at the elements of the right-hand side as arrows in $\mathcal{C} \times \mathcal{C}$ going from the object $\langle A, B \rangle$ to the object $\langle X, X \rangle$. The second object we can get from the action of the diagonal functor $\Delta$ on $X$. We have:
+
+\[  \mathcal{C} (A + B, X) \cong (\mathcal{C} \times \mathcal{C})( \langle A, B \rangle , \Delta X)\]
+This is a bijection between hom-sets in two different categories. It satisfies naturality conditions, so it's a natural isomorphism. 
+
+We can spot a pair of functors here as well. On the left we have the functor that takes a pair of objects $\langle A, B \rangle$ and produces their sum $A + B$
+\[ (+) \colon \mathcal{C} \times \mathcal{C} \to \mathcal{C}\]
+On the right, we have the diagonal functor $\Delta$ going in the opposite direction
+\[ \Delta \colon \mathcal{C} \to  \mathcal{C} \times \mathcal{C} \]
+Altogether, we have a pair of functors between a pair of categories:
+\[
+ \begin{tikzcd}
+  \mathcal{C}
+   \arrow[rr, bend right, "\Delta"']
+  &&
+  \mathcal{C} \times \mathcal{C}
+ \arrow[ll, bend right, "(+)"']
+  \end{tikzcd}
+\]
+and an isomorphism between the hom-sets
+\[
+ \begin{tikzcd}
+A + B
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+  &&
+ \langle A , B \rangle
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+ \arrow[ll, bend right, "(+)"']
+ \\
+ X
+   \arrow[rr, bend right, "\Delta"']
+ &&
+ \langle X, X \rangle
+  \end{tikzcd}
+\]
+
 
 \subsection{The product adjunction}
 
-\[  (\mathcal{C} \times \mathcal{C})( \Delta_X,  \langle A, B \rangle ) \cong  \mathcal{C} (X, A \times B)  \]
+We can apply the same reasoning to the definition of a product. This time we have a natural isomorphism between pairs of arrows and and a mapping into the product.
+
 \[  \mathcal{C} (X, A) \times \mathcal{C}(X, B) \cong  \mathcal{C} (X, A \times B)  \]
+Replacing pairs of arrows with arrows in the product category we get:
+
+\[  (\mathcal{C} \times \mathcal{C})( \Delta X,  \langle A, B \rangle ) \cong  \mathcal{C} (X, A \times B)  \]
+These are the two functors in action:
+\[
+ \begin{tikzcd}
+  \mathcal{C} \times \mathcal{C}
+  \arrow[rr, bend right, "(\times)"']
+  &&
+  \mathcal{C}
+  \arrow[ll, bend right, "\Delta"']
+  \end{tikzcd}
+\]
+and this is the isomorphism of hom-sets:
+
+\[
+ \begin{tikzcd}
+ \langle X, X \rangle
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+  &&
+  X
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+ \arrow[ll, bend right, "\Delta"']
+ \\
+ \langle A , B \rangle
+   \arrow[rr, bend right, "(\times)"']
+ &&
+ A \times B
+  \end{tikzcd}
+\]
+
+
+\section{Adjunction between functors}
+
+In general, an adjunction relates two functors going in opposite directions between two categories. The left functor 
+\[ L \colon \mathcal{D} \to \mathcal{C}\]
+and the right functor:
+\[ R \colon \mathcal{C} \to  \mathcal{D} \]
+The adjunction $L \dashv R$ is defined as a natural isomorphism between two hom-sets.
+\[  \mathcal{C} (L X, Y) \cong \mathcal{D}( X , R Y)\]
+
+Pictorially, these are the two functors:
+\[
+ \begin{tikzcd}
+  \mathcal{C}
+  \arrow[rr, bend right, "R"']
+  &&
+  \mathcal{D}
+  \arrow[ll, bend right, "L"']
+  \end{tikzcd}
+\]
+and this is the isomorphism of hom-sets:
+\[
+ \begin{tikzcd}
+L X
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+  &&
+  X
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+ \arrow[ll, bend right, "L"']
+ \\
+Y
+   \arrow[rr, bend right, "R"']
+ &&
+ R Y
+  \end{tikzcd}
+\]
+ These hom-sets come from two different categories, but sets are just sets. We say that $L$ is the left adjoint to $R$, or that $R$ is the right adjoint to $L$
+
+In Haskell, the simplified version of this could be encoded as a multi-parameter type class:
+\begin{haskell}
+class (Functor left, Functor right) => Adjunction left right where
+  ltor :: (left x -> y) -> (x -> right y)
+  rtol :: (x -> right y) -> (left x -> y)
+\end{haskell}
+It requires the following pragma at the top of the file:
+\begin{haskell}
+{-# language MultiParamTypeClasses #-}
+\end{haskell}
+
+
+
+Therefore, in a bicartesian category, the sum is the left adjoint to the diagonal functor, and the product is its right adjoint. We can write this very concisely (or we could impress it in clay, in a modern version of cuneiform):
+\[ (+) \dashv \Delta \dashv (\times) \]
+
+
+\section{Limits and Colimits}
+
+The definition of a limit also involves a natural isomorphism between hom-sets:
+\[ [\mathbf{I}, \mathcal{C}](\Delta_X, D)  \cong \mathcal{C}(X, \text{Lim}_D) \]
+The hom-set on the left is in the functor category. Its elements are cones, or natural transformations between the constant functor and the diagram functor. The one on the right is a hom-set in $\mathcal{C}$. 
+
+In a category where all limits exist, we have the adjunction between these two functors:
+\[ \Delta_{(-)} \colon \mathcal{C} \to  [\mathbf{I}, \mathcal{C}] \]
+\[ Lim_{(-)} \colon  [\mathbf{I}, \mathcal{C}] \to \mathcal{C} \]
+
+Dually, the colimit is described by the following natural isomorphism:
+\[ [\mathbf{I}, \mathcal{C}](D, \Delta_X)  \cong \mathcal{C}( \text{Colim}_D, X) \]
+We can write both adjunctions using one terse formula:
+\[ Colim \dashv \Delta \dashv Lim\]
 
 \section{Unit and Counit of Adjunction}
 
+We compare arrows for equality, but we prefer to use isomorphisms for comparing objects. 
+
+We have a problem with functors, though. On the one hand, they are objects in the functor category, so isomorphisms are the way to go; on the other hand, they are arrows in $\mathbf{Cat}$ so maybe it's okay to compare them for equality?
+
+To shed some light on this dilemma, we should ask ourselves \emph{why} we use equality for arrows. It's not because we like equality, but because there's nothing else for us to do in a set. Two elements of a set are either equal or not, period. 
+
+That's not the case in  $\mathbf{Cat}$ which, as we know, is a $2$-category. Here, hom-sets themselves have the structure of a category---the functor category. In a $2$-category we have arrows between arrows so, in particular, we can define isomorphisms between arrows. In $\mathbf{Cat}$ these would be natural isomorphisms between functors.
+
+However, even though we have the option of replacing arrow equalities with isomorphisms, categorical laws in $\mathbf{Cat}$ are still expressed as equalities. So, for instance, the composition of a functor $F$ with the identity functor is \emph{equal} to $F$, and the same for associativity. A $2$-category in which the laws are satisfied ``on the nose'' is called \emph{strict}, and $\mathbf{Cat}$ is an example of a strict $2$-category. 
+
+As far as comparing categories goes, we have even more options. Categories are objects in $\mathbf{Cat}$, so it's possible to define an isomorphism of categories as a pair of functors $L$ and $R$:
+\[
+ \begin{tikzcd}
+  \mathcal{C}
+  \arrow[rr, bend right, "R"']
+  \arrow[loop, "Id_{ \mathcal{C}} "']
+  &&
+  \mathcal{D}
+  \arrow[ll, bend right, "L"']
+  \arrow[loop, "Id_{ \mathcal{D}} "']
+  \end{tikzcd}
+\]
+such that
+\[ L \circ R = Id_{ \mathcal{C}} \]
+\[ R \circ L = Id_{ \mathcal{D}} \]
+This definition involves equality of functors, though. What's worse, acting on objects, it involves equality of objects:
+\[ L (R X) = X \]
+\[ R (L Y) = Y \]
+This is why it's more proper to talk about a weaker notion of \emph{equivalence} of categories, where equalities are replaced by isomorphisms:
+\[ L \circ R \cong Id_{ \mathcal{C}} \]
+\[ R \circ L \cong Id_{ \mathcal{D}} \]
+On objects, an equivalence of categories means that a round trip produces an object that is isomorphic, rather than equal, to the original one. In most cases, this is exactly what we want.
+
+An adjunction is also defined by a pair of functors going in opposite directions, so it makes sense to ask what the result of a round trip is. The defining isomorphism works for any pair of objects $X$ and $Y$
+\[  \mathcal{C} (L X, Y) \cong \mathcal{D}( X , R Y)\]
+so, in particular, we can replace $Y$ with $L X$
+\[  \mathcal{C} (L X, L X) \cong \mathcal{D}( X , R (L X))\]
+We can now use the Yoneda trick and pick the identity arrow $id_{L X}$ on the left. The isomorphism maps it to a unique arrow on the right, which we'll call $\eta_X$:
+\[ \eta_X \colon X \to R ( L X) \]
+Not only is this mapping defined for every $X$, but it's also natural in $X$. The natural transformation $\eta$ is called the \emph{unit} of the adjunction. If we observe that the $X$ on the left is the action of the identity functor on $X$, we can write:
+\[ \eta \colon Id_{\mathcal{D}} \to R \circ L \]
+
+We can do a similar trick by replacing $X$ with $R Y$:
+\[  \mathcal{C} (L (R Y), Y) \cong \mathcal{D}( R Y , R Y)\]
+We get another natural transformation called the \emph{counit} of the adjunction:
+\[ \varepsilon \colon L \circ R \to Id_{\mathcal{C}}  \]
+
+Notice that, if those two natural transformations were invertible, they would witness the equivalence of categories. But this kind of ``half-equivalence'' is even more interesting in the context of category theory. 
+
+\subsection{Triangle identities}
+
+We can use the unit/counit pair to formulate an equivalent  definition of adjunction. We start with two natural transformations:
+\[ \eta \colon Id_{\mathcal{D}} \to R \circ L \]
+\[ \varepsilon \colon L \circ R \to Id_{\mathcal{C}}  \]
+and impose additional \emph{triangle identities}. 
+
+These identities are derived by noticing that $\eta$ can be used to replace an identity functor by the composite $R \circ L$, and $\varepsilon$ can be used to eliminate the composite $L \circ R$. So, for instance, starting with $L$:
+\[ L = L \circ Id_{\mathcal{D}} \xrightarrow{L \circ \eta} L \circ R \circ L \xrightarrow{\varepsilon \circ L} Id_{\mathcal{C}} \circ L = L \]
+Here, we used the horizontal composition of natural transformation, with one of them being the identity transformation on $L$ (a.k.a., whiskering).
+
+The first triangle identity is the condition that this chain of transformations result in the identity natural transformation. Pictorially:
+
+\[
+ \begin{tikzcd}
+ L
+ \arrow[r, "L \circ \eta"]
+ \arrow[rd, "id_L"']
+ & L \circ R \circ L
+ \arrow[d, "\varepsilon \circ L"]
+ \\
+ & L
+  \end{tikzcd}
+\]
+
+Similarly, the following chain of natural transformations should also compose to identity:
+\[ R = Id_{\mathcal{D}} \circ R \xrightarrow{\eta \circ R} R \circ L \circ R \xrightarrow{R \circ \varepsilon} R \circ Id_{\mathcal{C}} = R \]
+or, pictorially:
+\[
+ \begin{tikzcd}
+ R
+ \arrow[r, "\eta \circ R"]
+ \arrow[rd, "id_R"']
+ & R \circ L \circ R
+ \arrow[d, "R \circ \varepsilon"]
+ \\
+ & R
+  \end{tikzcd}
+\]
+
+\subsection{The unit and counit of the currying adjunction}
+
+Let's calculate the unit and the counit of the currying adjunction:
+\[  \mathcal{C}(A \times B, C ) \cong  \mathcal{C} (A, C^B)  \]
+If we replace $C$ with $A \times B$, we get
+\[  \mathcal{C}(A \times B, A \times B ) \cong  \mathcal{C} (A, (A \times B)^B)  \]
+Corresponding to the identity arrow on the left, we get the unit of the adjunction:
+\[ \eta \colon A \to (A \times B)^B \]
+This is a curried version of product constructor. In Haskell, we can write it as:
+\begin{haskell}
+mkpair :: a -> (b -> (a, b))
+mkpair = curry id
+\end{haskell}
+
+The counit is more interesting. Replacing $A$ with $C^B$ we get:
+\[  \mathcal{C}(C^B \times B, C ) \cong  \mathcal{C} (C^B, C^B)  \]
+Corresponding to the identity arrow on the right, we get:
+\[ \varepsilon \colon C^B \times B \to C \]
+which is the function application arrow. 
+
+In Haskell:
+\begin{haskell}
+apply :: (a -> b, a) -> b
+apply = uncurry id
+\end{haskell}
+
+\begin{exercise}
+Derive the unit and counit for the sum and product adjunctions.
+\end{exercise}
+
 \section{Distributivity}
 
-Natural isomorphism:
+In a bicartesian closed category products distribute over sums. We've seen one direction of the proof using universal constructions. Adjunctions combined with the Yoneda lemma give us more powerful tools to tackle this problem.
 
+We want to show the natural isomorphism:
 \[(B + C) \times A \cong B \times A + C \times A \]
-
-Proof by Yoneda:
-
+Instead of proving this identity directly, we'll show that the mappings out from both sides to an arbitrary object $X$ are isomorphic:
 \[  \mathcal{C} ((B + C) \times A, X) \cong \mathcal{C}(B \times A + C \times A, X) \]
+The left hand side is a mapping out of a product, so we can apply the currying adjunction to it:
 \[  \mathcal{C} ((B + C) \times A, X) \cong \mathcal{C}(B + C, X^A) \]
+This gives us a mapping out of a sum which, by the sum adjunction is isomorphic to the product of two mappings:
 \[  \mathcal{C}(B + C, X^A) \cong \mathcal{C}(B, X^A) \times \mathcal{C}(C, X^A)\]
+We can now apply the inverse of the currying adjunction to both components:
 \[  \mathcal{C}(B, X^A) \times \mathcal{C}(C, X^A) \cong \mathcal{C}(B \times A, X) \times \mathcal{C}(C \times A, X)\]
-
+Finally, using the inverse of the sum adjunction, we arrive at the final result:
 \[ \mathcal{C}(B \times A, X) \times \mathcal{C}(C \times A, X) \cong \mathcal{C}(B \times A + C \times A, X) \]
 
+Every step in this proof was a natural isomorphism, so their composition is also a natural isomorphism. By Yoneda lemma, the two objects that form the left- and the right-hand side of distributivity law are isomorphic.
+
+\section{Free-Forgetful Adjunctions}
+The two functors in the adjunction play different roles: the picture of the adjunction is not symmetric. Nowhere is this illustrated better than in the case of the free/forgetful adjunctions. 
+
+A forgetful functor is a functor that ``forgets'' some of the structure of its source category. This is not a rigorous definition but, in most cases, it's pretty obvious what structure is being forgotten. Very often the target category is just the category of sets, which is considered the epitome of structurelessness. The result of the forgetful functor, in that case, is called the ``underlying'' set, and the functor itself is often called $U$. 
+
+The left adjoint to a forgetful functor is called a \emph{free functor}.
+
+\[
+ \begin{tikzcd}
+F X
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+  &&
+  X
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+ \arrow[ll, bend right, "F"']
+ \\
+Y
+   \arrow[rr, bend right, "U"']
+ &&
+ U Y
+  \end{tikzcd}
+\]
+
+A classic example of a free/forgetful adjunction is the construction of the free monoid.
+
+
+\subsection{The category of monoids}
+Monoids in a monoidal category $\mathcal{C}$ form their own category $\mathbf{Mon}(\mathcal{C})$. Its objects are monoids, and its arrows are the arrows in $\mathcal{C}$ that preserve the monoidal structure. 
+
+The following diagram explains what it means.
+\[
+ \begin{tikzcd}
+ & M_1
+ \arrow[dd, "f"]
+ & M_1 \otimes M_1
+ \arrow[l, "\mu_1"]
+ \arrow[dd, "f \otimes f"]
+ \\
+ I
+ \arrow[ru, "\eta_1"]
+ \arrow[rd, "\eta_2"']
+ \\
+ & M_2
+ & M_2 \otimes M_2
+ \arrow[l, "\mu_2"]
+  \end{tikzcd}
+\]
+A monoid morphism $f$ must map unit to unit, which means that:
+\[ f \circ \eta_1 = \eta_2 \]
+and it must map multiplication to multiplication:
+\[ f \circ \mu_1 = \mu_2 \circ (f \otimes f)\]
+Remember, the tensor product $\otimes$ is functorial, so it can lift pairs of arrows, here $f \otimes f$.
+
+In particular, the category $\mathbf{Set}$ is monoidal, with cartesian product and the terminal object providing the monoidal structure. Monoids in $\mathbf{Set}$ are sets with additional structure. They form their own category $\mathbf{Mon}(\mathbf{Set})$ and there is a forgetful functor $U$ that simply maps the monoid to the set of its elements.
+
+\subsection{Free monoid}
+
+We want to construct the free functor 
+\[ F \colon \mathbf{Set} \to \mathbf{Mon}(\mathbf{Set})\]
+that is adjoint to the forgetful functor $U$. We start with an arbitrary set $X$ and an arbitrary monoid $M$. On the one side of the adjunction we have the set of functions between two sets, $X$ and $U M$. On the other side we have a set of structure-preserving monoid morphisms from $F X$ to $M$. How can these two sets be isomorphic?
+
+Arrows in $\mathbf{Set}$ are just functions with no additional constraints. Arrows in $\mathbf{Mon}(\mathbf{Set})$, on the other hand, are constrained by the requirement that they preserve unit and multiplication. So, in general, we expect fewer arrows between monoids than between their underlying sets. 
+
+\[
+ \begin{tikzcd}
+F X
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+  &&
+  X
+\arrow[d, bend right, red, dashed]
+\arrow[d, dashed]
+\arrow[d, bend left, blue, dashed]
+ \arrow[ll, bend right, "F"']
+ \\
+M
+   \arrow[rr, bend right, "U"']
+ &&
+ U M
+  \end{tikzcd}
+\]
+
+The idea is that $F$ creates the most generic monoid possible, so that preserving its structure doesn't impose any additional constraints. 
+
+Keep in mind that a monoid in  $\mathbf{Mon}(\mathbf{Set})$ can be thought of as a set of elements and a monoid morphism as a function between such sets, satisfying some additional constraints. 
+
+So we are going to construct the set $F X$ starting with $X$ as the set of \emph{generators}.  Any function $f \colon X \to U M$ will map these generators to elements of $M$. The question is, what other elements do we have to add to the set of generators and how do we define the action of a function $f$ on those elements, so that the monoidal structure is preserved. 
+
+First of all, we can't pick one of the generators as the unit of $F X$, because it would have to be mapped to the unit of $M$. That would impose a constraint of $f$. Therefore the unit of $F X$ has no counterpart in $X$---it's an added element. The action of $f$ on it is fixed: it has to go to the unit of $M$. 
+
+We also have to define monoidal multiplication in $F X$. Let's start with a product of two generators. The result can't be one of the generators because, again, that would constrain $f$: product must be mapped to product. So we have to make all products of generators into new elements of $F X$. The same argument can be repeated for products of those elements, and so on. 
+
+Any new multiplication produces a new element of $F X$, except when it can be reduced to a previously added element by applying monoid laws. 
+
+The result of this procedure is that $F X$ can be represented as a set of all strings formed from the generators---an empty string standing for the unit. Multiplication is defined as concatenation of such strings. Concatenation is automatically associative, and concatenation with an empty string is identity. 
+
+In Haskell, we represent a free monoid generated by some type \hask{a} as a type of lists \hask{[a]}. Concatenation of lists is defined by:
+\begin{haskell}
+concat :: [a] -> [a] -> [a]
+concat [] as = as
+concat (a : as) as' = a : (concat as as')
+\end{haskell}
+
+For instance, the free monoid generated by \hask{Bool} contains an empty list \hask{[]} as a unit; two generators as singleton lists, \hask{[True]} and \hask{[False]}; their concatenations, \hask{[True, True]}, \hask{[True, False]}, \hask{[False, True]}, \hask{[False, False]}; and so on.
+
+\begin{exercise}
+What is the unit and the counit of the free monoid adjunction $F \dashv U$?
+\end{exercise}
+
+
 \section{notes}
-
-
-
 
 
 \begin{exercise}

@@ -6,3 +6,4 @@
 *.pygtex
 *.pygstyle
 *.toc
+.DS_Store

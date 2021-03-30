@@ -142,7 +142,20 @@ G X
  \end{tikzcd}
 \]
 
-A family of arrows $\alpha_X$ that satisfies the naturality condition is called a \emph{natural transformation}. 
+A family of arrows $\alpha_X$ that satisfies the naturality condition is called a \emph{natural transformation}.
+
+This is a diagram that shows a pair of categories, two functors between them, and a natural transformation $\alpha$ between the functors:
+\[
+\begin{tikzcd}[column sep=huge]
+\mathcal{C}
+  \arrow[bend left=50]{r}[name=U, label=above:$F$]{}
+  \arrow[bend right=50]{r}[name=D, label=below:$G$]{} 
+ &
+\mathcal{D}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U) -- node[label=left:$\alpha$] {} (D)}]{}
+\end{tikzcd}
+\]
+
 
 Since for every arrow in $\mathcal{C}$ there is a corresponding naturality square, we can say that a natural transformation maps objects to arrows and arrows to commuting squares.
 
@@ -207,22 +220,39 @@ In the category of categories, $\mathbf{Cat}$, functors are drawn as arrows. But
 
 What is an arrow in one category could be an object in another.
 
-\subsection{Composition of natural transformations}
+\subsection{Vertical composition of natural transformations}
 
-Natural transformations can only be defined between \emph{parallel} functors, that is functors that share the same source category and the same target category. Such parallel functors form a \emph{functor category}. The standard notation for a functor category between two categories $\mathcal{C}$ and $\mathcal{D}$ is $[\mathcal{C}, \mathcal{D}]$, the two categories between square brackets.
+Natural transformations can only be defined between \emph{parallel} functors, that is functors that share the same source category and the same target category. Such parallel functors form a \emph{functor category}. The standard notation for a functor category between two categories $\mathcal{C}$ and $\mathcal{D}$ is $[\mathcal{C}, \mathcal{D}]$, the names of the two categories between square brackets.
 
 The objects in $[\mathcal{C}, \mathcal{D}]$ are functors, the arrows are natural transformations. 
 
-To show that this is indeed a category, we have to first define the composition of natural transformations. This is easy if you keep in mind that components of natural transformations are regular arrows in the target category. These arrows compose.
+To show that this is indeed a category, we have to first define the composition of natural transformations. This is easy if we keep in mind that components of natural transformations are regular arrows in the target category. These arrows compose.
 
-Indeed, suppose that we have a natural transformation $\alpha$ between two functors $F$ and $G$. We want to compose it with another natural transformation $\beta$ that goes from $G$ to $H$ (this is called the \emph{vertical composition} of natural transformations). Let's look at the components of these transformations at some object $X$
+Indeed, suppose that we have a natural transformation $\alpha$ between two functors $F$ and $G$. We want to compose it with another natural transformation $\beta$ that goes from $G$ to $H$. 
+
+\[
+\begin{tikzcd}[column sep=huge]
+\mathcal{C}
+  \arrow[bend left=60]{rr}[name=U, label=above:$F$]{}
+  \arrow[]{rr}[name=M, label={[xshift=15pt, yshift=-5pt]:$G$}]{} 
+  \arrow[bend right=60]{rr}[name=D, label=below:$H$]{} 
+ &&
+\mathcal{D}
+  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(U) -- node[label=left:$\alpha$] {} (M)}]{}
+  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(M) -- node[label=left:$\beta$] {} (D)}]{}
+\end{tikzcd}
+\]
+
+
+Let's look at the components of these transformations at some object $X$
 \[ \alpha_X \colon F \, X \to G \, X \]
 \[ \beta_X \colon G \, X \to H \, X \]
 These are just two arrows in $\mathcal{D}$ that are composable. So we can define a composite natural transformation $\gamma$ as follows:
 \[ \gamma \colon F \to H\]
 \[ \gamma_X = \beta_X \circ \alpha_X \]
+ This is called the \emph{vertical composition} of natural transformations.
 
-Naturality condition for $\gamma$ can be shown by pasting together two naturality squares for $\alpha$ and $\beta$:
+Naturality condition for $\gamma$ can be shown by pasting together (vertically) two naturality squares for $\alpha$ and $\beta$:
 \[
  \begin{tikzcd}
  F X
@@ -264,6 +294,140 @@ Prove the naturality condition of the composition of natural transformations:
 Hint: Use the definition of $\gamma$ and the two naturality conditions for $\alpha$ and $\beta$.
 \end{exercise}
 
+\subsection{Horizontal composition of natural transformations}
+
+The second kind of composition of natural transformations is induced by composition of functors. Suppose that we have a pair of composable functors
+\begin{align*}
+ F \colon \mathcal{C} \to \mathcal{D}
+&&G \colon \mathcal{D} \to \mathcal{E} 
+\end{align*}
+that is parallel to another pair of composable functors:
+\begin{align*}
+ F' \colon \mathcal{C} \to \mathcal{D}
+&& G' \colon \mathcal{D} \to \mathcal{E} 
+\end{align*}
+We also have two natural transformations:
+\begin{align*}
+\alpha \colon F \to F'  
+&& \beta \colon G \to G' 
+\end{align*}
+Pictorially:
+\[
+\begin{tikzcd}[column sep=huge]
+\mathcal{C}
+  \arrow[bend left=50]{r}[name=U, label=above:$F$]{}
+  \arrow[bend right=50]{r}[name=D, label=below:$F'$]{} 
+ &
+\mathcal{D}
+  \arrow[bend left=50]{r}[name=U1, label=above:$G$]{}
+  \arrow[bend right=50]{r}[name=D1, label=below:$G'$]{} 
+ &
+\mathcal{E}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U) -- node[label=left:$\alpha$] {} (D)}]{}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\beta$] {} (D1)}]{}
+\end{tikzcd}
+\]
+The \emph{horizontal} composition $\beta \circ \alpha$ maps $G \circ F$ to $G' \circ F'$.
+
+Let's pick an object $X$ in $\mathcal{C}$. We use $\alpha$ to map it to an arrow 
+\[ \alpha_X \colon F X \to F' X \]
+We can lift this arrow using $G$
+\[ G (\alpha_X) \colon G (F X) \to G (F' X) \]
+What we need, though, is an arrow from $G (F X)$ to $G' (F' X)$. To get there, we can use the appropriate component of $\beta$
+\[ \beta_{F' X} \colon G (F' X) \to G' (F' X) \]
+Altogether, we have
+\[ (\beta \circ \alpha)_X = \beta_{F' X} \circ G (\alpha_X) \]
+
+But there is another possible candidate for this component: $G'(\alpha_X) \circ \beta_{F X}$. It just so happens that it's equal to the previous one due to naturality of $\beta$. 
+
+\[
+ \begin{tikzcd}
+  && G(F X)
+  \arrow[dd, red, "G(\alpha_X)"]
+  \arrow[dr, blue, "\beta_{F X}"]
+  \\
+  & F X
+  \arrow[rr, bend right=10, dashed, gray]
+  \arrow[ur, bend right=10, dashed]
+  \arrow[dd, red, "\alpha_X"]
+ && G' (F X)
+  \arrow[dd, red, "G'(\alpha_X)"]
+ \\
+ X
+ \arrow[ur, dashed]
+ \arrow[dr, gray, dashed]
+ && G(F' X)
+  \arrow[dr, blue, "\beta_{F' X}"]
+ \\
+ &F' X
+  \arrow[rr, bend right=10, dashed, gray]
+ \arrow[ur, bend right=10, dashed]
+ && G'(F' X)
+\end{tikzcd}
+\]
+The proof of naturality of $\beta \circ \alpha$ is left as an exercise to a dedicated reader.
+
+\subsection{Whiskering}
+
+Quite often, horizontal composition is used with one of the natural transformations being the identity. There is a shorthand notation for such composition. For instance, $\beta \circ id_F$ is written as $\beta \circ F$. 
+
+Because of the characteristic shape of the diagram, such composition is called ``whiskering''.
+\[
+\begin{tikzcd}[column sep=huge]
+\mathcal{C}
+ \arrow[r, "F"]
+ &
+\mathcal{D}
+  \arrow[bend left=50]{r}[name=U1, label=above:$G$]{}
+  \arrow[bend right=50]{r}[name=D1, label=below:$G'$]{} 
+ &
+\mathcal{E}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\beta$] {} (D1)}]{}
+\end{tikzcd}
+\]
+In components, we have:
+\[ (\beta \circ F)_X = \beta_{F X} \]
+
+Similarly, $id_G \circ \alpha$ is written as $G \circ \alpha$.
+\[
+\begin{tikzcd}[column sep=huge]
+\mathcal{C}
+  \arrow[bend left=50]{r}[name=U, label=above:$F$]{}
+  \arrow[bend right=50]{r}[name=D, label=below:$F'$]{} 
+ &
+\mathcal{D}
+\arrow[r, "G"]
+&
+\mathcal{E}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U) -- node[label=left:$\alpha$] {} (D)}]{}
+\end{tikzcd}
+\]
+In components:
+\[(G \circ \alpha)_X = G (\alpha_X) \]
+
+\subsection{Interchange law}
+We can combine vertical composition with horizontal composition, as seen in the following diagram:
+\[
+\begin{tikzcd}[column sep=huge]
+\mathcal{C}
+  \arrow[bend left=60]{rr}[name=U, label=above:$F$]{}
+  \arrow[]{rr}[name=M, label={[xshift=15pt, yshift=-5pt]:$G$}]{} 
+  \arrow[bend right=60]{rr}[name=D, label=below:$H$]{} 
+ &&
+\mathcal{D}
+  \arrow[bend left=60]{rr}[name=U1, label=above:$F'$]{}
+  \arrow[]{rr}[name=M1, label={[xshift=15pt, yshift=-5pt]:$G'$}]{} 
+  \arrow[bend right=60]{rr}[name=D1, label=below:$H'$]{} 
+&&
+\mathcal{E}
+  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(U) -- node[label=left:$\alpha$] {} (M)}]{}
+  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(M) -- node[label=left:$\beta$] {} (D)}]{}
+  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(U1) -- node[label=left:$\alpha'$] {} (M1)}]{}
+  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(M1) -- node[label=left:$\beta'$] {} (D1)}]{}
+\end{tikzcd}
+\]
+The interchange law states that the order of composition doesn't matter: we can first do vertical compositions and then the horizontal one, or first do the horizontal compositions and then the vertical one.
+
 \section{Universal Constructions Revisited}
 
 We've seen definitions of sums, products, exponentials, natural numbers, and lists. 
@@ -280,7 +444,7 @@ Defining particular objects through their connections requires looking at possib
 
 Defining an object by its mappings-out or mappings-in with respect to all objects in the category is called a \emph{universal construction}. 
 
-Since most universal constructions involve commuting diagrams, they can often be reformulated at a higher level using natural transformations. We'll study one such example in great detail to get some understanding of the terse language of category theory. We'll try to decode the statement that the sum is defined by the following natural isomorphism:
+Since most universal constructions involve commuting diagrams, they can often be reformulated at a higher level using natural transformations. We'll study several examples in greater detail to get some understanding of the terse language of category theory. We'll try, for instance, to decode the statement that the sum is defined by the following natural isomorphism:
 
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_X]  \cong \mathcal{C}(A + B, X) \]
 
@@ -876,19 +1040,5 @@ In the category of categories, $\mathbf{Cat}$, the hom-sets are not just sets. E
 In the language of 2-categories, objects are called 0-cells, arrows between them are called 1-cells, and arrows between arrows are called 2-cells. The obvious generalization of that picture would be to have 3-cells that go between 2-cells and so on. An $n$-category has cells going up to the $n$-th level. 
 
 But why not have arrows all the way down? Enter infinity categories. Far from being a curiosity, $\infty$-categories have practical applications. For instance they are used in algebraic topology to describe points, paths between points, surfaces swiped by paths, volumes swiped by surfaces, and so on, ad infinitum. 
-
-\section{notes}
-
-\begin{exercise}
-\end{exercise}
-\begin{haskell}
-\end{haskell}
-\[
- \begin{tikzcd}
-  \end{tikzcd}
-\]
-
-\[   \mathbf{Set} \]
-\[   \mathcal{C} \]
 
 \end{document}
