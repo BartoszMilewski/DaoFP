@@ -179,17 +179,25 @@ A
 \]
 The unique arrow from $X$ to $1$ is called $!$ (pronounced, \emph{bang}). Because of its uniqueness, the mapping-in, $h$, is totally determined by $f$.
 
+The invertible arrow that witnesses the isomorphism between $1 \times A$ and $A$ is called the \emph{left unitor}:
+\[ \lambda \colon 1 \times A \to A \]
 
 Here are some other isomorphisms written in Haskell (without proofs of having the inverse). This is associativity:
 \begin{haskell}
-assoc :: (a, (b, c)) -> ((a, b), c)
-assoc (a, (b, c)) = ((a, b), c)
+assoc :: ((a, b), c) -> (a, (b, c))
+assoc ((a, b), c) = (a, (b, c))
 \end{haskell}
+
 And this is the left unit
 \begin{haskell}
 lunit :: ((), a) -> a
 lunit (_, a) = a
 \end{haskell}
+
+These functions correspond to the \emph{associator}
+\[ \alpha \colon (A \times B) \times C \to A \times (B \times C) \]
+and the \emph{right unitor}:
+\[ \rho \colon A \times 1 \to A \]
 
 \begin{exercise}
 Show that the bijection in the proof of left unit is natural. Hint, change focus using an arrow $g \colon A \to B$.
@@ -243,23 +251,6 @@ The shorthand notation for this diagram is:
 
 This property of the product is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the product. 
 
-\subsection{Symmetric Monoidal Category}
-
-We have seen that the product satisfies these simple rules:
-\[1 \times A \cong A\]
-\[A \times B \cong B \times A \]
-\[(A \times B) \times C \cong A \times (B \times C) \]
-and is functorial. 
-
-A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen this structure before when working with sums and the initial object. 
-
-A category can have multiple monoidal structures at the same time. When you don't want to name your monoidal structure, you replace the plus sign or the product sign with a tensor sign, and the neutral element with the letter $I$. The rules of a symmetric monoidal category can then be written as:
-\[I \otimes A \cong A\]
-\[A \otimes B \cong B \otimes A \]
-\[(A \otimes B) \otimes C \cong A \otimes (B \otimes C) \]
-
-You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, but it requires both objects $A$ and $B$; and it has no elimination rule---no projections. Some interesting examples of tensor products are not even symmetric. 
-
 \section{Duality}
 
 When a child sees an arrow, it knows which end points at the source, and which points at the target
@@ -305,5 +296,99 @@ Every construction in category theory has its dual.
 If the direction of arrows is just a matter of interpretation, then what makes sum types so different from product types in programming? The difference goes back to one assumption we made at the start: There are no incoming arrows to the initial object (other than the identity arrow). This is in contrast with the terminal object having lots of outgoing arrows, which we used to define (global) elements. In fact, we assume that every object of interest has elements, and the ones that don't are isomorphic to \hask{Void}. 
 
 We'll see an even deeper difference when we talk about function types.
+
+\section{Monoidal Category}
+
+We have seen that the product satisfies these simple rules:
+\[1 \times A \cong A\]
+\[A \times B \cong B \times A \]
+\[(A \times B) \times C \cong A \times (B \times C) \]
+and is functorial. 
+
+A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen this structure before when working with sums and the initial object. 
+
+A category can have multiple monoidal structures at the same time. When you don't want to name your monoidal structure, you replace the plus sign or the product sign with a tensor sign, and the neutral element with the letter $I$. The rules of a symmetric monoidal category can then be written as:
+\[I \otimes A \cong A\]
+\[A \otimes B \cong B \otimes A \]
+\[(A \otimes B) \otimes C \cong A \otimes (B \otimes C) \]
+
+You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, but it requires both objects $A$ and $B$; and it has no elimination rule---no projections. Some interesting examples of tensor products are not even symmetric. 
+
+\subsection{Monoids}
+
+Monoids are very simple structures equipped with a binary operation and a unit. Natural numbers with addition and zero form a monoid. So do natural numbers with multiplication and one. 
+
+The intuition is that a monoid lets you combine two things to get one thing. There is also one special thing, such that combining it with anything else gives back the same thing. And the combining must be associative. 
+
+What's not assumed is that the combining is symmetric, or that there is an inverse element.
+
+The rules that define a monoid are reminiscent of the rules of a category. The difference is that, in a monoid, any two things are composable, whereas in a category this is usually not the case: You can only compose two arrows if the target of one is the source of another. Except, that is, when the category contains only one object, in which case all arrows are composable.
+
+A category with a single object is called a monoid. The combining operation is the composition of arrows and the unit is the identity arrow. 
+
+This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
+
+In a category, we are forced to define the operation in bulk, rather than looking at individual elements. We start with an object $M$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can generalize it to an arrow from a product $M \times M$ to $M$:
+\[ \mu \colon M \times M \to M \]
+The unit element can be defined as an arrow from the terminal object $1$:
+\[ \eta \colon 1 \to M \]
+
+We can translate this description directly to Haskell by defining a class of types equipped with two methods, traditionally called \hask{mappend} and \hask{mempty}:
+\begin{haskell}
+class Monoid m where
+  mappend :: (m, m) -> m
+  mempty  :: () -> m
+\end{haskell}
+
+The two arrows $\mu$ and $\eta$ have to satisfy monoid laws but, again, we have to formulate them in bulk, without any recourse to elements.
+
+To formulate the left unit law, we first create the product $1 \times M$. We then use $\eta$ to ``pick the unit element in $M$'' or, in terms of arrows, turn $1$ into $M$. Since we are operating on a product $1 \times M$, we  lift the pair $\langle \eta, id_M \rangle$, which ensures that we ``do not touch'' the $M$. We then perform the ``multiplication'' using $\mu$. 
+
+We want the result to be the same as the original element of $M$, but without mentioning elements. So we just use the left unitor $\lambda$ to go from $1 \times M$ to $M$ without ``stirring things up.''
+\[
+ \begin{tikzcd}
+ 1 \times M
+ \arrow[rr, "\eta \times id_M"]
+ \arrow[rrd, "\lambda"']
+& & M \times M
+ \arrow[d, "\mu"]
+ \\
+ && M
+  \end{tikzcd}
+\]
+Here is the analogous law for the right unit:
+\[
+ \begin{tikzcd}
+ M \times M
+ \arrow[d, "\mu"]
+ && M \times 1
+ \arrow[ll, "id_M \times \eta"']
+ \arrow[lld, "\rho"]
+ \\
+ M
+ \end{tikzcd}
+\]
+To formulate the law of associativity, we have to start with a triple product and act on it in bulk. Here, $\alpha$ is the associator that rearranges the product without ``stirring things up.''
+\[
+ \begin{tikzcd}
+ (M \times M) \times M 
+ \arrow[rr, "\alpha"]
+ \arrow[d, "\mu \times id"]
+ &&
+ M \times (M \times M)
+ \arrow[d, "id \times \mu"]
+ \\
+ M \times M 
+ \arrow[dr, "\mu"]
+& & M \times M
+ \arrow[dl, "\mu"']
+ \\
+&  M
+ \end{tikzcd}
+\]
+
+Notice that we didn't have to assume a lot about the categorical product that we used on the objects $M$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in a monoidal category. It doesn't even have to be symmetric. All we have to assume is that there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
+
+Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category.
 
 \end{document}

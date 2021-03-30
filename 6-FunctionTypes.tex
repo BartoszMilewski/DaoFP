@@ -492,7 +492,7 @@ undist :: (Either b c, a) -> Either (b, a) (c, a)
 undist (Left b, a)  = Left (b, a)
 undist (Right c, a) = Right (c, a)
 \end{haskell}
-but this is because of implicit currying. 
+but that's because currying is implicit in Haskell. 
 
 Here's the point-free version of this function:
 \begin{haskell}
@@ -500,78 +500,12 @@ undist = uncurry (either (curry Left) (curry Right))
 \end{haskell}
 This may not be the most readable implementation, but it underscores the fact that we need the exponential: we use both \hask{curry} and \hask{uncurry} to implement the mapping.
 
-We'll come back to this identity and construct a simpler proof of it in the chapter on adjunctions.
+We'll come back to this identity when we are equipped with more powerful tools: adjunctions.
 
 \begin{exercise}
 Show that:
 \[ 2 \times A \cong A + A \]
 where $2$ is the Boolean type. Do the proof diagrammatically first, and then implement two Haskell functions witnessing the isomorphism.
 \end{exercise}
-
-\subsection{Digression: Derivation used in the proof of distributivity}
-
-The morphism:
-\[(B + C) \times A \to B \times A + C \times A\]
-is a mapping \emph{out} of a product, so we have to call the definition of the function object to the rescue.  
-
-A mapping out of a product is in one to one correspondence with a mapping into the function object. Here's the original diagram that encapsulates this definition:
-
-\[
- \begin{tikzcd}
- C \times A
- \arrow[d, dashed, "h \times id_A"']
- \arrow[rd, "f"]
- \\
- B^A \times A
- \arrow[r, "\varepsilon"']
-& B
- \end{tikzcd}
-\]
-If we want to replace $f$ with \hask{undist}, we need to do the following substitutions. Replace $B$ with our result type: $B \times A + C \times A$. Replace $C$ with $B + C$:
-\[
- \begin{tikzcd}
- (B+C) \times A
- \arrow[d, dashed, "h \times id_A"']
- \arrow[rd, "\text{undist}"]
- \\
- (B \times A + C \times A)^A \times A
- \arrow[r, "\varepsilon"']
-& B \times A + C \times A
- \end{tikzcd}
-\]
-The problem is now reduced to finding the arrow $h$
-\[ h \colon (B + C) \to  (B \times A + C \times A)^A \]
-This is a simpler problem, because it's a mapping out of a sum, and we'll be able to decompose it further. The Haskell code for what we've just done is:
-\begin{haskell}
-undist = uncurry h
-  where
-    h :: Either b c -> (a -> Either (b, a) (c, a))
-\end{haskell}
-To decompose $h$ we need two arrows, one from $B$ and one from $C$. Or, in Haskell:
-
-\begin{haskell}
-    h = either f g
-    f :: b -> (a -> Either (b, a) (c, a))
-    g :: c -> (a -> Either (b, a) (c, a))
-\end{haskell}
-Let's look at the first one:
-\[f \colon B \to (B \times A + C \times A)^A \]
-This is a mapping \emph{into} the exponential, so it's determined by a mapping out from a product:
-\[ B \times A \to B \times A + C \times A \]
-The latter can be easily implemented as $\text{Left}$.
-
-In Haskell, we write:
-\begin{haskell}
-    f = curry h'
-    h' :: (b, a) -> Either (b, a) (c, a)
-    h'  = Left
-\end{haskell}
-
-Combining all these functions into one formula gives us:
-\begin{haskell}
-undist = uncurry (either (curry Left) (curry Right))
-\end{haskell}
-
-
 
 \end{document}

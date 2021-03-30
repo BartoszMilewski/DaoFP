@@ -307,7 +307,7 @@ Here's a possible implementation:
 foldl step init = \as ->
   case as of
     [] -> init
-    a : as -> step (fold step init as) a
+    a : as -> step (foldl step init as) a
 \end{haskell}
 
 As an example, we can use \hask{foldl} to calculate the sum of the elements of a list of natural numbers:
