@@ -1,0 +1,382 @@
+\documentclass[DaoFP]{subfiles}
+\begin{document}
+\setcounter{chapter}{10}
+
+\chapter{Algebras}
+
+The essence of algebra is the formal manipulation of expressions. But what is an expression, and how do we manipulate it?
+
+The first things to observe about algebraic expressions like $2 (x + y)$ or $a x^2 + b x + c$ is that there are infinitely many of them. There is a finite number of rules for making them, but these rules can be used in infinitely many combinations. This suggests that the rules are used \emph{recursively}. 
+
+
+
+Consider this simple example of an arithmetic expression:
+\begin{haskell}
+data Expr = Leaf Int | Plus Expr Expr
+\end{haskell}
+It's a recipe for building trees. We start with little trees using the \hask{Leaf} constructor. We then plant these seedlings into nodes, and so on.
+\begin{haskell}
+e2 = Leaf 2
+e3 = Leaf 3
+e5 = Plus e2 e3
+e7 = Plus e5 e2
+\end{haskell}
+
+Such recursive definitions work perfectly well in a programming language. The problem is that every new recursive data structure comes with its own library of functions that operate on it.
+
+From type-theory point of view, we've been able to define recursive types, such as natural numbers or lists, by providing, in each case, specific introduction and elimination rules. What we need is something more general, a procedure for generating arbitrary recursive types from simpler pluggable components. 
+
+There are two orthogonal concerns when it comes to recursive data structure. One is the machinery of recursion. The other is the pluggable components to be used by recursion. 
+
+We know how recursion works: We assume that we know how to construct small trees. We then use the recursive step to plant those trees into nodes to make bigger trees. 
+
+Category theory tells us how to formalize this imprecise description.
+
+\section{Algebras from Endofunctors}
+
+The idea of planting smaller trees into nodes requires that we formalize what it means to have a data structure with holes---a ``container for stuff.'' This is exactly what functors are for. Because we want to use these functors recursively, they have to be \emph{endo}-functors.
+
+For instance, the endofunctor from our earlier example would be defined by the following data structure, where \hask{x} marks the spots:
+\begin{haskell}
+data ExprF x = LeafF Int | PlusF x x
+\end{haskell}
+Information about all possible shapes of expressions is abstracted into a single functor. 
+
+The other important piece of information is the recipe for evaluating expressions. This, too, can be encoded using the same endofunctor. 
+
+Thinking recursively, let's assume that we know how to evaluate all subtrees of a larger expression. Then the remaining step is to plug these results into the top level node and evaluate it. 
+
+For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation the subtrees. It's pretty obvious what we should do in the last step. If the top of the tree is a leaf (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers. This recipe can be encoded as:
+\begin{haskell}
+eval :: ExprF Int -> Int
+eval (LeafF n)   = n
+eval (PlusF m n) = m + n
+\end{haskell}
+
+We made some seemingly obvious assumptions based on our expectations. For instance, since the node was called \hask{PlusF} we assumed that we should add the two numbers. But multiplication or subtraction would work as well.
+
+Since the leaf contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string, and using concatenation instead of addition:
+\begin{haskell}
+pretty :: ExprF String -> String
+pretty (LeafF n)   = show n
+pretty (PlusF s t) = s ++ " + " ++ t
+\end{haskell}
+
+In fact there are infinitely many evaluators, some sensible, others less so, but we shouldn't be judgmental. Therefore any choice of the target type and any choice of the evaluator is equally valid. 
+
+An \emph{algebra} for an endofunctor $F$ is a pair $(A, \alpha)$. The object $A$ is called the \emph{carrier} of the algebra, and the evaluator $\alpha \colon F A \to A$ is called the \emph{structure map}.
+
+In Haskell, given the functor \hask{f} we define:
+\begin{haskell}
+type Algebra f a = f a -> a
+\end{haskell}
+
+Notice that the evaluator is \emph{not} a polymorphic function. It's a specific choice of a function for a specific type \hask{a}. There may also be many different evaluators for the same type. They define separate algebras.
+
+We have defined two algebras for \hask{ExprF}. This one has \hask{Int} as a carrier:
+\begin{haskell}
+eval :: Algebra ExprF Int
+eval (LeafF n)   = n
+eval (PlusF m n) = m + n
+\end{haskell}
+and this one has \hask{String} as a carrier:
+\begin{haskell}
+pretty :: Algebra ExprF String
+pretty (LeafF n)   = show n
+pretty (PlusF s t) = s ++ " + " ++ t
+\end{haskell}
+
+\section{Category of Algebras}
+
+Algebras for a given endofunctor $F$ form a category. An arrow in that category is an \emph{algebra morphism}, which is a structure-preserving arrow between their carrier objects. 
+
+Preserving structure in this case means that the arrow must commute with the two structure maps. This is where functoriality comes into play. To switch from one structure map to another, we have to be able to lift an arrow between their carriers. 
+
+Given an endofunctor $F$, an algebra morphism between two algebras $(A, \alpha)$ and $(B, \beta)$ is an arrow $f \colon A \to B$ that makes this diagram commute:
+\[
+ \begin{tikzcd}
+ F A 
+ \arrow[r, "F f"]
+ \arrow[d, "\alpha"]
+ & F B
+\arrow[d, "\beta"]
+ \\
+ A
+ \arrow[r, "f"]
+ & B
+  \end{tikzcd}
+\]
+In other words, the following equation must hold:
+\[f \circ \alpha = \beta \circ F f \]
+
+The composition of two algebra morphisms is again an algebra morphism, which can be seen by pasting together two such diagrams. The identity arrow is also an algebra morphism, because 
+\[ id_A \circ \alpha = \alpha \circ F (id_A) \]
+(a functor maps identity to identity).
+
+The commuting condition in the definition of an algebra morphism is very restrictive. Consider for instance a function that maps an integer to a string. In Haskell it's the \hask{show} function (actually, a method of the \hask{Show} class). It is \emph{not} an algebra morphism from \hask{eval} to \hask{pretty}. 
+
+The initial object in the category of algebras is called the \emph{initial algebra} and, as we'll see, it plays a very important role.
+
+By definition, the initial algebra $(I, i)$ has a unique algebra morphism $f$ from it to any other algebra $(A, \alpha)$. Diagrammatically:
+
+\[
+ \begin{tikzcd}
+ F I 
+ \arrow[r, "F f"]
+ \arrow[d, "i"]
+ & F A
+\arrow[d, "\alpha"]
+ \\
+ I
+ \arrow[r, dashed, "f"]
+ & A
+  \end{tikzcd}
+\]
+ This unique morphism is called a \emph{catamorphism} for the algebra $(A, \alpha)$.
+
+\begin{exercise}
+Show that \hask{show} is not an algebra morphism. Hint: Consider what happens to a \hask{PlusF} node.
+\end{exercise}
+
+\begin{exercise}
+Let's define two algebras for the following functor:
+\begin{haskell}
+data FloatF x = Num Float | Op x x
+\end{haskell}
+The first algebra:
+\begin{haskell}
+addAlg :: Algebra FloatF Float
+addAlg (Num x) = log x
+addAlg (Op x y) = x + y
+\end{haskell}
+The second algebra:
+\begin{haskell}
+mulAlg :: Algebra FloatF Float
+mulAlg (Num x) = x
+mulAlg (Op x y) = x * y
+\end{haskell}
+Make a convincing argument that \hask{log} is an algebra morphism between these two. (\hask{Float} is a built-in floating-point number type.)
+\end{exercise}
+
+\section{Lambek's Lemma and Fixed Points}
+
+
+Lambek's lemma tells us that the structure map $i$ of the initial algebra is an isomorphism. 
+
+The reason for it is the self-similarity of algebras. You can lift any algebra $(A, \alpha)$ using $F$, and the result $(F A, F \alpha)$ is also an algebra with the structure map $F \alpha \colon F (F A) \to F A$. 
+
+In particular, if you lift the initial algebra $(I, i)$, you get an algebra with the carrier $F I$ and the structure map $F i \colon F (F I) \to F I$. It follows then that there must be a unique algebra morphism from the initial algebra to it:
+\[
+ \begin{tikzcd}
+ F I 
+ \arrow[r, "F h"]
+ \arrow[d, "i"]
+ & F (F I)
+\arrow[d, "F i"]
+ \\
+ I
+ \arrow[r, dashed, "h"]
+ & F I
+  \end{tikzcd}
+\]
+This $h$ is the inverse of $i$. To see that, let's consider the composition $i \circ h$. It is the arrow at the bottom of the following diagram
+\[
+ \begin{tikzcd}
+ F I 
+ \arrow[r, "F h"]
+ \arrow[d, "i"]
+ & F (F I)
+\arrow[d, "F i"]
+\arrow[r, "F i"]
+& F I
+\arrow[d, "i"]
+ \\
+ I
+ \arrow[r, dashed, "h"]
+ & F I
+ \arrow[r, "i"]
+ & I
+  \end{tikzcd}
+\]
+This is a pasting of the original diagram with a trivially commuting diagram. Therefore the whole rectangle commutes. We can interpret this as $i \circ h$ being an algebra morphism from $(I, i)$ to itself. But there already is such an algebra morphism---the identity. So, by uniqueness of the mapping out from the initial algebra, these two must be equal:
+\[ i \circ h = id_I \] 
+
+Knowing that, we can now go back to the previous diagram, which states that:
+\[ h \circ i = F i \circ F h \]
+Since $F$ is a functor, it maps composition to composition and identity to identity. Therefore the right hand side is equal to:
+\[ F (i \circ h) = F (id_I) = id_{F I} \]
+
+We have thus shown that $h$ is the inverse of $i$, which means that $i$ is an isomorphism. In other words:
+\[ F I \cong I \]
+We interpret this identity as stating that $I$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $I$ doesn't change it. 
+
+There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. 
+
+Let's consider how the definition of the fixed point works with our original example:
+\begin{haskell}
+data ExprF x = LeafF Int | PlusF x x
+\end{haskell}
+It's a data structure defined by the property that \hask{ExprF} acting on it reproduces it. Let's call this data structure \hask{Expr}. When we plug it in place of \hask{x}, we get (in pseudo-Haskell):
+\begin{haskell}
+Expr = LeafF Int | PlusF Expr Expr
+\end{haskell}
+Compare this with the recursive definition (actual Haskell):
+\begin{haskell}
+data Expr = Leaf Int | Plus Expr Expr
+\end{haskell}
+We get a recursive data structure as a solution to the fixed-point equation.
+
+In Haskell, we can define a fixed point data structure for any functor (or even just a type constructor). Let's call \hask{Fix f} the fixed point of a functor \hask{f}. Symbolically, the fixed-point equation can be written as:
+\[f ( \text{Fix} f) \cong  \text{Fix} f \]
+or, in code,
+\begin{haskell}
+data Fix f where
+  In :: f (Fix f) -> Fix f
+\end{haskell}
+The data constructor \hask{In} is exactly the structure map of the initial algebra whose carrier is \hask{Fix f}. Its inverse is:
+\begin{haskell}
+out :: Fix f -> f (Fix f)
+out (In x) = x
+\end{haskell}
+The Haskell standard library contains a more idiomatic definition:
+\begin{haskell}
+newtype Fix f = Fix { unFix :: f (Fix f) }
+\end{haskell}
+
+To create terms of the type \hask{Fix f} we often use ``smart constructors.'' For instance, with the \hask{ExprF} functor, we would define:
+\begin{haskell}
+leaf :: Int -> Fix ExprF
+leaf n = In (LeafF n)
+
+plus :: Fix ExprF -> Fix ExprF -> Fix ExprF
+plus e1 e2 = In (PlusF e1 e2)
+\end{haskell}
+and use it to generate an expression tree:
+\begin{haskell}
+e9 :: Fix ExprF
+e9 = plus (plus (leaf 2) (leaf 3)) (leaf 4)
+\end{haskell}
+
+\section{Catamorphisms}
+
+Our goal, as programmers, is to be able to perform a computation over a recursive data structure---to ``fold'' it. We now have all the ingredients. The data structure is defined as a fixed point of a functor. An algebra for this functor defines the operation we want to perform. We've seen the two combined in the following diagram that defines the catamorphism $f$ for the algebra $(A, \alpha)$:
+\[
+ \begin{tikzcd}
+ F I 
+ \arrow[r, "F f"]
+ \arrow[d, "i"]
+ & F A
+\arrow[d, "\alpha"]
+ \\
+ I
+ \arrow[r, dashed, "f"]
+ & A
+  \end{tikzcd}
+\]
+The missing piece of information was that $i$ could be inverted because it's an isomorphism. It means that we can read this diagram as:
+\[ f = \alpha \circ F f \circ i^{-1} \]
+and interpret it as a recursive definition of $f$. 
+
+Let's redraw this diagram using Haskell notation. The catamorphism depends on the algebra so, for the algebra with the carrier \hask{a} and the evaluator \hask{alg}, we'll have the catamorphism \hask{cata alg}.
+
+\[
+ \begin{tikzcd}
+  \hask{f (Fix f)}
+ \arrow[rrrr, "\hask{fmap (cata alg)}"]
+ &&&& \hask{f a}
+\arrow[d, "\hask{alg}"]
+ \\
+ \hask{Fix f}
+ \arrow[u, "\hask{out}"]
+ \arrow[rrrr, dashed, "\hask{cata alg}"]
+ &&&& \hask{a}
+  \end{tikzcd}
+\]
+By simply following the arrows, we get this recursive definition:
+\begin{haskell}
+cata :: Functor f => Algebra f a -> Fix f -> a
+cata alg = alg . fmap (cata alg) . out
+\end{haskell}
+
+Here's what's happening: \hask{cata alg} is applied to some \hask{Fix f}. Every \hask{Fix f} is obtained by applying \hask{In} to a functorful of \hask{Fix f}, and \hask{out} ``strips'' this data constructor. 
+
+We can evaluate the functorful of \hask{Fix f} by \hask{fmap}'ing \hask{cata alg} over it. This is a recursive application. The idea is that the trees inside the functor are smaller than the original tree, so the recursion eventually terminates. It terminates when it hits the leaves. 
+
+After this step, we are left with a functorful of values, and we apply the evaluator \hask{alg} to it, to get the final result.
+
+The power of this approach is that all the recursion is encapsulated in one data type and one library function: We have the definition of \hask{Fix} and the catamorphism. The client of the library has only to provide the \emph{non-recursive} pieces: the functor and the algebra. These are much easier to deal with.
+
+\subsection{Examples}
+
+We can immediately apply this construction to our earlier examples. You can check that:
+\begin{haskell}
+cata eval e9
+\end{haskell}
+evaluates to $9$ and
+\begin{haskell}
+cata pretty e9
+\end{haskell}
+evaluates to the string \hask{"2 + 3 + 4"}.
+
+Let's try this with other familiar functors. The fixed point of the \hask{Maybe} functor:
+\begin{haskell}
+data Maybe x = Nothing | Just x
+\end{haskell}
+after some renaming, is equivalent to the type of natural numbers
+\begin{haskell}
+data Nat = Z | S Nat
+\end{haskell}
+An algebra for this functor consists of a choice of the carrier \hask{a} and an evaluator:
+\begin{haskell}
+alg :: Maybe a -> a
+\end{haskell}
+The mapping out of \hask{Maybe} is determined by two things: the value corresponding to \hask{Nothing} and a function \hask{a->a} corresponding to \hask{Just}. We called these \hask{init} and \hask{step} when we discussed the type of natural numbers. The elimination rule for \hask{Nat} is the catamorphism for this algebra.
+
+The list type that we've seen previously is equivalent to a fixed point of the following functor:
+\begin{haskell}
+data ListF a x = NilF | ConsF a x
+\end{haskell}
+An algebra for this functor is a mapping out 
+\begin{haskell}
+alg :: ListF a c -> c
+alg NifF = init
+alg (ConsF a c) = step (a, c)
+\end{haskell}
+which is determined by a value \hask{init} and a function \hask{step}:
+\begin{haskell}
+init :: c
+step :: (a, c) -> c
+\end{haskell}
+A catamorphism for such an algebra is the list recursor:
+\begin{haskell}
+recList :: c -> ((a, c) -> c) -> (List a -> c)
+\end{haskell}
+where \hask{(List a)} is can be identified with the fixed point \hask{Fix (ListF a)}.
+
+Lists are so common that their eliminators (folds) are included in the standard library. But there are infinitely many possible recursive data structures, each generated by its own functor, and we can use the same catamorphism on all of them.
+
+\section{Initial Algebra as a Colimit}
+
+infinite levels of recursion
+
+\section{notes}
+
+natural numbers
+
+lists
+
+\begin{exercise}
+\end{exercise}
+
+\begin{haskell}
+\end{haskell}
+
+\[
+ \begin{tikzcd}
+  \end{tikzcd}
+\]
+
+\[   \mathbf{Set} \]
+\[   \mathcal{C} \]
+
+\end{document}

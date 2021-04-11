@@ -298,22 +298,22 @@ h []      = -- empty-list case
 h (a: as) = -- case for the head and the tail of a non-empty list
 \end{haskell}
 
-Corresponding to the recursor, here's the type signature of the function \hask{foldl} (fold \emph{left}), which you can find in the standard library:
+Corresponding to the recursor, here's the type signature of the function \hask{foldr} (fold \emph{right}), which you can find in the standard library:
 \begin{haskell}
-foldl :: (c -> a -> c) -> c -> [a] -> c
+foldr :: (a -> c -> c) -> c -> [a] -> c
 \end{haskell}
 Here's a possible implementation:
 \begin{haskell}
-foldl step init = \as ->
+foldr step init = \as ->
   case as of
     [] -> init
-    a : as -> step (foldl step init as) a
+    a : as -> step a (foldr step init as)
 \end{haskell}
 
-As an example, we can use \hask{foldl} to calculate the sum of the elements of a list of natural numbers:
+As an example, we can use \hask{foldr} to calculate the sum of the elements of a list of natural numbers:
 \begin{haskell}
 sum :: [Nat] -> Nat
-sum = foldl plus Z
+sum = foldr plus Z
 \end{haskell}
 
 
