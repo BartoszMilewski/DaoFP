@@ -120,12 +120,12 @@ For every object $X$ in $\mathcal{C}$ we pick an arrow that goes from $F X$ to $
 \[ \alpha_X \colon F X \to G X \]
 A natural transformation thus maps objects to arrows.
 
-The structure of the models, though, has as much to do with arrows than with objects, so let's see what happens to arrows. For every arrow $f \colon X \to Y$ in $\mathcal{C}$, there are two corresponding arrows in $\mathcal{D}$:
+The structure of the models, though, has as much to do with objects as it does with arrows, so let's see what happens to arrows. For every arrow $f \colon X \to Y$ in $\mathcal{C}$, there are two corresponding arrows in $\mathcal{D}$:
 \[ F f \colon F X \to F Y\]
 \[ G f \colon G X \to G Y \]
-These are the two liftings of $f$. You can use them to move within the bounds of each of the two models. Then there are the components of $\alpha$ which let you switch between the models. 
+These are the two liftings of $f$. You can use them to move within the bounds of each of the two models. Then there are the components of $\alpha$ which let you switch between the two models. 
 
-Naturality says that it shouldn't matter whether we first move inside the first model and then jump to the second one, or first jump to the second model and then move within it. This is illustrated by the commuting \emph{naturality square}:
+Naturality says that it shouldn't matter whether you first move inside the first model and then jump to the second one, or first jump to the second one and then move within it. This is illustrated by the commuting \emph{naturality square}:
 
 \[
  \begin{tikzcd}
@@ -163,13 +163,13 @@ If every component $\alpha_X$ of a natural transformation is an isomorphism, $\a
 
 We can now restate the main result about isomorphisms: Two objects are isomorphic if and only if there is a natural isomorphism between their hom-functors (either the covariant, or the contravariant ones).
 
-Natural transformations provide a very convenient higher-order way of expressing commuting conditions in a variety of situations. We'll use them in this capacity to reformulate the definitions of algebraic data types.
+Natural transformations provide a very convenient high-level way of expressing commuting conditions in a variety of situations. We'll use them in this capacity to reformulate the definitions of algebraic data types.
 
 \section{Natural Transformations in Programming}
 
 A natural transformation is a family of arrows parameterized by objects. In programming, this corresponds to a family of functions parameterized by types, that is a \emph{polymorphic function}. 
 
-The type of the argument to a natural transformation is constructed by one functor, and the return type by another. 
+The type of the argument to a natural transformation is constructed using one functor, and the return type using another. 
 
 In Haskell, we can define a data type that accepts two type constructors representing two functors, and produces a type of natural transformations:
 
@@ -204,7 +204,7 @@ safeHead (a : as) = Just a
 \end{haskell}
 (The standard library \hask{head} function is ``unsafe'' in that it faults when given an empty list.)
 
-A useful intuition for understanding natural transformations builds on the idea that functors acts like containers of data. There are two completely orthogonal things that you can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure of moving ``stuff'' between containers with no way of knowing what kind of ``stuff'' it is. 
+A useful intuition for understanding natural transformations builds on the idea that functors acts like containers of data. There are two completely orthogonal things that one can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure of moving ``stuff'' between containers without knowing what kind of ``stuff'' it is. 
 
 Naturality condition enforces the orthogonality of these two operations. It doesn't matter if you first modify the data and then move it to another container; or first move it, and then modify. 
 
@@ -513,7 +513,7 @@ There may be many cospans sharing the same three objects, meaning: there may be 
 
 \subsection{Functoriality of cospans}
 
-Let's consider what happens when we start varying the object $X$. We get a mapping from $X$ to the set of cospans:
+Let's consider what happens when we start varying the object $X$ in a cospan. We get a mapping from $X$ to the set of cospans $F$:
 \[ F X = [\mathbf{2}, \mathcal{C}](D, \Delta_X) \]
 This mapping turns out to be functorial.
 
@@ -526,7 +526,7 @@ It has two components corresponding to the two objects in $\mathbf{2}$. For inst
 \[ \mu_1 \colon D \, 1 \to \Delta_X 1 \]
 or, using the definitions of $D$ and $\Delta$:
 \[ \mu_1 \colon A \to X \]
-This is just the function $f$ in the diagram. 
+This is just the arrow $f$ in the diagram. 
 
 Similarly, the element of the right-hand side is:
 \[ \nu \colon D \to \Delta_{Y} \]
@@ -560,7 +560,7 @@ We are now in a position to translate this condition into a statement about natu
 A cospan centered at $X$ is a natural transformation, that is an element of the hom-set in the functor category:
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_X) \]
 
-Both are hom-sets in their respective categories. But they are also sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. But sometimes a set is just a set.
+Both are hom-sets in their respective categories. But they are just sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. As Lao Tzu would say, ``Sometimes a set is just a set.''
 
 Our universal construction is the bijection or the isomorphism of sets:
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_X)  \cong \mathcal{C}(A + B, X) \]
@@ -587,7 +587,7 @@ Such a natural transformation is a pair of arrows that form a \emph{span}:
 Collectively, these natural transformations form a hom-set in the functor category :
 \[[\mathbf{2}, \mathcal{C}](\Delta_X, D) \]
 
-Every element of this hom-set is in one-to-one correspondence with a unique mapping $h$ into the product $A \times B$, which in turn is a member of the hom-set $\mathcal{C}(X, A \times B)$. This is expressed as the isomorphism:
+Every element of this hom-set is in one-to-one correspondence with a unique mapping $h$ into the product $A \times B$ which, in turn, is a member of the hom-set $\mathcal{C}(X, A \times B)$. This is expressed as the isomorphism:
 \[ [\mathbf{2}, \mathcal{C}](\Delta_X, D)  \cong \mathcal{C}(X, A \times B) \]
 It can be shown that the naturality of this isomorphism guarantees that the triangles in this diagram commute:
 \[
@@ -763,7 +763,7 @@ Nothing prevents us from replacing the category $\mathbf{2}$ with something more
 
 There is a whole vocabulary built around such constructions. 
 
-We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can generalize this to any indexing category $\mathbf{I}$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \mathbf{I} \to \mathcal{C}$. A  natural transformation that's an element of the hom-set
+We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can replace $\mathbf{2}$ with an arbitrary indexing category $\mathbf{I}$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \mathbf{I} \to \mathcal{C}$. A  natural transformation that's an element of the hom-set
 \[ [\mathbf{I}, \mathcal{C}](\Delta_X, D)  \]
 is now called a \emph{cone}. Its dual, an element of
 \[ [\mathbf{I}, \mathcal{C}](D, \Delta_X)  \]
@@ -806,14 +806,14 @@ D 1
 
 Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_X$ shrinks all vertices to one, so naturality squares turn into triangles. It means that all triangles that contain $X$ must now commute. 
 
-The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}_D$. It satisfies the following isomorphism, natural in $X$:
+The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}_D$. Universality means that it satisfies the following isomorphism, natural in $X$:
 \[ [\mathbf{I}, \mathcal{C}](\Delta_X, D)  \cong \mathcal{C}(X, \text{Lim}_D) \]
 Dually, the universal cocone is called a \emph{colimit}, and is described by the following natural isomorphism:
 \[ [\mathbf{I}, \mathcal{C}](D, \Delta_X)  \cong \mathcal{C}( \text{Colim}_D, X) \]
 
 We can now say that a product is a limit, and a sum is a colimit, of a diagram from the indexing category $\mathbf{2}$.
 
-Limits and colimits concentrate the essence of a pattern into a single object. 
+Limits and colimits concentrate the essence of a pattern down to a single object. 
 
 A limit, like a product, it is defined by its mapping-in property. 
 
@@ -822,7 +822,7 @@ A colimit, like a sum, it is defined by its mapping out property.
 There are many interesting limits and colimits, and we'll see some when we discuss algebras and coalgebras.
 
 \begin{exercise}
-Show that the limit of a ``walking arrow'' category, that is a two-object category with an arrow connecting the two objects, has the same elements as the first object in the diagram.
+Show that the limit of a ``walking arrow'' category, that is a two-object category with an arrow connecting the two objects, has the same elements as the first object in the diagram (``elements'' are the arrows from the terminal object).
 \end{exercise}
 
 \section{The Yoneda Lemma}
@@ -845,23 +845,23 @@ The set of natural transformation is the hom-set in the functor category $[\math
 
 The reason this works is because all the mappings involved in this theorem are bound by the requirements to preserve the structure of the category $\mathcal{C}$ and the structure of its models. In particular, naturality conditions impose a huge set of constraints on the way the mapping propagates from one point to another. The proof of the Yoneda lemma starts with a single identity arrow and lets naturality propagate it across the whole category.
 
-Here's the sketch of the proof. It consists of two parts: First, given a natural transformation construct an element of $F A$. Second, given an element of $F A$ construct a natural transformation. 
+Here's the sketch of the proof. It consists of two parts: First, given a natural transformation we construct an element of $F A$. Second, given an element of $F A$ we construct a natural transformation. 
 
-First, let's pick an arbitrary element of the left-hand side, a natural transformation $\alpha$. Its component at $X$ is a function
+First, let's pick an arbitrary element on the left-hand side: a natural transformation $\alpha$. Its component at $X$ is a function
 \[ \alpha_X \colon \mathcal{C}(A, X) \to F X \]
-We can now apply the Yoneda trick: substitute $A$ for $X$ and pick the identity $id_A$ as an element of $\mathcal{C}(A, A)$. This gives us an element $\alpha_A (id_A)$ of $F A$.
+We can now apply the Yoneda trick: substitute $A$ for $X$ and pick the identity $id_A$ as an element of $\mathcal{C}(A, A)$. This produces an element $\alpha_A (id_A)$ of the set $F A$.
 
-Now the other way around. We have an element $y$ of the set $F A$ and we want to implement a natural transformation that takes an arrow $h$ from $ \mathcal{C}(A, X)$ and produces an element of $F X$. This is simply done by lifting the arrow $h$ using $F$. We get a function
-\[F f \colon F A \to F X \]
-We can apply this function to $y$ to get an element of $F X$.
+Now the other way around. Take an element $y$ of the set $F A$. We want to implement a natural transformation that takes an arrow $h$ from $ \mathcal{C}(A, X)$ and produces an element of $F X$. This is simply done by lifting the arrow $h$ using $F$. We get a function
+\[F h \colon F A \to F X \]
+We can apply this function to $y$ to get an element of $F X$. We take this element as the action of $\alpha_X$ on $h$.
 
 \begin{exercise}
 Show that the mapping 
 \[ \mathcal{C}(A, X) \to F X\]
-defined above is a natural transformation. Hint: Vary $X$ using some $h \colon X \to Y$.
+defined above is a natural transformation. Hint: Vary $X$ using some $f \colon X \to Y$.
 \end{exercise}
 
-The isomorphism in the Yoneda lemma is natural not only in $A$ but also in $F$. In other words, you can ``move'' from $F$ to $G$ by applying an arrow in the functor category, that is a natural transformation. This is quite a leap in the levels of abstraction, but all the definitions of functoriality and naturality work equally well in the functor category, where objects are functors, and arrows are natural transformations.
+The isomorphism in the Yoneda lemma is natural not only in $A$ but also in $F$. In other words, you can ``move'' from the functor $F$ to another functor $G$ by applying an arrow in the functor category, that is a natural transformation. This is quite a leap in the levels of abstraction, but all the definitions of functoriality and naturality work equally well in the functor category, where objects are functors, and arrows are natural transformations.
 
 \subsection{Yoneda lemma in programming}
 
@@ -888,7 +888,7 @@ forall x. (a -> x) -> x
 \end{haskell}
 We interpret this as saying that any data type \hask{a} can be replaced by a higher order polymorphic function. This function takes another function, a handler, a callback, or a \emph{continuation} as an argument. 
 
-This is the standard continuation passing transformation that's used a lot in distributed programming, when a value of type \hask{a} has to be retrieved from a remote server. It's also useful as a program transformation that turns a recursive algorithm into a tail-recursive function.
+This is the standard continuation passing transformation that's used a lot in distributed programming, when the value of type \hask{a} has to be retrieved from a remote server. It's also useful as a program transformation that turns recursive algorithms into a tail-recursive functions.
 
 Continuation passing style is difficult to work with because the composition of continuations is highly nontrivial, resulting in what programmers often call a ``callback hell.'' Fortunately continuations form a monad, which means their composition can be automated.
 
@@ -911,7 +911,7 @@ coyoneda_1 y = \h -> contramap h y
 
 \section{Yoneda Embedding}
 
-In a closed category we have objects that are stand-ins for hom-sets. This is obviously a thing in the category of sets, where hom-sets, being sets, are automatically objects. But in the category of categories  $\mathbf{Cat}$, hom-sets are sets of functors, and it's not immediately obvious that they should also be objects---that is categories. But, as we've seen, they are. Functors between any two categories form a functor category, with natural transformations as arrows.
+In a closed category we have objects that are stand-ins for hom-sets. This is obviously a thing in the category of sets, where hom-sets, being sets, are automatically objects. But in the category of categories  $\mathbf{Cat}$, hom-sets are sets of functors, and it's not immediately obvious that they should also be objects---that is categories. But, as we've seen, they are! Functors between any two categories form a functor category, with natural transformations as arrows.
 
 Because of that, it's possible to curry functors just like we curried functions. A functor from a product category can be viewed as a functor returning a functor. In other words, $\mathbf{Cat}$ is a closed (symmetric) monoidal category.
 
@@ -931,13 +931,13 @@ It takes an object $X$ and maps it to a presheaf $\mathcal{C}(-, X)$, which can 
 
 Let's also review its action on arrows. It lifts an arrow $f \colon X \to Y$ to a mapping of functors
 \[ \alpha \colon \mathcal{C}(-, X) \to \mathcal{C}(-, Y) \]
-The component of $\alpha$ at $Z$ is a function:
+The component of $\alpha$ at $Z$ is a function between hom-sets:
 \[ \alpha_Z \colon \mathcal{C}(Z, X) \to \mathcal{C}(Z, Y) \]
-which is simply the post-composition $(f \circ -)$.
+which is simply implemented as the post-composition $(f \circ -)$.
 
-Such a functor can be thought of as creating a model of $\mathcal{C}$ in the presheaf category. But this is no run-of-the-mill model---it's an \emph{embedding} of one category inside another which is called the \emph{Yoneda embedding}. 
+Such a functor can be thought of as creating a model of $\mathcal{C}$ in the presheaf category. But this is no run-of-the-mill model---it's an \emph{embedding} of one category inside another. This particular one is called the \emph{Yoneda embedding}. 
 
-First of all, every object of $\mathcal{C}$ is mapped to a different object of $[\mathcal{C}^{op},  \mathbf{Set}]$. We say that it's ``injective on objects.'' But that's not all: every arrow in $\mathcal{C}$ is mapped to a different arrow. We say that the embedding functor is \emph{faithful}. If that weren't enough, the mapping of hom-sets is also surjective, meaning that every arrow between objects that come from $\mathcal{C}$ comes from some arrow in $\mathcal{C}$. We say that the functor is \emph{full}. Altoghether, the embedding is \emph{fully faithful}.
+First of all, every object of $\mathcal{C}$ is mapped to a different object (functor) of $[\mathcal{C}^{op},  \mathbf{Set}]$. We say that it's ``injective on objects.'' But that's not all: every arrow in $\mathcal{C}$ is mapped to a different arrow. We say that the embedding functor is \emph{faithful}. If that weren't enough, the mapping of hom-sets is also surjective, meaning that every arrow between objects in $[\mathcal{C}^{op},  \mathbf{Set}]$ comes from some arrow in $\mathcal{C}$. We say that the functor is \emph{full}. Altoghether, the embedding is \emph{fully faithful}.
 
 The latter fact is the direct consequence of the Yoneda lemma. We know that, for any functor $F \colon \mathcal{C}^{op} \to \mathbf{Set}$, we have a natural isomorphism:
 
@@ -969,7 +969,7 @@ fromNat alpha = alpha id
 This isomorphism maps identity to identity and composition to composition. That's because it's implemented as post-composition, and post-composition preserves both identity and composition. We've seen this in the chapter on isomorphisms:
 \[ ((f \circ g) \circ -) = (f \circ -) \circ (g \circ -) \]
 
-It then follows then that this isomorphism also preserves isomorphisms. So if $X$ is isomorphic to $Y$ then the presheaves $ \mathcal{C}(-, X)$ and $ \mathcal{C}(-, Y)$ are also isomorphic, and vice versa. This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. 
+It then follows then that this isomorphism also preserves isomorphisms. So if $X$ is isomorphic to $Y$ then the presheaves $ \mathcal{C}(-, X)$ and $ \mathcal{C}(-, Y)$ are isomorphic, and vice versa. This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. 
 
 \section{Representable Functors}
 
@@ -1037,7 +1037,9 @@ The list functor is not representable. But can it be considered a sum or represe
 
 In the category of categories, $\mathbf{Cat}$, the hom-sets are not just sets. Each of them is a separate functor category, with natural transformations playing the role of arrows. This kind of structure is called a 2-category. 
 
-In the language of 2-categories, objects are called 0-cells, arrows between them are called 1-cells, and arrows between arrows are called 2-cells. The obvious generalization of that picture would be to have 3-cells that go between 2-cells and so on. An $n$-category has cells going up to the $n$-th level. 
+In the language of 2-categories, objects are called 0-cells, arrows between them are called 1-cells, and arrows between arrows are called 2-cells. 
+
+The obvious generalization of that picture would be to have 3-cells that go between 2-cells and so on. An $n$-category has cells going up to the $n$-th level. 
 
 But why not have arrows all the way down? Enter infinity categories. Far from being a curiosity, $\infty$-categories have practical applications. For instance they are used in algebraic topology to describe points, paths between points, surfaces swiped by paths, volumes swiped by surfaces, and so on, ad infinitum. 
 

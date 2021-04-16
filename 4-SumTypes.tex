@@ -389,7 +389,7 @@ In Haskell, we can define a sum of any two types using \hask{Either}. A category
 \subsection{One Plus Zero}
 Let's first show that $1 + 0 \cong 1$, meaning the sum of the terminal object and the initial object is isomorphic to the terminal object. The standard procedure for this kind of proofs is to use the Yoneda trick. Since sum types are defined by mapping out, we should compare arrows coming \emph{out} of either side. 
  
-Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's defined by a pair $(x, \text{absurd}_X)$, where $x$ is an element of $X$. 
+Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's defined by a pair $(x, \mbox{!`})$, where $x$ is an element of $X$ and $\mbox{!`}$ is the unique arrow from the initial object to $X$ (the \hask{absurd} function in Haskell). 
 
 \[
  \begin{tikzcd}
@@ -398,7 +398,7 @@ Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's d
  \arrow[ddr, bend right, "x"']
  && 0
  \arrow[dl, bend right, "\text{Right}"]
- \arrow[ddl, bend left, "\text{absurd}_X"]
+ \arrow[ddl, bend left, "\mbox{!`}"]
  \\
 &1 + 0
 \arrow[d, dashed, "h"]
@@ -414,14 +414,14 @@ Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's d
  X
  \end{tikzcd}
 \]
-We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \text{absurd}_X)$, we can simply map it to the arrow $x$ originating in $1$. Since there is only one $\text{absurd}_X$, the mapping is a bijection. 
+We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \mbox{!`})$, we can simply map it to the arrow $x$ originating in $1$. Since there is only one $\mbox{!`}$, the mapping is a bijection. 
 
-So our $\beta_X$ maps any pair $(x, \text{absurd}_X)$ to $x$. Conversely, $\beta^{-1}_X$ maps $x$ to the pair $(x, \text{absurd}_X)$. But is it a natural transformation? 
+So our $\beta_X$ maps any pair $(x, \mbox{!`})$ to $x$. Conversely, $\beta^{-1}_X$ maps $x$ to the pair $(x, \mbox{!`})$. But is it a natural transformation? 
 
 To answer that, we need to consider what happens when we change focus from $X$ to some $Y$ that is connected to it through an arrow $g \colon X \to Y$. We have two options now:
 \begin{itemize}
-\item Make $h$ switch focus by post-composing both $x$ and $\text{absurd}_X$ with $g$. We get a new pair $(y = g \circ x, \text{absurd}_Y)$. Follow it by $\beta_Y$.
-\item Use $\beta_X$ to map $(x, \text{absurd}_X)$ to $x$. Follow it with the post-composition $(g \circ -)$. 
+\item Make $h$ switch focus by post-composing both $x$ and $\mbox{!`}$ with $g$. We get a new pair $(y = g \circ x, \mbox{!`})$. Follow it by $\beta_Y$.
+\item Use $\beta_X$ to map $(x, \mbox{!`})$ to $x$. Follow it with the post-composition $(g \circ -)$. 
 \end{itemize}
 In both cases we get the same arrow $y = g \circ x$. So the transformation $\beta$ is natural. Therefore $1 + 0$ is isomorphic to $1$.
 
@@ -445,7 +445,7 @@ A very similar argument can be used to show that $A + 0 \cong A$. The following 
  \arrow[ddr, bend right, "f"']
  && 0
  \arrow[dl, bend right, "\text{Right}"]
- \arrow[ddl, bend left, "\text{absurd}_X"]
+ \arrow[ddl, bend left, "\mbox{!`}"]
  \\
 &A + 0
 \arrow[d, dashed, "h"]

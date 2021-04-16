@@ -9,8 +9,7 @@ The essence of algebra is the formal manipulation of expressions. But what is an
 The first things to observe about algebraic expressions like $2 (x + y)$ or $a x^2 + b x + c$ is that there are infinitely many of them. There is a finite number of rules for making them, but these rules can be used in infinitely many combinations. This suggests that the rules are used \emph{recursively}. 
 
 
-
-Consider this simple example of an arithmetic expression:
+In programming, expressions are virtually synonymous to (parsing) trees. Consider this simple example of an arithmetic expression:
 \begin{haskell}
 data Expr = Leaf Int | Plus Expr Expr
 \end{haskell}
@@ -22,13 +21,13 @@ e5 = Plus e2 e3
 e7 = Plus e5 e2
 \end{haskell}
 
-Such recursive definitions work perfectly well in a programming language. The problem is that every new recursive data structure comes with its own library of functions that operate on it.
+Such recursive definitions work perfectly well in a programming language. The problem is that every new recursive data structure requires its own library of functions that operate on it.
 
 From type-theory point of view, we've been able to define recursive types, such as natural numbers or lists, by providing, in each case, specific introduction and elimination rules. What we need is something more general, a procedure for generating arbitrary recursive types from simpler pluggable components. 
 
-There are two orthogonal concerns when it comes to recursive data structure. One is the machinery of recursion. The other is the pluggable components to be used by recursion. 
+There are two orthogonal concerns when it comes to recursive data structures. One is the machinery of recursion. The other is the pluggable components to be used by recursion. 
 
-We know how recursion works: We assume that we know how to construct small trees. We then use the recursive step to plant those trees into nodes to make bigger trees. 
+We know how to work recursion: We assume that we know how to construct small trees. Then we use the recursive step to plant those trees into nodes to make bigger trees. 
 
 Category theory tells us how to formalize this imprecise description.
 
@@ -46,14 +45,14 @@ The other important piece of information is the recipe for evaluating expression
 
 Thinking recursively, let's assume that we know how to evaluate all subtrees of a larger expression. Then the remaining step is to plug these results into the top level node and evaluate it. 
 
-For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation the subtrees. It's pretty obvious what we should do in the last step. If the top of the tree is a leaf (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers. This recipe can be encoded as:
+For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation of the subtrees. It's pretty obvious what we should do in the last step. If the top of the tree is a leaf (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers in it. This recipe can be encoded as:
 \begin{haskell}
 eval :: ExprF Int -> Int
 eval (LeafF n)   = n
 eval (PlusF m n) = m + n
 \end{haskell}
 
-We made some seemingly obvious assumptions based on our expectations. For instance, since the node was called \hask{PlusF} we assumed that we should add the two numbers. But multiplication or subtraction would work as well.
+We have made some seemingly obvious assumptions based on our experience. For instance, since the node was called \hask{PlusF} we assumed that we should add the two numbers. But multiplication or subtraction would work equally well.
 
 Since the leaf contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string, and using concatenation instead of addition:
 \begin{haskell}
@@ -62,7 +61,7 @@ pretty (LeafF n)   = show n
 pretty (PlusF s t) = s ++ " + " ++ t
 \end{haskell}
 
-In fact there are infinitely many evaluators, some sensible, others less so, but we shouldn't be judgmental. Therefore any choice of the target type and any choice of the evaluator is equally valid. 
+In fact there are infinitely many evaluators, some sensible, others less so, but we shouldn't be judgmental. Any choice of the target type and any choice of the evaluator should be equally valid. This leads to the following definition:
 
 An \emph{algebra} for an endofunctor $F$ is a pair $(A, \alpha)$. The object $A$ is called the \emph{carrier} of the algebra, and the evaluator $\alpha \colon F A \to A$ is called the \emph{structure map}.
 
@@ -71,9 +70,9 @@ In Haskell, given the functor \hask{f} we define:
 type Algebra f a = f a -> a
 \end{haskell}
 
-Notice that the evaluator is \emph{not} a polymorphic function. It's a specific choice of a function for a specific type \hask{a}. There may also be many different evaluators for the same type. They define separate algebras.
+Notice that the evaluator is \emph{not} a polymorphic function. It's a specific choice of a function for a specific type \hask{a}. There may be many choices of the carrier types and there be many different evaluators for a given type. They all define separate algebras.
 
-We have defined two algebras for \hask{ExprF}. This one has \hask{Int} as a carrier:
+We have previously defined two algebras for \hask{ExprF}. This one has \hask{Int} as a carrier:
 \begin{haskell}
 eval :: Algebra ExprF Int
 eval (LeafF n)   = n
@@ -88,11 +87,11 @@ pretty (PlusF s t) = s ++ " + " ++ t
 
 \section{Category of Algebras}
 
-Algebras for a given endofunctor $F$ form a category. An arrow in that category is an \emph{algebra morphism}, which is a structure-preserving arrow between their carrier objects. 
+Algebras for a given endofunctor $F$ form a category. An arrow in that category is an algebra morphism, which is a structure-preserving arrow between their carrier objects. 
 
-Preserving structure in this case means that the arrow must commute with the two structure maps. This is where functoriality comes into play. To switch from one structure map to another, we have to be able to lift an arrow between their carriers. 
+Preserving structure in this case means that the arrow must commute with the two structure maps. This is where functoriality comes into play. To switch from one structure map to another, we have to be able to lift an arrow that goes between their carriers. 
 
-Given an endofunctor $F$, an algebra morphism between two algebras $(A, \alpha)$ and $(B, \beta)$ is an arrow $f \colon A \to B$ that makes this diagram commute:
+Given an endofunctor $F$, an \emph{algebra morphism} between two algebras $(A, \alpha)$ and $(B, \beta)$ is an arrow $f \colon A \to B$ that makes this diagram commute:
 \[
  \begin{tikzcd}
  F A 
@@ -113,7 +112,7 @@ The composition of two algebra morphisms is again an algebra morphism, which can
 \[ id_A \circ \alpha = \alpha \circ F (id_A) \]
 (a functor maps identity to identity).
 
-The commuting condition in the definition of an algebra morphism is very restrictive. Consider for instance a function that maps an integer to a string. In Haskell it's the \hask{show} function (actually, a method of the \hask{Show} class). It is \emph{not} an algebra morphism from \hask{eval} to \hask{pretty}. 
+The commuting condition in the definition of an algebra morphism is very restrictive. Consider for instance a function that maps an integer to a string. In Haskell it's the \hask{show} function (actually, a method of the \hask{Show} class). This is \emph{not} an algebra morphism from \hask{eval} to \hask{pretty}. 
 
 The initial object in the category of algebras is called the \emph{initial algebra} and, as we'll see, it plays a very important role.
 
@@ -161,7 +160,7 @@ Make a convincing argument that \hask{log} is an algebra morphism between these 
 \section{Lambek's Lemma and Fixed Points}
 
 
-Lambek's lemma tells us that the structure map $i$ of the initial algebra is an isomorphism. 
+Lambek's lemma says that the structure map $i$ of the initial algebra is an isomorphism. 
 
 The reason for it is the self-similarity of algebras. You can lift any algebra $(A, \alpha)$ using $F$, and the result $(F A, F \alpha)$ is also an algebra with the structure map $F \alpha \colon F (F A) \to F A$. 
 
@@ -208,15 +207,19 @@ Since $F$ is a functor, it maps composition to composition and identity to ident
 
 We have thus shown that $h$ is the inverse of $i$, which means that $i$ is an isomorphism. In other words:
 \[ F I \cong I \]
-We interpret this identity as stating that $I$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $I$ doesn't change it. 
+We interpret this identity as stating that $I$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $I$ ``doesn't change it.''
 
 There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. 
-
+\subsection{Fixed point in Haskell}
 Let's consider how the definition of the fixed point works with our original example:
 \begin{haskell}
 data ExprF x = LeafF Int | PlusF x x
 \end{haskell}
-It's a data structure defined by the property that \hask{ExprF} acting on it reproduces it. Let's call this data structure \hask{Expr}. When we plug it in place of \hask{x}, we get (in pseudo-Haskell):
+Its fixed point is a data structure defined by the property that \hask{ExprF} acting on it reproduces it. If we call this data structure \hask{Expr}, the fixed point equation becomes  (in pseudo-Haskell):
+\begin{haskell}
+Expr = ExprF Expr
+\end{haskell}
+Expanding \hask{ExprF} we get:
 \begin{haskell}
 Expr = LeafF Int | PlusF Expr Expr
 \end{haskell}
@@ -251,7 +254,7 @@ leaf n = In (LeafF n)
 plus :: Fix ExprF -> Fix ExprF -> Fix ExprF
 plus e1 e2 = In (PlusF e1 e2)
 \end{haskell}
-and use it to generate an expression tree:
+and use it to generate expression trees like this one:
 \begin{haskell}
 e9 :: Fix ExprF
 e9 = plus (plus (leaf 2) (leaf 3)) (leaf 4)
@@ -259,7 +262,9 @@ e9 = plus (plus (leaf 2) (leaf 3)) (leaf 4)
 
 \section{Catamorphisms}
 
-Our goal, as programmers, is to be able to perform a computation over a recursive data structure---to ``fold'' it. We now have all the ingredients. The data structure is defined as a fixed point of a functor. An algebra for this functor defines the operation we want to perform. We've seen the two combined in the following diagram that defines the catamorphism $f$ for the algebra $(A, \alpha)$:
+Our goal, as programmers, is to be able to perform a computation over a recursive data structure---to ``fold'' it. We now have all the ingredients. 
+
+The data structure is defined as a fixed point of a functor. An algebra for this functor defines the operation we want to perform. We've seen the fixed point and the algebra combined in the following diagram:
 \[
  \begin{tikzcd}
  F I 
@@ -273,7 +278,9 @@ Our goal, as programmers, is to be able to perform a computation over a recursiv
  & A
   \end{tikzcd}
 \]
-The missing piece of information was that $i$ could be inverted because it's an isomorphism. It means that we can read this diagram as:
+that defines the catamorphism $f$ for the algebra $(A, \alpha)$.
+
+The final piece of information is the Lambek's lemma, which tells us that $i$ could be inverted because it's an isomorphism. It means that we can read this diagram as:
 \[ f = \alpha \circ F f \circ i^{-1} \]
 and interpret it as a recursive definition of $f$. 
 
@@ -298,7 +305,7 @@ cata :: Functor f => Algebra f a -> Fix f -> a
 cata alg = alg . fmap (cata alg) . out
 \end{haskell}
 
-Here's what's happening: \hask{cata alg} is applied to some \hask{Fix f}. Every \hask{Fix f} is obtained by applying \hask{In} to a functorful of \hask{Fix f}, and \hask{out} ``strips'' this data constructor. 
+Here's what's happening: \hask{cata alg} is applied to some \hask{Fix f}. Every \hask{Fix f} is obtained by applying \hask{In} to a functorful of \hask{Fix f}. The function \hask{out} ``strips'' this data constructor. 
 
 We can evaluate the functorful of \hask{Fix f} by \hask{fmap}'ing \hask{cata alg} over it. This is a recursive application. The idea is that the trees inside the functor are smaller than the original tree, so the recursion eventually terminates. It terminates when it hits the leaves. 
 
@@ -318,7 +325,33 @@ cata pretty e9
 \end{haskell}
 evaluates to the string \hask{"2 + 3 + 4"}.
 
-Let's try this with other familiar functors. The fixed point of the \hask{Maybe} functor:
+Sometimes we want to display the tree on multiple lines with indentation. This requires passing a depth counter to recursive calls. There is a clever trick that uses a function type as a carrier:
+\begin{haskell}
+pretty' :: Algebra ExprF (Int -> String)
+pretty' (LeafF n) i = indent i ++ show n
+pretty' (PlusF f g) i = f (i + 1) ++ "\n" ++
+                        indent i ++ "+" ++ "\n" ++
+                        g (i + 1)
+\end{haskell}
+The auxiliary function \hask{indent} replicates the space character:
+\begin{haskell}
+indent n = replicate (n * 2) ' '
+\end{haskell}
+The result of:
+\begin{haskell}
+cata pretty' e9 0
+\end{haskell}
+when printed, looks like this:
+\begin{haskell}
+    2
+  +
+    3
++
+  4
+\end{haskell}
+
+
+Let's try defining algebras for other familiar functors. The fixed point of the \hask{Maybe} functor:
 \begin{haskell}
 data Maybe x = Nothing | Just x
 \end{haskell}
@@ -330,7 +363,7 @@ An algebra for this functor consists of a choice of the carrier \hask{a} and an 
 \begin{haskell}
 alg :: Maybe a -> a
 \end{haskell}
-The mapping out of \hask{Maybe} is determined by two things: the value corresponding to \hask{Nothing} and a function \hask{a->a} corresponding to \hask{Just}. We called these \hask{init} and \hask{step} when we discussed the type of natural numbers. The elimination rule for \hask{Nat} is the catamorphism for this algebra.
+The mapping out of \hask{Maybe} is determined by two things: the value corresponding to \hask{Nothing} and a function \hask{a->a} corresponding to \hask{Just}. In our discussion of the type of natural numbers we called these \hask{init} and \hask{step}. We can now see that the elimination rule for \hask{Nat} is the catamorphism for this algebra.
 
 The list type that we've seen previously is equivalent to a fixed point of the following functor:
 \begin{haskell}
@@ -342,7 +375,7 @@ alg :: ListF a c -> c
 alg NifF = init
 alg (ConsF a c) = step (a, c)
 \end{haskell}
-which is determined by a value \hask{init} and a function \hask{step}:
+which is determined by the value \hask{init} and the function \hask{step}:
 \begin{haskell}
 init :: c
 step :: (a, c) -> c
@@ -357,26 +390,205 @@ Lists are so common that their eliminators (folds) are included in the standard 
 
 \section{Initial Algebra as a Colimit}
 
-infinite levels of recursion
+In general, there is no guarantee that the initial object in the category of algebras exists. But if it exists, Lambek's lemma tells us that it's a fixed point of the endofunctor for these algebras.  The construction of this fixed point is a little mysterious, since it involves tying the recursive knot. 
 
-\section{notes}
+Loosely speaking, the fixed point is reached after we apply the functor infinitely many times. Then, applying it once more wouldn't change anything. This idea can be made precise, if we take it one step at a time. For simplicity, let's consider algebras in the category of sets, which has all the nice properties.
 
-natural numbers
+We've seen, in our examples, that building instances of recursive data structures always starts with the leaves. The leaves are the parts in the definition of the functor that don't depend on the type parameter: the \hask{NilF} of the list, the \hask{LeafF} of the tree, the \hask{Nothing} of the \hask{Maybe}, etc. 
 
-lists
+We can tease them out if we apply our functor $F$ to the initial object---the empty set $0$. Since the empty set has no elements, the instances of the type $F 0$ are leaves only. 
 
-\begin{exercise}
-\end{exercise}
+Indeed, the only inhabitant of the type \hask{Maybe Void} is constructed using \hask{Nothing}. The only inhabitants of the type \hask{ExprF Void} are \hask{LeafF n}, where \hask{n} is an \hask{Int}.
 
+In other words, $F 0$ is the ``type of leaves'' for the functor $F$. Leaves are trees of depth one. For the \hask{Maybe} functor there's only one:
 \begin{haskell}
+m1 :: Maybe Void
+m1 = Nothing
 \end{haskell}
+
+In the second iteration, we apply $F$ to the leaves from the previous step and get trees of depth at most two. Their type is $F(F 0)$. 
+
+For instance, these are all the terms of the type \hask{Maybe(Maybe Void)}:
+\begin{haskell}
+m2, m2' :: Maybe (Maybe Void)
+m2 = Nothing
+m2' = Just Nothing
+\end{haskell}
+
+We can continue this process, adding deeper and deeper trees at each step. In the $n$-th iteration, the type $F^n 0$ ($n$-fold application of $f$ to the initial object) describes all threes of depth up to $n$. However, for every $n$, there are still infinitely many trees of depth greater than $n$ that are not covered. 
+
+If we knew how to define $F^{\infty} 0$, it would cover all possible trees. But the next best thing we could try is to gather all these partial trees into one infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. An infinite sum (a coproduct):
+$$ \coprod_{n = 0}^{\infty} F^n 0$$
+is just like a finite sum, except that it has infinitely many constructors $i_n$:
+\[
+ \begin{tikzcd}
+ 0
+ \arrow[ddrr, "i_0"']
+ & F 0
+  \arrow[ddr, "i_1"]
+& F (F 0)
+  \arrow[dd, "i_2"]
+ & ...
+ & F^n 0
+  \arrow[ddll, "i_n"]
+ & ...
+ \\
+ \\
+ &&\coprod_{n = 0}^{\infty} F^n 0
+  \end{tikzcd}
+\]
+It has the universal mapping-out property, just like the sum of two types, only with infinitely many cases. (Obviously, we can't express it in Haskell.)
+
+To construct a tree of depth $n$, we would first select it from $f^n 0$ and use the $n$-th constructor $i_n$ to inject it into the sum. 
+
+There is just one problem: the same tree shape can also be constructed using any of the $F^m$, with $m > n$. 
+
+We've seen the leaf \hask{Nothing} appear in \hask{Maybe Void} and \hask{Maybe(Maybe Void)}. In fact it shows up in any nonzero power of \hask{Maybe} acting on \hask{Void}. 
+
+Similarly, \hask{Just Nothing} shows up in all powers starting with two.
+
+\hask{Just(Just(Nothing))} shows up in all powers starting with three, and so on...
+
+But there is a way to collapse all these duplicates. The trick is to replace the sum by the colimit. Instead of a diagram consisting of individual objects, we can construct a chain. Let's call this chain $\Gamma$, and its colimit $I = Colim \, \Gamma$.
 
 \[
  \begin{tikzcd}
+ 0
+ \arrow[r, "\mbox{!`}"]
+ \arrow[ddrr, "i_0"']
+ & F 0
+  \arrow[r, "F\mbox{!`}"]
+ \arrow[ddr, "i_1"]
+& F (F 0)
+  \arrow[r, "F(F\mbox{!`})"]
+  \arrow[dd, "i_2"]
+ & ...
+ \arrow[r]
+ & F^n 0
+  \arrow[r]
+ \arrow[ddll, "i_n"]
+ & ...
+ \\
+ \\
+ &&I
   \end{tikzcd}
 \]
+It's almost the same as the sum, but with additional arrows at the base of the cocone. These arrows are the liftings of the unique arrow $\mbox{!`}$ that goes from the initial object to $f 0$ (we called it \hask{absurd} in Haskell). The effect of these arrows is to collapse the infinitely many copies of the same tree down to just one representative. 
 
-\[   \mathbf{Set} \]
-\[   \mathcal{C} \]
+To see that, consider for instance a tree of depth $n$. It can be first found as an element of $F^n 0$, that is to say, an arrow $t \colon 1 \to F^n 0$. It is injected into the colimit $I$ as the composite $i_n \circ t$. 
+
+The same shape of a tree is also found in $F^{n+1} 0$, as the composite $t' = F^n (\mbox{!`}) \circ t$. It is injected into the sum as the composite $i_{n+1} \circ t' = i_{n+1} \circ F^n (\mbox{!`}) \circ t$. 
+
+\[
+ \begin{tikzcd}
+ ...
+& 1
+\arrow[d, "t"]
+\arrow[dr, "t'"]
+ \\
+ ...
+ \arrow[r]
+ & F^n 0 
+ \arrow[r, "F^n (\mbox{!`})"]
+ \arrow[d, "i_n"]
+ & F^{n+1} 0
+ \arrow[dl, "i_{n+1}"]
+ \\
+ &  I
+  \end{tikzcd}
+\]
+This time, though, we have the commuting triangle in the side of the cocone:
+\[i_{n+1} \circ F^n (\mbox{!`}) = i_n \]
+which means that 
+\[ i_{n+1} \circ t' =  i_{n+1} \circ F^n (\mbox{!`}) \circ t =  i_n \circ t\]
+The two copies of the tree have been identified in the colimit. You can convince yourself that this procedure removes all duplicates.
+
+We can  prove directly that $I = Colim\, \Gamma$ is the initial algebra. There is one assumptions that we have to make: the functor $F$ must preserve the colimit: 
+\[ \text{Colim} (F \Gamma) \cong F I \]
+In particular, this is true in $\mathbf{Set}$. Here's the sketch of the proof: 
+
+First we show that there is an arrow $I \to F I$. We use the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $Colim (F \Gamma)$ then, by universality, there must be an arrow from $I$ to $Colim F \Gamma$. The latter, by our assumption, is isomorphic to $F I$. So we will have $I \to F I$.
+
+To construct this cocone, notice that $Colim (F \Gamma$) is itself the apex of a cocone $F \Gamma$. 
+
+\[
+ \begin{tikzcd}
+ F 0
+ \arrow[r, "F \mbox{!`}"]
+ \arrow[ddrr, "j_1"']
+ &  F (F 0)
+  \arrow[r, "F(F  \mbox{!`})"]
+ \arrow[ddr, "j_2"]
+& F^3 0
+  \arrow[r, "F^3\mbox{!`}"]
+  \arrow[dd, "j_3"]
+ & ...
+ \arrow[r]
+ & F^n 0
+  \arrow[r]
+ \arrow[ddll, "j_n"]
+ & ...
+ \\
+ \\
+ &&Colim (F \Gamma)
+  \end{tikzcd}
+\]
+The diagram $F \Gamma$ is the same as $\Gamma$ except that it's missing the initial object from the chain.
+
+The spokes of the cocone we are looking for are marked in red in the diagram below:
+\[
+ \begin{tikzcd}
+ 0
+ \arrow[r, "\mbox{!`}"]
+ \arrow[d, red, "\mbox{!`}"]
+ & F 0
+  \arrow[r, "F\mbox{!`}"]
+  \arrow[d, red, "F\mbox{!`}"]
+& F (F 0)
+  \arrow[r, "F(F\mbox{!`})"]
+  \arrow[d, red, "F(F\mbox{!`})"]
+ & ...
+ \arrow[r]
+ & F^{n+1} 0
+  \arrow[r]
+  \arrow[d, red]
+ & ...
+ \\
+ F 0
+ \arrow[r, "F \mbox{!`}"]
+ \arrow[ddrr, red, "j_1"']
+ &  F (F 0)
+  \arrow[r, "F(F  \mbox{!`})"]
+ \arrow[ddr, red, "j_2"]
+& F^3 0
+  \arrow[r, "F^3\mbox{!`}"]
+  \arrow[dd, red, "j_3"]
+ & ...
+ \arrow[r]
+ & F^n 0
+  \arrow[r]
+ \arrow[ddll, red, "j_n"]
+ & ...
+ \\
+ \\
+ &&Colim (F \Gamma)
+  \end{tikzcd}
+\]
+Since $I = Colim \Gamma$ is the apex of the universal cocone based on $\Gamma$, there must be a unique mapping out of it to $Colim (F \Gamma)$:
+\[ I \to F I \]
+
+Notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be embedded in it. It means that we can construct a cocone from $F \Gamma$ to the apex $I$ by going through (a sub-chain of) $\Gamma$. From the universality of $Colim (F \Gamma)$ it follows that there is a mapping out 
+\[ F I \cong Colim (F \Gamma) \to I \]
+This shows that $I$ is a carrier of an algebra. In fact, it can be shown that the two mappings are the inverse of each other, as we would expect from the Lambek's lemma.
+
+To show that this is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(A, \alpha)$. Again, we can use universality if we can construct a cocone from $\Gamma$ to $A$. 
+
+The zero'th spoke of this cocone goes from $0$ to $A$, so it's just $f_0 = \mbox{!`}$.
+
+The first one, $F 0 \to A$, is $f_1 = \alpha \circ F f_0$. 
+
+The third one, $F (F 0) \to A$ is  $f_2 = \alpha \circ F f_1$.  And so on...
+
+The unique mapping from $I$ to $A$ is our catamorphism. With some more diagram chasing, it can be shown that it's indeed an algebra morphism. 
 
 \end{document}
