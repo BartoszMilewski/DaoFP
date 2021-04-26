@@ -4,6 +4,16 @@
 
 \chapter{Coalgebras}
 
+Coalgebras are just algebras in the opposite category. End of chapter!
+
+But, as we've seen before, the category in which we're working is not symmetric with respect to duality. In particular, if we compare the terminal and the initial objects, their properties are not dually symmetric. The initial object in our category has no incoming arrows, whereas the terminal one has lots of outgoing arrows. Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---their dual, generated from the terminal object---to have slightly different properties.
+
+The main application of algebras was in processing recursive data structures: folding them. Dually, the main application of coalgebras is in generating, or unfolding, of recursive data structures. 
+
+We use catamorphisms to chop trees, we use anamorphisms to grow them. 
+
+We cannot produce information from nothing so, in general, both a catamorphism and an anamorphism reduce the information that's contained in their input. After you sum a list of integers, it's impossible to recover the original list. By the same token, if you grow a recursive data structure using an anamorphism, the seed must contain all the information that ends up in the tree. The advantage is that the information is now stored in a form that's more convenient for further processing.
+
 \section{Coalgebras from Endofunctors}
 
 \section{Category of Coalgebras}

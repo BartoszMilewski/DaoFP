@@ -355,6 +355,8 @@ The two functors in the adjunction play different roles: the picture of the adju
 
 A forgetful functor is a functor that ``forgets'' some of the structure of its source category. This is not a rigorous definition but, in most cases, it's pretty obvious what structure is being forgotten. Very often the target category is just the category of sets, which is considered the epitome of structurelessness. The result of the forgetful functor, in that case, is called the ``underlying'' set, and the functor itself is often called $U$. 
 
+More precisely, we say that a functor forgets \emph{structure} if the mapping of hom-sets is not surjective, that is, there are arrows in the target hom-set that have no corresponding arrows in the source hom-set. Intuitively, it means that the arrows in the source have to preserve some structure, and that structure is absent in the target. 
+
 The left adjoint to a forgetful functor is called a \emph{free functor}.
 
 \[
@@ -437,7 +439,7 @@ M
   \end{tikzcd}
 \]
 
-The idea is that $F$ creates the most generic monoid possible, so that preserving its structure doesn't impose any additional constraints. 
+The idea is that $F$ should create the most generic monoid possible, so that preserving its structure doesn't impose any additional constraints. 
 
 Keep in mind that a monoid in  $\mathbf{Mon}(\mathbf{Set})$ can be thought of as a set of elements and a monoid morphism as a function between such sets, satisfying some additional constraints. 
 
