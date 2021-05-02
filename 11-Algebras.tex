@@ -209,7 +209,8 @@ We have thus shown that $h$ is the inverse of $i$, which means that $i$ is an is
 \[ F I \cong I \]
 We interpret this identity as stating that $I$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $I$ ``doesn't change it.''
 
-There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. 
+There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. The least point of an endofunctor $F$ is denoted $\mu F$, so we have:
+\[ I = \mu F \]
 \subsection{Fixed point in Haskell}
 Let's consider how the definition of the fixed point works with our original example:
 \begin{haskell}
@@ -229,7 +230,9 @@ data Expr = Leaf Int | Plus Expr Expr
 \end{haskell}
 We get a recursive data structure as a solution to the fixed-point equation.
 
-In Haskell, we can define a fixed point data structure for any functor (or even just a type constructor). Let's call \hask{Fix f} the fixed point of a functor \hask{f}. Symbolically, the fixed-point equation can be written as:
+In Haskell, we can define a fixed point data structure for any functor (or even just a type constructor). As we'll see later, this doesn't always give us the carrier of the initial algebra. It only works for those functors that have the ``leaf'' component.
+
+Let's call \hask{Fix f} the fixed point of a functor \hask{f}. Symbolically, the fixed-point equation can be written as:
 \[f ( \text{Fix} f) \cong  \text{Fix} f \]
 or, in code,
 \begin{haskell}
@@ -400,7 +403,7 @@ We can tease them out if we apply our functor $F$ to the initial object---the em
 
 Indeed, the only inhabitant of the type \hask{Maybe Void} is constructed using \hask{Nothing}. The only inhabitants of the type \hask{ExprF Void} are \hask{LeafF n}, where \hask{n} is an \hask{Int}.
 
-In other words, $F 0$ is the ``type of leaves'' for the functor $F$. Leaves are trees of depth one. For the \hask{Maybe} functor there's only one:
+In other words, $F 0$ is the ``type of leaves'' for the functor $F$. Leaves are trees of depth one. For the \hask{Maybe} functor there's only one---the type of leaves for this functor is a singleton:
 \begin{haskell}
 m1 :: Maybe Void
 m1 = Nothing
@@ -590,5 +593,7 @@ The first one, $F 0 \to A$, is $f_1 = \alpha \circ F f_0$.
 The third one, $F (F 0) \to A$ is  $f_2 = \alpha \circ F f_1$.  And so on...
 
 The unique mapping from $I$ to $A$ is our catamorphism. With some more diagram chasing, it can be shown that it's indeed an algebra morphism. 
+
+Notice that this construction only works if we can ``prime'' the process by creating leaves. In other words, if $F 0 \cong 0$, there are no leaves, and all further iterations will just reproduce this $0$. 
 
 \end{document}

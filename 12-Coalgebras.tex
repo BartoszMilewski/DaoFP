@@ -6,19 +6,126 @@
 
 Coalgebras are just algebras in the opposite category. End of chapter!
 
-But, as we've seen before, the category in which we're working is not symmetric with respect to duality. In particular, if we compare the terminal and the initial objects, their properties are not dually symmetric. The initial object in our category has no incoming arrows, whereas the terminal one has lots of outgoing arrows. Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---their dual, generated from the terminal object---to have slightly different properties.
+However, as we've seen before, the category in which we're working is not symmetric with respect to duality. In particular, if we compare the terminal and the initial objects, their properties are not dually symmetric. Our initial object has no incoming arrows, whereas the terminal one has lots of outgoing arrows. 
 
-The main application of algebras was in processing recursive data structures: folding them. Dually, the main application of coalgebras is in generating, or unfolding, of recursive data structures. 
+Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---their dual, generated from the terminal object---not to be their mirror image.
+
+We've seen that the main application of algebras was in processing recursive data structures: in folding them. Dually, the main application of coalgebras is in generating, or unfolding, of recursive, often tree-like, data structures. The unfolding is done using an anamorphism.
 
 We use catamorphisms to chop trees, we use anamorphisms to grow them. 
 
-We cannot produce information from nothing so, in general, both a catamorphism and an anamorphism reduce the information that's contained in their input. After you sum a list of integers, it's impossible to recover the original list. By the same token, if you grow a recursive data structure using an anamorphism, the seed must contain all the information that ends up in the tree. The advantage is that the information is now stored in a form that's more convenient for further processing.
+We cannot produce information from nothing so, in general, both a catamorphism and an anamorphism reduce the amount of information that's contained in their input. 
+
+After you sum a list of integers, it's impossible to recover the original list. 
+
+By the same token, if you grow a recursive data structure using an anamorphism, the seed must contain all the information that ends up in the tree. But the information is now stored in a form that's more convenient for further processing.
 
 \section{Coalgebras from Endofunctors}
 
+A coalgebra for an endofunctor $F$ is a pair consisting of a carrier $A$ and a structure map $A \to F A$. 
+
+In Haskell, we define:
+\begin{haskell}
+ type Coalgebra f a = a -> f a
+\end{haskell}
+We often think of the carrier as the type of a seed from which we'll grow the data structure, be it a list or a tree. 
+
+For instance, here's a functor that we can use to create a binary tree, with integers stored at the nodes:
+\begin{haskell}
+data TreeF x = LeafF | NodeF Int x x
+  deriving (Show, Functor)
+\end{haskell}
+We don't even have to define the instance of \hask{Functor} for it---the \hask{deriving} clause tells the compiler to generate the canonical one for us (together with the \hask{Show} instance to allow conversion to \hask{String}, if we want to display it).
+
+A coalgebra is a function that takes a seed of the carrier type and produces a functorful of new seeds. These new seeds can then be used to generate the subtrees, and so on. 
+
+Here's a coalgebra for the functor \hask{TreeF} that takes a list of integers as a seed:
+\begin{haskell}
+split :: Coalgebra TreeF [Int]
+split [] = LeafF
+split (n : ns) = NodeF n left right
+  where
+    (left, right) = partition (<= n) ns
+\end{haskell}
+If the seed is empty, it generates a leaf; otherwise it creates a new node. This node stores the head of the list and fills the node with two new seeds. The library function \hask{partition} splits a list using a user-defined predicate, here \hask{(<= n)}, less-than-or-equal to \hask{n}. The result is a pair of lists: the first one satisfying the predicate, and the second one that doesn't. 
+
+You can imagine that a recursive application of this coalgebra would create a binary sorted tree. We'll use this coalgebra to implement a sort.
+
 \section{Category of Coalgebras}
 
+By analogy with algebra morphisms, we can define coalgebra morphisms as the arrows between carriers that satisfy the commuting condition. 
+
+Given two coalgebras $(A, \alpha)$ and $(B, \beta)$, the arrow $f \colon A \to B$ is a coalgebra morphism if the following diagram commutes:
+
+\[
+ \begin{tikzcd}
+ A 
+ \arrow[r, "f"]
+ \arrow[d, "\alpha"]
+ & B
+\arrow[d, "\beta"]
+ \\
+F  A
+ \arrow[r, "F f"]
+ & F B
+  \end{tikzcd}
+\]
+
+The interpretation is that it doesn't matter if we first map the carriers and then apply the coalgebra $\beta$ or first apply the coalgebra $\alpha$ and then apply the lifted arrow $F f$.
+
+Coalgebra morphism can be composed, and the identity arrow is automaticaly a coalgebra morphism. It's easy to see that coalgebras, just like algebras, form a category. 
+
+This time, however, we are interested in the terminal object in this category---a \emph{terminal coalgebra}. If a terminal coalgebra $(T, j)$ exists, it satisfies the dual of the Lambek's lemma. 
+
+\begin{exercise}{Lambek's lemma:}
+Show that the structure map $j$ of the terminal coalgebra is an isomorphism. Hint: The proof is dual to the one for the initial algebra.
+\end{exercise}
+
+As a consequence of the Lambek's lemma, the carrier of the terminal algebra is a fixed point of the endofunctor in question. 
+\[ F T \cong T \]
+with $j$ and $j^{-1}$ serving as the witnesses of this isomorphism. It also follows that $(T, j^{-1})$ is an algebra; just as  $(I, i^{-1})$ is a coalgebra, where $(I, i)$ is the initial algebra.
+
+We've seen before that the carrier of the initial algebra is a fixed point. In principle, there may be many fixed points for the same endofunctors. The initial algebra is the least fixed point and the terminal coalgebra the greatest fixed point. 
+
+The greatest fixed point of an endofunctor $F$ is denoted by $\nu F$, so we have:
+\[ T = \nu F \]
+
+We can also see that there must be a unique algebra morphism from the initial algebra to the terminal coalgebra. That's because the terminal coalgebra is also an algebra. Similarly, there is a unique coalgebra morphism from the initial algebra (which is also a coalgebra) to the terminal coalgebra. In fact, it can be shown that it's the same underlying morphism $\kappa \colon I \to T$ in both cases. 
+
+In the category of sets, the carrier set of the initial algebra is a subset of the carrier set of the terminal coalgebra, with the function $\kappa$ embedding the former in the latter. 
+
+We'll see later that in Haskell the situation is more subtle because of lazy evaluation. But at least for the functors that have the leaf component, that is, their action on the initial object is non-trivial, the Haskell fixed point type works as a carrier for both, the initial algebra and the terminal coalgebra.
+\begin{haskell}
+data Fix f where
+  In :: f (Fix f) -> Fix f
+\end{haskell}
+
+\begin{exercise}
+Show that, for the identity functor in $\mathbf{Set}$, every object is a fixed point, the empty set is the least fixed point, and the singleton set is the greatest fixed point. Hint: The least fixed point must have arrows going to all other fixed points, and the greatest fixed point must have arrows going from all other fixed points.
+\end{exercise}
+
+\begin{exercise}
+Show that the empty set is the carrier of the initial algebra for the identity functor in $\mathbf{Set}$. Dually, show that the singleton set is this functor's terminal coalgebra. Hint: Show that the unique arrows are indeed (co-) algebra morphisms.
+\end{exercise}
+
 \section{Anamorphisms}
+
+The terminal coalgebra $(T, j)$ is defined by its universal property: there is a unique algebra morphism from any coalgebra $(A, \alpha)$ to it making this diagram commute:
+
+\[
+ \begin{tikzcd}
+ A 
+ \arrow[r, dashed, "h"]
+ \arrow[d, "\alpha"]
+ & T
+\arrow[d, "j"]
+ \\
+ F A
+ \arrow[r,  "F h"]
+ & F T
+  \end{tikzcd}
+\]
+ This morphism is called the \emph{anamorphism}.
 
 \section{Hylomorphisms}
 
