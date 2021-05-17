@@ -11,12 +11,12 @@ The first things to observe about algebraic expressions like $2 (x + y)$ or $a x
 
 In programming, expressions are virtually synonymous to (parsing) trees. Consider this simple example of an arithmetic expression:
 \begin{haskell}
-data Expr = Leaf Int | Plus Expr Expr
+data Expr = Val Int | Plus Expr Expr
 \end{haskell}
-It's a recipe for building trees. We start with little trees using the \hask{Leaf} constructor. We then plant these seedlings into nodes, and so on.
+It's a recipe for building trees. We start with little trees using the \hask{Val} constructor. We then plant these seedlings into nodes, and so on.
 \begin{haskell}
-e2 = Leaf 2
-e3 = Leaf 3
+e2 = Val 2
+e3 = Val 3
 e5 = Plus e2 e3
 e7 = Plus e5 e2
 \end{haskell}
@@ -37,7 +37,7 @@ The idea of planting smaller trees into nodes requires that we formalize what it
 
 For instance, the endofunctor from our earlier example would be defined by the following data structure, where \hask{x} marks the spots:
 \begin{haskell}
-data ExprF x = LeafF Int | PlusF x x
+data ExprF x = ValF Int | PlusF x x
 \end{haskell}
 Information about all possible shapes of expressions is abstracted into a single functor. 
 
@@ -45,19 +45,19 @@ The other important piece of information is the recipe for evaluating expression
 
 Thinking recursively, let's assume that we know how to evaluate all subtrees of a larger expression. Then the remaining step is to plug these results into the top level node and evaluate it. 
 
-For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation of the subtrees. It's pretty obvious what we should do in the last step. If the top of the tree is a leaf (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers in it. This recipe can be encoded as:
+For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation of the subtrees. It's pretty obvious what we should do in the last step. If the top of the tree is a leaf \hask{ValF} (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers in it. This recipe can be encoded as:
 \begin{haskell}
 eval :: ExprF Int -> Int
-eval (LeafF n)   = n
+eval (ValF n)   = n
 eval (PlusF m n) = m + n
 \end{haskell}
 
 We have made some seemingly obvious assumptions based on our experience. For instance, since the node was called \hask{PlusF} we assumed that we should add the two numbers. But multiplication or subtraction would work equally well.
 
-Since the leaf contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string, and using concatenation instead of addition:
+Since the leaf \hask{ValF} contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string, and using concatenation instead of addition:
 \begin{haskell}
 pretty :: ExprF String -> String
-pretty (LeafF n)   = show n
+pretty (ValF n)   = show n
 pretty (PlusF s t) = s ++ " + " ++ t
 \end{haskell}
 
@@ -75,13 +75,13 @@ Notice that the evaluator is \emph{not} a polymorphic function. It's a specific 
 We have previously defined two algebras for \hask{ExprF}. This one has \hask{Int} as a carrier:
 \begin{haskell}
 eval :: Algebra ExprF Int
-eval (LeafF n)   = n
+eval (ValF n)   = n
 eval (PlusF m n) = m + n
 \end{haskell}
 and this one has \hask{String} as a carrier:
 \begin{haskell}
 pretty :: Algebra ExprF String
-pretty (LeafF n)   = show n
+pretty (ValF n)   = show n
 pretty (PlusF s t) = s ++ " + " ++ t
 \end{haskell}
 
@@ -214,7 +214,7 @@ There may be many fixed points, but this one is the \emph{least fixed point} bec
 \subsection{Fixed point in Haskell}
 Let's consider how the definition of the fixed point works with our original example:
 \begin{haskell}
-data ExprF x = LeafF Int | PlusF x x
+data ExprF x = ValF Int | PlusF x x
 \end{haskell}
 Its fixed point is a data structure defined by the property that \hask{ExprF} acting on it reproduces it. If we call this data structure \hask{Expr}, the fixed point equation becomes  (in pseudo-Haskell):
 \begin{haskell}
@@ -222,11 +222,11 @@ Expr = ExprF Expr
 \end{haskell}
 Expanding \hask{ExprF} we get:
 \begin{haskell}
-Expr = LeafF Int | PlusF Expr Expr
+Expr = ValF Int | PlusF Expr Expr
 \end{haskell}
 Compare this with the recursive definition (actual Haskell):
 \begin{haskell}
-data Expr = Leaf Int | Plus Expr Expr
+data Expr = Val Int | Plus Expr Expr
 \end{haskell}
 We get a recursive data structure as a solution to the fixed-point equation.
 
@@ -251,8 +251,8 @@ newtype Fix f = Fix { unFix :: f (Fix f) }
 
 To create terms of the type \hask{Fix f} we often use ``smart constructors.'' For instance, with the \hask{ExprF} functor, we would define:
 \begin{haskell}
-leaf :: Int -> Fix ExprF
-leaf n = In (LeafF n)
+val :: Int -> Fix ExprF
+val n = In (ValF n)
 
 plus :: Fix ExprF -> Fix ExprF -> Fix ExprF
 plus e1 e2 = In (PlusF e1 e2)
@@ -260,7 +260,7 @@ plus e1 e2 = In (PlusF e1 e2)
 and use it to generate expression trees like this one:
 \begin{haskell}
 e9 :: Fix ExprF
-e9 = plus (plus (leaf 2) (leaf 3)) (leaf 4)
+e9 = plus (plus (val 2) (val 3)) (val 4)
 \end{haskell}
 
 \section{Catamorphisms}
@@ -331,7 +331,7 @@ evaluates to the string \hask{"2 + 3 + 4"}.
 Sometimes we want to display the tree on multiple lines with indentation. This requires passing a depth counter to recursive calls. There is a clever trick that uses a function type as a carrier:
 \begin{haskell}
 pretty' :: Algebra ExprF (Int -> String)
-pretty' (LeafF n) i = indent i ++ show n
+pretty' (ValF n) i = indent i ++ show n
 pretty' (PlusF f g) i = f (i + 1) ++ "\n" ++
                         indent i ++ "+" ++ "\n" ++
                         g (i + 1)
@@ -391,17 +391,78 @@ where \hask{(List a)} is can be identified with the fixed point \hask{Fix (ListF
 
 Lists are so common that their eliminators (folds) are included in the standard library. But there are infinitely many possible recursive data structures, each generated by its own functor, and we can use the same catamorphism on all of them.
 
+\section{Initial Algebra from Universality}
+
+Another way of looking at the initial algebra, at least in $\mathbf{Set}$, is to view it as a collection of catamorphisms that, as a whole, hint at the existence of an underlying object. Instead of seeing $\mu F$ as a set of trees, we can look at it as a set of functions from algebras to their carriers. 
+
+First, let's make the polymorphism in the definition of \hask{cata} explicit:
+\begin{haskell}
+cata :: Functor f => forall a. Algebra f a -> Fix f -> a
+cata alg = alg . fmap (cata alg) . out
+\end{haskell}
+and then flip the arguments. We get:
+\begin{haskell}
+cata' :: Functor f => Fix f -> forall a. Algebra f a -> a
+cata' (In x) = \alg -> alg (fmap (flip cata' alg) x)
+\end{haskell}
+The function \hask{flip} reverses the order of arguments to a function:
+\begin{haskell}
+flip :: (a -> b -> c) -> (b -> a -> c)
+flip f b a = f a b
+\end{haskell}
+This gives us a mapping from \hask{Fix f} to a set of polymorphic functions.
+
+Conversely, given a polymorphic function of the type:
+\begin{haskell}
+forall a. Algebra f a -> a
+\end{haskell}
+we can reconstruct \hask{Fix f}:
+\begin{haskell}
+uncata :: Functor f => (forall a. Algebra f a -> a) -> Fix f
+uncata alga = alga In
+\end{haskell}
+In fact, these two functions, \hask{cata'} and \hask{uncata}, are the inverse of each other, establishing the isomorphism between \hask{Fix f} and the type of polymorphic functions:
+\begin{haskell}
+data Mu f = Mu (forall a. Algebra f a -> a)
+\end{haskell}
+Folding over \hask{Mu f} is easy, since \hask{Mu} carries in itself its own set of catamorphisms:
+\begin{haskell}
+cataMu :: Algebra f a -> (Mu f -> a)
+cataMu alg (Mu h) = h alg
+\end{haskell}
+
+You might be wondering how one can construct terms of the type \hask{Mu f} for, let's say lists. It can be done using recursion:
+\begin{haskell}
+fromList :: forall a. [a] -> Mu (ListF a)
+fromList as = Mu h
+  where h :: forall x. Algebra (ListF a) x -> x
+        h alg = go as
+          where
+            go [] = alg NilF
+            go (n: ns) = alg (ConsF n (go ns))
+\end{haskell}
+To compile this code you have to use the language pragma:
+\begin{haskell}
+{-# language ScopedTypeVariables #-}
+\end{haskell}
+which puts the type variable \hask{a} in the scope of the \hask{where} clause.
+
+\begin{exercise}
+Write a test that takes a list of integers, converts it to the \hask{Mu} form, and calculates the sum using \hask{cataMu}.
+\end{exercise}
+
+
 \section{Initial Algebra as a Colimit}
 
 In general, there is no guarantee that the initial object in the category of algebras exists. But if it exists, Lambek's lemma tells us that it's a fixed point of the endofunctor for these algebras.  The construction of this fixed point is a little mysterious, since it involves tying the recursive knot. 
 
 Loosely speaking, the fixed point is reached after we apply the functor infinitely many times. Then, applying it once more wouldn't change anything. This idea can be made precise, if we take it one step at a time. For simplicity, let's consider algebras in the category of sets, which has all the nice properties.
 
-We've seen, in our examples, that building instances of recursive data structures always starts with the leaves. The leaves are the parts in the definition of the functor that don't depend on the type parameter: the \hask{NilF} of the list, the \hask{LeafF} of the tree, the \hask{Nothing} of the \hask{Maybe}, etc. 
+We've seen, in our examples, that building instances of recursive data structures always starts with the leaves. The leaves are the parts in the definition of the functor that don't depend on the type parameter: the \hask{NilF} of the list, the \hask{ValF} of the tree, the \hask{Nothing} of the \hask{Maybe}, etc. 
 
 We can tease them out if we apply our functor $F$ to the initial object---the empty set $0$. Since the empty set has no elements, the instances of the type $F 0$ are leaves only. 
 
-Indeed, the only inhabitant of the type \hask{Maybe Void} is constructed using \hask{Nothing}. The only inhabitants of the type \hask{ExprF Void} are \hask{LeafF n}, where \hask{n} is an \hask{Int}.
+Indeed, the only inhabitant of the type \hask{Maybe Void} is constructed using \hask{Nothing}. The only inhabitants of the type \hask{ExprF Void} are \hask{ValF n}, where \hask{n} is an \hask{Int}.
 
 In other words, $F 0$ is the ``type of leaves'' for the functor $F$. Leaves are trees of depth one. For the \hask{Maybe} functor there's only one---the type of leaves for this functor is a singleton:
 \begin{haskell}
