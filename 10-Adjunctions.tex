@@ -6,13 +6,15 @@
 
 A sculptor subtracts irrelevant stone until a sculpture emerges. A mathematician abstracts irrelevant details until a pattern emerges.
 
-We were able to define a lot of constructions using their mapping-in and mapping-out properties. Those, in turn, could be compactly written as isomorphisms between hom-sets. This pattern of natural isomorphisms between hom-sets is called the adjunction and, once recognized, pops up virtually everywhere.
+We were able to define a lot of constructions using their mapping-in and mapping-out properties. Those, in turn, could be compactly written as isomorphisms between hom-sets. This pattern of natural isomorphisms between hom-sets is called an adjunction and, once recognized, pops up virtually everywhere.
 
 \section{The Currying Adjunction}
 
 The definition of the exponential is the classic example of an adjunction that relates mappings-out and mappings-in. Every mapping out of a product corresponds to a unique mapping into the exponential:
 \[  \mathcal{C}(A \times B, C ) \cong  \mathcal{C} (A, C^B)  \]
-The objects $A$ and $C$ take the roles of the observer and the focus. On the left, $A$ is mapped to a product $A \times B$, and $C$ acts as the focus. On the right, $C$ is exponentiated, and $A$ acts as the observer. 
+The object $C$ takes the role of the focus on the left hand side; the object $A$ becomes the observer on the right hand side. 
+
+On the left, $A$ is mapped to a product $A \times B$, and on the right, $C$ is exponentiated. 
 
 We can spot two functors at play. They are both parameterized by $B$. On the left we have the functor $(- \times B)$ acting on $A$. On the right we have the functor $(-)^B$ acting on $C$. 
 
@@ -29,7 +31,7 @@ The shorthand notation for the adjunction is $L \dashv R$. Substituting the prod
 
 \section{The Sum and the Product Adjunctions}
 
-The currying adjunction related two endofunctors, but an adjunction can be easily generalized to functors that go between categories. Let's see some examples first.
+The currying adjunction relats two endofunctors, but an adjunction can be easily generalized to functors that go between categories. Let's see some examples first.
 
 \subsection{The diagonal functor}
 
@@ -55,7 +57,7 @@ Recall that the sum is defined by its mapping out property. There is one-to one 
 \[  \mathcal{C} (A + B, X) \cong \mathcal{C}( A , X) \times \mathcal{C}( B , X)\]
 where the product on the right-hand side is just a cartesian product of sets, that is the set of pairs. Moreover, we've seen earlier that this bijection is natural in $X$.
 
-We know that a pair of arrows is a single arrow in the product category. We can, therefore, look at the elements of the right-hand side as arrows in $\mathcal{C} \times \mathcal{C}$ going from the object $\langle A, B \rangle$ to the object $\langle X, X \rangle$. The second object we can get from the action of the diagonal functor $\Delta$ on $X$. We have:
+We know that a pair of arrows is a single arrow in the product category. We can, therefore, look at the elements on the right-hand side as arrows in $\mathcal{C} \times \mathcal{C}$ going from the object $\langle A, B \rangle$ to the object $\langle X, X \rangle$. The latter object we can be obtained by acting with the diagonal functor $\Delta$ on $X$. We have:
 
 \[  \mathcal{C} (A + B, X) \cong (\mathcal{C} \times \mathcal{C})( \langle A, B \rangle , \Delta X)\]
 This is a bijection between hom-sets in two different categories. It satisfies naturality conditions, so it's a natural isomorphism. 
@@ -74,7 +76,7 @@ Altogether, we have a pair of functors between a pair of categories:
  \arrow[ll, bend right, "(+)"']
   \end{tikzcd}
 \]
-and an isomorphism between the hom-sets
+and an isomorphism between the hom-sets:
 \[
  \begin{tikzcd}
 A + B
@@ -135,6 +137,8 @@ and this is the isomorphism of hom-sets:
  A \times B
   \end{tikzcd}
 \]
+In other words, we have the adjunction:
+\[ (+) \dashv \Delta \]
 
 
 \section{Adjunction between functors}
@@ -176,7 +180,7 @@ Y
  R Y
   \end{tikzcd}
 \]
- These hom-sets come from two different categories, but sets are just sets. We say that $L$ is the left adjoint to $R$, or that $R$ is the right adjoint to $L$
+ These hom-sets come from two different categories, but sets are just sets. We say that $L$ is the left adjoint of $R$, or that $R$ is the right adjoint of $L$
 
 In Haskell, the simplified version of this could be encoded as a multi-parameter type class:
 \begin{haskell}
@@ -245,7 +249,7 @@ This is why it's more proper to talk about a weaker notion of \emph{equivalence}
 \[ R \circ L \cong Id_{ \mathcal{D}} \]
 On objects, an equivalence of categories means that a round trip produces an object that is isomorphic, rather than equal, to the original one. In most cases, this is exactly what we want.
 
-An adjunction is also defined by a pair of functors going in opposite directions, so it makes sense to ask what the result of a round trip is. The defining isomorphism works for any pair of objects $X$ and $Y$
+An adjunction is also defined as a pair of functors going in opposite directions, so it makes sense to ask what the result of a round trip is. The isomorphism that defines an adjunction works for any pair of objects $X$ and $Y$
 \[  \mathcal{C} (L X, Y) \cong \mathcal{D}( X , R Y)\]
 so, in particular, we can replace $Y$ with $L X$
 \[  \mathcal{C} (L X, L X) \cong \mathcal{D}( X , R (L X))\]
@@ -263,14 +267,18 @@ Notice that, if those two natural transformations were invertible, they would wi
 
 \subsection{Triangle identities}
 
-We can use the unit/counit pair to formulate an equivalent  definition of adjunction. We start with two natural transformations:
+We can use the unit/counit pair to formulate an equivalent  definition of adjunction. To do that, we will start with two natural transformations:
 \[ \eta \colon Id_{\mathcal{D}} \to R \circ L \]
 \[ \varepsilon \colon L \circ R \to Id_{\mathcal{C}}  \]
 and impose additional \emph{triangle identities}. 
 
-These identities are derived by noticing that $\eta$ can be used to replace an identity functor by the composite $R \circ L$, and $\varepsilon$ can be used to eliminate the composite $L \circ R$. So, for instance, starting with $L$:
+These identities are derived by noticing that $\eta$ can be used to replace an identity functor by the composite $R \circ L$, effectively letting us insert $R \circ L$ anywhere an identity functor would work.
+
+Similarly, $\varepsilon$ can be used to eliminate the other composite $L \circ R$. 
+
+So, for instance, starting with $L$:
 \[ L = L \circ Id_{\mathcal{D}} \xrightarrow{L \circ \eta} L \circ R \circ L \xrightarrow{\varepsilon \circ L} Id_{\mathcal{C}} \circ L = L \]
-Here, we used the horizontal composition of natural transformation, with one of them being the identity transformation on $L$ (a.k.a., whiskering).
+Here, we used the horizontal composition of natural transformation, with one of them being the identity transformation (a.k.a., whiskering).
 
 The first triangle identity is the condition that this chain of transformations result in the identity natural transformation. Pictorially:
 
@@ -300,6 +308,8 @@ or, pictorially:
  & R
   \end{tikzcd}
 \]
+
+It can be shown that the existence of the two natural transformations, $\eta$ and $\varepsilon$, satisfying the triangle identities is equivalent to the previous definition of the adjunction using the natural isomorphism of hom-sets.
 
 \subsection{The unit and counit of the currying adjunction}
 
@@ -345,10 +355,10 @@ This gives us a mapping out of a sum which, by the sum adjunction is isomorphic 
 \[  \mathcal{C}(B + C, X^A) \cong \mathcal{C}(B, X^A) \times \mathcal{C}(C, X^A)\]
 We can now apply the inverse of the currying adjunction to both components:
 \[  \mathcal{C}(B, X^A) \times \mathcal{C}(C, X^A) \cong \mathcal{C}(B \times A, X) \times \mathcal{C}(C \times A, X)\]
-Finally, using the inverse of the sum adjunction, we arrive at the final result:
+Using the inverse of the sum adjunction, we arrive at the final result:
 \[ \mathcal{C}(B \times A, X) \times \mathcal{C}(C \times A, X) \cong \mathcal{C}(B \times A + C \times A, X) \]
 
-Every step in this proof was a natural isomorphism, so their composition is also a natural isomorphism. By Yoneda lemma, the two objects that form the left- and the right-hand side of distributivity law are isomorphic.
+Every step in this proof was a natural isomorphism, so their composition is also a natural isomorphism. By Yoneda lemma, the two objects that form the left- and the right-hand side of distributivity law are therefore isomorphic.
 
 \section{Free-Forgetful Adjunctions}
 The two functors in the adjunction play different roles: the picture of the adjunction is not symmetric. Nowhere is this illustrated better than in the case of the free/forgetful adjunctions. 
@@ -385,7 +395,7 @@ A classic example of a free/forgetful adjunction is the construction of the free
 \subsection{The category of monoids}
 Monoids in a monoidal category $\mathcal{C}$ form their own category $\mathbf{Mon}(\mathcal{C})$. Its objects are monoids, and its arrows are the arrows in $\mathcal{C}$ that preserve the monoidal structure. 
 
-The following diagram explains what it means.
+The following diagram explains what it means for $f$ to be a monoid morphism from a monoid $M_1$ to a monoid $M_2$:
 \[
  \begin{tikzcd}
  & M_1
@@ -409,15 +419,17 @@ and it must map multiplication to multiplication:
 \[ f \circ \mu_1 = \mu_2 \circ (f \otimes f)\]
 Remember, the tensor product $\otimes$ is functorial, so it can lift pairs of arrows, here $f \otimes f$.
 
-In particular, the category $\mathbf{Set}$ is monoidal, with cartesian product and the terminal object providing the monoidal structure. Monoids in $\mathbf{Set}$ are sets with additional structure. They form their own category $\mathbf{Mon}(\mathbf{Set})$ and there is a forgetful functor $U$ that simply maps the monoid to the set of its elements.
+In particular, the category $\mathbf{Set}$ is monoidal, with cartesian product and the terminal object providing the monoidal structure. Monoids in $\mathbf{Set}$ are sets with additional structure. They form their own category $\mathbf{Mon}(\mathbf{Set})$ and there is a forgetful functor $U$ that simply maps the monoid to the set of its elements. When we say that a monoid is a set, we mean the underlying set.
 
 \subsection{Free monoid}
 
 We want to construct the free functor 
 \[ F \colon \mathbf{Set} \to \mathbf{Mon}(\mathbf{Set})\]
-that is adjoint to the forgetful functor $U$. We start with an arbitrary set $X$ and an arbitrary monoid $M$. On the one side of the adjunction we have the set of functions between two sets, $X$ and $U M$. On the other side we have a set of structure-preserving monoid morphisms from $F X$ to $M$. How can these two sets be isomorphic?
+that is adjoint to the forgetful functor $U$. We start with an arbitrary set $X$ and an arbitrary monoid $M$. On the right side of the adjunction we have the set of functions between two sets, $X$ and $U M$. On the left side, we have a set of highly constrained structure-preserving monoid morphisms from $F X$ to $M$. How can these two sets be isomorphic?
 
-Arrows in $\mathbf{Set}$ are just functions with no additional constraints. Arrows in $\mathbf{Mon}(\mathbf{Set})$, on the other hand, are constrained by the requirement that they preserve unit and multiplication. So, in general, we expect fewer arrows between monoids than between their underlying sets. 
+In  $\mathbf{Mon}(\mathbf{Set})$, monoids are just sets of elements, and a monoid morphism is a function between such sets, satisfying some additional constraints. It has to preserve unit and multiplication. 
+
+Arrows in $\mathbf{Set}$, on the other hand, are just functions with no additional constraints. So, in general, there are fewer arrows between monoids than there are between their underlying sets. 
 
 \[
  \begin{tikzcd}
@@ -439,23 +451,25 @@ M
   \end{tikzcd}
 \]
 
-The idea is that $F$ should create the most generic monoid possible, so that preserving its structure doesn't impose any additional constraints. 
+Here's the idea: if we want to have a one to one matching between arrows, we want $F X$ to be much larger than $X$. This way, there will be many more functions from it to $M$---so many that, even after rejecting the ones that don't preserve the structure, we'll have enough to match every function $f \colon X \to U M$.
 
-Keep in mind that a monoid in  $\mathbf{Mon}(\mathbf{Set})$ can be thought of as a set of elements and a monoid morphism as a function between such sets, satisfying some additional constraints. 
+We'll construct the monoid $F X$ starting from the set $X$, adding more elements as necessary . We'll call $X$ the set of \emph{generators} of $F X$.
 
-So we are going to construct the set $F X$ starting with $X$ as the set of \emph{generators}.  Any function $f \colon X \to U M$ will map these generators to elements of $M$. The question is, what other elements do we have to add to the set of generators and how do we define the action of a function $f$ on those elements, so that the monoidal structure is preserved. 
+We'll construct a monoid morphism $g \colon F X \to M$ starting from the function $f$. On generators, $g$ works the same as $f$:
+\[ g x = f x \]
+Every time we add new element to $F X$, we'll extend the definition of $g$.
 
-First of all, we can't pick one of the generators as the unit of $F X$, because it would have to be mapped to the unit of $M$. That would impose a constraint of $f$. Therefore the unit of $F X$ has no counterpart in $X$---it's an added element. The action of $f$ on it is fixed: it has to go to the unit of $M$. 
+Since $F X$ is supposed to be a monoid, it has to have a unit. We can't pick one of the generators to be the unit, because it would impose a constraint of $f$ (it would have to map it to the unit of $M$). So we'll just add an extra element $e$ to $X$ and call it a unit. We'll define the action of $g$ on it by saying that it's mapped to the unit $e'$ of $M$:
+\[ g e = e' \]
 
-We also have to define monoidal multiplication in $F X$. Let's start with a product of two generators. The result can't be one of the generators because, again, that would constrain $f$: product must be mapped to product. So we have to make all products of generators new elements of $F X$. The same argument can be repeated for products of those elements, and so on. 
+We also have to define monoidal multiplication in $F X$. Let's start with a product of two generators $a$ and $b$. The result of the multiplication cannot be another generator because, again, that would constrain $f$: products must be mapped to products. So we have to make all products of generators new elements of $F X$. Again, the action of $g$ on those products is fixed:
+\[ g (a \cdot b)  = g a \cdot g b\]
 
-Any new multiplication produces a new element of $F X$, except when it can be reduced to a previously added element by applying monoid laws. 
+Continuing with this construction, any new multiplication produces a new element of $F X$, except when it can be reduced to an existing element by applying monoid laws. For instance, the new unit $e$ times a generator $a$ must be equal to $a$. But we have made sure that $e$ is mapped to the unit of $M$, so the product $g e \cdot g a$ is equal to $g a$.
 
-The result of this procedure is that $F X$ can be represented as a set of all strings formed from the generators---an empty string standing for the unit. Multiplication is defined as concatenation of such strings. Concatenation is automatically associative, and concatenation with an empty string is identity. 
+Another way of looking at this construction is to consider the set $X$ an alphabet. The elements of $FX$ are then strings of characters from this alphabet. The generators are single-letter strings, $``a"$, $``b"$, and so on. The unit is an empty string , $``"$. Multiplication is string concatenation, so  $``a"$ times $``b"$ is a new string  $``ab"$. Concatenation is automatically associative and unital (with the empty string as the unit).
 
-The intuition behind free functors is that they generate structure ``freely,'' as in ``without any additional constraints.'' They do it lazily: instead of performing operations, they take notes. The free monoid ``remembers to do the multiplication'' at a later time. It stores the arguments to multiplication but doesn't perform the multiplication. It's only allowed to simplify its notes based on generic monoidal laws. So, for instance, it doesn't have to store the command to multiply by the unit. It can also ``skip the parentheses'' because of associativity. 
-
-The result of a free functor can be seen as a domain-specific program. In case of a free monoid, this program is just a list.
+The intuition behind free functors is that they generate structure ``freely,'' as in ``without any additional constraints.'' They do it lazily: instead of performing operations, they just record them for later. The free monoid ``remembers to do the multiplication'' at a later time. It stores the arguments to multiplication in a string, but doesn't perform the multiplication. It's only allowed to simplify its records based on generic monoidal laws. So, for instance, it doesn't have to store the command to multiply by the unit. It can also ``skip the parentheses'' because of associativity. 
 
 \begin{exercise}
 What is the unit and the counit of the free monoid adjunction $F \dashv U$?
