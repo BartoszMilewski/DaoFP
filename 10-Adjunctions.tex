@@ -39,7 +39,7 @@ The sum and the product types were defined using bijections where one of the sid
 
 To explore this idea, we need to define the diagonal functor $\Delta$, which is a particular mapping from $\mathcal{C}$ to $\mathcal{C} \times \mathcal{C}$. It takes an object $X$ and duplicates it, producing a pair of objects $\langle X, X \rangle$. It also takes an arrow $f$ and duplicates it $\langle f, f \rangle$
 
-Interestingly, this functor is related to the constant functor we've seen previously. The constant functor can be though of as a functor of two variables---it just ignores the second one. We've seen this in the Haskell definition:
+Interestingly, the diagonal functor is related to the constant functor we've seen previously. The constant functor can be though of as a functor of two variables---it just ignores the second one. We've seen this in the Haskell definition:
 \begin{haskell}
 data Const c a = Const c
 \end{haskell}
@@ -47,7 +47,7 @@ data Const c a = Const c
 To see the connection, let's look at the product category $\mathcal{C} \times \mathcal{C}$ as a functor category $[ \mathbf{2}, \mathcal{C}]$, in other words, the exponential object $\mathcal{C}^{ \mathbf{2}}$ in $\mathbf{Cat}$. Indeed, a functor from $\mathbf{2}$ picks a pair of objects---which is a single object in the product category.
 
 
-A functor $\mathcal{C} \to [\mathbf{2}, \mathcal{C}]$ can be curried to $\mathcal{C} \times \mathbf{2} \to  \mathcal{C}$. If we do this to the diagonal functor, we see that it ignores the second argument, the one coming from $\mathbf{2}$: it does the same whether the second argument is $1$ or $2$. But that's exactly what the constant functor does. This is why we use the same symbol $\Delta$ for both.
+A functor $\mathcal{C} \to [\mathbf{2}, \mathcal{C}]$ can be uncurried to $\mathcal{C} \times \mathbf{2} \to  \mathcal{C}$. If we do this to the diagonal functor, we see that it ignores the second argument, the one coming from $\mathbf{2}$: it does the same whether the second argument is $1$ or $2$. But that's exactly what the constant functor does. This is why we use the same symbol $\Delta$ for both.
 
 Incidentally, this argument can be easily generalized to any indexing category, not just $\mathbf{2}$.
 
@@ -419,15 +419,19 @@ and it must map multiplication to multiplication:
 \[ f \circ \mu_1 = \mu_2 \circ (f \otimes f)\]
 Remember, the tensor product $\otimes$ is functorial, so it can lift pairs of arrows, here $f \otimes f$.
 
-In particular, the category $\mathbf{Set}$ is monoidal, with cartesian product and the terminal object providing the monoidal structure. Monoids in $\mathbf{Set}$ are sets with additional structure. They form their own category $\mathbf{Mon}(\mathbf{Set})$ and there is a forgetful functor $U$ that simply maps the monoid to the set of its elements. When we say that a monoid is a set, we mean the underlying set.
+In particular, the category $\mathbf{Set}$ is monoidal, with cartesian product and the terminal object providing the monoidal structure. 
+
+Monoids in $\mathbf{Set}$ are sets with additional structure. They form their own category $\mathbf{Mon}(\mathbf{Set})$ and there is a forgetful functor $U$ that simply maps the monoid to the set of its elements. When we say that a monoid is a set, we mean the underlying set.
 
 \subsection{Free monoid}
 
 We want to construct the free functor 
 \[ F \colon \mathbf{Set} \to \mathbf{Mon}(\mathbf{Set})\]
-that is adjoint to the forgetful functor $U$. We start with an arbitrary set $X$ and an arbitrary monoid $M$. On the right side of the adjunction we have the set of functions between two sets, $X$ and $U M$. On the left side, we have a set of highly constrained structure-preserving monoid morphisms from $F X$ to $M$. How can these two sets be isomorphic?
+that is adjoint to the forgetful functor $U$. We start with an arbitrary set $X$ and an arbitrary monoid $M$. 
 
-In  $\mathbf{Mon}(\mathbf{Set})$, monoids are just sets of elements, and a monoid morphism is a function between such sets, satisfying some additional constraints. It has to preserve unit and multiplication. 
+On the right-hand side of the adjunction we have the set of functions between two sets, $X$ and $U M$. On the left-hand side, we have a set of highly constrained structure-preserving monoid morphisms from $F X$ to $M$. How can these two sets be isomorphic?
+
+In  $\mathbf{Mon}(\mathbf{Set})$, monoids are just sets of elements, and a monoid morphism is a function between such sets, satisfying additional constraints: it has to preserve unit and multiplication. 
 
 Arrows in $\mathbf{Set}$, on the other hand, are just functions with no additional constraints. So, in general, there are fewer arrows between monoids than there are between their underlying sets. 
 
@@ -451,25 +455,27 @@ M
   \end{tikzcd}
 \]
 
-Here's the idea: if we want to have a one to one matching between arrows, we want $F X$ to be much larger than $X$. This way, there will be many more functions from it to $M$---so many that, even after rejecting the ones that don't preserve the structure, we'll have enough to match every function $f \colon X \to U M$.
+Here's the idea: if we want to have a one to one matching between arrows, we want $F X$ to be much larger than $X$. This way, there will be many more functions from it to $M$---so many that, even after rejecting the ones that don't preserve the structure, we'll still have enough to match every function $f \colon X \to U M$.
 
-We'll construct the monoid $F X$ starting from the set $X$, adding more elements as necessary . We'll call $X$ the set of \emph{generators} of $F X$.
+We'll construct the monoid $F X$ starting from the set $X$, adding more elements as necessary. We'll call $X$ the set of \emph{generators} of $F X$.
 
 We'll construct a monoid morphism $g \colon F X \to M$ starting from the function $f$. On generators, $g$ works the same as $f$:
 \[ g x = f x \]
 Every time we add new element to $F X$, we'll extend the definition of $g$.
 
-Since $F X$ is supposed to be a monoid, it has to have a unit. We can't pick one of the generators to be the unit, because it would impose a constraint of $f$ (it would have to map it to the unit of $M$). So we'll just add an extra element $e$ to $X$ and call it a unit. We'll define the action of $g$ on it by saying that it's mapped to the unit $e'$ of $M$:
+Since $F X$ is supposed to be a monoid, it has to have a unit. We can't pick one of the generators for the unit, because it would impose a constraint of $f$---it would have to map it to the unit of $M$. So we'll just add an extra element $e$ to $X$ and call it a unit. We'll define the action of $g$ on it by saying that it is mapped to the unit $e'$ of $M$:
 \[ g e = e' \]
 
-We also have to define monoidal multiplication in $F X$. Let's start with a product of two generators $a$ and $b$. The result of the multiplication cannot be another generator because, again, that would constrain $f$: products must be mapped to products. So we have to make all products of generators new elements of $F X$. Again, the action of $g$ on those products is fixed:
+We also have to define monoidal multiplication in $F X$. Let's start with a product of two generators $a$ and $b$. The result of the multiplication cannot be another generator because, again, that would constrain $f$---products must be mapped to products. So we have to make all products of generators new elements of $F X$. Again, the action of $g$ on those products is fixed:
 \[ g (a \cdot b)  = g a \cdot g b\]
 
-Continuing with this construction, any new multiplication produces a new element of $F X$, except when it can be reduced to an existing element by applying monoid laws. For instance, the new unit $e$ times a generator $a$ must be equal to $a$. But we have made sure that $e$ is mapped to the unit of $M$, so the product $g e \cdot g a$ is equal to $g a$.
+Continuing with this construction, any new multiplication produces a new element of $F X$, except when it can be reduced to an existing element by applying monoid laws. For instance, the new unit $e$ times a generator $a$ must be equal to $a$. But we have made sure that $e$ is mapped to the unit of $M$, so the product $g e \cdot g a$ is automatically equal to $g a$.
 
-Another way of looking at this construction is to consider the set $X$ an alphabet. The elements of $FX$ are then strings of characters from this alphabet. The generators are single-letter strings, $``a"$, $``b"$, and so on. The unit is an empty string , $``"$. Multiplication is string concatenation, so  $``a"$ times $``b"$ is a new string  $``ab"$. Concatenation is automatically associative and unital (with the empty string as the unit).
+Another way of looking at this construction is to think of the set $X$ as an alphabet. The elements of $FX$ are then strings of characters from this alphabet. The generators are single-letter strings, $``a"$, $``b"$, and so on. The unit is an empty string , $``"$. Multiplication is string concatenation, so  $``a"$ times $``b"$ is a new string  $``ab"$. Concatenation is automatically associative and unital, with the empty string as the unit.
 
-The intuition behind free functors is that they generate structure ``freely,'' as in ``without any additional constraints.'' They do it lazily: instead of performing operations, they just record them for later. The free monoid ``remembers to do the multiplication'' at a later time. It stores the arguments to multiplication in a string, but doesn't perform the multiplication. It's only allowed to simplify its records based on generic monoidal laws. So, for instance, it doesn't have to store the command to multiply by the unit. It can also ``skip the parentheses'' because of associativity. 
+The intuition behind free functors is that they generate structure ``freely,'' as in ``with no additional constraints.'' They do it lazily: instead of performing operations, they just record them. 
+
+The free monoid ``remembers to do the multiplication'' at a later time. It stores the arguments to multiplication in a string, but doesn't perform the multiplication. It's only allowed to simplify its records based on generic monoidal laws. For instance, it doesn't have to store the command to multiply by the unit. It can also ``skip the parentheses'' because of associativity. 
 
 \begin{exercise}
 What is the unit and the counit of the free monoid adjunction $F \dashv U$?
@@ -484,7 +490,7 @@ class Monoid m where
   mempty  :: m
 \end{haskell}
 
-A free monoid generated by some type \hask{a}, here treated as a set of values, is represented by a list type \hask{[a]}. An empty list serves as the unit, and monoid multiplication is implemented as list concatenation, traditionally written in infix form:
+A free monoid generated by some type \hask{a} treated as a set of values, is represented by a list type \hask{[a]}. An empty list serves as the unit, and monoid multiplication is implemented as list concatenation, traditionally written in infix form:
 \begin{haskell}
 (++) :: [a] -> [a] -> [a]
 (++) []     ys = ys
