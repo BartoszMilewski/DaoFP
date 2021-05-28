@@ -14,7 +14,78 @@ When monads are explained in the context of programming, it's hard to see the co
 
 \section{Programming with Side Effects}
 
+So far we've been talking about programming in terms of programs modeled mainly on functions between sets (with the exception of non-termination). In programming, such functions are called \emph{total} and \emph{pure}. 
 
+A total function is defined for all values of its arguments. 
+
+A pure function is implemented purely in terms of its arguments---it has no access to, much less having the ability to modify, its environment. 
+
+Most real-world programs, though, have to interact with the external world: they read and write files, process network packets, prompt users for data, etc. Most programming languages solve this problem by allowing side effect. A side effect is anything that breaks the totality or the purity of a function. 
+
+Unfortunately, the shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful functions one has to carefully reason about the composition of effects on a case-by-case basis. To make things even harder, most effects are hidden inside the implementation of a function and all the functions it's calling.
+
+The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return type of a pure function. Amazingly, this is possible for all relevant effects. The idea is that, instead of a function of the type \hask{a->b}, we use a function \hask{a->f b}, where the functor \hask{f} encodes the appropriate effect. 
+
+\subsection{Partiality}
+In imperative languages, partiality is often encoded with exceptions. When a function is called with the ``wrong'' value for its argument, it throws an exception. In some languages, the type of exception is encoded in the signature of the function using special syntax. 
+
+In Haskell, a partial function can be replaced by a function returning the result inside the \hask{Maybe} functor. Such a function, when called with the ``wrong'' argument, return \hask{Nothing}, otherwise is wraps the result in the \hask{Just} constructor.
+
+If we want to encode more information about the type of the failure, we can use the \hask{Either} functor, with the \hask{Left} traditionally passing the error data (often a simple \hask{String}) to the caller.
+
+Unlike in imperative languages, in Haskell, the callers of a \hask{Maybe}-valued function cannot easily ignore the exceptional condition. In order to extract the value, they have to pattern-match the result and decide what to do with \hask{Nothing}.
+
+\subsection{Logging}
+
+Writing some values to an external data structure, or logging, is a side effect that's particularly dangerous in multi-threaded applications, where multiple threads might try to access the same log simultaneously.
+
+The simple solution is for a function to return the value to be logged paired with the return value. In other words, a logging function can be replaced by a pure function returning a product. In this context, the return type is encapsulated in the writer functor, which is implemented as a product type.
+
+\subsection{Environment}
+
+The read-only environment can be simply passed to a function that needs access to it as an additional argument. If we have a function \hask{a->b} that needs access to an environment \hask{e}, we replace it with a function \hask{(a, e)->b}. At first sight, this doesn't fit the pattern of encoding side effects in the return type. However, such a function can always be curried to a function returning a function:
+\begin{haskell}
+a -> (e -> b)
+\end{haskell}
+Such return type can be encapsulated as the reader functor, itself parameterized by the environment type \hask{e}:
+\begin{haskell}
+data Reader e a = Reader (e -> a)
+\end{haskell}
+The caller of the function is then responsible for extracting the value from the reader functor by passing it the environment:
+\begin{haskell}
+runReader :: Reader e a -> e -> a
+runReader (Reader h) e = h e
+\end{haskell}
+
+\subsection{State}
+
+The most common side effect of functions is related to accessing and potentially modifying some shared state. Unfortunately, shared state is the most common source of concurrency errors. This is a notorious problem in object oriented languages where stateful objects can be transparently shared between many clients. In Java, such objects may be provided with individual mutexes at the cost of impaired performance and the risk of deadlocks.
+
+In functional programming we make state manipulations explicit: we pass the state as an additional argument and return the modified state paired with the return value. We replace a stateful function $a->b$ with
+\begin{haskell}
+(a, s) -> (b, s)
+\end{haskell}
+where \hask{s} is the type of state. As before, we can curry such a function to get it to the form
+\begin{haskell}
+a -> s -> (b, s)
+\end{haskell}
+which let's us define the functor
+\begin{haskell}
+data State s a = State (s -> (a, s))
+\end{haskell}
+As with the reader functor, the caller of such a function is supposed to retrieve both the result and the modified state by providing the initial state and calling \hask{runState}:
+\begin{haskell}
+runState :: State s a -> s -> (a, s)
+runState (State h) s = h s
+\end{haskell}
+
+\subsection{Nondeterminism}
+
+Imagine performing a quantum experiment. You have a source of 
+
+What does it mean for a function to be non-deterministic? It means that it will return different results every time it's called. This is not much 
+
+\subsection{Input/Output}
 
 \section{Monads from Adjunctions}
 
