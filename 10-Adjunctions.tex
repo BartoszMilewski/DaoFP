@@ -198,6 +198,15 @@ It requires the following pragma at the top of the file:
 Therefore, in a bicartesian category, the sum is the left adjoint to the diagonal functor, and the product is its right adjoint. We can write this very concisely (or we could impress it in clay, in a modern version of cuneiform):
 \[ (+) \dashv \Delta \dashv (\times) \]
 
+\begin{exercise}
+The hom-set $\mathcal{C} (L X, Y)$ on the left-hand side of the adjunction formula suggests that $L X$ could be seen as a representing object for some functor (a co-presheaf). What is this functor? Hint: It maps a $Y$ to a set. What set is it?
+\end{exercise}
+
+\begin{exercise}
+Conversely, a representing object $A$ for a presheaf $P$ is defined by:
+\[P X \cong \mathcal{D}(X, A)\]
+What is the presheaf for which $R Y$, in the adjunction formula, is the representing object.
+\end{exercise}
 
 \section{Limits and Colimits}
 
@@ -240,13 +249,13 @@ As far as comparing categories goes, we have even more options. Categories are o
 \]
 such that
 \[ L \circ R = Id_{ \mathcal{C}} \]
-\[ R \circ L = Id_{ \mathcal{D}} \]
+\[ Id_{ \mathcal{D}} = R \circ L  \]
 This definition involves equality of functors, though. What's worse, acting on objects, it involves equality of objects:
 \[ L (R X) = X \]
-\[ R (L Y) = Y \]
+\[ Y = R (L Y) \]
 This is why it's more proper to talk about a weaker notion of \emph{equivalence} of categories, where equalities are replaced by isomorphisms:
 \[ L \circ R \cong Id_{ \mathcal{C}} \]
-\[ R \circ L \cong Id_{ \mathcal{D}} \]
+\[ Id_{ \mathcal{D}} \cong R \circ L \]
 On objects, an equivalence of categories means that a round trip produces an object that is isomorphic, rather than equal, to the original one. In most cases, this is exactly what we want.
 
 An adjunction is also defined as a pair of functors going in opposite directions, so it makes sense to ask what the result of a round trip is. The isomorphism that defines an adjunction works for any pair of objects $X$ and $Y$
@@ -309,7 +318,18 @@ or, pictorially:
   \end{tikzcd}
 \]
 
-It can be shown that the existence of the two natural transformations, $\eta$ and $\varepsilon$, satisfying the triangle identities is equivalent to the previous definition of the adjunction using the natural isomorphism of hom-sets.
+It turns out that an adjunction can be alternatively defined in terms of the two natural transformations, $\eta$ and $\varepsilon$, as long as the  triangle identities are satisfied. 
+
+The mapping of hom-sets can be easily recovered. For instance, let's start with an arrow $f \colon X \to R Y$, which is an element of $\mathcal{D}( X , R Y)$. We can lift it to 
+\[L f \colon L X \to L (R Y)\]
+We can then use $\eta$ to collapse the composite $L \circ R$ to identity. The result is a mapping $L X \to Y$, which is an element of $ \mathcal{C} (L X, Y)$.
+
+
+The definition of the adjunction using unit and counit is more general in the sense that it can be translated to a 2-category setting. 
+
+\begin{exercise}
+Given an arrow $g \colon L X \to Y$ implement an arrow $X \to R Y$ using $\varepsilon$ and the fact that $R$ is a functor. Hint: Start with the object $X$ and see how you can get from there to $R Y$ with one stopover.
+\end{exercise}
 
 \subsection{The unit and counit of the currying adjunction}
 
