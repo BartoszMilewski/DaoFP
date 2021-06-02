@@ -395,6 +395,8 @@ Lists are so common that their eliminators (folds) are included in the standard 
 
 Another way of looking at the initial algebra, at least in $\mathbf{Set}$, is to view it as a collection of catamorphisms that, as a whole, hint at the existence of an underlying object. Instead of seeing $\mu F$ as a set of trees, we can look at it as a set of functions from algebras to their carriers. 
 
+In a way, this is just another manifestation of the Yoneda lemma: every data structure can be described either by mappings in or mappings out. The mappings in, in this case, are the constructors of the recursive data structure. The mappings out are all the catamorphisms that can be applied to it.
+
 First, let's make the polymorphism in the definition of \hask{cata} explicit:
 \begin{haskell}
 cata :: Functor f => forall a. Algebra f a -> Fix f -> a

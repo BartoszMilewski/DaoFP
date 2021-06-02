@@ -997,7 +997,13 @@ Seen this way, the representing object $A$ is like a logarithm of a functor.
 
 The analogy goes deeper: just like a logarithm of a product is a sum of logarithms, a representing object for a product data type is a sum. For instance, the functor that squares its argument using a product, $F x = x \times x$, is represented by $2$, which is the sum $1 + 1$. 
 
-Representable functors play a very special role in the category of $ \mathbf{Set}$-valued functors. Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
+Representable functors play a very special role in the category of $ \mathbf{Set}$-valued functors. Notice that the Yoneda embedding maps objects of $\mathcal{C}$ to representable presheaves. It maps an object $X$ to a presheaf represented by $X$: 
+
+\[  \mathcal{Y} \colon X \mapsto \mathcal{C}(-, X) \]
+
+We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded inside the presheaf category as representable functors. The question is, what else is there in the presheaf category ``in between'' representable functors?
+
+Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
 
 \subsection{Representable functors in programming}
 
