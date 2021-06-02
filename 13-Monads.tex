@@ -22,14 +22,14 @@ A pure function is implemented purely in terms of its arguments---it has no acce
 
 Most real-world programs, though, have to interact with the external world: they read and write files, process network packets, prompt users for data, etc. Most programming languages solve this problem by allowing side effect. A side effect is anything that breaks the totality or the purity of a function. 
 
-Unfortunately, the shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful functions one has to carefully reason about the composition of effects on a case-by-case basis. To make things even harder, most effects are hidden inside the implementation of a function and all the functions it's calling.
+Unfortunately, the shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful computations one has to carefully reason about the composition of effects on a case-by-case basis. To make things even harder, most effects are hidden inside the implementation of a function and all the functions it's calling.
 
-The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return type of a pure function. Amazingly, this is possible for all relevant effects. The idea is that, instead of a function of the type \hask{a->b}, we use a function \hask{a->f b}, where the functor \hask{f} encodes the appropriate effect. 
+The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return type of a pure function. Amazingly, this is possible for all relevant effects. The idea is that, instead of a computation of the type \hask{a->b}, we use a function \hask{a->f b}, where the functor \hask{f} encodes the appropriate effect. 
 
 \subsection{Partiality}
 In imperative languages, partiality is often encoded with exceptions. When a function is called with the ``wrong'' value for its argument, it throws an exception. In some languages, the type of exception is encoded in the signature of the function using special syntax. 
 
-In Haskell, a partial function can be replaced by a function returning the result inside the \hask{Maybe} functor. Such a function, when called with the ``wrong'' argument, return \hask{Nothing}, otherwise is wraps the result in the \hask{Just} constructor.
+In Haskell, a partial computation can be replaced by a function returning the result inside the \hask{Maybe} functor. Such a function, when called with the ``wrong'' argument, return \hask{Nothing}, otherwise is wraps the result in the \hask{Just} constructor.
 
 If we want to encode more information about the type of the failure, we can use the \hask{Either} functor, with the \hask{Left} traditionally passing the error data (often a simple \hask{String}) to the caller.
 
@@ -37,9 +37,18 @@ Unlike in imperative languages, in Haskell, the callers of a \hask{Maybe}-valued
 
 \subsection{Logging}
 
-Writing some values to an external data structure, or logging, is a side effect that's particularly dangerous in multi-threaded applications, where multiple threads might try to access the same log simultaneously.
+Sometimes a computation has to log some values to an external data structure. Logging or auditing is a side effect that's particularly dangerous in multi-threaded applications, where multiple threads might try to access the same log simultaneously.
 
-The simple solution is for a function to return the value to be logged paired with the return value. In other words, a logging function can be replaced by a pure function returning a product. In this context, the return type is encapsulated in the writer functor, which is implemented as a product type.
+The simple solution is for a function to return the value to be logged paired with the return value. In other words, a logging computation of the type \hask{a->b} can be replaced by a pure function:
+\begin{haskell}
+a -> Writer w b
+\end{haskell}
+where the \hask{Writer} functor is a thin encapsulation of the product:
+\begin{haskell}
+newtype Writer w a = Writer (a, w)
+\end{haskell}
+
+The caller of this function is then responsible for extracting the logged value.
 
 \subsection{Environment}
 
@@ -49,7 +58,7 @@ a -> (e -> b)
 \end{haskell}
 Such return type can be encapsulated as the reader functor, itself parameterized by the environment type \hask{e}:
 \begin{haskell}
-data Reader e a = Reader (e -> a)
+newtype Reader e a = Reader (e -> a)
 \end{haskell}
 The caller of the function is then responsible for extracting the value from the reader functor by passing it the environment:
 \begin{haskell}
@@ -71,7 +80,7 @@ a -> s -> (b, s)
 \end{haskell}
 which let's us define the functor
 \begin{haskell}
-data State s a = State (s -> (a, s))
+newtype State s a = State (s -> (a, s))
 \end{haskell}
 As with the reader functor, the caller of such a function is supposed to retrieve both the result and the modified state by providing the initial state and calling \hask{runState}:
 \begin{haskell}
@@ -81,11 +90,74 @@ runState (State h) s = h s
 
 \subsection{Nondeterminism}
 
-Imagine performing a quantum experiment. You have a source of 
+Imagine performing a quantum experiment that measures the spin of an electron. Half of the time the spin will be up, half of the time it will be down. The result is non-deterministic. One way to describe it is to use the many-worlds interpretation: when we perform the experiment, the Universe splits into two Universes, one for each result.  
 
-What does it mean for a function to be non-deterministic? It means that it will return different results every time it's called. This is not much 
+What does it mean for a function to be non-deterministic? It means that it will return different results every time it's called. We can model this behavior using the many-worlds interpretation: when we call the function it returns all possible results at once. In practice, we'll settle for a (possibly infinite) list of results:
+
+We replace a non-deterministic computation \hask{a->b} with a pure function returning a functorful of results---this time it's the list functor:
+\begin{haskell}
+a -> [b]
+\end{haskell}
+Again, it's up to the caller to decide what to do with these results.
 
 \subsection{Input/Output}
+
+This is the trickiest side effect because it involves interacting with the external world. Obviously, we cannot model the whole world inside a computer program. So the interaction has to be done outside of a pure program. The trick is to let the program create a script that will be executed by the runtime: the virtual machine that runs our program. 
+
+This script sits inside the opaque, predefined \hask{IO} functor. The values inside this functor are not accessible to the program: there is no \hask{runIO} function. Instead the \hask{IO} value is executed by the runtime. Conceptually, this happens \emph{after} the program is executed. Because of Haskell's laziness, though, the pure functions that form the program are evaluated on demand---the demand being driven by the execution of the \hask{IO} script.
+
+The \hask{IO} object that is produced by a Haskell program is called \hask{main} and this is its type signature:
+\begin{haskell}
+main :: IO ()
+\end{haskell}
+It's the \hask{IO} functor acting on the unit---meaning, it doesn't contain any useful value other than the input/output script.
+
+We'll talk about how \hask{IO} actions are created soon.
+
+\subsection{Continuation}
+
+We've seen that, as a consequences of the Yoneda lemma, we can replace a value of type \hask{a} with a function that takes a handler for that value. This handler is called a continuation. Calling a handler is considered a side effect of a computation. In terms of pure functions, we encode it as:
+\begin{haskell}
+a -> Cont r b
+\end{haskell}
+where \hask{Cont r} is the following functor:
+\begin{haskell}
+newtype Cont r a = Cont ((a -> r) -> r)
+\end{haskell}
+It's the responsibility of the caller of this function to provide the continuation and retrieve the result:
+\begin{haskell}
+runCont :: Cont r a -> (a -> r) -> r
+runCont (Cont f) k = f k
+\end{haskell}
+
+This is the \hask{Functor} instance for \hask{Cont r}:
+\begin{haskell}
+instance Functor (Cont r) where
+  -- f :: a -> b
+  -- k :: b -> r
+  fmap f c = Cont (\k -> runCont c (k . f))
+\end{haskell}
+
+\section{Composing Effects}
+
+Now that we know how to make one giant leap using a function that produces both a value and a side effect, the next problem is how to decompose this leap into smaller human-sized steps. Equivalently, how to combine two smaller steps into one larger step. 
+
+The way effectful computations are normally composed is to use regular function composition for the values, and let the side effects combine themselves separately. 
+
+When we translate effectful computations to pure functions that return functorial values, we are faced with the problem of composing two functions of the form
+\begin{haskell}
+f :: a -> f b
+g :: b -> f c
+\end{haskell}
+
+The naive approach would be to unpack the result of the first function, pass the value to the next function, then compose the effects of both functions on the side and combine them with the result of the second function. This is not always possible, even for cases that we have studied so far, much less for an arbitrary functor.
+
+Consider, for instance, the case of the \hask{Maybe} functor. If the first function returns \hask{Nothing}, we have no value with which to call the second function. We have to short-circuit it, and return \hask{Nothing} as the result of composition. So the composition is possible, but it means skipping the second call based on the side effect of the first call. 
+
+In fact, all functors 
+
+\section{Monads}
+
 
 \section{Monads from Adjunctions}
 
