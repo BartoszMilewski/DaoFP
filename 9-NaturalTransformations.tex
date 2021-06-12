@@ -1005,6 +1005,18 @@ We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded 
 
 Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
 
+\subsection{The guessing game}
+
+The idea that objects can be described by the way they interact with other objects is sometimes illustrated by playing imaginary guessing games. One category theorist picks a secret object in a category, and the other has to guess which object it is (up to isomorphism, of course). 
+
+The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond, each time, with a set: the set of arrows from the probing object $A$ to the secret object $X$. This, of course, is the hom-set $\mathcal{C}(A, X)$. 
+
+The totality of these answers, as long as the opponent is not cheating, will define a presheaf $F \colon \mathcal{C} \to \mathbf{Set}$, and the object they are hiding is its representing object. 
+
+But how do we know they are not cheating? To test that, we have to be able to ask questions about arrows. For every arrow we select, they should give us a function between two sets---the sets they gave us for its endpoints. We can then check if all identity arrows are mapped to identity functions, and whether compositions of arrows map to compositions of functions. In other words, we'll be able to verify that $F$ is a functor. 
+
+However, a clever enough opponent may still fool us. The presheaf they are revealing to us may describe a fantastical object---a figment of their imagination---and we won't be able to tell. It turns out that such imaginary objects are often as interesting as the real ones. 
+
 \subsection{Representable functors in programming}
 
 In Haskell, we define a class of representable functors using two functions that witness the isomorphism: \hask{tabulate} turns a function into a lookup table, and \hask{index} uses the representing type \hask{Key} to index into it.

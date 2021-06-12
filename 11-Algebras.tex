@@ -21,7 +21,7 @@ e5 = Plus e2 e3
 e7 = Plus e5 e2
 \end{haskell}
 
-Such recursive definitions work perfectly well in a programming language. The problem is that every new recursive data structure requires its own library of functions that operate on it.
+Such recursive definitions work perfectly well in a programming language. The problem is that every new recursive data structure would require its own library of functions that operate on it.
 
 From type-theory point of view, we've been able to define recursive types, such as natural numbers or lists, by providing, in each case, specific introduction and elimination rules. What we need is something more general, a procedure for generating arbitrary recursive types from simpler pluggable components. 
 
@@ -112,7 +112,13 @@ The composition of two algebra morphisms is again an algebra morphism, which can
 \[ id_A \circ \alpha = \alpha \circ F (id_A) \]
 (a functor maps identity to identity).
 
-The commuting condition in the definition of an algebra morphism is very restrictive. Consider for instance a function that maps an integer to a string. In Haskell it's the \hask{show} function (actually, a method of the \hask{Show} class). This is \emph{not} an algebra morphism from \hask{eval} to \hask{pretty}. 
+The commuting condition in the definition of an algebra morphism is very restrictive. Consider for instance a function that maps an integer to a string. In Haskell there is a \hask{show} function (actually, a method of the \hask{Show} class) that does it. It is \emph{not} an algebra morphism from \hask{eval} to \hask{pretty}. 
+
+\begin{exercise}
+Show that \hask{show} is not an algebra morphism. Hint: Consider what happens to a \hask{PlusF} node.
+\end{exercise}
+
+\subsection{Initial algebra}
 
 The initial object in the category of algebras is called the \emph{initial algebra} and, as we'll see, it plays a very important role.
 
@@ -133,9 +139,6 @@ By definition, the initial algebra $(I, i)$ has a unique algebra morphism $f$ fr
 \]
  This unique morphism is called a \emph{catamorphism} for the algebra $(A, \alpha)$.
 
-\begin{exercise}
-Show that \hask{show} is not an algebra morphism. Hint: Consider what happens to a \hask{PlusF} node.
-\end{exercise}
 
 \begin{exercise}
 Let's define two algebras for the following functor:
@@ -154,7 +157,7 @@ mulAlg :: Algebra FloatF Float
 mulAlg (Num x) = x
 mulAlg (Op x y) = x * y
 \end{haskell}
-Make a convincing argument that \hask{log} is an algebra morphism between these two. (\hask{Float} is a built-in floating-point number type.)
+Make a convincing argument that \hask{log} (logarithm) is an algebra morphism between these two. (\hask{Float} is a built-in floating-point number type.)
 \end{exercise}
 
 \section{Lambek's Lemma and Fixed Points}

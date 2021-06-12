@@ -13,6 +13,7 @@
 \renewcommand{\chaptitlefont}{\titlefont}
 
 \usepackage{subfiles}
+\usepackage{makeidx}
 
 \usepackage{amsfonts}
 \usepackage{amssymb}  
@@ -25,11 +26,19 @@
 \newcommand{\exinline}[1]{(\refstepcounter{exercise}Exercise~\theexercise\label{#1})}
 
 \usepackage{minted}
+\usepackage{etoolbox}
 \newcommand{\hask}[1]{\mintinline{Haskell}{#1}}
 \newenvironment{haskell}
   {\VerbatimEnvironment
-  	\begin{minted}[escapeinside=??, mathescape=true,frame=single, framesep=5pt, tabsize=1]{Haskell}}
+  	\begin{minted}[escapeinside=??, mathescape=true, frame=single, framesep=5pt, tabsize=1,bgcolor=white]{Haskell}}
   {\end{minted}}
+\makeatletter
+% replace \medskip before and after the box with nothing, i.e., remove it
+\patchcmd{\minted@colorbg}{\medskip}{}{}{}
+\patchcmd{\endminted@colorbg}{\medskip}{}{}{}
+\makeatother
+
+\makeindex
 
 \begin{document}
 \setcounter{tocdepth}{4}
@@ -68,6 +77,6 @@ Most programming texts, following Brian Kernighan, start with "Hello World!". It
 \subfile{12-Coalgebras}
 \subfile{13-Monads}
 
-
+\printindex
 
 \end{document}

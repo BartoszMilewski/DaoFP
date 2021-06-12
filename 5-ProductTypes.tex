@@ -389,6 +389,43 @@ To formulate the law of associativity, we have to start with a triple product an
 
 Notice that we didn't have to assume a lot about the categorical product that we used on the objects $M$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in a monoidal category. It doesn't even have to be symmetric. All we have to assume is that there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
 
-Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category.
+Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category. 
+
+A \index{monoid}\emph{monoid} in a monoidal category is an object $M$ equipped with two morphisms:
+\[ \mu \colon M \otimes M \to M \]
+\[ \eta \colon I \to M \]
+satisfying the unit and associativity laws:
+\[
+ \begin{tikzcd}
+ 1 \otimes M
+ \arrow[rr, "\eta \otimes id_M"]
+ \arrow[rrd, "\lambda"']
+& & M \otimes M
+ \arrow[d, "\mu"']
+&& M \otimes 1
+ \arrow[ll, "id_M \otimes \eta"']
+ \arrow[lld, "\rho"]
+ \\
+ && M
+  \end{tikzcd}
+\]
+
+\[
+ \begin{tikzcd}
+ (M \otimes M) \otimes M 
+ \arrow[rr, "\alpha"]
+ \arrow[d, "\mu \otimes id"]
+ &&
+ M \otimes (M \otimes M)
+ \arrow[d, "id \otimes \mu"]
+ \\
+ M \otimes M 
+ \arrow[dr, "\mu"]
+& & M \otimes M
+ \arrow[dl, "\mu"']
+ \\
+&  M
+ \end{tikzcd}
+\]
 
 \end{document}
