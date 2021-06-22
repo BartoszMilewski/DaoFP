@@ -204,6 +204,14 @@ safeHead (a : as) = Just a
 \end{haskell}
 (The standard library \hask{head} function is ``unsafe'' in that it faults when given an empty list.)
 
+Another example is the function \hask{reverse}, which reverses a list. It's a natural transformation from the list functor to the list functor:
+\begin{haskell}
+reverse :: Natural [] []
+reverse [] = []
+reverse (a : as) = reverse as ++ [a]
+\end{haskell}
+Incidentally, this is a very inefficient implementation. The actual library function uses an optimized algorithm.
+
 A useful intuition for understanding natural transformations builds on the idea that functors acts like containers of data. There are two completely orthogonal things that you can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure of moving ``stuff'' between containers without knowing what kind of ``stuff'' it is. 
 
 Naturality condition enforces the orthogonality of these two operations. It doesn't matter if you first modify the data and then move it to another container; or first move it, and then modify. 
