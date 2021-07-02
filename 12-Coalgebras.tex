@@ -6,9 +6,9 @@
 
 Coalgebras are just algebras in the opposite category. End of chapter!
 
-Well, maybe not... As we've seen before, the category in which we're working is not symmetric with respect to duality. In particular, if we compare the terminal and the initial objects, their properties are not dually symmetric. Our initial object has no incoming arrows, whereas the terminal one has lots of outgoing arrows. 
+Well, maybe not... As we've seen before, the category in which we're working is not symmetric with respect to duality. In particular, if we compare the terminal and the initial objects, their properties are not symmetric. Our initial object has no incoming arrows, whereas the terminal one, besides having unique incoming arrows, has lots of outgoing arrows. 
 
-Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---their dual, generated from the terminal object---not to be their mirror image.
+Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---their duals, generated from the terminal object---not to be just their mirror images, but to add their own interesting twists.
 
 We've seen that the main application of algebras was in processing recursive data structures: in folding them. Dually, the main application of coalgebras is in generating, or unfolding, of recursive, tree-like, data structures. The unfolding is done using an anamorphism.
 
@@ -18,7 +18,7 @@ We cannot produce information from nothing so, in general, both a catamorphism a
 
 After you sum a list of integers, it's impossible to recover the original list. 
 
-By the same token, if you grow a recursive data structure using an anamorphism, the seed must contain all the information that ends up in the tree. The idea is that the information is now stored in a form that's more convenient for further processing.
+By the same token, if you grow a recursive data structure using an anamorphism, the seed must contain all the information that ends up in the tree. The advantage is that the information is now stored in a form that's more convenient for further processing.
 
 \section{Coalgebras from Endofunctors}
 
@@ -47,9 +47,9 @@ split (n : ns) = NodeF n left right
   where
     (left, right) = partition (<= n) ns
 \end{haskell}
-If the seed is empty, it generates a leaf; otherwise it creates a new node. This node stores the head of the list and fills the node with two new seeds. The library function \hask{partition} splits a list using a user-defined predicate, here \hask{(<= n)}, less-than-or-equal to \hask{n}. The result is a pair of lists: the first one satisfying the predicate, and the second one not. 
+If the seed is empty, it generates a leaf; otherwise it creates a new node. This node stores the head of the list and fills the node with two new seeds. The library function \hask{partition} splits a list using a user-defined predicate, here \hask{(<= n)}, less-than-or-equal to \hask{n}. The result is a pair of lists: the first one satisfying the predicate; and the second, not. 
 
-You can convince yourself that a recursive application of this coalgebra would create a binary sorted tree. We'll use this coalgebra later to implement a sort.
+You can convince yourself that a recursive application of this coalgebra creates a binary sorted tree. We'll use this coalgebra later to implement a sort.
 
 \section{Category of Coalgebras}
 
@@ -71,7 +71,7 @@ F  A
   \end{tikzcd}
 \]
 
-The interpretation is that it doesn't matter if we first map the carriers and then apply the coalgebra $\beta$ or first apply the coalgebra $\alpha$ and then apply the lifted arrow $F f$.
+The interpretation is that it doesn't matter if we first map the carriers and then apply the coalgebra $\beta$, or first apply the coalgebra $\alpha$ and then apply the arrow to its contents, using the lifting $F f$.
 
 Coalgebra morphisms can be composed, and the identity arrow is automaticaly a coalgebra morphism. It's easy to see that coalgebras, just like algebras, form a category. 
 
@@ -92,18 +92,32 @@ We've seen before that the carrier of the initial algebra is a fixed point. In p
 The greatest fixed point of an endofunctor $F$ is denoted by $\nu F$, so we have:
 \[ T = \nu F \]
 
-We can also see that there must be a unique algebra morphism from the initial algebra to the terminal coalgebra. That's because the terminal coalgebra is also an algebra. Similarly, there is a unique coalgebra morphism from the initial algebra (which is also a coalgebra) to the terminal coalgebra. In fact, it can be shown that it's the same underlying morphism $\kappa \colon I \to T$ in both cases. 
+We can also see that there must be a unique algebra morphism (a catamorphism) from the initial algebra to the terminal coalgebra. That's because the terminal coalgebra is an algebra. 
+
+Similarly, there is a unique coalgebra morphism from the initial algebra (which is also a coalgebra) to the terminal coalgebra. In fact, it can be shown that it's the same underlying morphism $\kappa \colon \mu F \to \nu F$ in both cases. 
 
 In the category of sets, the carrier set of the initial algebra is a subset of the carrier set of the terminal coalgebra, with the function $\kappa$ embedding the former in the latter. 
+\[
+\begin{tikzpicture}
+         \draw (-1,0)[fill=blue!25!white] ellipse (0.7 and 1);
+         \draw (2,0)[fill=blue!5!white] ellipse (1.4 and 2);
+         \draw (2,0)[fill=blue!25!white] ellipse (0.7 and 1);
+         \node[above] at (0, 1) {$\kappa$};
+       	\draw[dashed, blue] (-1, 1) -- (2, 1);
+	\draw[dashed, blue] (-1, -1) -- (2, -1);
+        \node at (-1, 0) { $\mu F$ };
+        \node at (2, 1.5) { $\nu F$ };
+\end{tikzpicture}
+\]
 
-We'll see later that in Haskell the situation is more subtle because of lazy evaluation. But, at least for the functors that have the leaf component---that is, their action on the initial object is non-trivial---the Haskell's fixed point type works as a carrier for both, the initial algebra and the terminal coalgebra.
+We'll see later that in Haskell the situation is more subtle, because of lazy evaluation. But, at least for functors that have the leaf component---that is, their action on the initial object is non-trivial---Haskell's fixed point type works as a carrier for both the initial algebra and the terminal coalgebra.
 \begin{haskell}
 data Fix f where
   In :: f (Fix f) -> Fix f
 \end{haskell}
 
 \begin{exercise}
-Show that, for the identity functor in $\mathbf{Set}$, every object is a fixed point, the empty set is the least fixed point, and the singleton set is the greatest fixed point. Hint: The least fixed point must have arrows going to all other fixed points, and the greatest fixed point must have arrows going from all other fixed points.
+Show that, for the identity functor in $\mathbf{Set}$, every object is a fixed point, the empty set is the least fixed point, and the singleton set is the greatest fixed point. Hint: The least fixed point must have arrows going to all other fixed points, and the greatest fixed point must have arrows coming from all other fixed points.
 \end{exercise}
 
 \begin{exercise}
@@ -112,7 +126,7 @@ Show that the empty set is the carrier of the initial algebra for the identity f
 
 \section{Anamorphisms}
 
-The terminal coalgebra $(T, j)$ is defined by its universal property: there is a unique coalgebra morphism from any coalgebra $(A, \alpha)$ to it, making the following diagram commute:
+The terminal coalgebra $(T, j)$ is defined by its universal property: there is a unique coalgebra morphism $h$ from any coalgebra $(A, \alpha)$ to $(T, j)$.  This morphism is called the \emph{anamorphism}. Being a coalgebra morphism, it makes the following diagram commute:
 \[
  \begin{tikzcd}
  A 
@@ -126,7 +140,6 @@ The terminal coalgebra $(T, j)$ is defined by its universal property: there is a
  & F T
   \end{tikzcd}
 \]
- This morphism is called the \emph{anamorphism}.
  
  Just like with algebras, we can use the Lambek's lemma to ``solve'' for \hask{h}:
  \[ h = j^{-1} \circ F h \circ \alpha \]
@@ -136,7 +149,7 @@ The terminal coalgebra $(T, j)$ is defined by its universal property: there is a
 ana :: Functor f => Coalgebra f a -> a -> Fix f
 ana coa = In . fmap (ana coa) . coa 
 \end{haskell}
-Given a seed of type \hask{a}, we first act on it with the coalgebra \hask{coa}. This gives us a functorful of seeds. We expand these seeds by recursively applying the anamorphism using \hask{fmap}. We then apply the constructor \hask{In} to get the final result.
+Here's the interpretation of this formula: Given a seed of type \hask{a}, we first act on it with the coalgebra \hask{coa}. This gives us a functorful of seeds. We expand these seeds by recursively applying the anamorphism using \hask{fmap}. We then apply the constructor \hask{In} to get the final result.
  
 As an example, we can apply the anamorphism to the \hask{split} coalgebra we defined earlier: \hask{ana split} takes a list of integers and creates a sorted tree. 
 
@@ -158,11 +171,11 @@ When studying algebras we relied on data structures that had a leaf component---
 
 With coalgebras, we are free to drop this requirement. We no longer have to construct recursive data structures ``by hand''---we have anamorphisms to do that for us. An endofunctor that has no leaves is perfectly acceptable: its coalgebras are going to generate infinite data structures. 
 
-Infinite data structures are representable in Haskell because of its laziness. Things are evaluated on the need-to-know basis. Only those parts of an infinite data structure that are explicitly demanded are calculated; the evaluation of the rest is suspended. 
+Infinite data structures are representable in Haskell because of its laziness. Things are evaluated on the need-to-know basis. Only those parts of an infinite data structure that are explicitly demanded are calculated; the evaluation of the rest is kept in suspended animation. 
 
-To implement infinite data structures in other, strict, languages, one must resort to representing values as functions---something Haskell does behind the scenes.
+To implement infinite data structures in strict languages, one must resort to representing values as functions---something Haskell does behind the scenes (these functions are called \emph{thunks}).
 
-Let's look at a simple example: an infinite stream of values. To generate it, we first define a functor that looks very much like the one we used to generate a list, except that it lacks the leaf component---the constructor for an empty list. You may recognize it as a product functor, with the first component fixed to be the payload:
+Let's look at a simple example: an infinite stream of values. To generate it, we first define a functor that looks very much like the one we used to generate lists, except that it lacks the leaf component---the empty list constructor. You may recognize it as a product functor, with the first component fixed to be the stream payload:
 \begin{haskell}
 data StreamF a x = StreamF a x
   deriving Functor
@@ -176,7 +189,7 @@ Here's a simple coalgebra that uses a single integer \hask{n} as a seed:
 step :: Coalgebra (StreamF Int) Int
 step n = StreamF n (n+1)
 \end{haskell}
-It stores the seed as a payload, and seeds the next budding stream with \hask{n = 1}. 
+It stores the seed as a payload, and seeds the next budding stream with \hask{n + 1}. 
 
 The anamorphism for this coalgebra, seeded with zero, generates the stream of all natural numbers.
 \begin{haskell}
@@ -207,14 +220,14 @@ qsort = hylo toList split
 
 Notice that there is no trace of the fixed point in the definition of the hylomorphism. Conceptually, the coalgebra is used to build (unfold) the recursive data structure from the seed, and the algebra is used to fold it into a value of type \hask{b}. But because of Haskell's laziness, the intermediate data structure doesn't have to be materialized in full in memory. This is particularly important when dealing with very large intermediate trees. Only the branches that are currently being traversed are evaluated and, as soon as they have been processed, they are passed to the garbage collector. 
 
-Hylomorphisms in Haskell are a convenient replacement for recursive backtracking algorithms, which are very hard to implement correctly in imperative languages. This is because designing a data structure is easier than following complicated flow of control and keeping track of our place in a recursive algorithm. 
+Hylomorphisms in Haskell are a convenient replacement for recursive backtracking algorithms, which are very hard to implement correctly in imperative languages. We take advantage of the fact that designing a data structure is easier than following complicated flow of control and keeping track of our place in a recursive algorithm. 
 
-Data structures can be used to visualize complex flows of control.
+This way, data structures can be used to visualize complex flows of control.
 
 \subsection{The impedance mismatch}
-We've seen that, in the category of sets, the initial algebras don't necessarily coincide with terminal coalgebras. The identity functor, for instance, has the empty set as its initial algebra and the singleton set as its terminal coalgebra. 
+We've seen that, in the category of sets, the initial algebras don't necessarily coincide with terminal coalgebras. The identity functor, for instance, has the empty set as its (carrier of) the initial algebra and the singleton set as its terminal coalgebra. 
 
-We also have other functors that have no leaf component, such as the stream functor. The initial algebra for such a functor is the empty set as well. 
+We have other functors that have no leaf components, such as the stream functor. The initial algebra for such a functor is the empty set as well. 
 
 In $\mathbf{Set}$, the initial algebra is the subset of the terminal coalgebra, and hylomorphisms can only be defined for this subset. It means that we can use a hylomorphism only if the anamorphism for a particular coalgebra lands us in this subset. In that case, because the embedding of initial algebras in terminal coalgebras is injective, we can find the corresponding element in the initial algebra and apply the catamorphism to it.
 
@@ -234,7 +247,7 @@ It's a perfectly well-formed Haskell program that passes the type checker. So wh
 
 This is the aspect of real-life computations that mere functions between sets cannot model. Some computer function may never terminate. 
 
-Recursive functions are formally described by \emph{domain theory} as limits of partially defined functions. If a function is not defined for a particular value of the argument, it is said to return a bottom, $\bot$. If we include bottoms as special elements of every type (these are called \emph{lifted} types), we can say that our function \hask{sumAllNats} returns a bottom of the type \hask{Int}. In general, catamorphisms for infinite types don't terminate, so we can treat them as returning bottoms.
+Recursive functions are formally described by \emph{domain theory} as limits of partially defined functions. If a function is not defined for a particular value of the argument, it is said to return a bottom value $\bot$. If we include bottoms as special elements of every type (these are called \emph{lifted} types), we can say that our function \hask{sumAllNats} returns a bottom of the type \hask{Int}. In general, catamorphisms for infinite types don't terminate, so we can treat them as returning bottoms.
 
 It should be noted, however, that the inclusion of bottoms complicates the categorical interpretation of Haskell. In particular, many of the universal constructions that rely on uniqueness of mappings no longer work as advertised.
 
@@ -260,15 +273,15 @@ forall a. (a -> f a, a) -> Nu f
 \end{haskell}
 tells us that we can construct an element of \hask{Nu f} from a pair \hask{(a -> f a, a)}. It looks just like a data constructor, except that it's polymorphic in \hask{a}. 
 
-Data types with a polymorphic constructor are called \emph{existential} types. To construct an element of the existential type, we have the option of picking a particular type for which we have the data required by the constructor. 
+Data types with a polymorphic constructor are called \emph{existential} types. To construct an element of an existential type, we have the option of picking a particular type, for which we have the data required by the constructor. 
 
-For instance, we can construct a term of the type \hask{Nu (StreamF Int} by providing a pair:
+For instance, we can construct a term of the type \hask{Nu (StreamF Int)} by providing a pair:
 \begin{haskell}
 nuArgs :: (Int -> StreamF Int Int, Int)
 nuArgs =  (\n -> StreamF n (n+1) , 0)
 \end{haskell}
 
-The clients of an existential data type have no idea what type was used in its construction. All they know is that such a type \emph{exists}---hence the name. If they want to use an existential type, they have to do it in a way that is not sensitive to the choice that was made in its construction. In practice, it means that an existential type carries with itself both the producer and the consumer of the hidden value. 
+The clients of an existential data type have no idea what type was used in its construction. All they know is that such a type \emph{exists}---hence the name. If they want to use an existential type, they have to do it in a way that is not sensitive to the choice that was made in its construction. In practice, it means that an existential type must carry with itself both the producer and the consumer of the hidden value. 
 
 This is indeed the case in our example: the producer is just the value of type \hask{a}, and the consumer is the function \hask{a -> f a}.
 
@@ -286,9 +299,9 @@ We can also omit the quantification altogether:
 data Nu f where 
   Nu :: (a -> f a, a) -> Nu f
 \end{haskell}
-That's because type variables that are not arguments to the type constructor are automatically treated as existentials. 
+This is because type variables that are not arguments to the type constructor are automatically treated as existentials. 
 
-We can use the more traditional form:
+We can also use the more traditional form:
 \begin{haskell}
 data Nu f = forall a. Nu (a -> f a, a)
 \end{haskell}
@@ -334,9 +347,9 @@ At face value, the idea that we could construct a terminal coalgebra by applying
 
 To turn this loose reasoning into a rigorous proof, we have to tame the infinity, which means we have to define some kind of a limiting procedure. 
 
-For simplicity, let's consider the product functor:
+As an example, let's consider the product functor:
 \[F_A X = A \times X \]
-Its terminal coalgebra is an infinite stream. We'll start approximating it by starting with the terminal object $1$. The next step is:
+Its terminal coalgebra is an infinite stream. We'll approximate it it by starting with the terminal object $1$. The next step is:
 \[ F_A 1 = A \times 1 \cong A \]
 which we could imagine is a stream of length one. We can continue with:
 \[ F_A (F_A 1) = A \times (A \times 1) \cong A \times A \]
@@ -344,7 +357,7 @@ a stream of length two, and so on.
 
 This looks promising, but what we need is one object that would combine all these approximations. We need a way to glue the next approximation to the previous one.
 
-Recall from a previous exercise the limit of the walking arrow diagram. This limit has the same elements as the first object in the diagram. In particular, consider the limit in this diagram:
+Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. This limit has the same elements as the starting object in the diagram. In particular, consider the limit in this diagram:
 \[
  \begin{tikzcd}
  & Lim D_1
@@ -396,23 +409,6 @@ We can continue extending this diagram to infinity. The limit of the infinite ch
   \arrow[l, "F^n !"]
  \end{tikzcd}
 \]
-The proof of this fact can be obtained by reversing the arrows in the analogous proof for initial algebras.
-
-\subsection{notes}
-
-
-\begin{exercise}
-\end{exercise}
-
-\begin{haskell}
-\end{haskell}
-
-\[
- \begin{tikzcd}
-  \end{tikzcd}
-\]
-
-\[   \mathbf{Set} \]
-\[   \mathcal{C} \]
+The proof of this fact can be obtained from the analogous proof for initial algebras by reversing the arrows.
 
 \end{document}

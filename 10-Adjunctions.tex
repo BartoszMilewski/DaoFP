@@ -269,7 +269,9 @@ Not only is this mapping defined for every $X$, but it's also natural in $X$. Th
 
 We can do a similar trick by replacing $X$ with $R Y$:
 \[  \mathcal{C} (L (R Y), Y) \cong \mathcal{D}( R Y , R Y)\]
-We get another natural transformation called the \emph{counit} of the adjunction:
+We get a family of arrows:
+\[ \varepsilon_Y \colon L (R Y) \to Y \]
+which form another natural transformation called the \emph{counit} of the adjunction:
 \[ \varepsilon \colon L \circ R \to Id_{\mathcal{C}}  \]
 
 Notice that, if those two natural transformations were invertible, they would witness the equivalence of categories. But this kind of ``half-equivalence'' is even more interesting in the context of category theory. 
@@ -538,6 +540,34 @@ Following the intuition of a free monoid being a domain-specific program, \hask{
 \begin{exercise}
 Write a program that takes a list of integers and interprets it in two ways: once using the additive and once using the multiplicative monoid of integers.
 \end{exercise}
+\section{The Category of Adjunctions}
+We can define composition of adjunctions by taking advantage of the composition of functors that define them. Two adjunctions, $L \dashv R$ and $L' \dashv R'$, are composable if they share the category in the middle:
+\[
+ \begin{tikzcd}
+  \mathcal{C}
+  \arrow[rr, bend right, "R'"']
+  &&
+  \mathcal{D}
+  \arrow[ll, bend right, "L'"']
+    \arrow[rr, bend right, "R"']
+&&
+  \mathcal{E}
+  \arrow[ll, bend right, "L"']
+ \end{tikzcd}
+\]
+By composing the functors we get a new adjunction $(L' \circ L) \dashv (R \circ R')$. 
 
+Indeed, let's consider the hom-set:
+\[ \mathcal{C}(L' (L e), c) \]
+Using the $L' \dashv R'$ adjunction, we can transpose $L'$ to the right, where it becomes $R'$:
+\[ \mathcal{D}(L e, R' c) \]
+and using $L \dashv R$ we can similarly transpose $L$:
+\[ \mathcal{E}( e, R(R' c)) \]
+Combining these two isomorphisms, we get the composite adjunction:
+\[ \mathcal{C}((L' \circ L) e, c) \cong \mathcal{E}( e, (R \circ R') c)\]
+
+Because functor composition is associative, the composition of adjunctions is also associative. It's easy to see that a pair of identity functors forms a trivial adjunction that serves as the identity with respect to composition of adjunctions. Therefore we can define a category $\mathbf{Adj}(\mathbf{Cat})$ in which objects are categories and arrows are adjunctions (by convention, pointing in the direction of the left adjoint). 
+
+Adjunctions can be defined purely in terms of functors and natural transformations, that is 1-cells and 2-cells in the 2-category $\mathbf{Cat}$. There is nothing special about $\mathbf{Cat}$, and in fact adjunctions can be defined in any 2-category. Moreover, the category of adjunctions is itself a 2-category.
 
 \end{document}

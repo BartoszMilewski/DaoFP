@@ -258,7 +258,7 @@ Let's look at the components of these transformations at some object $X$
 These are just two arrows in $\mathcal{D}$ that are composable. So we can define a composite natural transformation $\gamma$ as follows:
 \[ \gamma \colon F \to H\]
 \[ \gamma_X = \beta_X \circ \alpha_X \]
- This is called the \emph{vertical composition} of natural transformations.
+ This is called the \emph{vertical composition} of natural transformations. You'll see it written using a dot $\gamma = \beta \cdot \alpha$ or a simple juxtaposition $\gamma = \beta \alpha$.
 
 Naturality condition for $\gamma$ can be shown by pasting together (vertically) two naturality squares for $\alpha$ and $\beta$:
 \[
@@ -398,6 +398,18 @@ Because of the characteristic shape of the diagram, such composition is called `
 In components, we have:
 \[ (\beta \circ F)_X = \beta_{F X} \]
 
+Let's consider how we would translate this to Haskell. A natural transformation is a polymorphic function. Because of parametricity, it's defined by the same formula for all types. So whiskering on the right doesn't change the formula, it changes function signature. 
+
+For instance, if this is the declaration of \hask{beta}:
+\begin{haskell}
+beta :: G x -> G' x
+\end{haskell}
+then its whiskered version would be:
+\begin{haskell}
+beta_f :: G (F x) -> G' (F x)
+\end{haskell}
+Because of Haskell's type inference, this shift is often implicit.
+
 Similarly, $id_G \circ \alpha$ is written as $G \circ \alpha$.
 \[
 \begin{tikzcd}[column sep=huge]
@@ -414,6 +426,17 @@ Similarly, $id_G \circ \alpha$ is written as $G \circ \alpha$.
 \]
 In components:
 \[(G \circ \alpha)_X = G (\alpha_X) \]
+
+In Haskell, the lifting of $\alpha_X$ by $G$ is done using \hask{fmap}, so given:
+\begin{haskell}
+alpha :: F x -> F' x
+\end{haskell}
+the whiskered version would be:
+\begin{haskell}
+g_alpha :: G (F x) -> G (F' x)
+g_alpha = fmap alpha
+\end{haskell}
+Again, Haskell's type inference engine figures out which version of \hask{fmap} to use (here, it's the one from the \hask{Functor} instance of \hask{G}).
 
 \subsection{Interchange law}
 We can combine vertical composition with horizontal composition, as seen in the following diagram:
