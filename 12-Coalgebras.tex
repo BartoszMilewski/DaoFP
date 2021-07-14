@@ -175,7 +175,7 @@ Infinite data structures are representable in Haskell because of its laziness. T
 
 To implement infinite data structures in strict languages, one must resort to representing values as functions---something Haskell does behind the scenes (these functions are called \emph{thunks}).
 
-Let's look at a simple example: an infinite stream of values. To generate it, we first define a functor that looks very much like the one we used to generate lists, except that it lacks the leaf component---the empty list constructor. You may recognize it as a product functor, with the first component fixed to be the stream payload:
+Let's look at a simple example: an infinite stream of values. To generate it, we first define a functor that looks very much like the one we used to generate lists, except that it lacks the leaf component---the empty list constructor. You may recognize it as a product functor, with the first component fixed---it describes the stream's payload:
 \begin{haskell}
 data StreamF a x = StreamF a x
   deriving Functor
@@ -225,7 +225,7 @@ Hylomorphisms in Haskell are a convenient replacement for recursive backtracking
 This way, data structures can be used to visualize complex flows of control.
 
 \subsection{The impedance mismatch}
-We've seen that, in the category of sets, the initial algebras don't necessarily coincide with terminal coalgebras. The identity functor, for instance, has the empty set as its (carrier of) the initial algebra and the singleton set as its terminal coalgebra. 
+We've seen that, in the category of sets, the initial algebras don't necessarily coincide with terminal coalgebras. The identity functor, for instance, has the empty set as the carrier of the initial algebra and the singleton set as the carrier of its terminal coalgebra. 
 
 We have other functors that have no leaf components, such as the stream functor. The initial algebra for such a functor is the empty set as well. 
 
@@ -247,7 +247,7 @@ It's a perfectly well-formed Haskell program that passes the type checker. So wh
 
 This is the aspect of real-life computations that mere functions between sets cannot model. Some computer function may never terminate. 
 
-Recursive functions are formally described by \emph{domain theory} as limits of partially defined functions. If a function is not defined for a particular value of the argument, it is said to return a bottom value $\bot$. If we include bottoms as special elements of every type (these are called \emph{lifted} types), we can say that our function \hask{sumAllNats} returns a bottom of the type \hask{Int}. In general, catamorphisms for infinite types don't terminate, so we can treat them as returning bottoms.
+Recursive functions are formally described by \emph{domain theory} as limits of partially defined functions. If a function is not defined for a particular value of the argument, it is said to return a bottom value $\bot$. If we include bottoms as special elements of every type (these are then called \emph{lifted} types), we can say that our function \hask{sumAllNats} returns a bottom of the type \hask{Int}. In general, catamorphisms for infinite types don't terminate, so we can treat them as returning bottoms.
 
 It should be noted, however, that the inclusion of bottoms complicates the categorical interpretation of Haskell. In particular, many of the universal constructions that rely on uniqueness of mappings no longer work as advertised.
 
@@ -267,15 +267,15 @@ Let's uncurry this definition:
 ana :: Functor f => forall a. (a -> f a, a) -> Fix f
 ana (coa, x) = In (fmap (curry ana coa) (coa x))
 \end{haskell}
-In this form, we can re-interpret it as the definition of the carrier for the terminal coalgebra. Let's replace \hask{Fix f} with the type we are defining, \hask{Nu f}. The type signature:
+In this form, we can take it as the definition of the carrier for the terminal coalgebra. We can replace \hask{Fix f} with the type we are defining---let's call it \hask{Nu f}. The type signature:
 \begin{haskell}
 forall a. (a -> f a, a) -> Nu f
 \end{haskell}
 tells us that we can construct an element of \hask{Nu f} from a pair \hask{(a -> f a, a)}. It looks just like a data constructor, except that it's polymorphic in \hask{a}. 
 
-Data types with a polymorphic constructor are called \emph{existential} types. To construct an element of an existential type, we have the option of picking a particular type, for which we have the data required by the constructor. 
+Data types with a polymorphic constructor are called \emph{existential} types. To construct an element of an existential type, we have the option of picking the most convenient type---the type for which we have the data required by the constructor. 
 
-For instance, we can construct a term of the type \hask{Nu (StreamF Int)} by providing a pair:
+For instance, we can construct a term of the type \hask{Nu (StreamF Int)} by picking \hask{Int} as the convenient type, and providing the pair:
 \begin{haskell}
 nuArgs :: (Int -> StreamF Int Int, Int)
 nuArgs =  (\n -> StreamF n (n+1) , 0)
@@ -285,7 +285,7 @@ The clients of an existential data type have no idea what type was used in its c
 
 This is indeed the case in our example: the producer is just the value of type \hask{a}, and the consumer is the function \hask{a -> f a}.
 
-Naively, all the clients could do with this pair, without any knowledge of what the type \hask{a} was, is to apply the function to the value. But if \hask{f} is a functor, they can repeat this process by applying the function to the contents of \hask{f a}, and so on. They end up with all the information that's contained in the infinite stream.
+Naively, all that the clients could do with this pair, without any knowledge of what the type \hask{a} was, is to apply the function to the value. But if \hask{f} is a functor, they can do much more. They can repeat the process by applying the lifted function to the contents of \hask{f a}, and so on. They end up with all the information that's contained in the infinite stream.
 
 There are several ways of defining existential data types in Haskell. We can use the uncurried version of the anamorphism directly as the data constructor:
 \begin{haskell}
