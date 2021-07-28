@@ -25,7 +25,7 @@ The compiler will recognize this definition as dependently typed if you include 
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 \end{haskell}
-The first argument to the type constructor is a natural number \hask{n}. Notice: this is a value, not a type. The type checker figures that out from the usage in the two data constructors. The first one creates a vector of the type \hask{Vec Z a}, and the second creates a vector of the type \hask{Vect (S n) a}, where \hask{Z} and \hask{S} are defined as the constructors of natural numbers:
+The first argument to the type constructor is a natural number \hask{n}. Notice: this is a value, not a type. The type checker is able to figure this out from the usage of \hask{n} in the two data constructors. The first one creates a vector of the type \hask{Vec Z a}, and the second creates a vector of the type \hask{Vect (S n) a}, where \hask{Z} and \hask{S} are defined as the constructors of natural numbers:
 \begin{haskell}
 data Nat = Z | S Nat
 \end{haskell}
@@ -77,19 +77,19 @@ Implement the function \hask{tailV} that returns the tail of the non-zero-length
 
 \section{Dependent Types Categorically}
 
-The easiest way to visualize dependent types is to think of them as families of types indexed by elements of a set. In the case of counted vectors, the indexing set would be the set of natural numbers.
+The easiest way to visualize dependent types is to think of them as families of types indexed by elements of a set. In the case of counted vectors, the indexing set would be the set of natural numbers $\mathbb{N}$.
 
-The zeroth type would be the unit type \hask{()} representing an empty vector. The type corresponding to one would be \hask{a}; then we'd have a pair \hask{(a, a)}, a triple \hask{(a, a, a)} and so on, with higher and higher powers of \hask{a}.
+The zeroth type would be the unit type \hask{()} representing an empty vector. The type corresponding to \hask{(S Z)} would be \hask{a}; then we'd have a pair \hask{(a, a)}, a triple \hask{(a, a, a)} and so on, with higher and higher powers of \hask{a}.
 
 If we want to talk about the whole family as one big set, we can take the union of all these types.
 
 \subsection{Fibrations}
 
-Although intuitively easy to visualize, this point of view doesn't generalize nicely to category theory, where we don't like mixing sets with objects. So we turn this picture on its head and instead of talking about injecting family members into the family, we consider a mapping that goes in the opposite direction. 
+Although intuitively easy to visualize, this point of view doesn't generalize nicely to category theory, where we don't like mixing sets with objects. So we turn this picture on its head and instead of talking about injecting family members into the sum, we consider a mapping that goes in the opposite direction. 
 
-This, again, we can first visualize using sets. We have one big set $E$ describing the whole family and a function $p$ called the projection that goes from $E$ down to the indexing set $B$ (also called the \emph{base}). 
+This, again, we can first visualize using sets. We have one big set $E$ describing the whole family, and a function $p$ called the projection that goes from $E$ down to the indexing set $B$ (also called the \emph{base}). 
 
-This function will, in general, map multiple elements to one. We can then talk about the inverse image of a particular element $x \in B$ as the set of elements that get mapped down to it by $p$. This set is called the \emph{fibre} and is written $p^{-1} x$ (even though, in general, $p$ is not invertible in the normal sense).
+This function will, in general, map multiple elements to one. We can then talk about the inverse image of a particular element $x \in B$ as the set of elements that get mapped down to it by $p$. This set is called the \emph{fibre} and is written $p^{-1} x$ (even though, in general, $p$ is not invertible in the usual sense). Seen as a collection of fibers, $E$ is often called a \emph{fiber bundle} or just a bundle.
 
 \[
 \begin{tikzpicture}
@@ -122,11 +122,11 @@ This function will, in general, map multiple elements to one. We can then talk a
 
 Now forget about sets. A \emph{fibration} in an arbitrary category is a pair of objects $E$ and $B$ and an arrow $p \colon E \to B$. 
 
-So this is really just an arrow, but the context is everything. When an arrow is called a fibration, use the intuition from sets, and imagine its source $E$ as a collection of fibers, with $p$ projecting each fiber down to a single point in the base $B$. 
+So this is really just an arrow, but the context is everything. When an arrow is called a fibration, we use the intuition from sets, and imagine its source $E$ as a collection of fibers, with $p$ projecting each fiber down to a single point in the base $B$. 
 
-We will model type families as fibrations. For instance, our counted-vector family can be represented as a fibration whose base is the type of natural numbers. The whole family is a sum (coproduct) of consecutive powers (products) of $A$:
+We will therefore model type families as fibrations. For instance, our counted-vector family can be represented as a fibration whose base is the type of natural numbers. The whole family is a sum (coproduct) of consecutive powers (products) of $A$:
 \[ E = \coprod_{n\colon \mathbb{N}} A^n \]
-the zeroth power---the initial object---representing a vector of size zero.
+with the zeroth power---the initial object---representing a vector of size zero.
 \[
 \begin{tikzpicture}
 \def\dx{0.5};
@@ -164,14 +164,14 @@ The projection $p$ is a mapping out of a sum, so it can be defined as a product 
 
 \subsection{Slice categories}
 
-In category theory we like to describe things in bulk---defining internal structure of things by structure-preserving mappings between them. Such is the case with fibrations. 
+In category theory we like to describe things in bulk---defining internal structure of things by structure-preserving maps between them. Such is the case with fibrations. 
 
 If we fix the base object $B$ and consider all possible source objects in $\mathcal{C}$, and all possible projections down to $B$, we get a \emph{slice category} $\mathcal{C}/B$ (also known as an over-category). 
 
-An arrow in the slice category between two objects $\langle E, p \rangle$ and $\langle E', p' \rangle$ is an arrow $f \colon E \to E'$ that commutes with the projections, that is:
+An object in the slice category is a pair $\langle E, p \colon E \to B \rangle$, and an arrow between two objects $\langle E, p \rangle$ and $\langle E', p' \rangle$ is an arrow $f \colon E \to E'$ that commutes with the projections, that is:
 \[p' \circ f = p \]
 
-Again, the best way to visualize this is to notice that such an arrow maps fibers of $p$ to fibers of $p'$. It's a ``fiber-preserving'' mapping.
+Again, the best way to visualize this is to notice that such an arrow maps fibers of $p$ to fibers of $p'$. It's a ``fiber-preserving'' mapping between bundles.
 
 \[
  \begin{tikzcd}
@@ -190,7 +190,7 @@ Again, the best way to visualize this is to notice that such an arrow maps fiber
 
  Let's start with a particular fibration $p \colon E \to B$ and ask ourselves the question: what happens when we change the base from $B$ to some $B'$ that is related to it through a mapping $f \colon B' \to B$. Can we ``pull the fibres back'' along $f$? 
  
- Again, let's think about sets first. Imagine picking a fibre in $E$ over some point $y \in B$. We can plant this fibre over all points in $B'$ that are in the inverse image $f^{-1} y$. If multiple points in $B'$ are mapped to the same point in $B$, we just duplicate the corresponding fiber. This way every point in $B'$ will have a fiber sticking out of it. The union of all these fibers will form a new set $E'$.
+ Again, let's think about sets first. Imagine picking a fibre in $E$ over some point $y \in B$. We can plant this fibre over all points in $B'$ that are in the inverse image $f^{-1} y$. If multiple points in $B'$ are mapped to the same point in $B$, we just duplicate the corresponding fiber. This way, every point in $B'$ will have a fiber sticking out of it. The union of all these fibers will form a new bundle $E'$.
 
 \[
 \begin{tikzpicture}
@@ -234,7 +234,7 @@ Again, the best way to visualize this is to notice that such an arrow maps fiber
 \end{tikzpicture}
 \]
 
-We have constructed a new fibration with the base $B'$. Its projection $p' \colon E' \to B'$ maps each point in a fibre to the point over which this fibre was planted. There is also a natural mapping $g \colon E' \to E$ that maps fibers to their corresponding fibres. 
+We have thus constructed a new fibration with the base $B'$. Its projection $p' \colon E' \to B'$ maps each point in a given fibre to the point over which this fibre was planted. There is also a natural mapping $g \colon E' \to E$ that maps fibers to their corresponding fibres. 
 
 By construction, this new fibration $\langle E', p'\rangle$ satisfies the condition:
 \[ p \circ g = f \circ p' \]
@@ -254,20 +254,19 @@ which can be represented as a commuting square:
 \]
 
 In  $\mathbf{Set}$, we can explicitly construct $E'$ as a subset of the cartesian product $B' \times E$ with $p' = \pi_1$ and $g = \pi_2$ (the two cartesian projections). An element of $E'$ is a pair $\langle b, e \rangle$, and the commuting condition is the equation:
-\[ f b = p e \]
+\[ f (b) = p (e) \]
 
 This commuting square is the starting point for the categorical generalization. However, even in $\mathbf{Set}$ there are many different fibrations over $B'$ that make this diagram commute. We have to pick the universal one. Such a universal construction is called a \emph{pullback}, or a \emph{fibered product}.
 
-A pullback of $p \colon E \to B$ along $f \colon B' \to B$ is an object $E'$ together with two arrows $p' \colon E' \to B'$ and $g \colon E' \to E$ that makes the above diagram commute and that satisfies the universal condition. 
+A pullback of $p \colon E \to B$ along $f \colon B' \to B$ is an object $E'$ together with two arrows $p' \colon E' \to B'$ and $g \colon E' \to E$ that makes the above diagram commute, and that satisfies the universal condition. 
 
-The universal condition says that, for any other candidate object $G$ with two arrows $q \colon G \to E$ and $q' \colon G \to B'$ making the square commute, there is a unique arrow $h \colon G \to E'$ that makes the whole diagram commute:
-
+The universal condition says that, for any other candidate object $G$ with two arrows $q' \colon G \to E$ and $q \colon G \to B'$ such that $p \circ q' = f \circ q$, there is a unique arrow $h \colon G \to E'$ that makes the two triangles commute:
 \[
  \begin{tikzcd}
  G
  \arrow[dr, dashed, "h"]
- \arrow[drr, bend left, "q"]
- \arrow[ddr, bend right, "q'"']
+ \arrow[drr, bend left, "q'"]
+ \arrow[ddr, bend right, "q"']
  \\
  &E'
  \arrow[r, "g"]
@@ -281,7 +280,13 @@ The universal condition says that, for any other candidate object $G$ with two a
  &B
   \end{tikzcd}
 \]
-The little corner symbol is often used to mark pullbacks.
+The angle symbol in the corner of the square is used to mark pullbacks.
+
+If we look at the pullback through the prism of fibrations, $E$ is a bundle over $B$, and we are constructing a new bundle $E'$ out of the fibers taken from $E$. Where we plant these fibers over $B'$ is determined by (the inverse image of) $f$. This procedure makes $E'$ a bundle over both $B'$ and $B$, the latter with the projection $p \circ g = f \circ p'$. 
+
+$G$ in this picture is some other bundle over $B'$ with the projection $q$. It is simultaneously a bundle over $B$ with the projection $f \circ q = p \circ q'$. The unique mapping $h$ maps the fibers of $G$ given by $q^{-1}$ to the fibers of $E'$ given by $p'$. 
+
+All mappings in this picture work on fibers. Some of them rearrange fibers over new bases---that's what a pullback does. This is analogous to what natural transformations do to containers. Others modify individual fibers---the mapping $h \colon G \to E'$ works like this. This is analogous to what \hask{fmap} does to containers. The universal condition then tells us that $q'$ can be factored into a transformation of fibers $h$, followed by the rearrangement $g$.
 
 It's worth noting that picking the terminal object as the pullback target gives us the definition of the categorical product:
 \[
@@ -299,6 +304,8 @@ It's worth noting that picking the terminal object as the pullback target gives 
  1
   \end{tikzcd}
 \]
+
+Alternatively, we can think of this as a generalization of the diagonal functor. Normally, the diagonal functor $\Delta E$ would duplicate $E$. Here, you can imagine $\pi_1$ fibrating $B\times E$ into as many copies of $E$ as there are elements in $B$. We'll use this analogy when we talk about the dependent sum.
 
 Conversely, a single fiber can be extracted from a fibration by pulling it back to the terminal object. In this case the mapping $x \colon 1 \to B$ picks an element of the base, and the pullback along it pulls a fiber $F$:
 \[
@@ -351,46 +358,58 @@ In a locally cartesian closed category, the base change functor has both the lef
 
 \section{Dependent Sum}
 
-In type theory, the dependent sum or the sigma type is defined as a pair of values in which the type of the second component depends on the value of the first component. Our counted vector can be thought of as a dependent sum consisting of a natural number \hask{n} paired with an n-tuple of \hask{a}.
+In type theory, the dependent sum, or the sigma type $\Sigma_{x : B} T(x)$, is defined as a pair in which the type of the second component depends on the value of the first component. Our counted vector can be thought of as a dependent sum consisting of a natural number \hask{n} paired with an element of an n-tuple \hask{(a, a, ... a)}.
 
-The introduction rule for the dependent sum assumes that there is a family of types $T(x)$ indexed by elements of some base type $B$. Then an element of $\Sigma_{x : B} T(x)$ is constructed from a pair of elements $x \colon B$ and $y \colon T(x)$. 
+The introduction rule for the dependent sum assumes that there is a family of types $T(x)$ indexed by elements of the base type $B$. Then an element of $\Sigma_{x : B} T(x)$ is constructed from a pair of elements $x \colon B$ and $y \colon T(x)$. 
 
-Categorically, dependent sum is modeled as the left adjoint of the base-change functor. To see this, let's first revisit the definition of a product. We've seen before that it can be written as a pullback from the terminal object. Here's the universal construction for the product/pullback (the weird notation anticipates the ultimate goal of this construction):
+Categorically, dependent sum is modeled as the left adjoint of the base-change functor. 
+
+To see this, let's first revisit the definition of a product. We've noticed before that a product can be written as a pullback from the terminal object. Here's the universal construction for the product/pullback (the weird notation anticipates the ultimate goal of this construction):
 \[
  \begin{tikzcd}
- G
+ S
  \arrow[dr, dashed, "\phi^T"]
  \arrow[drr, bend left, "\phi"]
  \arrow[ddr, bend right, "q"]
  \\
- &B' \times E
+ &B \times E
 \arrow[dr, phantom,  , very near start, "\lrcorner"]
  \arrow[r, "\pi_2"]
  \arrow[d, "\pi_1"']
  &E
  \arrow[d, "!"]
  \\
- &B'
+ &B
  \arrow[r, "!"]
  &1
   \end{tikzcd}
 \]
 
-We have also seen the product defined using an adjunction. We can spot the adjunction in this diagram: for every pair of arrows $\langle \phi, q \rangle$ there is a unique arrow $\phi^T$ that makes the triangles commute. 
+We have also seen that the product can be defined using an adjunction. We can spot this adjunction in our diagram: for every pair of arrows $\langle \phi, q \rangle$ there is a unique arrow $\phi^T$ that makes the triangles commute. 
 
-Notice that, if we keep $q$ fixed, we get a one-to-one correspondence between two arrows $\phi$ and $\phi^T$. 
+Notice that, if we keep $q$ fixed, we get a one-to-one correspondence between the arrows $\phi$ and $\phi^T$. 
 
-We can now put on our fibrational glasses on and notice that $\langle G, q\rangle$ and $\langle B' \times E, \pi_1 \rangle$ are two fibrations over the same base $B'$, and the commuting triangle makes $\phi^T$ a morphism in the slice category $\mathcal{C}/B'$. In other words $\phi^T$ is a member of the hom-set:
- \[ (\mathcal{C}/B')(\langle G, q \rangle, \langle B' \times E, \pi_1 \rangle)  \]
+We can now put on our fibrational glasses and notice that $\langle S, q\rangle$ and $\langle B \times E, \pi_1 \rangle$ are two fibrations over the same base $B$, and the commuting triangle makes $\phi^T$ a morphism in the slice category $\mathcal{C}/B$. In other words $\phi^T$ is a member of the hom-set:
+ \[ (\mathcal{C}/B)(\langle S, q \rangle, \langle B \times E, \pi_1 \rangle)  \]
  
- We can now rewrite the one-to-one correspondence between $\phi$ and $\phi^T$ as an isomorphism of hom-sets:
-\[ \mathcal{C}(G, E) \cong  (\mathcal{C}/B')(\langle G, q \rangle, \langle B' \times E, \pi_1 \rangle)\]
-In fact, it's an adjunction in which the left functor is the forgetful functor that maps $\langle G, q \rangle$ to $G$.
+ We can rewrite the one-to-one correspondence between $\phi$ and $\phi^T$ as an isomorphism of hom-sets:
+\[ \mathcal{C}(S, E) \cong  (\mathcal{C}/B)(\langle S, q \rangle, \langle B \times E, \pi_1 \rangle)\]
+In fact, it's an adjunction in which the left functor is the forgetful functor that maps $\langle S, q \rangle$ to $S$, thus forgetting the fibration.
 
-We can now generalize this diagram by replacing the terminal object with an arbitrary base $B$. We now have a fibration $\langle E, p \rangle$, and we get the pullback square that defines the base-change functor:
+If you squint at this adjunction hard enough, you can see the outlines of the definition of a categorical sum (coproduct). 
+
+On the left we have a mapping out of $S$, which we can interpret as a sum of fibers. These fibers are defined by the fibration $\langle S, q \rangle$. 
+
+Recall that the fibration $\langle B \times E, \pi_1 \rangle$ can be though of as a generalization of the diagonal functor, producing many copies of $E$ planted over $B$. Then the right hand side looks like a bunch of arrows, each mapping a different fiber of $S$ to a copy of $E$. 
+
+For comparison, this is the definition of a coproduct of two ``fibers'', $F_1$ and $F_2$:
+\[ \mathcal{C}(F_1 + F_2, E) \cong (\mathcal{C} \times \mathcal{C}) (\langle F_1, F_2 \rangle, \Delta E) \]
+A dependent sum is a sum of many such fibers.
+
+We can generalize our diagram by replacing the terminal object with an arbitrary base $B'$. We now have a fibration $\langle E, p \rangle$, and we get the pullback square that defines the base-change functor $f^*$:
 \[
  \begin{tikzcd}
- G
+ S
  \arrow[dr, dashed, "\phi^T"]
  \arrow[drr, bend left, "\phi"]
  \arrow[ddr, bend right, "q"]
@@ -402,38 +421,44 @@ We can now generalize this diagram by replacing the terminal object with an arbi
  &E
  \arrow[d, "p"]
  \\
- &B'
- \arrow[r, "f"]
  &B
+ \arrow[r, "f"]
+ &B'
   \end{tikzcd}
 \]
 
-\[ (\mathcal{C}/B) \big(\langle G, \Sigma_f q\rangle , \langle E, p\rangle \big)  \cong   (\mathcal{C}/B') (\langle G, q \rangle , \langle E', f^* p\rangle )\]
+The universality of the pullback results in the following adjunction:
+
+\[ (\mathcal{C}/B') \big(\langle S, \Sigma_f q\rangle , \langle E, p\rangle \big)  \cong   (\mathcal{C}/B) (\langle S, q \rangle , \langle E', f^* p\rangle )\]
+Here, $\phi$ is an element of the left-hand side and $\phi^T$ is the corresponding element of the right-hand side. They are morphisms in the corresponding slice categories:
+
 \[
 \begin{tikzcd}
- G
- \arrow[rr, "\phi^T"]
- \arrow[rd, "q"']
- && E'
- \arrow[ld, "f^* p"]
- \\
- & B'
-  \end{tikzcd}
- \hspace{20pt}
- \begin{tikzcd}
- G
+ S
  \arrow[rr, "\phi"]
  \arrow[rd, "\Sigma_f q"']
  &&E
  \arrow[dl, "p"]
  \\
- &B
+ &B'
+ \end{tikzcd}
+\hspace{20pt}
+ \begin{tikzcd}
+ S
+ \arrow[rr, "\phi^T"]
+ \arrow[rd, "q"']
+ && E'
+ \arrow[ld, "f^* p"]
+ \\
+ & B
   \end{tikzcd}
-\]
+ \]
+This adjunction defines the fibration $\Sigma_f$ as the left adjoint to the base-change functor. Because of all the commuting conditions, it is actually given by the simple formula:
+ \[ \Sigma_f q = f \circ q \]
 
-\[ \Sigma_f q = f \circ q \]
 
 
+We can extract individual components by first choosing $B$ to be the terminal object, and having the arrow $x \colon 1 \to B'$ select a single fiber in $E$. If we replace $S$ with the terminal object, we can select a point $y$ in this fibre. Then $\phi$ selects the corresponding element of $E$.
 \[
  \begin{tikzcd}
  1
@@ -442,6 +467,7 @@ We can now generalize this diagram by replacing the terminal object with an arbi
  \arrow[ddr, bend right, "id"']
  \\
  &F
+\arrow[dr, phantom,  , very near start, "\lrcorner"]
  \arrow[r, "g"]
  \arrow[d, "!"']
  &E
@@ -449,21 +475,27 @@ We can now generalize this diagram by replacing the terminal object with an arbi
  \\
  &1
  \arrow[r, "x"]
- &B
+ &B'
   \end{tikzcd}
 \]
 
-
-left adjoint to base-change functor
-
-proof by universal property of pullbacks
-
-terminal-object base picks a fiber
-
-terminal-object as bundle over termina-object base: picks en element of a given fiber
-
-
 \section{Dependent Product}
+
+In type theory, the dependent product, or dependent function, or pi-type, is defined as a function whose return type depends on the value of its argument. A simple example is a function that constructs a vector of a given size and fills it with copies of a given value:
+\begin{haskell}
+replicateV :: SNat n -> a -> Vec n a
+replicateV SZ _ = VNil
+replicateV (SS n) x = VCons x (replicateV n x)
+\end{haskell}
+
+At the time of this writing, Haskell's support for dependent types is limited, so the implementation of dependent functions requires the use of singleton types. In this case, the number that is the argument to \hask{replicateV} is passed as a singleton natural:
+\begin{haskell}
+data SNat n where
+  SZ :: SNat Z
+  SS :: SNat n -> SNat (S n)
+\end{haskell}
+
+
 
 \[
  \begin{tikzcd}
@@ -477,8 +509,50 @@ terminal-object as bundle over termina-object base: picks en element of a given 
   \end{tikzcd}
 \]
 
+\[
+ \begin{tikzcd}
+ G \times B
+ \arrow[d, "\phi^T \times B"']
+ \arrow[dr, "\phi"]
+ \\
+ S \times B
+ \arrow[dr, phantom,  , very near start, "\lrcorner"]
+\arrow[d, "\pi_2"]
+ \arrow[r, "\pi_1"]
+ & G
+ \arrow[d, "!"]
+ \\
+ B
+ \arrow[r, "!"]
+ &
+ 1
+  \end{tikzcd}
+\]
 
-Bundle $E/B$ (can be thought of as a sum of fibres).
+
+\[
+ \begin{tikzcd}
+ G
+ \arrow[d, dashed, "\phi^T"']
+ \arrow[dr, "\phi"]
+ \arrow[dd, bend right=55, "q"']
+ \\
+ E'
+ \arrow[dr, phantom,  , very near start, "\lrcorner"]
+\arrow[d, "f^* p"']
+ \arrow[r, "g"']
+ & E
+ \arrow[d, "p"]
+ \\
+ B'
+ \arrow[r, "f"]
+ &
+ B
+  \end{tikzcd}
+\]
+
+\[(\mathcal{C}/B)(\langle G, q \rangle, \langle S, \Pi_f \,g\rangle) \cong (\mathcal{C}/B') (\langle E', f^* p\rangle, \langle G, q \rangle) \]
+
 
 Family of sections $S$ of a bundle $E$ over $B$. Equipped with a projection $p \colon E \to B$.
 
@@ -498,7 +572,8 @@ $G \times B$ is a pullback from the terminal object
 \[
  \begin{tikzcd}
  G \times B
- \arrow[d, "\pi_2"]
+ \arrow[dr, phantom,  , very near start, "\lrcorner"]
+\arrow[d, "\pi_2"]
  \arrow[r, "\pi_1"]
  & G
  \arrow[d, "!"]
