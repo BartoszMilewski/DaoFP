@@ -16,7 +16,7 @@ The object $C$ takes the role of the focus on the left hand side; the object $A$
 
 On the left, $A$ is mapped to a product $A \times B$, and on the right, $C$ is exponentiated. 
 
-We can spot two functors at play. They are both parameterized by $B$. On the left we have the functor $(- \times B)$ acting on $A$. On the right we have the functor $(-)^B$ acting on $C$. 
+We can spot two functors at play. They are both parameterized by $B$. On the left we have the functor $(- \times B)$ applied to $A$. On the right we have the functor $(-)^B$ applied to $C$. 
 
 If we write these functors as:
 \[ L_B A = A \times B \]
@@ -24,6 +24,8 @@ If we write these functors as:
 then the natural isomorphism
 \[ \mathcal{C}(L_B A, C) \cong \mathcal{C}(A, R_B C) \]
 is called the adjunction between them. 
+
+In components, this isomorphism tells us that, given a mapping $\phi \in \mathcal{C}(L_B A, C)$, there is a unique mapping $\phi^T \in \mathcal{C}(A, R_B C)$ and vice versa. These mappings are sometimes called the \emph{transpose} of each other---the nomenclature taken from matrix algebra.
 
 The shorthand notation for the adjunction is $L \dashv R$. Substituting the product functor for $L$ and the exponential functor for $R$, we can write the currying adjunction concisely as:
 

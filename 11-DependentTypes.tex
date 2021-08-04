@@ -481,11 +481,11 @@ We can extract individual components by first choosing $B$ to be the terminal ob
 
 \section{Dependent Product}
 
-In type theory, the dependent product, or dependent function, or pi-type, is defined as a function whose return type depends on the value of its argument. A simple example is a function that constructs a vector of a given size and fills it with copies of a given value:
+In type theory, the dependent product, or dependent function, or pi-type $\Pi_{x:B} T(x)$, is defined as a function whose return type depends on the value of its argument. A simple example is a function that constructs a vector of a given size and fills it with copies of a given value:
 \begin{haskell}
-replicateV :: SNat n -> a -> Vec n a
-replicateV SZ _ = VNil
-replicateV (SS n) x = VCons x (replicateV n x)
+replicateV :: a -> SNat n -> Vec n a
+replicateV _ SZ  = VNil
+replicateV x (SS n) = VCons x (replicateV x n)
 \end{haskell}
 
 At the time of this writing, Haskell's support for dependent types is limited, so the implementation of dependent functions requires the use of singleton types. In this case, the number that is the argument to \hask{replicateV} is passed as a singleton natural:
@@ -494,13 +494,46 @@ data SNat n where
   SZ :: SNat Z
   SS :: SNat n -> SNat (S n)
 \end{haskell}
+(Note that \hask{replicateV} is a function of two arguments, so it can be either considered a dependent function of a pair, or a regular function returning a dependent function.)
 
+Before we describe the categorical model of dependent functions, it's instructive to look at sets. A dependent function selects one element from each member of the type family $T(x)$. 
 
+You may think of this selection as a large tuple---an element of the cartesian product that you get by multiplying together all the sets in the family. This is the meaning of the product notation, $\Pi_{x:B} T(x)$. In the trivial case of $B$ being a two-element set $\{1, 2\}$, we get the usual cartesian product $T(1) \times T(2)$. 
 
+In our example, \hask{replicateV} picks a particular counted vector for each value of \hask{n}. Counted vectors are equivalent to tuples so, for \hask{n} equal zero, \hask{replicateV} returns an empty tuple \hask{()}; for \hask{n} equals one it returns a single value \hask{x}; for \hask{n} equals two, it returns a pair \hask{(x, x)}; etc. 
+
+The function \hask{replicateV}, evaluated at \hask{x :: a},  is equivalent to an infinite tuple:
+\[ ((), x, (x, x), (x, x, x), ...) \]
+which is an element of the type:
+\[ ((), a, (a, a), (a, a, a), ...) \]
+
+In order to build a categorical model of dependent functions, we need to change our perspective from a family of types to a fibration. We start with a bundle $E/B$ that is fibered by the projection $p\colon E \to B$. A dependent function is called a \emph{section} of this bundle. If you visualize the bundle as a bunch of fibers sticking out from the base $B$, a section is like a haircut: it cuts through each fibre to produce a corresponding value. In physics, such sections are called fields---with spacetime as the base. 
+
+Just like we talked about a function object representing a set of functions, we can talk about an object that represents a set of sections of a given bundle. 
+
+Just like we defined function application as a mapping out of the product:
+\[\varepsilon_{B, C} \colon C^B \times B \to C\]
+we can define the dependent function application as a mapping:
+\[\varepsilon \colon S \times B \to E\]
+We can visualize it as taking a section out of $S$ and an element of the base $B$ and producing a value in the bundle $E$. But this time we have to insist that this value be in the correct fiber. If we project the result of $\varepsilon$ using $p$, we should get the same element of $B$ that was used in the product $S \times B$. In other words, this diagram should commute:
+\[
+ \begin{tikzcd}
+ S \times B 
+ \arrow[rr, "\varepsilon"]
+ \arrow[dr, "\pi_2"']
+ && E
+ \arrow[dl, "p"]
+ \\
+ &B
+  \end{tikzcd}
+\]
+That makes $\varepsilon$ a morphism in the slice category $\mathcal{C}/B$.
+
+And just like the exponential object was universal, so is the object of sections. The universality condition has the same form: for any other object $G$ with an arrow $\phi \colon G \times B \to E$ there is a unique arrow $\phi^T \colon G \to S$ that makes the following diagram commute:
 \[
  \begin{tikzcd}
  G \times B
- \arrow[d, "\phi^T \times B"']
+ \arrow[d, dashed, "\phi^T \times B"']
  \arrow[dr, "\phi"]
  \\
  S \times B
@@ -508,50 +541,90 @@ data SNat n where
  &E
   \end{tikzcd}
 \]
+The difference is that both $\varepsilon$ and $\phi$ are morphisms in the slice category $\mathcal{C}/B$. 
+
+The one-to-one correspondence between $\phi$ and $\phi^T$ forms an adjunction:
+\[(\mathcal{C}/B) (\langle G\times B, \pi_2\rangle , \langle E, p\rangle ) \cong \mathcal{C} (G, S) \]
+that can be used as a definition of the object of sections $S$. 
 
 \[
  \begin{tikzcd}
- G \times B
- \arrow[d, "\phi^T \times B"']
- \arrow[dr, "\phi"]
- \\
- S \times B
+& G \times B
  \arrow[dr, phantom,  , very near start, "\lrcorner"]
-\arrow[d, "\pi_2"]
- \arrow[r, "\pi_1"]
+ \arrow[ld, dashed, "\phi"']
+\arrow[d, "\pi_2"']
+ \arrow[r, "\pi_1"']
  & G
  \arrow[d, "!"]
+ \arrow[dd, bend left = 70, "\phi^T"]
  \\
- B
+ E
+  \arrow[r,  "p"']
+&B
  \arrow[r, "!"]
- &
- 1
+ &1
+ \\
+ & S \times B
+ \arrow[ur, phantom,  , very near start, "\urcorner"]
+ \arrow[u, "\pi_2"]
+ \arrow[r, "\pi_1"']
+ \arrow[ul, "\varepsilon"]
+ & S
+ \arrow[u, "!"]
   \end{tikzcd}
 \]
+
+\[
+ \begin{tikzcd}
+& E'
+ \arrow[dr, phantom,  , very near start, "\lrcorner"]
+ \arrow[ld, dashed, "\phi"']
+\arrow[d, "f^*q"']
+ \arrow[r, "g"']
+ & G
+ \arrow[d, "q"]
+ \arrow[dd, bend left = 70, "\phi^T"]
+ \\
+ E
+  \arrow[r,  "p"']
+&B
+ \arrow[r, "f"]
+ &B'
+ \\
+ & S \times B
+ \arrow[ur, phantom,  , very near start, "\urcorner"]
+ \arrow[u, "\pi_2"]
+ \arrow[r, "\pi_1"']
+ \arrow[ul, "\varepsilon"]
+ & S
+ \arrow[u, "\Pi_f\, p"]
+  \end{tikzcd}
+\]
+
 
 
 \[
  \begin{tikzcd}
- G
- \arrow[d, dashed, "\phi^T"']
- \arrow[dr, "\phi"]
- \arrow[dd, bend right=55, "q"']
- \\
- E'
+ E
+ \arrow[dr,  "p"']
+& E'
  \arrow[dr, phantom,  , very near start, "\lrcorner"]
-\arrow[d, "f^* p"']
+ \arrow[l, dashed, "\phi"']
+\arrow[d, "f^* q"']
  \arrow[r, "g"']
- & E
- \arrow[d, "p"]
+ & G
+ \arrow[d, "q"]
+ \arrow[r, "\phi^T"]
+ & S
+ \arrow[dl, "\Pi_f p"]
  \\
- B'
+ &B
  \arrow[r, "f"]
- &
- B
+ &B'
   \end{tikzcd}
 \]
 
-\[(\mathcal{C}/B)(\langle G, q \rangle, \langle S, \Pi_f \,g\rangle) \cong (\mathcal{C}/B') (\langle E', f^* p\rangle, \langle G, q \rangle) \]
+\[ (\mathcal{C}/B) (\langle E', f^* q \rangle, \langle E, p \rangle) \cong  (\mathcal{C}/B')(\langle G, q \rangle, \langle S, \Pi_f \,p\rangle) \]
 
 
 Family of sections $S$ of a bundle $E$ over $B$. Equipped with a projection $p \colon E \to B$.
