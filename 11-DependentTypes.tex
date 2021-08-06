@@ -125,7 +125,7 @@ Now forget about sets. A \emph{fibration} in an arbitrary category is a pair of 
 So this is really just an arrow, but the context is everything. When an arrow is called a fibration, we use the intuition from sets, and imagine its source $E$ as a collection of fibers, with $p$ projecting each fiber down to a single point in the base $B$. 
 
 We will therefore model type families as fibrations. For instance, our counted-vector family can be represented as a fibration whose base is the type of natural numbers. The whole family is a sum (coproduct) of consecutive powers (products) of $A$:
-\[ E = \coprod_{n\colon \mathbb{N}} A^n \]
+\[ E = A^0 + A^1 + A^2 + ... = \coprod_{n\colon \mathbb{N}} A^n \]
 with the zeroth power---the initial object---representing a vector of size zero.
 \[
 \begin{tikzpicture}
@@ -160,7 +160,7 @@ with the zeroth power---the initial object---representing a vector of size zero.
 \end{tikzpicture}
 \]
 
-The projection $p$ is a mapping out of a sum, so it can be defined as a product of individual mappings $A^n \to \mathbb{N}$, each assigning the number corresponding to the power to which $A$ was raised.
+The projection $p$ is a mapping out of a sum, so it can be defined as a product of individual mappings $A^n \to \mathbb{N}$, each assigning the number corresponding to the power to which $A$ was raised to get the corresponding counted vector.
 
 \subsection{Slice categories}
 
@@ -190,7 +190,7 @@ Again, the best way to visualize this is to notice that such an arrow maps fiber
 
  Let's start with a particular fibration $p \colon E \to B$ and ask ourselves the question: what happens when we change the base from $B$ to some $B'$ that is related to it through a mapping $f \colon B' \to B$. Can we ``pull the fibres back'' along $f$? 
  
- Again, let's think about sets first. Imagine picking a fibre in $E$ over some point $y \in B$. We can plant this fibre over all points in $B'$ that are in the inverse image $f^{-1} y$. If multiple points in $B'$ are mapped to the same point in $B$, we just duplicate the corresponding fiber. This way, every point in $B'$ will have a fiber sticking out of it. The union of all these fibers will form a new bundle $E'$.
+ Again, let's think about sets first. Imagine picking a fibre in $E$ over some point $y \in B$ that is in the image of $f$. We can plant this fibre over all points in $B'$ that are in the inverse image $f^{-1} y$. If multiple points in $B'$ are mapped to the same point in $B$, we just duplicate the corresponding fiber. This way, every point in $B'$ will have a fiber sticking out of it. The union of all these fibers will form a new bundle $E'$.
 
 \[
 \begin{tikzpicture}
@@ -234,7 +234,7 @@ Again, the best way to visualize this is to notice that such an arrow maps fiber
 \end{tikzpicture}
 \]
 
-We have thus constructed a new fibration with the base $B'$. Its projection $p' \colon E' \to B'$ maps each point in a given fibre to the point over which this fibre was planted. There is also a natural mapping $g \colon E' \to E$ that maps fibers to their corresponding fibres. 
+We have thus constructed a new fibration with the base $B'$. Its projection $p' \colon E' \to B'$ maps each point in a given fibre to the point over which this fibre was planted. There is also an obvious mapping $g \colon E' \to E$ that maps fibers to their corresponding fibers. 
 
 By construction, this new fibration $\langle E', p'\rangle$ satisfies the condition:
 \[ p \circ g = f \circ p' \]
@@ -253,7 +253,7 @@ which can be represented as a commuting square:
   \end{tikzcd}
 \]
 
-In  $\mathbf{Set}$, we can explicitly construct $E'$ as a subset of the cartesian product $B' \times E$ with $p' = \pi_1$ and $g = \pi_2$ (the two cartesian projections). An element of $E'$ is a pair $\langle b, e \rangle$, and the commuting condition is the equation:
+In  $\mathbf{Set}$, we can explicitly construct $E'$ as a \emph{subset} of the cartesian product $B' \times E$ with $p' = \pi_1$ and $g = \pi_2$ (the two cartesian projections). An element of $E'$ is a pair $\langle b, e \rangle$, such that:
 \[ f (b) = p (e) \]
 
 This commuting square is the starting point for the categorical generalization. However, even in $\mathbf{Set}$ there are many different fibrations over $B'$ that make this diagram commute. We have to pick the universal one. Such a universal construction is called a \emph{pullback}, or a \emph{fibered product}.
@@ -284,11 +284,11 @@ The angle symbol in the corner of the square is used to mark pullbacks.
 
 If we look at the pullback through the prism of fibrations, $E$ is a bundle over $B$, and we are constructing a new bundle $E'$ out of the fibers taken from $E$. Where we plant these fibers over $B'$ is determined by (the inverse image of) $f$. This procedure makes $E'$ a bundle over both $B'$ and $B$, the latter with the projection $p \circ g = f \circ p'$. 
 
-$G$ in this picture is some other bundle over $B'$ with the projection $q$. It is simultaneously a bundle over $B$ with the projection $f \circ q = p \circ q'$. The unique mapping $h$ maps the fibers of $G$ given by $q^{-1}$ to the fibers of $E'$ given by $p'$. 
+$G$ in this picture is some other bundle over $B'$ with the projection $q$. It is simultaneously a bundle over $B$ with the projection $f \circ q = p \circ q'$. The unique mapping $h$ maps the fibers of $G$ given by $q^{-1}$ to fibers of $E'$ given by $p'$. 
 
 All mappings in this picture work on fibers. Some of them rearrange fibers over new bases---that's what a pullback does. This is analogous to what natural transformations do to containers. Others modify individual fibers---the mapping $h \colon G \to E'$ works like this. This is analogous to what \hask{fmap} does to containers. The universal condition then tells us that $q'$ can be factored into a transformation of fibers $h$, followed by the rearrangement $g$.
 
-It's worth noting that picking the terminal object as the pullback target gives us the definition of the categorical product:
+It's worth noting that picking the terminal object as the pullback target gives us automatically the definition of the categorical product:
 \[
  \begin{tikzcd}
  B \times E
@@ -305,9 +305,9 @@ It's worth noting that picking the terminal object as the pullback target gives 
   \end{tikzcd}
 \]
 
-Alternatively, we can think of this as a generalization of the diagonal functor. Normally, the diagonal functor $\Delta E$ would duplicate $E$. Here, you can imagine $\pi_1$ fibrating $B\times E$ into as many copies of $E$ as there are elements in $B$. We'll use this analogy when we talk about the dependent sum.
+Alternatively, we can think of this picture as a generalization of the diagonal functor. Normally, the diagonal functor $\Delta E$ would duplicate $E$. Here, you can imagine $\pi_1$ fibrating $B\times E$ into as many copies of $E$ as there are elements in $B$. We'll use this analogy when we talk about the dependent sum and product.
 
-Conversely, a single fiber can be extracted from a fibration by pulling it back to the terminal object. In this case the mapping $x \colon 1 \to B$ picks an element of the base, and the pullback along it pulls a fiber $F$:
+Conversely, a single fiber can be extracted from a fibration by pulling it back to the terminal object. In this case the mapping $x \colon 1 \to B$ picks an element of the base, and the pullback along it extracts a single fiber $F$:
 \[
  \begin{tikzcd}
  F
@@ -353,18 +353,18 @@ Given two slice categories $\mathcal{C}/B'$ and $\mathcal{C}/B$ and an arrow bet
 \]
 Notice that the functor $f^*$ goes in the opposite direction to the arrow $f$.
 
-In a locally cartesian closed category, the base change functor has both the left and the right adjoints. The left adjoint is called the dependent sum, and the right adjoint is called the dependent product.
+In a locally cartesian closed category, the base change functor has both the left and the right adjoints. The left adjoint is called the dependent sum, and the right adjoint is called the dependent product (or dependent function).
 
 
 \section{Dependent Sum}
 
-In type theory, the dependent sum, or the sigma type $\Sigma_{x : B} T(x)$, is defined as a pair in which the type of the second component depends on the value of the first component. Our counted vector can be thought of as a dependent sum consisting of a natural number \hask{n} paired with an element of an n-tuple \hask{(a, a, ... a)}.
+In type theory, the dependent sum, or the sigma type $\Sigma_{x : B} T(x)$, is defined as a type of pair in which the type of the second component depends on the value of the first component. Our counted vector type can be thought of as a dependent sum. An element of this type is a natural number \hask{n} paired with an element of an n-tuple \hask{(a, a, ... a)}.
 
 The introduction rule for the dependent sum assumes that there is a family of types $T(x)$ indexed by elements of the base type $B$. Then an element of $\Sigma_{x : B} T(x)$ is constructed from a pair of elements $x \colon B$ and $y \colon T(x)$. 
 
 Categorically, dependent sum is modeled as the left adjoint of the base-change functor. 
 
-To see this, let's first revisit the definition of a product. We've noticed before that a product can be written as a pullback from the terminal object. Here's the universal construction for the product/pullback (the weird notation anticipates the ultimate goal of this construction):
+To see this, let's first revisit the definition of a product. We've noticed before that a product can be written as a pullback from the terminal object. Here's the universal construction for the product/pullback (the weird notation anticipates the ultimate target of this construction):
 \[
  \begin{tikzcd}
  S
@@ -389,16 +389,16 @@ We have also seen that the product can be defined using an adjunction. We can sp
 
 Notice that, if we keep $q$ fixed, we get a one-to-one correspondence between the arrows $\phi$ and $\phi^T$. 
 
-We can now put on our fibrational glasses and notice that $\langle S, q\rangle$ and $\langle B \times E, \pi_1 \rangle$ are two fibrations over the same base $B$, and the commuting triangle makes $\phi^T$ a morphism in the slice category $\mathcal{C}/B$. In other words $\phi^T$ is a member of the hom-set:
- \[ (\mathcal{C}/B)(\langle S, q \rangle, \langle B \times E, \pi_1 \rangle)  \]
+We can now put our fibrational glasses on and notice that $\langle S, q\rangle$ and $\langle B \times E, \pi_1 \rangle$ are two fibrations over the same base $B$, and the commuting triangle makes $\phi^T$ a morphism in the slice category $\mathcal{C}/B$. In other words $\phi^T$ is a member of the hom-set:
+ \[ (\mathcal{C}/B) \left(\left \langle {S \atop q} \right \rangle, \left \langle {B \times E \atop \pi_1} \right \rangle \right)  \]
  
  We can rewrite the one-to-one correspondence between $\phi$ and $\phi^T$ as an isomorphism of hom-sets:
-\[ \mathcal{C}(S, E) \cong  (\mathcal{C}/B)(\langle S, q \rangle, \langle B \times E, \pi_1 \rangle)\]
+\[ \mathcal{C}(S, E) \cong  (\mathcal{C}/B)\left(\left \langle {S \atop q} \right \rangle, \left \langle {B \times E \atop \pi_1} \right \rangle \right)\]
 In fact, it's an adjunction in which the left functor is the forgetful functor that maps $\langle S, q \rangle$ to $S$, thus forgetting the fibration.
 
 If you squint at this adjunction hard enough, you can see the outlines of the definition of a categorical sum (coproduct). 
 
-On the left we have a mapping out of $S$, which we can interpret as a sum of fibers. These fibers are defined by the fibration $\langle S, q \rangle$. 
+On the left we have a mapping out of $S$. Think of $S$ as a sum of fibers that are defined by the fibration $\langle S, q \rangle$. 
 
 Recall that the fibration $\langle B \times E, \pi_1 \rangle$ can be though of as a generalization of the diagonal functor, producing many copies of $E$ planted over $B$. Then the right hand side looks like a bunch of arrows, each mapping a different fiber of $S$ to a copy of $E$. 
 
@@ -429,8 +429,8 @@ We can generalize our diagram by replacing the terminal object with an arbitrary
 
 The universality of the pullback results in the following adjunction:
 
-\[ (\mathcal{C}/B') \big(\langle S, \Sigma_f q\rangle , \langle E, p\rangle \big)  \cong   (\mathcal{C}/B) (\langle S, q \rangle , \langle E', f^* p\rangle )\]
-Here, $\phi$ is an element of the left-hand side and $\phi^T$ is the corresponding element of the right-hand side. They are morphisms in the corresponding slice categories:
+\[ (\mathcal{C}/B') \left( \left \langle {S \atop \Sigma_f q } \right \rangle , \left \langle {E \atop p} \right \rangle \right)  \cong   (\mathcal{C}/B) \left( \left \langle {S \atop q} \right \rangle , \left \langle {E' \atop f^* p} \right \rangle \right)\]
+where $ \Sigma_f q = f \circ q $. Here, $\phi$ is an element of the left-hand side and $\phi^T$ is the corresponding element of the right-hand side. They are morphisms in the corresponding slice categories:
 
 \[
 \begin{tikzcd}
@@ -453,31 +453,12 @@ Here, $\phi$ is an element of the left-hand side and $\phi^T$ is the correspondi
  & B
   \end{tikzcd}
  \]
-This adjunction defines the fibration $\Sigma_f$ as the left adjoint to the base-change functor. Because of all the commuting conditions, it is actually given by the simple formula:
- \[ \Sigma_f q = f \circ q \]
+This adjunction defines the fibration $\Sigma_f$ as the left adjoint to the base-change functor. 
+
+\subsection{Existential quantification}
 
 
 
-We can extract individual components by first choosing $B$ to be the terminal object, and having the arrow $x \colon 1 \to B'$ select a single fiber in $E$. If we replace $S$ with the terminal object, we can select a point $y$ in this fibre. Then $\phi$ selects the corresponding element of $E$.
-\[
- \begin{tikzcd}
- 1
- \arrow[dr, dashed, "y"]
- \arrow[drr, bend left, "\phi"]
- \arrow[ddr, bend right, "id"']
- \\
- &F
-\arrow[dr, phantom,  , very near start, "\lrcorner"]
- \arrow[r, "g"]
- \arrow[d, "!"']
- &E
- \arrow[d, "p"]
- \\
- &1
- \arrow[r, "x"]
- &B'
-  \end{tikzcd}
-\]
 
 \section{Dependent Product}
 
@@ -507,15 +488,19 @@ The function \hask{replicateV}, evaluated at \hask{x :: a},  is equivalent to an
 which is an element of the type:
 \[ ((), a, (a, a), (a, a, a), ...) \]
 
-In order to build a categorical model of dependent functions, we need to change our perspective from a family of types to a fibration. We start with a bundle $E/B$ that is fibered by the projection $p\colon E \to B$. A dependent function is called a \emph{section} of this bundle. If you visualize the bundle as a bunch of fibers sticking out from the base $B$, a section is like a haircut: it cuts through each fibre to produce a corresponding value. In physics, such sections are called fields---with spacetime as the base. 
+In order to build a categorical model of dependent functions, we need to change our perspective from a family of types to a fibration. We start with a bundle $E/B$ fibered by the projection $p\colon E \to B$. A dependent function is called a \emph{section} of this bundle. 
 
-Just like we talked about a function object representing a set of functions, we can talk about an object that represents a set of sections of a given bundle. 
+If you visualize the bundle as a bunch of fibers sticking out from the base $B$, a section is like a haircut: it cuts through each fibre to produce a corresponding value. In physics, such sections are called fields---with spacetime as the base. 
 
-Just like we defined function application as a mapping out of the product:
+Just like we talked about a function object representing a set of functions, we can talk about an object $S$ that represents a set of sections of a given bundle. 
+
+And just like we defined function application as a mapping out of the product:
 \[\varepsilon_{B, C} \colon C^B \times B \to C\]
 we can define the dependent function application as a mapping:
 \[\varepsilon \colon S \times B \to E\]
-We can visualize it as taking a section out of $S$ and an element of the base $B$ and producing a value in the bundle $E$. But this time we have to insist that this value be in the correct fiber. If we project the result of $\varepsilon$ using $p$, we should get the same element of $B$ that was used in the product $S \times B$. In other words, this diagram should commute:
+We can visualize it as picking a section in $S$ and an element of the base $B$ and producing a value in the bundle $E$. 
+
+But this time we have to insist that this value be in the correct fiber. If we project the result of $\varepsilon$ using $p$, we should get the same element of $B$ that was used in the product $S \times B$. In other words, this diagram should commute:
 \[
  \begin{tikzcd}
  S \times B 
@@ -541,107 +526,79 @@ And just like the exponential object was universal, so is the object of sections
  &E
   \end{tikzcd}
 \]
-The difference is that both $\varepsilon$ and $\phi$ are morphisms in the slice category $\mathcal{C}/B$. 
+The difference is that now both $\varepsilon$ and $\phi$ are morphisms in the slice category $\mathcal{C}/B$. 
 
 The one-to-one correspondence between $\phi$ and $\phi^T$ forms an adjunction:
-\[(\mathcal{C}/B) (\langle G\times B, \pi_2\rangle , \langle E, p\rangle ) \cong \mathcal{C} (G, S) \]
-that can be used as a definition of the object of sections $S$. 
+\[(\mathcal{C}/B) \left( \left \langle {G\times B \atop \pi_2} \right \rangle , \left \langle {E \atop p } \right \rangle \right) \cong \mathcal{C} (G, S) \]
+which can be seen as the definition of the object of sections $S$. 
 
-\[
- \begin{tikzcd}
-& G \times B
- \arrow[dr, phantom,  , very near start, "\lrcorner"]
- \arrow[ld, dashed, "\phi"']
-\arrow[d, "\pi_2"']
- \arrow[r, "\pi_1"']
- & G
- \arrow[d, "!"]
- \arrow[dd, bend left = 70, "\phi^T"]
- \\
- E
-  \arrow[r,  "p"']
-&B
- \arrow[r, "!"]
- &1
- \\
- & S \times B
- \arrow[ur, phantom,  , very near start, "\urcorner"]
- \arrow[u, "\pi_2"]
- \arrow[r, "\pi_1"']
- \arrow[ul, "\varepsilon"]
- & S
- \arrow[u, "!"]
-  \end{tikzcd}
-\]
-
-\[
- \begin{tikzcd}
-& E'
- \arrow[dr, phantom,  , very near start, "\lrcorner"]
- \arrow[ld, dashed, "\phi"']
-\arrow[d, "f^*q"']
- \arrow[r, "g"']
- & G
- \arrow[d, "q"]
- \arrow[dd, bend left = 70, "\phi^T"]
- \\
- E
-  \arrow[r,  "p"']
-&B
- \arrow[r, "f"]
- &B'
- \\
- & S \times B
- \arrow[ur, phantom,  , very near start, "\urcorner"]
- \arrow[u, "\pi_2"]
- \arrow[r, "\pi_1"']
- \arrow[ul, "\varepsilon"]
- & S
- \arrow[u, "\Pi_f\, p"]
-  \end{tikzcd}
-\]
-
+Recall that we can interpret the product $G \times B$ as a generalization of the diagonal functor. It takes copies of $G$ and plants them as identical fibers over each element of $B$. Fixing an element of $G$ means slicing horizontally through $G \times B$. The left hand side of the adjunction maps this slice to a section of $E$.
 
 
 \[
- \begin{tikzcd}
- E
- \arrow[dr,  "p"']
-& E'
- \arrow[dr, phantom,  , very near start, "\lrcorner"]
- \arrow[l, dashed, "\phi"']
-\arrow[d, "f^* q"']
- \arrow[r, "g"']
- & G
- \arrow[d, "q"]
- \arrow[r, "\phi^T"]
- & S
- \arrow[dl, "\Pi_f p"]
- \\
- &B
- \arrow[r, "f"]
- &B'
-  \end{tikzcd}
+\begin{tikzpicture}
+\def\dy{0.2};
+\def\yb{0};
+\def\yt{10 * \dy}; 
+
+\def\dx{0.4};
+\def\xl{-2};
+\def\xr{1};
+
+\filldraw[fill=blue!50!green!20, draw=white] (\xl, \yb) rectangle (\xl + 4 * \dx, \yt);
+\draw (\xl, \yb) -- (\xl, \yt);
+\draw (\xl + \dx, \yb) -- (\xl + \dx, \yt);
+\draw (\xl + 2 * \dx, \yb) -- (\xl + 2 * \dx, \yt);
+\draw (\xl + 3 * \dx, \yb) -- (\xl + 3 * \dx, \yt);
+\draw (\xl + 4 * \dx, \yb) -- (\xl + 4 * \dx, \yt);
+\node[below] at (\xl + 2 * \dx, \yb) {$B$};
+\node[left] at (\xl, 5 * \dy) {$G$};
+
+\def\a{2* \dy}
+\def\b{6* \dy}
+\def\c{4* \dy}
+\def\d{12* \dy}
+\def\e{10* \dy}
+
+
+\draw[fill=orange!30, draw=white] (\xr, \yb) -- (\xr, \a) -- (\xr + 1 * \dx, \b) -- (\xr + 2 * \dx, \c) -- (\xr + 3 * \dx, \d) -- (\xr + 4 * \dx, \e) -- (\xr + 4 * \dx, \yb) -- cycle;
+
+
+\draw (\xr, \yb) -- (\xr, \a);
+\draw (\xr + \dx, \yb) -- (\xr + \dx, \b);
+\draw (\xr + 2 * \dx, \yb) -- (\xr + 2 * \dx, \c);
+\draw (\xr + 3 * \dx, \yb) -- (\xr + 3 * \dx, \d);
+\draw (\xr + 4 * \dx, \yb) -- (\xr + 4 * \dx, \e);
+
+\node[below] at (\xr + 2 * \dx, \yb) {$B$};
+\node[above] at (\xr + 1 * \dx, 8 * \dy) {$E$};
+
+\draw[dashed] (\xr, \a -\dy ) -- (\xr + 1 * \dx, \b - 5 * \dy) -- (\xr + 2 * \dx, \c - \dy) -- (\xr + 3 * \dx, \d - 4*\dy) -- (\xr + 4 * \dx, \e - 3*\dy);
+
+
+\filldraw[black] (\xl + 3 * \dx, \yb + 4* \dy) circle (1 pt);
+\filldraw[black] (\xr + 3 * \dx, \yb + 8* \dy) circle (1 pt);
+
+\draw[->] ((\xl + 3 * \dx, \yb + 4* \dy) -- (\xr + 3 * \dx, \yb + 8* \dy);
+
+\draw[dashed] (\xl, \yb + 4* \dy) -- (\xl + 4* \dx, \yb + 4* \dy);
+
+\end{tikzpicture}
 \]
 
-\[ (\mathcal{C}/B) (\langle E', f^* q \rangle, \langle E, p \rangle) \cong  (\mathcal{C}/B')(\langle G, q \rangle, \langle S, \Pi_f \,p\rangle) \]
+An element of the right hand side of the adjunction takes an element of $G$ and maps it to an element of $S$. Thus elements of $S$ are in one-to-one correspondence with section of $E$.
 
+These are all set-theoretical intuitions. We can generalize them by first noticing that the right hand side of the adjunction can be trivially expressed as a hom-set in the slice category $\mathcal{C}/1$ over the terminal object. 
 
-Family of sections $S$ of a bundle $E$ over $B$. Equipped with a projection $p \colon E \to B$.
+There is one-to-one correspondence between objects $X$ in $\mathcal{C}$ and objects $\langle X, ! \rangle$ in  $\mathcal{C}/1$. Arrows in $\mathcal{C}/1$ are just the arrows of $\mathcal{C}$ with no additional constraints. We therefore have:
+\[(\mathcal{C}/B) \left( \left \langle {G\times B \atop \pi_2} \right \rangle , \left \langle {E \atop p } \right \rangle \right) \cong (\mathcal{C}/1)  \left( \left \langle {G \atop !} \right \rangle , \left \langle {S \atop ! } \right \rangle \right)  \]
 
-Evaluation map $\varepsilon \colon S \times B \to E$ must commute with projection, so it's an arrow in $\mathbf{Set}/B$.
+The next step is to ``blur the focus'' by replacing the terminal object with a more general base $B'$. 
 
-Universal property: For any other set $G$ and a mapping in $\mathbf{Set}/B$,  $\phi \colon G \times B \to E$, there is a unique mapping $\phi^T \colon G \to S$ that makes things commute.
+The right-hand side becomes a hom-set in the slice category $\mathcal{C}/B'$ and $G$ gets fibrated by some $q \colon G \to B'$. 
 
-\[\mathbf{Set} (G, S) \cong (\mathbf{Set}/B)(\langle G\times B, \pi_2\rangle , \langle E, p\rangle ) \]
-\[\pi_2 \colon G \times B \to B \]
-\[p \colon E \to B \]
+We can then replace the product $G \times B$ with a more general pullback of $q$ along some $f \colon B \to B'$.
 
-this can be written as:
-
-\[(\mathbf{Set}/1) (\langle G, !\rangle , \langle S, !\rangle ) \cong (\mathbf{Set}/B)(\langle G\times B, \pi_2\rangle , \langle E, p\rangle )  \]
-
-$G \times B$ is a pullback from the terminal object
 \[
  \begin{tikzcd}
  G \times B
@@ -655,16 +612,112 @@ $G \times B$ is a pullback from the terminal object
  \arrow[r, "!"]
  &
  1
-  \end{tikzcd}
+ \end{tikzcd}
+ \hspace{20pt}
+\begin{tikzpicture}
+\draw[->] (0, 0) -- (1, 0);
+\end{tikzpicture}
+ \hspace{20pt}
+ \begin{tikzcd}
+ G'
+\arrow[dr, phantom,  , very near start, "\lrcorner"]
+ \arrow[d, "f^*q"']
+ \arrow[r, "g"]
+ & G
+ \arrow[d, "q"]
+ \\
+ B
+ \arrow[r, "f"]
+ &B'
+\end{tikzcd}
 \]
 
-Given $f \colon B \to B'$, we have the base-changer functor $f^* \colon \mathcal{C}/B' \to \mathcal{C}/B$.
+The result is that instead of a bunch of $G$ fibers over $B$, we get a pullback $G'$ that is populated by groups of fibers from the fibration $q \colon G \to B'$. 
 
-$\Pi_f \colon \mathcal{C}/B \to \mathcal{C}/B'$ is right adjoint to $f^*$
-
-\[(\mathcal{C}/B')(\langle G, q \rangle, \langle S, \Pi_f \,p\rangle) \cong (\mathcal{C}/B) (\langle G', f^* q\rangle, \langle E, p \rangle) \]
+Imagine, for instance, that $B'$ is a two-element set. The fibration $q$ will split $G$ into two fibers. These fibers will be replanted over $B$ to form $G'$. The replanting is guided by $f^{-1}$. 
 
 \[
+\begin{tikzpicture}
+\def\xmin{-4};
+
+\def\dy{0.2};
+\def\yb{0};
+\def\yt{10 * \dy}; 
+
+\def\dx{0.4};
+\def\xl{-2};
+\def\xr{1};
+
+\filldraw[fill=blue!50!green!20, draw=white] (\xmin, \yb) rectangle (\xmin + \dx, \yt - 2*\dy);
+\filldraw[fill=red!50!green!20, draw=white] (\xmin + \dx, \yb) rectangle (\xmin + 2 * \dx, \yt);
+\draw (\xmin, \yb) -- (\xmin, \yt - 2*\dy);
+\draw (\xmin + \dx, \yb) -- (\xmin+ \dx, \yt);
+\draw (\xmin + 2 * \dx, \yb) -- (\xmin + 2 * \dx, \yt);
+\node[below] (BB) at (\xmin + \dx, \yb) {$B'$};
+\node[above] at (\xmin + \dx, 10 * \dy) {$G$};
+
+
+
+\filldraw[fill=blue!50!green!20, draw=white] (\xl, \yb) rectangle (\xl + 4 * \dx, \yt - 2*\dy);
+\filldraw[fill=red!50!green!20, draw=white] (\xl + \dx, \yb) rectangle (\xl + 3 * \dx, \yt);
+\draw (\xl, \yb) -- (\xl, \yt - 2*\dy);
+\draw (\xl + \dx, \yb) -- (\xl + \dx, \yt);
+\draw (\xl + 2 * \dx, \yb) -- (\xl + 2 * \dx, \yt);
+\draw (\xl + 3 * \dx, \yb) -- (\xl + 3 * \dx, \yt - 2*\dy);
+\draw (\xl + 4 * \dx, \yb) -- (\xl + 4 * \dx, \yt - 2*\dy);
+\node[below] (B) at (\xl + 2 * \dx, \yb) {$B$};
+\node[above] at (\xl + \dx, 10 * \dy) {$G'$};
+
+\draw[->]  (B) -- (BB) node [midway, below] {$f$};
+
+\def\a{2* \dy}
+\def\b{6* \dy}
+\def\c{4* \dy}
+\def\d{12* \dy}
+\def\e{10* \dy}
+
+
+\draw[fill=orange!30, draw=white] (\xr, \yb) -- (\xr, \a) -- (\xr + 1 * \dx, \b) -- (\xr + 2 * \dx, \c) -- (\xr + 3 * \dx, \d) -- (\xr + 4 * \dx, \e) -- (\xr + 4 * \dx, \yb) -- cycle;
+
+
+\draw (\xr, \yb) -- (\xr, \a);
+\draw (\xr + \dx, \yb) -- (\xr + \dx, \b);
+\draw (\xr + 2 * \dx, \yb) -- (\xr + 2 * \dx, \c);
+\draw (\xr + 3 * \dx, \yb) -- (\xr + 3 * \dx, \d);
+\draw (\xr + 4 * \dx, \yb) -- (\xr + 4 * \dx, \e);
+
+\node[below] at (\xr + 2 * \dx, \yb) {$B$};
+\node[above] at (\xr + 1 * \dx, 8 * \dy) {$E$};
+
+\draw[dashed] (\xr, \a -\dy ) -- (\xr + 1 * \dx, \b - 5 * \dy) -- (\xr + 2 * \dx, \c - \dy) -- (\xr + 3 * \dx, \d - 4*\dy) -- (\xr + 4 * \dx, \e - 3*\dy);
+
+
+\filldraw[black] (\xl + 3 * \dx, \yb + 4* \dy) circle (1 pt);
+\filldraw[black] (\xr + 3 * \dx, \yb + 8* \dy) circle (1 pt);
+
+\draw[->] ((\xl + 3 * \dx, \yb + 4* \dy) -- (\xr + 3 * \dx, \yb + 8* \dy);
+
+\draw[dashed] (\xl, \yb + 4* \dy) -- (\xl + 4* \dx, \yb + 4* \dy);
+
+\end{tikzpicture}
+\]
+
+The adjunction that defines the dependent function type is therefore:
+\[ (\mathcal{C}/B) \left( \left \langle {G' \atop f^* q} \right \rangle, \left \langle {E \atop p} \right \rangle \right) \cong  (\mathcal{C}/B')\left( \left \langle {G \atop q} \right \rangle, \left \langle {S \atop \Pi_f \,p } \right \rangle \right) \]
+as a mapping between morphisms in their respective slice categories:
+
+
+\[
+ \begin{tikzcd}
+ G'
+ \arrow[rr, "\phi"]
+ \arrow[rd, "f^* q"']
+ &&E
+ \arrow[dl, "p"]
+ \\
+ &B
+ \end{tikzcd}
+ \hspace{20pt}
 \begin{tikzcd}
  G
  \arrow[rr, "\phi^T"]
@@ -674,63 +727,10 @@ $\Pi_f \colon \mathcal{C}/B \to \mathcal{C}/B'$ is right adjoint to $f^*$
  \\
  & B'
   \end{tikzcd}
- \hspace{20pt}
- \begin{tikzcd}
- G'
- \arrow[rr, "\phi"]
- \arrow[rd, "f^* q"']
- &&E
- \arrow[dl, "p"]
- \\
- &B
-  \end{tikzcd}
 \]
 
-\[
-\begin{tikzpicture}
-\def\dy{0.6};
-\def\ybl{0}; % base left
-\def\ybm{\dy}; % base middle
-\def\ybr{2*\dy}; % base right
 
-\def\dx{0.6};
-\def\xbl{0};
-\def\xbm{\dx};
-\def\xbr{2*\dx};
-
-\draw (\xbl, \ybl) -- (\xbr, \ybr);
-\filldraw[black] (\xbm, \ybm) circle (1 pt);
-
-
-
-\def\x{0};
-\def\xl{-1.5};
-\def\xr{1.5};
-
-
-\def \ya{0.8};
-\def \yb{1.7};
-\def \yc{2.6};
-\def \yt {2.3};
-
-\filldraw[fill=blue!50!green!20, draw=white] (\xl, \ya) rectangle (\x, \yc);
-\filldraw[fill=orange!30, draw=white] (\x, \ya) rectangle (\xr, \yc);
-
-\node[below] (a) at (\x, \ya) {$F$};
-\node(b) at (\x, \yb) {};
-\node [above] (c) at (\x, \yc) {$G$};
-
-\node(l)[right] at (\xl, \yt) {$\mathcal{C}$};
-\node(r)[left] at (\xr, \yt) {$\mathcal{D}$};
-
-
-\filldraw[black] (b) circle (1 pt);
-\node [left] at (b) {$\alpha$};
-
-\draw (a)  -- (c);
-
-\end{tikzpicture}
-\]
+\subsection{Universal quantification}
 
 \section{Equality}
 
@@ -755,11 +755,11 @@ equal Z Z = True
 equal (S m) (S n) = equal m n
 equal _ _ = False
 \end{haskell}
-We are recursively stripping $S$'s in each number until one of them reaches $Z$. If the other reaches $Z$ at the same time, the numbers were equal, otherwise they were not. 
+We are recursively stripping $S$'s in each number until one of them reaches $Z$. If the other reaches $Z$ at the same time, the numbers we started with were equal, otherwise they were not. 
 
 \subsection{Equational reasoning}
 
-Notice that when defining equality we were already using the equal sign. For instance, the equal sign in:
+Notice that, when defining equality, we were already using the equal sign. For instance, the equal sign in:
 \begin{haskell}
 equal Z Z = True
 \end{haskell}
@@ -779,15 +779,19 @@ We can now use the definition of \hask{add} to simplify this expression. We try 
 \begin{haskell}
 add (S Z) (S Z) = S (add (S Z) Z)
 \end{haskell}
-In this expression we can perform another substitution of equals:
+In this expression we can perform another substitution of equals using the first clause of the definition of \hask{add}:
 \begin{haskell}
-add (S Z) Z = S Z
+add (S Z) Z = (S Z)
 \end{haskell}
-to arrive at:
+We arrive at:
 \begin{haskell}
 add (S Z) (S Z) = S (S Z)
 \end{haskell}
-We can clearly see that this is the same as our encoding of $2$. But we haven't shown that our definition of equality is reflexive so, in principle, we don't know of \hask{eq (S (S Z)) (S (S Z))} yields \hask{True}. We have to use step-by-step equational reasoning again:
+We can clearly see that this is the same as our encoding of $2$. But we haven't shown that our definition of equality is reflexive so, in principle, we don't know if 
+\begin{haskell}
+eq (S (S Z)) (S (S Z))
+\end{haskell}
+yields \hask{True}. We have to use step-by-step equational reasoning again:
 \begin{haskell}
 equal (S (S Z) (S (S Z)) =
 {- second clause of the definition of equal -}
@@ -798,7 +802,7 @@ equal Z Z =
 True
 \end{haskell}
 
-We can use this kind of reasoning to prove statements about concrete numbers, but we run into problems when reasoning about arbitrary numbers. For instance, using our definition of addition, we can easily show that \hask{add n Z} is the same as \hask{n}. But we can't prove that \hask{add Z n} is the same as \hask{n}. Such proofs require the use of induction. 
+We can use this kind of reasoning to prove statements about concrete numbers, but we run into problems when reasoning about generic numbers. For instance, using our definition of addition, we can easily show that \hask{add n Z} is the same as \hask{n}. But we can't prove that \hask{add Z n} is the same as \hask{n}. The latter proof requires the use of induction. 
 
 We end up distinguishing between two kinds of equality. One is proven using substitutions, or rewriting rules, and is called \emph{definitional equality}. You can think of it as macro expansion or inline expansion in programming languages. It also involves $\beta$-reductions: performing function application by replacing formal parameters by actual arguments, as in:
 \begin{haskell}
@@ -811,16 +815,16 @@ The second more interesting kind of equality is called \emph{propositional equal
 
 \subsection{Equality vs isomorphism}
 
-We talked about category theorists preferring isomorphism over equality---at least as it comes to objects. It is true that, within the confines of a category, there is no way to differentiate between isomorphic objects. In general, though, equality is stronger than isomorphism. This is a problem, because it's very convenient to be able to substitute equals for equals, but it's not always clear that one can substitute isomorphic for isomorphic. 
+We said that category theorists prefer isomorphism over equality---at least as it comes to objects. It is true that, within the confines of a category, there is no way to differentiate between isomorphic objects. In general, though, equality is stronger than isomorphism. This is a problem, because it's very convenient to be able to substitute equals for equals, but it's not always clear that one can substitute isomorphic for isomorphic. 
 
-Mathematicians have been struggling with this problem, trying to modify the definition of isomorphism, but a real breakthrough came when they decided to simultaneously weaken the definition of equality. This led to the development of \emph{homotopy type theory}, or HoTT for short. 
+Mathematicians have been struggling with this problem, trying to modify the definition of isomorphism---but a real breakthrough came when they decided to simultaneously weaken the definition of equality. This led to the development of \emph{homotopy type theory}, or HoTT for short. 
 
 Roughly speaking, in HoTT, equality is represented as a type, and in order to prove equality one has to construct an element of that type---in the spirit of the Curry-Howard interpretation. Furthermore, the proofs themselves can be compared for equality, and so on ad infinitum. You can picture this by considering proofs of equality not as points but as some abstract paths that can be morphed into each other; hence the language of homotopies.
 
 In this setting, instead of isomorphism, which involves strict equalities of arrows:
 \[ f \circ g = id \]
 \[ g \circ f = id \]
-one defines an equivalence, in which these equalities are treated as equality types.
+one defines an equivalence, in which these equalities are treated as types.
 
 The main idea of HoTT is that one can impose the \emph{univalence axiom}, which states that equalities are equivalent to equivalences, or symbolically:
 \[ (A = B) \cong (A \cong B) \]
@@ -828,9 +832,6 @@ The main idea of HoTT is that one can impose the \emph{univalence axiom}, which 
 \subsection{Equality types}
 
 \subsection{Notes}
-
-
-relation to logic: universal/esistential quantification
 
 
 induction
