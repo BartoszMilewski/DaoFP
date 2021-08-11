@@ -457,7 +457,10 @@ This adjunction defines the fibration $\Sigma_f$ as the left adjoint to the base
 
 \subsection{Existential quantification}
 
+In the \emph{propositions as types} interpretation, type families correspond to families of propositions. The dependent sum type $\Sigma_{x : B} \, T(x)$ corresponds to the proposition: There exists an $x$ for which $T(x)$ is true:
+\[ \exists_{x : B} \, T (x)\]
 
+Indeed, a term of the type $\Sigma_{x : B} \, T(x)$ is a pair of an element $x \colon B$ and an element $y \colon T(x)$---which shows that $T(x)$ is non-empty for some $x$.
 
 
 \section{Dependent Product}
@@ -732,6 +735,9 @@ as a mapping between morphisms in their respective slice categories:
 
 \subsection{Universal quantification}
 
+The logical interpretation of the dependent product $\Pi_{x : B} \, T(x)$ is a universally quanitified proposition. An element of $\Pi_{x : B} \, T(x)$ is a section---the proof that it's possible to select an element from each member of the family $T(x)$. In other words, its a proof of the proposition:
+\[ \forall_{x : B}\, T(x) \]
+
 \section{Equality}
 
 Our first experience in mathematics is related to equality. We learn that 
@@ -740,7 +746,9 @@ and we don't think much of it afterwards.
 
 But what does it mean that $1+1$ is equal to $2$? Two is a number, but one plus one is an expression, so they are not the same thing. There is some mental processing that we have to perform before we pronounce these two things equal. 
 
-Contrast this with the statement $0 = 0$, in which both sides of equality are \emph{the same thing}. If we are to define equality, we'll have to at least make sure that every thing is equal to itself. We call this property \emph{reflexivity}. 
+Contrast this with the statement $0 = 0$, in which both sides of equality are \emph{the same thing}. 
+
+It makes sense that, if we are to define equality, we'll have to at least make sure that every thing is equal to itself. We call this property \emph{reflexivity}. 
 
 Recall our definition of natural numbers:
 \begin{haskell}
@@ -748,14 +756,14 @@ data Nat where
   Z :: Nat
   S :: Nat -> Nat
 \end{haskell}
-This is the definition of equality for natural numbers:
+This is how we can define equality for natural numbers:
 \begin{haskell}
 equal :: Nat -> Nat -> Bool
 equal Z Z = True
 equal (S m) (S n) = equal m n
 equal _ _ = False
 \end{haskell}
-We are recursively stripping $S$'s in each number until one of them reaches $Z$. If the other reaches $Z$ at the same time, the numbers we started with were equal, otherwise they were not. 
+We are recursively stripping $S$'s in each number until one of them reaches $Z$. If the other reaches $Z$ at the same time, we pronounce the numbers we started with to be equal, otherwise they are not. 
 
 \subsection{Equational reasoning}
 
@@ -775,11 +783,11 @@ We encode $1 + 1$ as
 \begin{haskell}
 add (S Z) (S Z)
 \end{haskell}
-We can now use the definition of \hask{add} to simplify this expression. We try to match the first clause and fail, because \hask{S Z} is not the same as \hask{Z}. But the second clause matches. We get:
+We can now use the definition of \hask{add} to simplify this expression. We try to match the first clause, and we fail, because \hask{S Z} is not the same as \hask{Z}. But the second clause matches. In it, \hask{n} is an arbitrary number, so we can substitute \hask{S Z} for it, and get:
 \begin{haskell}
 add (S Z) (S Z) = S (add (S Z) Z)
 \end{haskell}
-In this expression we can perform another substitution of equals using the first clause of the definition of \hask{add}:
+In this expression we can perform another substitution of equals using the first clause of the definition of \hask{add} (again, with \hask{n} replaced by \hask{S Z}):
 \begin{haskell}
 add (S Z) Z = (S Z)
 \end{haskell}
@@ -787,7 +795,7 @@ We arrive at:
 \begin{haskell}
 add (S Z) (S Z) = S (S Z)
 \end{haskell}
-We can clearly see that this is the same as our encoding of $2$. But we haven't shown that our definition of equality is reflexive so, in principle, we don't know if 
+We can clearly see that the right-hand side is the encoding of $2$. But we haven't shown that our definition of equality is reflexive so, in principle, we don't know if:
 \begin{haskell}
 eq (S (S Z)) (S (S Z))
 \end{haskell}
@@ -802,7 +810,7 @@ equal Z Z =
 True
 \end{haskell}
 
-We can use this kind of reasoning to prove statements about concrete numbers, but we run into problems when reasoning about generic numbers. For instance, using our definition of addition, we can easily show that \hask{add n Z} is the same as \hask{n}. But we can't prove that \hask{add Z n} is the same as \hask{n}. The latter proof requires the use of induction. 
+We can use this kind of reasoning to prove statements about concrete numbers, but we run into problems when reasoning about generic numbers---for instance, showing that something is true for all \hask{n}. For instance, using our definition of addition, we can easily show that \hask{add n Z} is the same as \hask{n}. But we can't prove that \hask{add Z n} is the same as \hask{n}. The latter proof requires the use of induction. 
 
 We end up distinguishing between two kinds of equality. One is proven using substitutions, or rewriting rules, and is called \emph{definitional equality}. You can think of it as macro expansion or inline expansion in programming languages. It also involves $\beta$-reductions: performing function application by replacing formal parameters by actual arguments, as in:
 \begin{haskell}
@@ -815,21 +823,38 @@ The second more interesting kind of equality is called \emph{propositional equal
 
 \subsection{Equality vs isomorphism}
 
-We said that category theorists prefer isomorphism over equality---at least as it comes to objects. It is true that, within the confines of a category, there is no way to differentiate between isomorphic objects. In general, though, equality is stronger than isomorphism. This is a problem, because it's very convenient to be able to substitute equals for equals, but it's not always clear that one can substitute isomorphic for isomorphic. 
+We said that category theorists prefer isomorphism over equality---at least when it comes to objects. It is true that, within the confines of a category, there is no way to differentiate between isomorphic objects. In general, though, equality is stronger than isomorphism. This is a problem, because it's very convenient to be able to substitute equals for equals, but it's not always clear that one can substitute isomorphic for isomorphic. 
 
 Mathematicians have been struggling with this problem, trying to modify the definition of isomorphism---but a real breakthrough came when they decided to simultaneously weaken the definition of equality. This led to the development of \emph{homotopy type theory}, or HoTT for short. 
 
-Roughly speaking, in HoTT, equality is represented as a type, and in order to prove equality one has to construct an element of that type---in the spirit of the Curry-Howard interpretation. Furthermore, the proofs themselves can be compared for equality, and so on ad infinitum. You can picture this by considering proofs of equality not as points but as some abstract paths that can be morphed into each other; hence the language of homotopies.
+Roughly speaking, in type theory\footnote{By type theory I mean Martin-L{\"o}f type theory}, equality is represented as a type, and in order to prove equality one has to construct an element of that type---in the spirit of the Curry-Howard interpretation. Furthermore, in HoTT, the proofs themselves can be compared for equality, and so on ad infinitum. You can picture this by considering proofs of equality not as points but as some abstract paths that can be morphed into each other; hence the language of homotopies.
 
 In this setting, instead of isomorphism, which involves strict equalities of arrows:
 \[ f \circ g = id \]
 \[ g \circ f = id \]
-one defines an equivalence, in which these equalities are treated as types.
+one defines an \emph{equivalence}, in which these equalities are treated as types.
 
 The main idea of HoTT is that one can impose the \emph{univalence axiom}, which states that equalities are equivalent to equivalences, or symbolically:
 \[ (A = B) \cong (A \cong B) \]
-
+Notice that this is an axiom, not a theorem. We can either take it or leave it and the theory is still valid (at least we think so).
 \subsection{Equality types}
+
+Suppose that you want to compare two terms for equality. The first requirement is that both terms be of the same type. You can't compare apples with oranges. Don't get confused by some programming languages allowing comparisons of unlike terms: in every such case there is an implicit conversion involved, and the final equality is always tested between same-type values. 
+
+For every pair of values there is, in principle, a separate type of proofs of equality. There is a type for $0 = 0$, there is a type for $1=1$, and there is a type for $1 = 0$; the latter type hopefully uninhabited. So equality is a dependent type: it depends on two values that you're comparing.
+
+Equality type is therefore a dependent type: it depends on the two values that we are comparing. It's usually written as $\mathit{Id}_A$, where $A$ is the type of both values, or using an infix notation as $=_A$ (equal sign with the subscript $A$). For instance, the type of equality of two zeros is written as $\mathit{Id}_{\mathbb{N}}\, 0\, 0$ or:
+\[ 0 =_{\mathbb{N}} 0 \]
+
+The introduction for equality is a dependent function: 
+\[ \text{refl}_A \colon \Pi_{x : A}  \mathit{Id}_A \,x \, x\]
+which provides the proof that that 
+\[ \forall _{x:A} \;x = x \]
+This is the familiar reflexivity: it's true for all $x$ that $x$ is equal to itself. 
+
+We can now prove that $0=0$. We just call $\text{refl}_{\mathbb{N}}\, 0$ and it produces an element of the type $0 =_{\mathbb{N}} 0$.
+
+
 
 \subsection{Notes}
 
