@@ -740,7 +740,7 @@ The logical interpretation of the dependent product $\Pi_{x : B} \, T(x)$ is a u
 
 \section{Equality}
 
-Our first experience in mathematics is related to equality. We learn that 
+Our first experience in mathematics involves equality. We learn that 
 \[1+1=2\] 
 and we don't think much of it afterwards. 
 
@@ -771,7 +771,9 @@ Notice that, when defining equality, we were already using the equal sign. For i
 \begin{haskell}
 equal Z Z = True
 \end{haskell}
-tells us that wherever we see the expression \hask{equal Z Z} we can replace it with \hask{True} and vice versa. This is the principle of substituting equals for equals, which is the basis for \emph{equational reasoning} in Haskell. We can't encode proofs of equality directly in Haskell, but we can use equational reasoning to reason about Haskell programs. This is one of the main advantages of pure functional programming. You can't perform such substitutions in imperative languages, because of side effects.
+tells us that wherever we see the expression \hask{equal Z Z} we can replace it with \hask{True} and vice versa. 
+
+This is the principle of substituting equals for equals, which is the basis for \emph{equational reasoning} in Haskell. We can't encode proofs of equality directly in Haskell, but we can use equational reasoning to reason about Haskell programs. This is one of the main advantages of pure functional programming. You can't perform such substitutions in imperative languages, because of side effects.
 
 If we want to prove that $1+1$ is $2$, we have to first define addition. The definition can either be recursive in the first or in the second argument. This one recurses in the second argument:
 \begin{haskell}
@@ -779,7 +781,7 @@ add :: Nat -> Nat -> Nat
 add n Z = n
 add n (S m) = S (add n m)
 \end{haskell}
-We encode $1 + 1$ as 
+We encode $1 + 1$ as:
 \begin{haskell}
 add (S Z) (S Z)
 \end{haskell}
@@ -825,36 +827,98 @@ The second more interesting kind of equality is called \emph{propositional equal
 
 We said that category theorists prefer isomorphism over equality---at least when it comes to objects. It is true that, within the confines of a category, there is no way to differentiate between isomorphic objects. In general, though, equality is stronger than isomorphism. This is a problem, because it's very convenient to be able to substitute equals for equals, but it's not always clear that one can substitute isomorphic for isomorphic. 
 
-Mathematicians have been struggling with this problem, trying to modify the definition of isomorphism---but a real breakthrough came when they decided to simultaneously weaken the definition of equality. This led to the development of \emph{homotopy type theory}, or HoTT for short. 
+Mathematicians have been struggling with this problem, mostly trying to modify the definition of isomorphism---but a real breakthrough came when they decided to simultaneously weaken the definition of equality. This led to the development of \emph{homotopy type theory}, or HoTT for short. 
 
-Roughly speaking, in type theory\footnote{By type theory I mean Martin-L{\"o}f type theory}, equality is represented as a type, and in order to prove equality one has to construct an element of that type---in the spirit of the Curry-Howard interpretation. Furthermore, in HoTT, the proofs themselves can be compared for equality, and so on ad infinitum. You can picture this by considering proofs of equality not as points but as some abstract paths that can be morphed into each other; hence the language of homotopies.
+Roughly speaking, in type theory, specifically in Martin-L{\"o}f theory of dependent types, equality is represented as a type, and in order to prove equality one has to construct an element of that type---in the spirit of the Curry-Howard interpretation. 
+
+Furthermore, in HoTT, the proofs themselves can be compared for equality, and so on ad infinitum. You can picture this by considering proofs of equality not as points but as some abstract paths that can be morphed into each other; hence the language of homotopies.
 
 In this setting, instead of isomorphism, which involves strict equalities of arrows:
 \[ f \circ g = id \]
 \[ g \circ f = id \]
 one defines an \emph{equivalence}, in which these equalities are treated as types.
 
-The main idea of HoTT is that one can impose the \emph{univalence axiom}, which states that equalities are equivalent to equivalences, or symbolically:
+The main idea of HoTT is that one can impose the \emph{univalence axiom} which, roughly speaking, states that equalities are equivalent to equivalences, or symbolically:
 \[ (A = B) \cong (A \cong B) \]
 Notice that this is an axiom, not a theorem. We can either take it or leave it and the theory is still valid (at least we think so).
 \subsection{Equality types}
 
-Suppose that you want to compare two terms for equality. The first requirement is that both terms be of the same type. You can't compare apples with oranges. Don't get confused by some programming languages allowing comparisons of unlike terms: in every such case there is an implicit conversion involved, and the final equality is always tested between same-type values. 
+Suppose that you want to compare two terms for equality. The first requirement is that both terms be of the same type. You can't compare apples with oranges. Don't get confused by some programming languages allowing comparisons of unlike terms: in every such case there is an implicit conversion involved, and the final equality is always between same-type values. 
 
-For every pair of values there is, in principle, a separate type of proofs of equality. There is a type for $0 = 0$, there is a type for $1=1$, and there is a type for $1 = 0$; the latter type hopefully uninhabited. So equality is a dependent type: it depends on two values that you're comparing.
+For every pair of values there is, in principle, a separate type of proofs of equality. There is a type for $0 = 0$, there is a type for $1=1$, and there is a type for $1 = 0$; the latter hopefully uninhabited. 
 
-Equality type is therefore a dependent type: it depends on the two values that we are comparing. It's usually written as $\mathit{Id}_A$, where $A$ is the type of both values, or using an infix notation as $=_A$ (equal sign with the subscript $A$). For instance, the type of equality of two zeros is written as $\mathit{Id}_{\mathbb{N}}\, 0\, 0$ or:
+Equality type, a.k.a., identity type, is therefore a dependent type: it depends on the two values that we are comparing. It's usually written as $\mathit{Id}_A$, where $A$ is the type of both values, or using an infix notation as $x=_A y$ (equal sign with the subscript $A$). 
+
+For instance, the type of equality of two zeros is written as $\mathit{Id}_{\mathbb{N}} (0, 0)$ or:
 \[ 0 =_{\mathbb{N}} 0 \]
+Notice: this is not a statement or a term. It's a \emph{type}, like \hask{Int} or \hask{Bool}. You can define a value of this type if you have an introduction rule for it.
 
-The introduction for equality is a dependent function: 
-\[ \text{refl}_A \colon \Pi_{x : A}  \mathit{Id}_A \,x \, x\]
-which provides the proof that that 
+The introduction rule for the equality type is the dependent function: 
+\[ \mathit{refl}_A \colon \Pi_{x : A}  \mathit{Id}_A  (x, x)\]
+which can be interpreted in the spirit of propositions as types as the proof of the statement:
 \[ \forall _{x:A} \;x = x \]
-This is the familiar reflexivity: it's true for all $x$ that $x$ is equal to itself. 
+This is the familiar reflexivity: it shows that, for all $x$ of type $A$, $x$ is equal to itself. You can apply this function to some concrete value $x$ of type $A$, and it will produce a new value of type $\mathit{Id}_A  (x, x)$, which is a type that depends on the value of $x$.
 
-We can now prove that $0=0$. We just call $\text{refl}_{\mathbb{N}}\, 0$ and it produces an element of the type $0 =_{\mathbb{N}} 0$.
+We can now prove that $0=0$. We can execute $\mathit{refl}_{\mathbb{N}} (0)$ to get a value of the type $0 =_{\mathbb{N}} 0$. This value is the proof that the type is inhabited, and therefore corresponds to a true proposition.
 
+This is the only introduction rule for equality, so you might think that all proofs of equality boil down to ``they are equal because they are the same.'' Surprisingly, this is not the case. 
 
+In type theory we have this interplay of introduction and elimination rules that essentially makes them the inverse of each other. 
+
+Consider the definition of a product. We introduce it by providing two values, $x \colon A$ and $y \colon B$ and we get a value $p \colon A \times B$. We can then eliminate it by extracting two values using two projections. But how do we know if these are the same values that we used to construct it? This is something that we have to postulate (in the categorical model this follows from the universal construction). 
+
+Conversely, if we are given a value $p \colon A \times B$, we can extract the two components using projections, and then use the introduction rule to recompose it. But how do we know that we'll get the same $p$? This too has to be postulated. This is sometimes called the uniqueness condition, or the $\eta$-conversion rule.
+
+The equality type also has the elimination rule, which we'll discuss shortly, but we don't impose the uniqueness condition. It means that it's possible that there are some equality proofs that were not obtained using the $\mathit{refl}$ introduction rule. 
+
+This is exactly the weakening of the notion of equality that makes HoTT interesting to mathematicians.
+
+\subsection{Induction principle}
+
+Before formulating the elimination rule for equality, it's instructive to first discuss a simpler elimination rule for natural numbers. We've already seen such rule describing primitive recursion. It allowed us to define recursive functions by specifying a value $\mathit{init}$ and a function $\mathit{step}$.
+
+Using dependent types, we can generalize this rule to define the \emph{dependent elimination rule} that is equivalent to the principle of mathematical induction.
+
+The principle of induction can be described as a device to prove, in one fell swoop, whole families of propositions indexed by natural numbers. For instance, the statement that \hask{add Z n} is equal to \hask{n} is really an infinite number of propositions, one per each value of \hask{n}. 
+
+We could, in principle, write a program that would meticulously verify this statement for a very large number of cases, but we'd never be sure if it holds in general. There are some conjectures about natural numbers that have been tested this way using computers but, obviously, they can never exhaust an infinite set of cases.
+
+In general, we can divide all mathematical theorems into two groups: the ones that can be easily formulated and the ones whose formulation is complex. They can be further subdivided into the ones whose proofs are simple, and the ones that are hard or impossible to prove. For instance, the famous Fermat's Last Theorem was extremely easy to formulate, but its proof required some massively complex mathematical machinery. 
+
+Here, we are interested in theorems about natural numbers that are both easy to formulate and easy to prove. We'll assume that we know how to generate a family of propositions or, equivalently, a dependent type $T(n)$, where $n$ is a natural number. We'll also assume that we have a value:
+\[\mathit{init} \colon T(Z) \]
+or, equivalently, the proof of the proposition corresponding to zero; and a dependent function:
+\[\mathit{step} \colon \Pi_{n:\mathbb{N}}\,\left(T(n) \to T(S n)\right) \]
+This function is interpreted as generating a proof of the $(n + 1)$st proposition from the proof of the $n$th proposition.
+
+The \emph{dependent elimination rule} for natural numbers tells us that, given such $\mathit{init}$ and $\mathit{step}$, there exists a dependent function:
+\[f \colon \Pi_{n:\mathbb{N}} \, T(n) \]
+This function is interpreted as providing the proof that $T(n)$ is true for all $n$.
+
+Moreover, this function, when applied to zero reproduces $\mathit{init}$:
+\[ f (Z) = \mathit{init} \]
+and, when applied to the successor of $n$, reduces to taking a $\mathit{step}$:
+\[ f (S n) = (\mathit{step} (n)) (f (n)) \]
+(Here, $\mathit{step}(n)$ produces a function, which is then applied to the value $f(n)$.)
+
+Notice that the induction principle is not a theorem about natural numbers. It's part of the \emph{definition} of the type of natural numbers. 
+
+\subsection{Equality elimination rule}
+
+$x \colon A$, $y \colon A$, $p \colon \mathit{Id}(x, y)$
+
+type family $T(x, y, p)$
+
+$t \colon \Pi_{x : A} \,T(x, x, \mathit{refl}(x))$
+
+then:
+
+$f \colon \Pi_{x, y : A} \Pi_{p : \mathit{Id}(x, y)} \, T(x, y, p)$
+
+such that (computation rule)
+
+$f (x, x, \mathit{refl}(x)) = t(x)$
+This id definitional equality!
 
 \subsection{Notes}
 
