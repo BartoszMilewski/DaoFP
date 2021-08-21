@@ -95,7 +95,7 @@ The easiest way to visualize dependent types is to think of them as families of 
 
 The zeroth type would be the unit type \hask{()} representing an empty vector. The type corresponding to \hask{(S Z)} would be \hask{a}; then we'd have a pair \hask{(a, a)}, a triple \hask{(a, a, a)} and so on, with higher and higher powers of \hask{a}.
 
-If we want to talk about the whole family as one big set, we can take the sum of all these types. For instance, the sum of all powers of $a$ is the familiar list type or a free monoid:
+If we want to talk about the whole family as one big set, we can take the sum of all these types. For instance, the sum of all powers of $a$ is the familiar list type, a.k.a, a free monoid:
 \[ \mathit{List} (a) = \coprod_{n:\mathbb{N}} a^n \]
 
 \subsection{Fibrations}
@@ -996,6 +996,6 @@ This is a very strong postulate. One way to understand it is to argue that, with
 
 The closest analogy that we've seen so far is the result of parametricity, which states that, in Haskell, all polymorphic functions between endofunctors are automatically natural transformations. Another example, this time from calculus, is that any analytic function defined on the real axis has a unique extension to the whole complex plane. 
 
-The use of dependent types blurs the boundary between programming and mathematics. There is a whole spectrum of languages starting with Haskell, which dips its toes in dependent types while still being used in commercial applications, to theorem provers, which are used by mathematicians to formalize mathematical proofs.
+The use of dependent types blurs the boundary between programming and mathematics. There is a whole spectrum of languages, starting with Haskell, which dips its toes in dependent types while still firmly established in commercial usage; all the way to theorem provers, which are helping mathematicians formalize mathematical proofs.
 
 \end{document}
