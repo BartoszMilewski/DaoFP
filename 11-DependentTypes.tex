@@ -757,9 +757,22 @@ where $\Pi_f E$ is a suitable rearrangement of the object of sections $S(E)$. Th
   \end{tikzcd}
 \]
 
+The following exercises shed some light on the role played by $f$. It can be seen as localizing the sections of $E$ by restricting them to ``neighborhoods'' defined by $f^{-1}$.
+
 \begin{exercise}
 Consider what happens when $B'$ is a two-element set $\{0, 1\}$ and $f$ maps the whole of $B$ to one element, say $1$. How would you define the function on the right-hand side of the adjunction? What should it do to the fiber over $0$?
 \end{exercise}
+
+\begin{exercise}
+Let's pick $G$ to be a singleton set $1$, and let $x \colon 1 \to B'$ be a fibration that selects an element in $B'$. Using the adjunction, show that:
+\begin{itemize}
+\item $f^* 1$ has two types of fibers: singletons over the elements of $f^{-1} (x)$ and empty sets otherwise. 
+\item A mapping $\phi \colon f^* 1 \to E$ is equivalent to a selection of elements, one from each fiber of $E$ over the elements of $f^{-1}(x)$. In other words, it's a partial section of $E$ over the subset $f^{-1}(x)$ of $B$.
+\item A fiber of $\Pi_f E$ over a given $x$ is such a partial section. 
+\end{itemize}
+\end{exercise}
+
+
 
 \subsection{Universal quantification}
 
