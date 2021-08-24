@@ -551,7 +551,9 @@ The one-to-one correspondence between $\phi$ and $\phi^T$ forms an adjunction:
 \[(\mathcal{C}/B) \left( \left \langle {G\times B \atop \pi_2} \right \rangle , \left \langle {E \atop p } \right \rangle \right) \cong \mathcal{C} \left(G, S(E)\right) \]
 which we can use as the definition of the object of sections $S(E)$. 
 
-Recall that we can interpret the product $G \times B$ as a generalization of the diagonal functor. It takes copies of $G$ and plants them as identical fibers over each element of $B$. Fixing an element of $G$ means slicing horizontally through $G \times B$. The left hand side of the adjunction maps this slice, fiber-by-fiber, to a section of $E$.
+Recall that we can interpret the product $G \times B$ as a generalization of the diagonal functor. It takes copies of $G$ and plants them as identical fibers over each element of $B$. 
+
+In $\mathbf{Set}$, a single morphism on the left-hand side would be implemented as a family of functions, one per fiber. The adjunction tells us that, using this family, we can implement a function from $G$ to $S(E)$ and vice versa. For any given $x \colon G$ we get a horizontal slice of $G \times B$. Our family of functions maps this slice, fiber-by-fiber, to a section of $E$.
 
 
 \[
@@ -605,7 +607,7 @@ Recall that we can interpret the product $G \times B$ as a generalization of the
 \end{tikzpicture}
 \]
 
-An element of the right hand side of the adjunction takes an element of $G$ and maps it to an element of $S(E)$. Thus elements of $S(E)$ are in one-to-one correspondence with section of $E$.
+Thus elements of $S(E)$ are in one-to-one correspondence with sections of $E$.
 
 These are all set-theoretical intuitions. We can generalize them by first noticing that the right hand side of the adjunction can be trivially expressed as a hom-set in the slice category $\mathcal{C}/1$ over the terminal object. 
 
@@ -754,6 +756,10 @@ where $\Pi_f E$ is a suitable rearrangement of the object of sections $S(E)$. Th
  & B'
   \end{tikzcd}
 \]
+
+\begin{exercise}
+Consider what happens when $B'$ is a two-element set $\{0, 1\}$ and $f$ maps the whole of $B$ to one element, say $1$. How would you define the function on the right-hand side of the adjunction? What should it do to the fiber over $0$?
+\end{exercise}
 
 \subsection{Universal quantification}
 
