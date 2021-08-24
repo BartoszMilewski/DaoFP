@@ -517,7 +517,7 @@ Just like we defined function application as a mapping out of the product:
 \[\varepsilon_{B, C} \colon C^B \times B \to C\]
 we can define the dependent function application as a mapping:
 \[\varepsilon \colon S(E) \times B \to E\]
-We can visualize it as picking a section in $S$ and an element of the base $B$ and producing a value in the bundle $E$. 
+We can visualize it as picking a section in $S$ and an element of the base $B$ and producing a value in the bundle $E$. (In physics, this would correspond to measuring a field at a particular point in space and time.)
 
 But this time we have to insist that this value be in the correct fiber. If we project the result of $\varepsilon$ using $p$, we should get the same element of $B$ that was used in the product $S(E) \times B$. In other words, this diagram should commute:
 \[
@@ -548,7 +548,7 @@ And just like the exponential object was universal, so is the object of sections
 The difference is that now both $\varepsilon$ and $\phi$ are morphisms in the slice category $\mathcal{C}/B$. 
 
 The one-to-one correspondence between $\phi$ and $\phi^T$ forms an adjunction:
-\[(\mathcal{C}/B) \left( \left \langle {G\times B \atop \pi_2} \right \rangle , \left \langle {E \atop p } \right \rangle \right) \cong \mathcal{C} (G, S(E)) \]
+\[(\mathcal{C}/B) \left( \left \langle {G\times B \atop \pi_2} \right \rangle , \left \langle {E \atop p } \right \rangle \right) \cong \mathcal{C} \left(G, S(E)\right) \]
 which we can use as the definition of the object of sections $S(E)$. 
 
 Recall that we can interpret the product $G \times B$ as a generalization of the diagonal functor. It takes copies of $G$ and plants them as identical fibers over each element of $B$. Fixing an element of $G$ means slicing horizontally through $G \times B$. The left hand side of the adjunction maps this slice, fiber-by-fiber, to a section of $E$.
@@ -708,26 +708,34 @@ Imagine, for instance, that $B'$ is a two-element set. The fibration $q$ will sp
 \node[below] at (\xr + 2 * \dx, \yb) {$B$};
 \node[above] at (\xr + 1 * \dx, 8 * \dy) {$E$};
 
+% dashed zigzag in E
 \draw[dashed] (\xr, \a -\dy ) -- (\xr + 1 * \dx, \b - 5 * \dy) -- (\xr + 2 * \dx, \c - \dy) -- (\xr + 3 * \dx, \d - 4*\dy) -- (\xr + 4 * \dx, \e - 3*\dy);
 
-
-\filldraw[black] (\xl + 3 * \dx, \yb + 4* \dy) circle (1 pt);
+\filldraw[black] (\xl + 3 * \dx, \yb + 5* \dy) circle (1 pt);
 \filldraw[black] (\xr + 3 * \dx, \yb + 8* \dy) circle (1 pt);
 
-\draw[->] ((\xl + 3 * \dx, \yb + 4* \dy) -- (\xr + 3 * \dx, \yb + 8* \dy);
+% arrow from f*G to E
+\draw[->] ((\xl + 3 * \dx, \yb + 5* \dy) -- (\xr + 3 * \dx, \yb + 8* \dy);
 
-\draw[dashed] (\xl, \yb + 4* \dy) -- (\xl + 4* \dx, \yb + 4* \dy);
+% dashed slices through f*G
+\draw[dashed] (\xl, \yb + 4* \dy) -- (\xl + \dx, \yb + 4* \dy);
+\draw[dashed] (\xl + \dx, \yb + 5* \dy) -- (\xl + 3* \dx, \yb + 5* \dy);
+\draw[dashed] (\xl + 3*\dx, \yb + 4* \dy) -- (\xl + 4* \dx, \yb + 4* \dy);
+
+% slices through G
+\draw[dashed] (\xmin, \yb + 4* \dy) -- (\xmin + \dx, \yb + 4* \dy);
+\draw[dashed] (\xmin + \dx, \yb + 5* \dy) -- (\xmin + 2 * \dx, \yb + 5* \dy);
 
 \end{tikzpicture}
 \]
 
 The adjunction that defines the dependent function type is therefore:
 \[ (\mathcal{C}/B) \left( f^* \left \langle {G \atop q} \right \rangle, \left \langle {E \atop p} \right \rangle \right) \cong  (\mathcal{C}/B')\left( \left \langle {G \atop q} \right \rangle, \Pi_f \left \langle {E \atop p } \right \rangle \right) \]
-where $\Pi_f E$ generalizes the object of sections $S(E)$. The adjunction is a mapping between morphisms in their respective slice categories:
+where $\Pi_f E$ is a suitable rearrangement of the object of sections $S(E)$. The adjunction is a mapping between morphisms in their respective slice categories:
 
 \[
  \begin{tikzcd}
- G'
+ f^* G
  \arrow[rr, "\phi"]
  \arrow[rd, "f^* q"']
  &&E
@@ -996,6 +1004,6 @@ This is a very strong postulate. One way to understand it is to argue that, with
 
 The closest analogy that we've seen so far is the result of parametricity, which states that, in Haskell, all polymorphic functions between endofunctors are automatically natural transformations. Another example, this time from calculus, is that any analytic function defined on the real axis has a unique extension to the whole complex plane. 
 
-The use of dependent types blurs the boundary between programming and mathematics. There is a whole spectrum of languages, starting with Haskell, which dips its toes in dependent types while still firmly established in commercial usage; all the way to theorem provers, which are helping mathematicians formalize mathematical proofs.
+The use of dependent types blurs the boundary between programming and mathematics. There is a whole spectrum of languages,  with Haskell barely dipping its toes in dependent types while still firmly established in commercial usage; all the way to theorem provers, which are helping mathematicians formalize mathematical proofs.
 
 \end{document}
