@@ -6,7 +6,7 @@
 
 \section{String Diagrams}
 
-A line partitions a plane. We can think of it as either dividing a plane or as connecting two half-planes.
+A line partitions a plane. We can think of it as either dividing a plane or as connecting two halves of the plane.
 
 A dot partitions a line. We can think of it as either separating two half-lines or as joining them together.
 
@@ -37,7 +37,7 @@ This is a diagram in which two categories are represented as dots, two functors 
 \end{tikzpicture}
 \]
 
-But the same idea can be represented by drawing categories as areas of a plane, functors that connect them as lines between areas, and natural transformations as dots that partition line segments. 
+But the same idea can be represented by drawing categories as areas of a plane, functors that connect them as lines between areas, and natural transformations as dots that join line segments. 
 
 The idea is that a functor always goes between a pair of categories, therefore it can be drawn as a boundary between them. A natural transformation always goes between a pair of functors, therefore it can be drawn as a dot joining two halves of a line.
 
@@ -188,7 +188,7 @@ The bottom of the string diagram corresponds to the composition of functors $G \
 
 \end{tikzpicture}
 \]
-Drawing two parallel vertical lines, in this new system, corresponds to functor composition. You can think of the composition of natural transformations as happening along the imaginary horizontal line in the middle of the diagram. But what if somebody was sloppy in drawing the diagram, and one of the dots was a little higher than the other? As it turns out, the exact positioning of the dots doesn't matter, due to the interchange law.
+Drawing two parallel vertical lines, in this new system, corresponds to functor composition. You can think of the horizontal composition of natural transformations as happening along the imaginary horizontal line in the middle of the diagram. But what if somebody was sloppy in drawing the diagram, and one of the dots was a little higher than the other? As it turns out, the exact positioning of the dots doesn't matter, due to the interchange law.
 
 But first, let's illustrate whiskering: horizontal composition in which one of the natural transformation is the identity. We can draw it like this:
 
@@ -272,7 +272,7 @@ But, really, the identity can be inserted at any point on a vertical line, so we
 
 \end{tikzpicture}
 \]
-You can easily imagine the diagram for $\alpha \circ G$.
+Similarly, you can easily imagine the diagram for $\alpha \circ G$.
 
 Here's the string diagram that corresponds to the interchange law:
 \[
@@ -334,7 +334,7 @@ Now try to replace a pair of natural transformations in this diagram with identi
 
 \subsection{String diagrams for the monad}
 
-A monad is defined as an endofunctor and two natural transformations, as illustrated by the following diagrams:
+A monad is defined as an endofunctor equipped with two natural transformations, as illustrated by the following diagrams:
  
 \[
 \begin{tikzcd}[column sep=huge]
@@ -792,7 +792,7 @@ It turns out that $T = R \circ L$ is in fact a monad, with the multiplication $\
 
 \end{tikzpicture}
 \]
-Reading this diagram bottom-up, we get the following transformation (imagine slicing it horizontally at the dot):
+Reading this diagram bottom-to-top, we get the following transformation (imagine slicing it horizontally at the dot):
 \[  R \circ L \circ R \circ L \xrightarrow{R \circ \varepsilon \circ L} R \circ L  \]
 Compare this with the definition of monadic $\mu$:
 
@@ -832,7 +832,7 @@ To complete the picture, we can use string diagrams to derive monadic laws using
 
 To summarize, every adjunction $L \dashv R$ with the unit $\eta$ and counit $\varepsilon$ defines a monad $(R \circ L, \eta, R \circ \varepsilon \circ L)$.
 
-In the next chapter we'll see that, dually, the other composition, $L \circ R$ defines a comonad.
+We'll see later that, dually, the other composition, $L \circ R$ defines a comonad.
 
 \begin{exercise}
 Draw string diagrams to illustrate monadic laws (unit and associativity) for the monad derived from an adjunction.
@@ -840,12 +840,12 @@ Draw string diagrams to illustrate monadic laws (unit and associativity) for the
 
 \section{Examples of Monads from Adjunctions}
 
-We'll go through several examples of adjunctions that generate some of the monads that we use in programming. Most examples involve functors that leave the category of Haskell types and functions, even though the round trip that generates the monad ends up being an endofunctor. This is why it's often impossible to express the adjunction in Haskell. 
+We'll go through several examples of adjunctions that generate some of the monads that we use in programming. Most examples involve functors that leave the category of Haskell types and functions, even though the round trip that generates the monad ends up being an endofunctor. This is why it's often impossible to express such an adjunction in Haskell. 
 
 To additionally complicate things, there is a lot of bookkeeping related to explicit naming of data constructors, which is necessary for type inference to work. This may sometimes obscure the simplicity on the underlying formulas.
 
 \subsection{Free monoid and the list monad}
-The list monad corresponds to the free monoid adjunction we've seen before. The unit of this adjunction, $\eta_X \colon X \to U (F X)$, injects the elements of the set $X$ as the generators of the free monoid. We represent the free monoid as a list, and its generators are singleton lists. This is exactly what we defined as the monadic unit:
+The list monad corresponds to the free monoid adjunction we've seen before. The unit of this adjunction, $\eta_X \colon X \to U (F X)$, injects the elements of the set $X$ as the generators of the free monoid $F X$ and $U$ produces the underlying set. We represent the free monoid as a list, and its generators are singleton lists. The unit maps elements of $X$ to such singletons:
 \begin{haskell}
 return x = [x]
 \end{haskell}
@@ -856,13 +856,13 @@ Recall the Haskell implementation of a list catamorphism:
 foldMap :: Monoid m => (a -> m) -> ([a] -> m)
 foldMap f = foldr mappend mempty . fmap f
 \end{haskell}
-The counit is just \hask{ foldMap id }, or 
+We can interpret it as taking a function from \hask{a} to the underlying set of a monoid \hask{m} and producing a monoid morphism from the free monoid generated by \hask{a} to \hask{m}. We get the counit $\varepsilon_M$ by applying it to the identity, \hask{foldMap id }, or 
 \begin{haskell}
 epsilon = foldr mappend mempty
 \end{haskell}
 Monad multiplication is given by the whiskering of the counit:
 \[ \mu = U \circ \varepsilon \circ F \]
-You can easily convince yourself that left whiskering doesn't do much here, since it's just a lifting of a monoid morphism by the forgetful functor. It just keeps the function while forgetting about it's special property of preserving structure. 
+You can easily convince yourself that left whiskering doesn't do much here, since it's just a lifting of a monoid morphism by the forgetful functor. It keeps the function while forgetting about its special property of preserving structure. 
 
 The right whiskering by $F$ is more interesting. It means taking the component of $\varepsilon$ at a free monoid generated from the set $X$. This  free monoid is defined by:
 \begin{haskell}
