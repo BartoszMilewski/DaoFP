@@ -651,41 +651,65 @@ These are the monad laws in terms of $\mu$ and $\eta$. They can be directly tran
 
 \section{Monoidal Functors}
 
-Functors are structure-preserving maps between categories. If two objects are connected in the source category, their images are connected in the target category. They also preserve composition and identity, which means that they map commuting diagrams to commuting diagrams. What they do not preserve, in general, is universal constructions. 
+We've seen several examples of monoidal cateogries. Such categories are equipped with some kind of binary operation, e.g., a cartesian product, a sum, composition (in the category of endofunctors), etc. They also have a special object that serves as a unit with respect to this binary operation. Unit and associativity laws are satisfied either on the nose (in strict monoidal categories) or up to isomorphism.
 
-For instance, this is the familiar diagram that defines a product:
-\[
- \begin{tikzcd}
- & C
-\arrow[d, dashed, "h"]
- \arrow[ddl, bend right, "f"']
- \arrow[ddr, bend left, "g"]
-\\
-&A \times B
- \arrow[dl,  "\text{fst}"]
-  \arrow[dr,   "\text{snd}"']
-\\
-A && B
- \end{tikzcd}
-\]
-A functor $F$ will map this diagram to a similar diagram in the target category. There is no guarantee, though, that $F (A \times B)$ will be the product of $F A$ and $F B$ in that new category. Several things may go wrong to break the universality of $F (A \times B)$. The factorizing arrow $F h$ might not be unique, or there may be some extraneous objects with a pair of arrows to $F A$ and $F B$ for which there is no factorizing arrow.
+Every time we have more than one instance of some structure, we may ask ourselves the question: is there a whole category of such things? In this case: do monoidal categories form their own category? For that we have to define arrows between monoidal categories.
 
-With a generic tensor product, the problem is that the image of the functor might miss some objects in the target category.
+A \emph{monoidal functor} $F$ from a monoidal category $\mathcal{C}$ to another monoidal category $\mathcal{D}$ maps tensor product to tensor product and unit to unit---all up to isomorphism:
+\begin{align*}
+F A \otimes F B &\cong F (A \otimes B) \\
+I &\cong F I 
+\end{align*}
+Here, on the left-hand side we have the tensor product and the unit in the target category, and on the right their counterparts in the source category. 
 
-If we want a functor $F$ from a monoidal category $\mathcal{C}$ to another monoidal category $\mathcal{D}$ to preserve the monoidal structure, we have to impose additional constraints. We may request that it maps tensor product to tensor product and unit to unit---up to isomorphism:
-\[ F (A \otimes B) \cong F A \otimes F B \]
-\[F I \cong I \]
-where on the left we have the product and the unit in the source category, and on the right their counterparts in the target category.
+If the two monoidal categories in question are not strict, that is the unit and associativity laws are satisfied only up to isomorphism, there are additional coherency conditions that ensure that unitors are mapped to unitors and associators are mapped to associators.
 
+The category of monoidal categories with monoidal functors as arrows is called $\mathbf{MonCat}$. In fact it's a 2-category, since one can define structure-preserving natural transformations between monoidal functors.
 
-strength
+\subsection{Lax monoidal functors}
 
-strong functors
+One of the perks of monoidal categories is that they allow us to define monoids. You can easily convince yourself that monoidal functors map monoids to monoids. It turns out that we don't need the whole power of monoidal functors to accomplish this task. Let's consider what are the minimal requirements for a functor to map a monoid to a monoid. 
+
+Let's start with a monoid $(M, \mu, \eta)$ in the monoidal category $(\mathcal{C}, \otimes, I)$. We have a functor $F$ that maps $M$ to $F M$ and we want $F M$ to be a monoid in the target monoidal category $(\mathcal{D}, \otimes_{\mathcal{D}}, I_{\mathcal{D}})$. For that we need to find two morphisms:
+\begin{align*}
+\eta' &\colon I_{\mathcal{D}} \to F M \\
+ \mu' &\colon F M \otimes_{\mathcal{D}} F M \to F M 
+\end{align*}
+satisfying monoidal laws.
+
+We do have at our disposal the liftings of the original morphisms:
+\begin{align*}
+ F \eta &\colon F I \to F M \\
+ F \mu &\colon F (M \otimes M) \to F M
+\end{align*}
+
+What we are missing in order to implement $\eta'$ and $\mu'$ are two additional arrows 
+\begin{align*}
+I_{\mathcal{D}} &\to F I\\
+ F M \otimes_{\mathcal{D}} F M &\to F (M \otimes M)
+ \end{align*}
+A monoidal functor would provide such arrows as halves of the defining isomorphisms, but for what we're trying it accomplish, we don't need the other halves. All we need is a weaker notion of a lax monoidal functor. 
+
+A \emph{lax monoidal functor} is a functor equipped with a one-way morphism $\phi_I$ and a natural transformation whose components are $\phi_{A B}$:
+\begin{align*}
+\phi_I &\colon I_{\mathcal{D}} \to F I \\
+\phi_{A B} &\colon F A \otimes_{\mathcal{D}} F B \to F (A \otimes B)
+\end{align*}
+satisfying the appropriate untiality and associativity conditions.
+
+\subsection{Lax monoidal functors in Haskell}
+
+\begin{haskell}
+class Monoidal f where
+  unit  :: f ()
+  (>*<) :: f x -> f y -> f (x, y)
+\end{haskell}
+
+\subsection{Applicative functors}
+
+\subsection{Functorial strength}
 
 strong monads
 
-applicative
-
-\[   \mathcal{C} \]
 
 \end{document}
