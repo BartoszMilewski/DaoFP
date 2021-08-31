@@ -26,7 +26,11 @@ Most real-world programs, though, have to interact with the external world: they
 
 Unfortunately, this shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful computations one has to carefully reason about the composition of effects, on a case-by-case basis. To make things even harder, most effects are hidden inside the implementation of a function and all the functions it's calling, recursively.
 
-The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return type of a pure function. Amazingly, this is possible for all relevant effects. The idea is that, instead of a computation of the type \hask{a->b} with side effects, we use a function \hask{a->f b}, where the functor \hask{f} encodes the appropriate effect. Below is the list of common effects and their pure-function versions.
+The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return type of a pure function. Amazingly, this is possible for all relevant effects. 
+
+The idea is that, instead of a computation of the type \hask{a->b} with side effects, we use a function \hask{ a -> f b}, where the type constructor \hask{f} encodes the appropriate effect. At this point there are no conditions imposed on \hask{f}. It doesn't even have to be a \hask{Functor}, much less a monad. This will come later, when we talk about effect composition.
+
+Below is the list of common effects and their pure-function versions.
 
 \subsection{Partiality}
 In imperative languages, partiality is often encoded using exceptions. When a function is called with the ``wrong'' value for its argument, it throws an exception. In some languages, the type of exception is encoded in the signature of the function using special syntax. 
@@ -59,11 +63,16 @@ Some computations need read-only access to some external data stored in the envi
 \begin{haskell}
 a -> (e -> b)
 \end{haskell}
-Such return type can be encoded as the reader functor, itself parameterized by the environment type \hask{e}:
+The return type of this function can be encoded in the reader functor, itself parameterized by the environment type \hask{e}:
 \begin{haskell}
 newtype Reader e a = Reader (e -> a)
 \end{haskell}
-The callers of the function are then responsible for extracting the value from the reader. They do it by passing it the environment:
+
+This is an example of a delayed side effect. The function:
+\begin{haskell}
+a -> Reader e a
+\end{haskell}
+doesn't want to deal with effects so it delegates the responsibility to the caller. You may think of it as producing a script to be executed at a later time. The function \hask{runReader} plays the role of a very simple interpreter of this script:
 \begin{haskell}
 runReader :: Reader e a -> e -> a
 runReader (Reader h) e = h e
@@ -79,13 +88,13 @@ In functional programming we make state manipulations explicit: we pass the stat
 \end{haskell}
 where \hask{s} is the type of state. As before, we can curry such a function to get it to the form:
 \begin{haskell}
-a -> s -> (b, s)
+a -> (s -> (b, s))
 \end{haskell}
 This return type can be encapsulated in the following functor:
 \begin{haskell}
 newtype State s a = State (s -> (a, s))
 \end{haskell}
-The caller of such a function is supposed to retrieve the result and the modified state by providing the initial state and calling the helper function \hask{runState}:
+The caller of such a function is supposed to retrieve the result and the modified state by providing the initial state and calling the helper function, the interpreter, \hask{runState}:
 \begin{haskell}
 runState :: State s a -> s -> (a, s)
 runState (State h) s = h s
@@ -108,9 +117,11 @@ Again, it's up to the caller to decide what to do with these results.
 
 This is the trickiest side effect because it involves interacting with the external world. Obviously, we cannot model the whole world inside a computer program. So, in order to keep the program pure, the interaction has to happen outside of it. The trick is to let the program generate a script. This script is then passed to the runtime to be executed. The runtime is the effectful virtual machine that runs the program. 
 
-This script itself sits inside the opaque, predefined \hask{IO} functor. The values hidden in this functor are not accessible to the program: there is no \hask{runIO} function. Instead, the \hask{IO} value produced by the program is executed by the runtime. Conceptually, this happens \emph{after} the program is finished. Because of Haskell's laziness, though, the pure functions that form the program are evaluated on demand---the demand being driven by the execution of the \hask{IO} script.
+This script itself sits inside the opaque, predefined \hask{IO} functor. The values hidden in this functor are not accessible to the program: there is no \hask{runIO} function. Instead, the \hask{IO} value produced by the program is executed, at least conceptually, \emph{after} the program is finished. 
 
-The \hask{IO} object that is produced by a Haskell program is called \hask{main} and this is its type signature:
+In reality, because of Haskell's laziness, the execution of I/O is interleaved with the rest of the program.  Pure functions that comprise the bulk of your program are evaluated on demand---the demand being driven by the execution of the \hask{IO} script. If it weren't for I/O, nothing would be evaluated.
+
+The \hask{IO} object that is produced by a Haskell program is called \hask{main} and its type signature is:
 \begin{haskell}
 main :: IO ()
 \end{haskell}
@@ -145,19 +156,21 @@ Notice that this is a covariant functor because the type \hask{a} is in a doubly
 
 \section{Composing Effects}
 
-Now that we know how to make one giant leap using a function that produces both a value and a side effect, the next problem is to figure out how to decompose this leap into smaller human-sized steps. Equivalently, how do we combine two smaller steps into one larger step. 
+Now that we know how to make one giant leap using a function that produces both a value and a side effect, the next problem is to figure out how to decompose this leap into smaller human-sized steps. Or, conversely, how to combine two smaller steps into one larger step. 
 
-The way effectful computations are normally composed is to use regular function composition for the values, and let the side effects combine themselves separately. 
+The way effectful computations are composed in imperative languages is to use regular function composition for the values and let the side effects combine themselves separately. 
 
-When we translate effectful computations to pure functions, we are faced with the problem of composing two functions of the form
+When we represent effectful computations as pure functions, we are faced with the problem of composing two functions of the form
 \begin{haskell}
-f :: a -> f b
-g :: b -> f c
+g :: a -> f b
+h :: b -> f c
 \end{haskell}
 
-The naive approach would be to unpack the result of the first function, pass the value to the next function, then compose the effects of both functions on the side, and finally combine them with the result of the second function. This is not always possible, even for cases that we have studied so far, much less for an arbitrary functor.
+The naive approach would be to unpack the result of the first function, pass the value to the next function, then compose the effects of both functions on the side, and combine them with the result of the second function. This is not always possible, even for cases that we have studied so far, much less for an arbitrary type constructor.
 
-It's instructive to see how it can be done for the \hask{Maybe} functor. If the first function returns \hask{Nothing}, we have no value with which to call the second function. We have to short-circuit it, and return \hask{Nothing} as the result of composition. So the composition is possible, but it means modifying flow of control by skipping the second call based on the side effect of the first call. 
+It's instructive to see how we could do it for the \hask{Maybe} functor. If the first function returns \hask{Just}, we pattern match it to extract the contents and call the next function with it.
+
+But if the first function returns \hask{Nothing}, we have no value with which to call the second function. We have to short-circuit it, and return \hask{Nothing} directly. So composition is possible, but it means modifying flow of control by skipping the second call based on the side effect of the first call. 
 
 For some functors the composition of side effects is possible, for others it's not. How can we characterize those ``good'' functors?
 
@@ -172,11 +185,11 @@ This is very similar to regular function composition:
 \end{haskell}
 so it's natural to ask if there is a category in which the former defines a composition of arrows. Let's see what more is needed to construct such a category.
 
-Objects in this new category are the same Haskell types as before. An arrow from \hask{a} to \hask{b} is modeled as a Haskell function:
+Objects in this new category are the same Haskell types as before. But an arrow from \hask{a} to \hask{b} is implemented as a Haskell function:
 \begin{haskell}
 g :: a -> f b
 \end{haskell}
-Our function \hask{composeWithEffects} can be used to compose such arrows. 
+Our \hask{composeWithEffects} can then be used to implement the composition of such arrows. 
 
 To have a category, we require that this composition be associative. We also need an identity arrow for every object \hask{a}. This is an arrow from \hask{a} to \hask{a}, so it corresponds to a Haskell function:
 \begin{haskell}
@@ -184,7 +197,7 @@ idWithEffects :: a -> f a
 \end{haskell}
 It must behave like identity with respect to \hask{composeWithEffects}.
 
-We have just defined a monad. After some renaming and rearranging, we can write it as a typeclass:
+We have just defined a monad! After some renaming and rearranging, we can write it as a typeclass:
 \begin{haskell}
 class Functor m => Monad m where
   (<=<) :: (b -> m c) -> (a -> m b) -> (a -> m c)
@@ -210,9 +223,9 @@ You can easily convince yourself that category laws are satisfied. In particular
 
 The category that we have just defined is called the \emph{Kleisli category} for the monad \hask{m}. The functions \hask{a -> m b} are called the \emph{Kleisli arrows}. They compose using \hask{<=<} and the identity arrow is called \hask{return}.
 
-All functors from the previous section are \hask{Monad} instances. If you look at them as functors, it's hard to see any similarities between them. The thing they have in common is that they can be used to implement \emph{composable} Kleisli arrows. 
+All functors from the previous section are \hask{Monad} instances. If you look at them as type constructors, or even functors, it's hard to see any similarities between them. The thing they have in common is that they can be used to implement \emph{composable} Kleisli arrows. 
 
-Composition is something that happens \emph{between} things. While focusing our attention on things, we often lose sight of what happen in the gaps. 
+As Lao Tze would say: Composition is something that happens \emph{between} things. While focusing our attention on things, we often lose sight of what happen in the gaps. 
 
 \section{Alternative Definitions}
 
@@ -239,15 +252,15 @@ Conversely, \hask{join} can be implemented in terms of \hask{<=<}:
 \begin{haskell}
 join = id <=< id
 \end{haskell}
-This may not be immediately obvious, until you realize that the rightmost \hask{id} is applided to \hask{m (m a)}, and the leftmost is applied to \hask{m a}. We interpret:
+This may not be immediately obvious, until you realize that the rightmost \hask{id} is applided to \hask{m (m a)}, and the leftmost is applied to \hask{m a}. We interpret a Haskell function:
 \begin{haskell}
 m (m a) -> m (m a)
 \end{haskell}
-as an arrow in the Kleisli category that goes from \hask{ m(m a) } to \hask{m a}, and 
+as an arrow in the Kleisli category that goes from \hask{ m(m a) } to \hask{m a}. Similarly, the function:
 \begin{haskell}
 m a -> m a
 \end{haskell}
-as a Kleisli arrow from \hask{ m a} to \hask{a}. Their Kleisli composition is again a Kleisli arrow from \hask{ m (m a)} to \hask{a}, or a function 
+implements a Kleisli arrow from \hask{ m a} to \hask{a}. Their Kleisli composition produces a Kleisli arrow from \hask{ m (m a)} to \hask{a}, or a Haskell function:
 \begin{haskell}
 m (m a) -> m a
 \end{haskell}
@@ -261,9 +274,9 @@ class Functor m => Monad m where
 
 This is still not the definition you will find in the standard Haskell \hask{Prelude}. Since the fish operator is a generalization of the dot operator, using it is equivalent to point-free programming. It lets us compose arrows without naming intermediate values. Although some consider point-free programs more elegant, most programmers find them difficult to follow. 
 
-But function composition can be decomposed into two steps: Apply the first function, then apply the second function to the result. Explicitly naming the result may help our understanding of what's going on.
+But function composition is really done in two steps: We apply the first function, then apply the second function to the result. Explicitly naming the intermediate result is often helpful in understanding of what's going on.
 
-To do the same with Kleisli arrows, we have to know how to apply a Kleisli arrow to a named monadic value. The function that does that is called \emph{bind} and is written as an infix operator:
+To do the same with Kleisli arrows, we have to know how to apply the second Kleisli arrow to a named monadic value---the result of the first Kleisli arrow. The function that does that is called \emph{bind} and is written as an infix operator:
 \begin{haskell}
 (>>=) :: m a -> (a -> m b) -> m b
 \end{haskell}
@@ -286,7 +299,7 @@ class Monad m where
 \end{haskell}
 This is almost the definition you'll find in the \hask{Prelude}, except for the additional constraint. This constraint states the fact that every instance of \hask{Monad} is also an instance of \hask{Applicative}. We will postpone the discussion of applicatives to the section on monoidal functors.
 
-We can also implement \hask{join} using \hask{>>=}:
+We can also implement \hask{join} using bind:
 \begin{haskell}
 join  :: (Monad m) => m (m a) -> m a
 join mma =  mma >>= id
@@ -317,29 +330,29 @@ In order to compose functions that produce logs, we need a way to combine indivi
 \begin{haskell}
 newtype Writer w a = Writer (a, w)
 \end{haskell}
-requires the type of the log to be a monoid. This allows us to append logs and to create an empty log.
+requires the type of the log to be an instance of \hask{Monoid}. This allows us to append logs and to create an empty log.
 \begin{haskell}
 instance Monoid w => Monad (Writer w) where
   (Writer (a, w)) >>= k = let (Writer (b, w')) = k a
                           in Writer (b, mappend w w')
   return a = Writer (a, mempty)
 \end{haskell}
-The \hask{let} clause is used for introducing local bindings. Here, the result of applying \hask{k} is pattern matched, and the local variables \hask{b} and \hask{w'} are initialized. The \hask{let}/\hask{in} construct is an expression whose value is given by the content of the \hask{in} clause.
+The \index{\hask{let}}\hask{let} clause is used for introducing local bindings. Here, the result of applying \hask{k} is pattern matched, and the local variables \hask{b} and \hask{w'} are initialized. The \hask{let}/\hask{in} construct is an expression whose value is given by the content of the \hask{in} clause.
 
 \subsection{Environment}
 
-The reader monad is a thin encapsulation of a function from the environment to the relevant return type:
+The reader monad is a thin encapsulation of a function from the environment to the return type:
 \begin{haskell}
 newtype Reader e a = Reader (e -> a)
 \end{haskell}
 Here's the \hask{Monad} instance:
 \begin{haskell}
 instance Monad (Reader e) where
-  ma >>= k = Reader (\e -> let a = runReader rd e
+  ma >>= k = Reader (\e -> let a = runReader ma e
                            in runReader (k a) e)
   return a = Reader (\e -> a)
 \end{haskell}
-The implementation of bind for the reader monad creates a function that takes the environment as its argument. This environment is used twice, first to run \hask{ma} to get the value of \hask{a}, and then to evaluate the value produced by running \hask{k a}.
+The implementation of bind for the reader monad creates a function that takes the environment as its argument. This environment is used twice, first to run \hask{ma} to get the value of \hask{a}, and then to evaluate the value produced by \hask{k a}.
 
 The implementation of \hask{return} ignores the environment.
 
@@ -357,7 +370,7 @@ runE (E f) e = f e
 
 
 \subsection{State}
-Like reader, the state monad is also a function type:
+Like reader, the state monad is a function type:
 \begin{haskell}
 newtype State s a = State (s -> (a, s))
 \end{haskell}
@@ -386,7 +399,7 @@ In this form, it's easy to convert it to point-free notation:
 join mma = State (uncurry runState . runState mma)
 \end{haskell}
 
-There are two basic Kleisli arrows (the first one, conceptually, coming from the terminal object \hask{()}) using which we can construct an arbitrary stateful computation. The first one retrieves the current state:
+There are two basic Kleisli arrows (the first one, conceptually, coming from the terminal object \hask{()}) with which we can construct an arbitrary stateful computation. The first one retrieves the current state:
 \begin{haskell}
 get :: State s s
 get = State (\s -> (s, s))
@@ -409,7 +422,7 @@ instance Monad [] where
 
 What in imperative languages is done using nested loops we can do in Haskell using the list monad. Think of \hask{as} as aggregating the result of running the inner loop and \hask{k} as the code that runs in the outer loop. 
 
-In many ways, Haskell's list behaves more like what is called an iterator or a generator in imperative languages. Because of laziness, the elements of the list are rarely stored in memory all at once. You may also think of a list as a coroutine that produces elements of a sequence on demand.
+In many ways, Haskell's list behaves more like what is called an iterator or a generator in imperative languages. Because of laziness, the elements of the list are rarely stored in memory all at once. You may also think of a list as a coroutine that produces, on demand, elements of a sequence.
 
 \subsection{Continuation}
 
@@ -418,7 +431,7 @@ The implementation of bind for the continuation monad:
 \begin{haskell}
 newtype Cont r a = Cont ((a -> r) -> r)
 \end{haskell}
-requires some backward thinking, because of the inversion of control. 
+requires some backward thinking, because of the inherent inversion of control---the ``don't call us, we'll call you'' principle. 
 
 The result of bind is supposed to be a function that takes, as an argument, a continuation \hask{k} of the type:
 \begin{haskell}
@@ -429,29 +442,31 @@ We have to put together such a function given the two ingredients at our disposa
 ma :: Cont r a
 fk :: a -> Cont r b
 \end{haskell}
-We can run \hask{ma} as long as we can give it a continuation that accepts an \hask{a}. We can build such a continuation: given an \hask{a} it will call \hask{fk}, which returns a \hask{b}-expecting continuation. That's exactly the continuation \hask{k} we have at our disposal:
+We'd like to run \hask{ma}, but for that we need a continuation that would accept an \hask{a}. We can build such a continuation: given an \hask{a} it would call \hask{fk}. The result is a \hask{b}-expecting continuation \hask{Cont r b}. But that's exactly the continuation \hask{k} we have at our disposal. Taken together, this convoluted process produces the following implementation:
 \begin{haskell}
 instance Monad (Cont r) where
   ma >>= fk = Cont (\k -> runCont ma (\a -> runCont (fk a) k))
   return a = Cont (\k -> k a)
 \end{haskell}
-As I mentioned earlier, composing continuations is not for the faint of heart. However, it has to be implemented only once, in the definition of the continuation monad. From there on, the \hask{do} notation makes it really easy.
+As we mentioned earlier, composing continuations is not for the faint of heart. However, it has to be implemented only once---in the definition of the continuation monad. From there on, the \hask{do} notation will make the rest relatively easy.
 
 \subsection{Input/Output}
 
-The \hask{IO} monad's implementation is baked into the language. The basic I/O primitives are available through the library. They are either in the form of Kleisli arrows, or \hask{IO} objects (conceptually, Kleisli arrows from the terminal object \hask{()}). For instance, the following object contains a command to read a line from the standard input:
+The \hask{IO} monad's implementation is baked into the language. The basic I/O primitives are available through the library. They are either in the form of Kleisli arrows, or \hask{IO} objects (conceptually, Kleisli arrows from the terminal object \hask{()}). 
+
+For instance, the following object contains a command to read a line from the standard input:
 \begin{haskell}
 getLine :: IO String
 \end{haskell}
-There is no way to extract the string from it, since it's not there yet; but the program can process it through a series of Kleisli arrows. For instance, if you want to execute different code depending on the string stored in the \hask{IO} object, you bind it to a Kleisli arrow that takes a string as input and produces a more complex \hask{IO} action, and so on. 
+There is no way to extract the string from it, since it's not there yet; but the program can process it through a further series of Kleisli arrows. 
 
-The \hask{IO} monad is the ultimate procrastinator: the composition of its Kleisli arrows piles up task after task to be executed later.
+The \hask{IO} monad is the ultimate procrastinator: the composition of its Kleisli arrows piles up task after task to be executed later by the Haskell runtime.
 
 To output a string followed by a newline, you can use this Kleisli arrow:
 \begin{haskell}
 putStrLn :: String -> IO ()
 \end{haskell}
-Combining the two, you can construct a simple \hask{main} object:
+Combining the two, you may construct a simple \hask{main} object:
 \begin{haskell}
 main :: IO ()
 main = getLine >>= putStrLn
@@ -460,7 +475,7 @@ which echos a string you type.
 
 \section{Do Notation}
 
-It's worth repeating that the purpose of monads in programming is to let us decompose one big Kleisli arrow into multiple smaller ones. 
+It's worth repeating that the sole purpose of monads in programming is to let us decompose one big Kleisli arrow into multiple smaller ones. 
 
 This can be either done directly, in a point-free style, using Kleisli composition \hask{<=<}; or by naming intermediate values and binding them to Kleisli arrows using \hask{>>=}. 
 
@@ -485,14 +500,14 @@ The body of this lambda is further decomposed using another ad-hoc Kleisli arrow
 \s2 -> putStrLn ("Hello " ++ s1 ++ " " ++ s2)
 \end{haskell}
 
-Such constructs are so common that there is special syntax called the \hask{do} notation that avoids a lot of boilerplate. The above code can be written as:
+Such constructs are so common that there is special syntax called the \hask{do} notation that cuts through a lot of boilerplate. The above code, for instance, can be written as:
 \begin{haskell}
 main = do
   s1 <- getLine
   s2 <- getLine
   putStrLn ("Hello " ++ s1 ++ " " ++ s2)
 \end{haskell}
-The compiler will automatically convert it to a series of nested lambdas. The line \hask{ s1<-getLine } can be read as: ``\hask{s1} \emph{gets} the result of \hask{getLine}.''
+The compiler will automatically convert it to a series of nested lambdas. The line \hask{ s1<-getLine } is usually read as: ``\hask{s1} \emph{gets} the result of \hask{getLine}.''
 
 Here's another example: a function that uses the list monad to generate all possible pairs of elements taken from two lists.
 \begin{haskell}
@@ -502,12 +517,12 @@ pairs as bs = do
   b <- bs
   return (a, b)
 \end{haskell}
-Notice that the last line in a \hask{do} block must return a monadic value---here this is accomplished using \hask{return}.
+Notice that the last line in a \hask{do} block must produce a monadic value---here this is accomplished using \hask{return}.
 
 
 As mentioned before, the \hask{do} notation makes an easy task of otherwise very cumbersome composition of continuations.
 
-Most imperative languages lack the abstraction power to generically define a monad and instead they attempt to hard-code some of the common monads. For instance, they implement exceptions as an alternative to the \hask{Either} monad, or concurrent tasks as an alternative to the continuation monad. Some, like C++, introduce coroutines that mimic Haskell's \hask{do} notation. 
+Most imperative languages lack the abstraction power to generically define a monad and instead they attempt to hard-code some of the more common monads. For instance, they implement exceptions as an alternative to the \hask{Either} monad, or concurrent tasks as an alternative to the continuation monad. Some, like C++, introduce coroutines that mimic Haskell's \hask{do} notation. 
 
 \begin{exercise}
 Implement the following function that works for any monad:
@@ -523,23 +538,23 @@ Rewrite the \hask{pairs} function using the bind operators and lambdas.
 
 \section{Monads Categorically}
 
-In category theory monads first arose in the study of algebras. In particular, the bind operator can be used to implement the very important operation of substitution. 
+In category theory monads first arose in the study of algebras. In particular, we can use the bind operator to implement the very important operation of substitution. 
 
 \subsection{Substitution}
 
-Consider this simple expression type parameterized by the type that we will use for naming variables:
+Consider this simple expression type. It's parameterized by the type \hask{x} that we can use for naming variables:
 \begin{haskell}
 data Ex x = Val Int 
           | Var x 
           | Plus (Ex x) (Ex x) 
  deriving (Functor, Show)
 \end{haskell}
-Using this type we can, for instance, construct an expression $(2 + a) + b$:
+We can, for instance, construct an expression $(2 + a) + b$:
 \begin{haskell}
 ex :: Ex Char
 ex = Plus (Plus (Val 2) (Var 'a')) (Var 'b')
 \end{haskell}
-We can implement the \hask{Monad} instance for it:
+We can implement the \hask{Monad} instance for \hask{Ex}:
 \begin{haskell}
 instance Monad Ex where
   Val n >>= k = Val n
@@ -552,7 +567,7 @@ instance Monad Ex where
   return x = Var x 
 \end{haskell}
 
-Now suppose that you want to make a substitution by replacing $a$ with $x_1 + 2$ and $b$ with $x_2$ (for simplicity, let's not worry about other letters of the alphabet). This substitution is represented by the Kleisli arrow \hask{sub} (as you can see, we were even able to change the type of variable names from \hask{Char} to \hask{String}):
+Now suppose that you want to make a substitution by replacing $a$ with $x_1 + 2$ and $b$ with $x_2$ (for simplicity, let's not worry about other letters of the alphabet). This substitution is represented by the Kleisli arrow \hask{sub} (as you can see, we are even able to change the type of variable names from \hask{Char} to \hask{String}):
 \begin{haskell}
 sub :: Char -> Ex String
 sub 'a' = Plus (Var "x1") (Val 2)
@@ -579,25 +594,29 @@ In category theory, the functor that defines the monad is traditionally denoted 
 \[ \mu \colon T \circ T \to T \]
 (Of course, only \emph{endo}-functors can be squared this way.) 
 
-The second maps the identity functor to $T$:
+The second, corresponding to \hask{return}, maps the identity functor to $T$:
 \[ \eta \colon Id \to T \]
 
 Compare this with our earlier definition of a monoid in a monoidal category:
-\[ \mu \colon M \otimes M \to M \]
-\[ \eta \colon I \to M \]
+\begin{align*}
+\mu &\colon M \otimes M \to M \\
+\eta &\colon I \to M
+\end{align*}
 The similarity is striking. This is why we often call the natural transformation $\mu$ \emph{monadic multiplication}. But in what category can the composition of functors be considered a tensor product? 
 
 Enter the category of endofunctors. Objects in this category are endofunctors and arrows are natural transformations. 
 
-But there's more structure in that category. Any two endofunctors can be composed, so maybe composition could serve as a tensor product? After all, the only condition we impose on a tensor product is that it's functorial in both arguments. That is, given a pair of arrows:
- \[ \alpha \colon T \to T'\]
- \[ \beta \colon S \to S' \]
+But there's more structure to that category. Any two endofunctors can be composed, so maybe composition could be considered a tensor product? After all, the only condition we impose on a tensor product is that it's functorial in both arguments. That is, given a pair of arrows:
+\begin{align*}
+ \alpha &\colon T \to T' \\
+ \beta &\colon S \to S' 
+\end{align*}
  we can lift it to the mapping of tensor products:
  \[ \alpha \otimes \beta \colon T \otimes S \to T' \otimes S' \]
  
  In the category of endofunctors, the arrows are natural transformations so, if we replace $\otimes$ with $\circ$, the lifting would be a mapping:
 \[ \alpha \circ \beta \colon T \circ T' \to S \circ S' \]
-But this is just horizontal composition of natural transformations (now you understand why it's denoted by a circle).
+But this is just the horizontal composition of natural transformations (now you understand why it's denoted by a circle).
 
 The unit object in this monoidal category is the identity endofunctor, and unit laws are satisfied ``on the nose,'' meaning
 \[ \text{Id} \circ T = T = T \circ \text{Id}\]
@@ -610,9 +629,11 @@ Notice, however, that composition is not symmetric, so this is not a symmetric m
 So, all said, a monad is a monoid in the monoidal category of endofunctors. 
 
 A monad $(T, \eta, \mu)$ consists of an object in the category of endofunctors---meaning an endofunctor $T$; and two arrows---meaning natural transformations:
-\[ \eta \colon \text{Id} \to T \]
-\[ \mu \colon T \circ T \to T \]
-For this to be a monoid, these arrows must satisfy monoidal laws. Here are the unit laws (the unitors here are strict equalities):
+\begin{align*}
+ \eta &\colon \text{Id} \to T \\
+ \mu &\colon T \circ T \to T 
+\end{align*}
+For this to be a monoid, these arrows must satisfy monoidal laws. Here are the unit laws (with unitors strict equalities):
 \[
  \begin{tikzcd}
 \text{Id} \circ T
@@ -653,12 +674,12 @@ These are the monad laws in terms of $\mu$ and $\eta$. They can be directly tran
 
 We've seen several examples of monoidal cateogries. Such categories are equipped with some kind of binary operation, e.g., a cartesian product, a sum, composition (in the category of endofunctors), etc. They also have a special object that serves as a unit with respect to this binary operation. Unit and associativity laws are satisfied either on the nose (in strict monoidal categories) or up to isomorphism.
 
-Every time we have more than one instance of some structure, we may ask ourselves the question: is there a whole category of such things? In this case: do monoidal categories form their own category? For that we have to define arrows between monoidal categories.
+Every time we have more than one instance of some structure, we may ask ourselves the question: is there a whole category of such things? In this case: do monoidal categories form their own category? For this to work we would have to define arrows between monoidal categories.
 
-A \emph{monoidal functor} $F$ from a monoidal category $\mathcal{C}$ to another monoidal category $\mathcal{D}$ maps tensor product to tensor product and unit to unit---all up to isomorphism:
+A \emph{monoidal functor} $F$ from a monoidal category $(\mathcal{C}, \otimes, I)$ to another monoidal category $(\mathcal{D}, \oplus, J)$ maps tensor product to tensor product and unit to unit---all up to isomorphism:
 \begin{align*}
-F A \otimes F B &\cong F (A \otimes B) \\
-I &\cong F I 
+F A \oplus F B &\cong F (A \otimes B) \\
+J &\cong F I 
 \end{align*}
 Here, on the left-hand side we have the tensor product and the unit in the target category, and on the right their counterparts in the source category. 
 
@@ -670,10 +691,10 @@ The category of monoidal categories with monoidal functors as arrows is called $
 
 One of the perks of monoidal categories is that they allow us to define monoids. You can easily convince yourself that monoidal functors map monoids to monoids. It turns out that we don't need the whole power of monoidal functors to accomplish this task. Let's consider what are the minimal requirements for a functor to map a monoid to a monoid. 
 
-Let's start with a monoid $(M, \mu, \eta)$ in the monoidal category $(\mathcal{C}, \otimes, I)$. We have a functor $F$ that maps $M$ to $F M$ and we want $F M$ to be a monoid in the target monoidal category $(\mathcal{D}, \otimes_{\mathcal{D}}, I_{\mathcal{D}})$. For that we need to find two morphisms:
+Let's start with a monoid $(M, \mu, \eta)$ in the monoidal category $(\mathcal{C}, \otimes, I)$. We have a functor $F$ that maps $M$ to $F M$ and we want $F M$ to be a monoid in the target monoidal category $(\mathcal{D}, \oplus, J)$. For that we need to find two morphisms:
 \begin{align*}
-\eta' &\colon I_{\mathcal{D}} \to F M \\
- \mu' &\colon F M \otimes_{\mathcal{D}} F M \to F M 
+\eta' &\colon J \to F M \\
+ \mu' &\colon F M \oplus F M \to F M 
 \end{align*}
 satisfying monoidal laws.
 
@@ -683,17 +704,17 @@ We do have at our disposal the liftings of the original morphisms:
  F \mu &\colon F (M \otimes M) \to F M
 \end{align*}
 
-What we are missing in order to implement $\eta'$ and $\mu'$ are two additional arrows 
+What we are missing, in order to implement $\eta'$ and $\mu'$, are two additional arrows:
 \begin{align*}
-I_{\mathcal{D}} &\to F I\\
- F M \otimes_{\mathcal{D}} F M &\to F (M \otimes M)
+J &\to F I\\
+ F M \oplus F M &\to F (M \otimes M)
  \end{align*}
 A monoidal functor would provide such arrows as halves of the defining isomorphisms, but for what we're trying it accomplish, we don't need the other halves. All we need is a weaker notion of a lax monoidal functor. 
 
 A \emph{lax monoidal functor} is a functor equipped with a one-way morphism $\phi_I$ and a natural transformation whose components are $\phi_{A B}$:
 \begin{align*}
-\phi_I &\colon I_{\mathcal{D}} \to F I \\
-\phi_{A B} &\colon F A \otimes_{\mathcal{D}} F B \to F (A \otimes B)
+\phi_I &\colon J \to F I \\
+\phi_{A B} &\colon F A \oplus F B \to F (A \otimes B)
 \end{align*}
 satisfying the appropriate untiality and associativity conditions.
 
