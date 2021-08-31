@@ -709,26 +709,27 @@ What we are missing, in order to implement $\eta'$ and $\mu'$, are two additiona
 J &\to F I\\
  F M \oplus F M &\to F (M \otimes M)
  \end{align*}
-A monoidal functor would provide such arrows as halves of the defining isomorphisms, but for what we're trying it accomplish, we don't need the other halves. All we need is a weaker notion of a lax monoidal functor. 
+A monoidal functor would provide such arrows as halves of the defining isomorphisms. However, for what we're trying it accomplish, we don't need the other halves. Such a relaxed functor is called a lax monoidal functor. 
 
-A \emph{lax monoidal functor} is a functor equipped with a one-way morphism $\phi_I$ and a natural transformation whose components are $\phi_{A B}$:
+A \emph{lax monoidal functor} is a functor equipped with a one-way morphism and a natural transformation:
 \begin{align*}
 \phi_I &\colon J \to F I \\
 \phi_{A B} &\colon F A \oplus F B \to F (A \otimes B)
 \end{align*}
 satisfying the appropriate untiality and associativity conditions.
 
-\subsection{Lax monoidal functors in Haskell}
+The simplest example of a lax monoidal functor is an endofunctor that (half-) preserves the cartesian product. We can define it in Haskell as a typeclass:
 
 \begin{haskell}
 class Monoidal f where
   unit  :: f ()
-  (>*<) :: f x -> f y -> f (x, y)
+  (>*<) :: f a -> f b -> f (a, b)
 \end{haskell}
-
-\subsection{Applicative functors}
+Corresponding to $\phi_{A B}$ we have an infix operator which, according to Haskell conventions, it's written in its curried form.
 
 \subsection{Functorial strength}
+
+\subsection{Applicative functors}
 
 strong monads
 
