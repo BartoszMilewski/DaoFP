@@ -744,29 +744,29 @@ This definition makes no sense in isolation, but it does when the environment co
 pairWith :: Int -> (String -> (Int, String))
 pairWith a = \x -> (a, x)
 \end{haskell}
-The function returned by calling \hask{pairWith 5} is such a closure.
+The function returned by calling \hask{pairWith 5} ``encloses'' the 5 from its environment.
 
-Now consider this version, which returns a singleton list that contains our closure:
+Now consider this modification, which returns a singleton list that contains the closure:
 \begin{haskell}
 pairWith' :: Int -> [String -> (Int, String)]
 pairWith' a = [\x -> (a, x)]
 \end{haskell}
-As a programmer you'd be very surprised if this didn't work. But what we do here is highly nontrivial: we are smuggling the environment inside the list functor. According to our model of lambda calculus, a closure is a morphism from the product of the environment type and the function argument type, here \hask{(Int, String)}. 
+As a programmer you'd be very surprised if this didn't work. But what we do here is highly nontrivial: we are smuggling the environment inside the list functor. According to our model of lambda calculus, a closure is a morphism from the product of the environment and the function argument, here \hask{(Int, String)}. 
 
 The property that lets us smuggle the environment under a functor is called \index{strength, functorial}\emph{functorial strength} or \emph{tensorial strength} and can be implemented in Haskell as:
 \begin{haskell}
-strength :: Functor f => (a, f b) -> f (a, b)
-strength (a, bs) = fmap (a, ) bs
+strength :: Functor f => (e, f a) -> f (e, a)
+strength (e, as) = fmap (e, ) as
 \end{haskell}
-The notation \hask{(a, )} is called a \index{tuple section}\emph{tuple section} and is equivalent to the partial application of the pair constructor: \hask{(,) a}.
+The notation \hask{(e, )} is called a \index{tuple section}\emph{tuple section} and is equivalent to the partial application of the pair constructor: \hask{(,) e}.
 
 In category theory, strength for an endofunctor $F$ is defined as a natural transformation:
 \[ \sigma \colon A \otimes F(B) \to F (A \otimes B) \]
-that works nicely with the unitors and the associator of the monoidal category that defines the tensor product.
+There are some additional conditions which ensure that it works nicely with the unitors and the associator of the monoidal category that defines the tensor product.
 
 As you can see from the above implementation, in Haskell, every functor is strong. This is why we don't have to worry about accessing the environment from inside a functor. 
 
-Even more importantly, every monad in Haskell is strong by virtue of being a functor. And this is also why every monad is automatically \hask{Monoidal}. 
+Even more importantly, every monad in Haskell is strong by virtue of being a functor. This is also why every monad is automatically \hask{Monoidal}. 
 \begin{haskell}
 instance Monad m => Monoidal m where
   unit = return ()
@@ -781,18 +781,80 @@ In general, though, not every endofunctor in a monoidal category is strong. The 
 
 \subsection{Applicative functors}
 
-In programming, the idea of applicative functors arose from the following question: A functor lets us lift a function of one variable. How can we lift a function of two or more variables?
+In programming, the idea of applicative functors arose from the following question: A functor lets us lift a function of one variable. How can we lift a function of two or more variables? By analogy with \hask{fmap}, we'd like to have a function:
+\begin{haskell}
+liftA2 :: (a -> b -> c) -> f a -> f b -> f c
+\end{haskell}
 
+A function of two arguments (here, in its curried form) is a function of one argument returning a function. So, assuming that \hask{f} is a functor, we can \hask{fmap} the first argument:
+\begin{haskell}
+a -> (b -> c)
+\end{haskell}
+over the second argument \hask{(f a)} to get:
+\begin{haskell}
+f (b -> c)
+\end{haskell}
+The problem is, we don't know how to apply \hask{f (b -> c)} to the remaining argument \hask{f b}. 
 
+The class of functors that let us do that is called \hask{Applicative}. It turns out that once we know how to lift a two-argument function, we can lift functions of any number of arguments, except zero. A zero-argument function is just a value, so lifting it means implementing a function:
+\begin{haskell}
+pure :: a -> f
+\end{haskell}
+Here's the full definition:
 \begin{haskell}
 class Functor f => Applicative f where
     pure  :: a -> f a
     (<*>) :: f (a -> b) -> f a -> f b
 \end{haskell}
+The application of a functor-ful of functions to a functor-ful of arguments is defined as an infix operator that is customarily called ``splat.''
+
+There is also an infix version of \hask{fmap}:
+\begin{haskell}
+(<$>) :: (a -> b) -> f a -> f b
+\end{haskell}
+which can be used in a shorthand notation to implement \hask{liftA2}:
+\begin{haskell}
+liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
+liftA2 g as bs = g <$> as <*> bs
+\end{haskell}
+Both operators bind left, which makes this syntax mimic regular function application.
+
+\begin{exercise}
+Implement \hask{liftA3}, a function that lifts a 3-argument function using an applicative functor.
+\end{exercise}
+
+\subsection{Closed functors}
+If you squint at the definition of the splat operator:
+\begin{haskell}
+(<*>) :: f (a -> b) -> (f a -> f b)
+\end{haskell}
+you may see it as mapping a function object to a function object. 
+
+This becomes clearer if you consider a functor between two categories, both of them closed. You start with a function object $B^A$ in the source category and apply the functor $F$ to it:
+\[ F (B^A) \]
+Alternatively, you may map the two objects $A$ and $B$ and construct a function object between them in the target category:
+\[ (F B)^{F A} \]
+If we demand that the two objects be isomorphic, we get a strict \emph{closed functor}. But, as was the case with monoidal functors, we are more interested in the lax version, which is equipped with a one-way natural transformation:
+\[ F (B^A) \to (F B)^{F A} \]
+If $F$ is an endofunctor, this translates directly into the definition of the splat operator. 
+
+The full definition of a lax closed functor includes the mapping of the monoidal unit and some coherence conditions. 
+
+In a closed monoidal category, the exponential is related to the cartesian product through an adjunction. It's no surprise then that lax monoidal and lax closed endofunctors are the same. We can easily express this in Haskell:
 
 \begin{haskell}
-liftA2 :: (a -> b -> c) -> f a -> f b -> f c
+
 \end{haskell}
+
+\begin{haskell}
+\end{haskell}
+
+\begin{haskell}
+\end{haskell}
+
+\begin{haskell}
+\end{haskell}
+
 
 \begin{haskell}
 class Applicative m => Monad m where
