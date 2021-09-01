@@ -155,9 +155,9 @@ pairWithTen = pair 10 -- partial application of pair
 
 \subsection{Relation to lambda calculus}
 
-Another way of looking at the definition of the function object is to consider $C$ the type of the environment in which $f$ is defined. In that case it's customary to call it $\Gamma$. The arrow is interpreted as an expression that can be defined in the environment $\Gamma$. 
+Another way of looking at the definition of the function object is to interpret $C$ as the type of the environment in which $f$ is defined. In that case it's customary to call it $\Gamma$. The arrow is interpreted as an expression that can be defined in the environment $\Gamma$. 
 
-Consider a simple example, the expression
+Consider a simple example, the expression:
 \[a x^2 + b x + c\]
 You may think of it as being parameterized by a triple of real numbers $(a, b, c)$ and a variable $x$, taken to be, let's say, a complex number. The triple is an element of a product $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$. This product is the environment $\Gamma$ for our expression. 
 
@@ -201,7 +201,7 @@ The defining diagram for the function object becomes
 
 The environment $\Gamma$ that provides free parameters for the expression $e$ is a product of multiple objects representing the types of the parameters (in our example, it was $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$). An empty environment is represented by the terminal object, the unit of the product. In the latter case, $h$ simply picks an element from the function object. 
 
-It's important to keep in mind that, in general, a function object represents functions that depend on external parameters. Such functions are called \emph{closures}. Closures are functions that capture values from their environment.
+It's important to keep in mind that, in general, a function object represents functions that depend on external parameters. Such functions are called \index{closure}\emph{closures}. Closures are functions that capture values from their environment.
 
 Here's an example of a function returning a closure (for simplicity, we use \hask{Double} for all types)
 \begin{haskell}
