@@ -900,15 +900,24 @@ instance Applicative [] where
 \end{haskell}
 Of course, the list functor is also a monad, so there is another \hask{Applicative} instance based on that. Its splat operator applies every function to every argument.
 
+In programming, monad is more powerful than applicative. That's because monadic code lets you examine the contents of a monadic value and branch depending on it. This is true even for the \hask{IO} monad which otherwise provides no means of extracting the value, as in this example:
+\begin{haskell}
+main :: IO ()
+main = do
+  s <- getLine
+  if s == "yes"
+  then putStrLn "Thank you!"
+  else putStrLn "Next time."
+\end{haskell}
+Of course, the inspection of the value is postponed until the runtime interpreter of \hask{IO} gets hold of this code. 
 
+Applicative composition using the splat operator doesn't allow for one part of the computation to inspect the result of the other. This a limitation that can be turned into an advantage. The absence of dependencies makes it possible to run the computations in parallel.  Haskell's parallel libraries use applicative programming extensively.
+
+On the other hand, monads let us use the very convenient \hask{do} syntax, which is arguably more readable than the applicative syntax. Fortunately, there is a language extension \hask{ApplicativeDo}, which instructs the compiler to selectively use applicative constructs in interpreting \hask{do} blocks, whenever there are no dependencies.
 
 \begin{exercise}
 Verify \hask{Applicative} laws for the zip instance of the list functor.
 \end{exercise}
-
-difference between applicative and monad
-
-performance, parallel programming, applicative do
 
 
 
