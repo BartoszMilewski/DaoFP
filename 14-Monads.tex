@@ -800,7 +800,7 @@ The class of functors that let us do that is called \hask{Applicative}. It turns
 \begin{haskell}
 pure :: a -> f
 \end{haskell}
-Here's the full definition:
+Here's the Haskell definition:
 \begin{haskell}
 class Functor f => Applicative f where
     pure  :: a -> f a
@@ -818,6 +818,14 @@ liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
 liftA2 g as bs = g <$> as <*> bs
 \end{haskell}
 Both operators bind left, which makes this syntax mimic regular function application.
+
+An applicative functor must also satisfy a set of laws:
+\begin{haskell}
+pure id <*> v = v                            -- Identity
+pure f <*> pure x = pure (f x)               -- Homomorphism
+u <*> pure y = pure ($ y) <*> u              -- Interchange
+pure (.) <*> u <*> v <*> w = u <*> (v <*> w) -- Composition
+\end{haskell}
 
 \begin{exercise}
 Implement \hask{liftA3}, a function that lifts a 3-argument function using an applicative functor.
@@ -841,32 +849,68 @@ If $F$ is an endofunctor, this translates directly into the definition of the sp
 The full definition of a lax closed functor includes the mapping of the monoidal unit and some coherence conditions. 
 
 In a closed monoidal category, the exponential is related to the cartesian product through an adjunction. It's no surprise then that lax monoidal and lax closed endofunctors are the same. We can easily express this in Haskell:
-
 \begin{haskell}
+instance (Functor f, Monoidal f) => Applicative f where
+  pure a = fmap (const a) unit
+  fs <*> as = fmap apply (fs >*< as)
+\end{haskell}
+where \hask{const} is a function that ignores its second argument:
+\begin{haskell}
+const :: a -> b -> a
+const a b = a
+\end{haskell}
+and \hask{apply} is the uncurried function application:
+\begin{haskell}
+apply :: (a -> b, a) -> b
+apply (f, a) = f a
+\end{haskell}
+The other way around we have:
+\begin{haskell}
+instance Applicative f => Monoidal f where
+  unit = pure ()
+  as >*< bs = (,) <$> as <*> bs
+\end{haskell}
+In the latter, we used the pair constructor \hask{(,)} as a two-argument function.
 
+\subsection{Monads and applicatives}
+
+Since, in a cartesian closed category, every monad is lax monoidal, it is automatically applicative. This can be shown directly by implementing \hask{ap}, which has the same type signature as the splat operator:
+\begin{haskell}
+ap :: (Monad m) => m (a -> b) -> m a -> m b
+ap fs as = do 
+    f <- fs
+    a <- as
+    return (f a) 
 \end{haskell}
 
-\begin{haskell}
-\end{haskell}
-
-\begin{haskell}
-\end{haskell}
-
-\begin{haskell}
-\end{haskell}
-
-
+This connection is expressed in the Haskell definition of a \hask{Monad} that includes \hask{Applicative} as its superclass:
 \begin{haskell}
 class Applicative m => Monad m where
     (>>=)       :: forall a b. m a -> (a -> m b) -> m b
     return      :: a -> m a
     return      = pure
 \end{haskell}
+Notice that the default implementation of \hask{return} as \hask{pure} is included. 
 
+The converse is not true: not every \hask{Applicative} is a \hask{Monad}. The standard example is the \hask{Applicative} instance for a list functor that uses zipping:
 \begin{haskell}
-ap                :: (Monad m) => m (a -> b) -> m a -> m b
-ap m1 m2          = do { x1 <- m1; x2 <- m2; return (x1 x2) }
+instance Applicative [] where
+  pure = repeat
+  fs <*> as = zipWith apply fs as
 \end{haskell}
+Of course, the list functor is also a monad, so there is another \hask{Applicative} instance based on that. Its splat operator applies every function to every argument.
+
+
+
+\begin{exercise}
+Verify \hask{Applicative} laws for the zip instance of the list functor.
+\end{exercise}
+
+difference between applicative and monad
+
+performance, parallel programming, applicative do
+
+
 
 
 \end{document}
