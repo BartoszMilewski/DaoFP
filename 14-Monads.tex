@@ -103,7 +103,7 @@ Notice that, modulo constructor unpacking, \hask{runState} is bona fide function
 
 \subsection{Nondeterminism}
 
-Imagine performing a quantum experiment that measures the spin of an electron. Half of the time the spin will be up, and half of the time it will be down. The result is non-deterministic. One way to describe it is to use the many-worlds interpretation: when we perform the experiment, the Universe splits into two Universes, one for each result.  
+Imagine performing a quantum experiment that measures the spin of an electron. Half of the time the spin will be up, and half of the time it will be down. The result is non-deterministic. One way to describe it is to use the many-worlds interpretation: when we perform the experiment, the Universe splits into two universes, one for each result.  
 
 What does it mean for a function to be non-deterministic? It means that it will return different results every time it's called. We can model this behavior using the many-worlds interpretation: we let the function return \emph{all possible results} at once. In practice, we'll settle for a (possibly infinite) list of results:
 
@@ -165,6 +165,7 @@ When we represent effectful computations as pure functions, we are faced with th
 g :: a -> f b
 h :: b -> f c
 \end{haskell}
+In all cases of interest the type constructor \hask{f} happens to be a \hask{Functor}, so we'll assume that in what follows.
 
 The naive approach would be to unpack the result of the first function, pass the value to the next function, then compose the effects of both functions on the side, and combine them with the result of the second function. This is not always possible, even for cases that we have studied so far, much less for an arbitrary type constructor.
 
@@ -225,7 +226,7 @@ The category that we have just defined is called the \emph{Kleisli category} for
 
 All functors from the previous section are \hask{Monad} instances. If you look at them as type constructors, or even functors, it's hard to see any similarities between them. The thing they have in common is that they can be used to implement \emph{composable} Kleisli arrows. 
 
-As Lao Tze would say: Composition is something that happens \emph{between} things. While focusing our attention on things, we often lose sight of what happen in the gaps. 
+As Lao Tze would say: Composition is something that happens \emph{between} things. While focusing our attention on things, we often lose sight of what's in the gaps. 
 
 \section{Alternative Definitions}
 
@@ -611,7 +612,7 @@ But there's more structure to that category. Any two endofunctors can be compose
  \alpha &\colon T \to T' \\
  \beta &\colon S \to S' 
 \end{align*}
- we can lift it to the mapping of tensor products:
+ we can lift it to the mapping of the tensor product:
  \[ \alpha \otimes \beta \colon T \otimes S \to T' \otimes S' \]
  
  In the category of endofunctors, the arrows are natural transformations so, if we replace $\otimes$ with $\circ$, the lifting would be a mapping:
@@ -620,7 +621,7 @@ But this is just the horizontal composition of natural transformations (now you 
 
 The unit object in this monoidal category is the identity endofunctor, and unit laws are satisfied ``on the nose,'' meaning
 \[ \text{Id} \circ T = T = T \circ \text{Id}\]
-We don't need any unitors---or, for that matter, associators---since functor composition is automatically associative. 
+We don't need any unitors. We don't need any associators either, since functor composition is automatically associative. 
 
 A monoidal category in which unit and associativity laws are equalities is called a \index{strict monoidal category}\emph{strict} monoidal category.
 
@@ -633,7 +634,7 @@ A monad $(T, \eta, \mu)$ consists of an object in the category of endofunctors--
  \eta &\colon \text{Id} \to T \\
  \mu &\colon T \circ T \to T 
 \end{align*}
-For this to be a monoid, these arrows must satisfy monoidal laws. Here are the unit laws (with unitors strict equalities):
+For this to be a monoid, these arrows must satisfy monoidal laws. Here are the unit laws (with unitors replaced by strict equalities):
 \[
  \begin{tikzcd}
 \text{Id} \circ T
@@ -691,14 +692,14 @@ The category of monoidal categories with monoidal functors as arrows is called $
 
 One of the perks of monoidal categories is that they allow us to define monoids. You can easily convince yourself that monoidal functors map monoids to monoids. It turns out that you don't need the full power of monoidal functors to accomplish this task. Let's consider what are the minimal requirements for a functor to map a monoid to a monoid. 
 
-Let's start with a monoid $(M, \mu, \eta)$ in the monoidal category $(\mathcal{C}, \otimes, I)$. We have a functor $F$ that maps $M$ to $F M$ and we want $F M$ to be a monoid in the target monoidal category $(\mathcal{D}, \oplus, J)$. For that we need to find two mappings:
+Let's start with a monoid $(M, \mu, \eta)$ in the monoidal category $(\mathcal{C}, \otimes, I)$. Consider a functor $F$ that maps $M$ to $F M$. We want $F M$ to be a monoid in the target monoidal category $(\mathcal{D}, \oplus, J)$. For that we need to find two mappings:
 \begin{align*}
 \eta' &\colon J \to F M \\
  \mu' &\colon F M \oplus F M \to F M 
 \end{align*}
 satisfying monoidal laws.
 
-We do have at our disposal the liftings of the original mappings:
+Since $M$ is a monoid, we do have at our disposal the liftings of the original mappings:
 \begin{align*}
  F \eta &\colon F I \to F M \\
  F \mu &\colon F (M \otimes M) \to F M
@@ -709,7 +710,7 @@ What we are missing, in order to implement $\eta'$ and $\mu'$, are two additiona
 J &\to F I\\
  F M \oplus F M &\to F (M \otimes M)
  \end{align*}
-A monoidal functor would provide such arrows as halves of the defining isomorphisms. However, for what we're trying it accomplish, we don't need the other halves. We can relax the isomorphisms. 
+A monoidal functor would provide such arrows as halves of the defining isomorphisms. However, for what we're trying it accomplish, we don't need the other halves, so we can relax the isomorphisms. 
 
 A \emph{lax monoidal functor} is a functor equipped with a one-way morphism and a natural transformation:
 \begin{align*}
@@ -718,7 +719,7 @@ A \emph{lax monoidal functor} is a functor equipped with a one-way morphism and 
 \end{align*}
 satisfying the appropriate untiality and associativity conditions.
 
-The simplest example of a lax monoidal functor is an endofunctor that (half-) preserves the cartesian product. We can define it in Haskell as a typeclass:
+The simplest example of a lax monoidal functor is an endofunctor that (half-) preserves the usual cartesian product. We can define it in Haskell as a typeclass:
 
 \begin{haskell}
 class Monoidal f where
@@ -746,7 +747,7 @@ pairWith a = \x -> (a, x)
 \end{haskell}
 The function returned by calling \hask{pairWith 5} ``encloses'' the 5 from its environment.
 
-Now consider this modification, which returns a singleton list that contains the closure:
+Now consider the following modification, which returns a singleton list that contains the closure:
 \begin{haskell}
 pairWith' :: Int -> [String -> (Int, String)]
 pairWith' a = [\x -> (a, x)]
@@ -762,7 +763,7 @@ The notation \hask{(e, )} is called a \index{tuple section}\emph{tuple section} 
 
 In category theory, strength for an endofunctor $F$ is defined as a natural transformation:
 \[ \sigma \colon A \otimes F(B) \to F (A \otimes B) \]
-There are some additional conditions which ensure that it works nicely with the unitors and the associator of the monoidal category that defines the tensor product.
+There are some additional conditions which ensure that it works nicely with the unitors and the associator of the monoidal category in question.
 
 The fact that we were able to implement \hask{strength} for any functor means that, in Haskell, every functor is strong. This is the reason why we don't have to worry about accessing the environment from inside a functor. 
 
@@ -775,9 +776,9 @@ instance Monad m => Monoidal m where
     b <- mb
     return (a, b)
 \end{haskell}
-(Warning: to compile this code you'll need to turn a few compiler extensions.) If you desugar this code to use bind and lambdas, you'll notice that the final \hask{return} needs access to both \hask{a} and \hask{b}, which are defined in outer environments. This would be impossible without a monad being strong.
+(Warning: to compile this code you'll need to turn a few compiler extensions.) If you desugar this code to use monadic bind and lambdas, you'll notice that the final \hask{return} needs access to both \hask{a} and \hask{b}, which are defined in outer environments. This would be impossible without a monad being strong.
 
-In general, though, not every endofunctor in a monoidal category is strong. The reason it works in Haskell is that the category we're working with is cartesian closed. For now, the magic incantation is that such a category is self-enriched, so every endofunctor is canonically enriched. In Haskell this boils down to the fact that we can \hask{fmap} a partially applied pair constructor \hask{(a, )}.
+In category theory, though, not every endofunctor in a monoidal category is strong. The reason it works in Haskell is that the category we're working with is cartesian closed. For now, the magic incantation is that such a category is self-enriched, so every endofunctor is canonically enriched. In Haskell this boils down to the fact that we can \hask{fmap} a partially applied pair constructor \hask{(a, )}.
 
 \subsection{Applicative functors}
 
