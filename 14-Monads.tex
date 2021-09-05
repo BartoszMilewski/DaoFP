@@ -789,7 +789,7 @@ By analogy with \hask{fmap}, we'd like to have a function:
 liftA2 :: (a -> b -> c) -> f a -> f b -> f c
 \end{haskell}
 
-A function of two arguments (here, in its curried form) is a function of one argument returning a function. So, assuming that \hask{f} is a functor, we can \hask{fmap} the first argument:
+A function of two arguments---here, in its curried form---is a function of one argument returning a function. So, assuming that \hask{f} is a functor, we can \hask{fmap} the first argument of \hask{liftA2}:
 \begin{haskell}
 a -> (b -> c)
 \end{haskell}
@@ -799,7 +799,7 @@ f (b -> c)
 \end{haskell}
 The problem is, we don't know how to apply \hask{f (b -> c)} to the remaining argument \hask{f b}. 
 
-The class of functors that let us do that is called \hask{Applicative}. It turns out that once we know how to lift a two-argument function, we can lift functions of any number of arguments, except zero. A zero-argument function is just a value, so lifting it means implementing a function:
+The class of functors that let us do that is called \hask{Applicative}. It turns out that, once we know how to lift a two-argument function, we can lift functions of any number of arguments, except zero. A zero-argument function is just a value, so lifting it means implementing a function:
 \begin{haskell}
 pure :: a -> f a
 \end{haskell}
