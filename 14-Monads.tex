@@ -421,7 +421,7 @@ instance Monad [] where
 \end{haskell}
 \hask{return} constructs a singleton list.
 
-What in imperative languages is done using nested loops we can do in Haskell using the list monad. Think of \hask{as} as aggregating the result of running the inner loop and \hask{k} as the code that runs in the outer loop. 
+What in imperative languages do using nested loops we can do in Haskell using the list monad. Think of \hask{as} as aggregating the result of running the inner loop and \hask{k} as the code that runs in the outer loop. 
 
 In many ways, Haskell's list behaves more like what is called an iterator or a generator in imperative languages. Because of laziness, the elements of the list are rarely stored in memory all at once. You may also think of a list as a coroutine that produces, on demand, elements of a sequence.
 
