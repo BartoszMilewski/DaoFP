@@ -4,6 +4,59 @@
 
 \chapter{Comonads}
 
+If it were easily pronounceable, we should probably call side effects ``ntext,'' because the dual to side effects is ``context."
+
+Just like we were using Kleisli arrows to deal with side effects, we use co-Kleisli arrows to deal with context. 
+
+Let's start with the familiar example of an environment as a context. We have previously constructed a reader monad from it, by currying the arrow:
+\begin{haskell}
+(a, e) -> b
+\end{haskell}
+This time, however, we'll treat it as a co-Kleisli arrow, which is an arrow from a ``contextualized'' argument.
+
+As was the case with monads, we are interested in being able to compose such arrows. This is relatively easy for the environment-carrying arrows:
+\begin{haskell}
+composeWithEnv :: ((b, e) -> c) -> ((a, e) -> b) -> ((a, e) -> c)
+composeWithEnv g f = \(a, e) -> g (f (a, e), e)
+\end{haskell}
+
+It's also straightforward to implement an arrow that serves as an identity with respect to this composition:
+
+\begin{haskell}
+idWithEnv :: (a, e) -> a
+idWithEnv (a, e) = a
+\end{haskell}
+
+\section{Comonads in Programming}
+
+A functor \hask{w} (consider it a stylized upside-down \hask{m}) is a comonad if it supports composition of co-Kleisli arrows:
+
+\begin{haskell}
+class Functor w => Comonad w where
+   (=<=) :: (w b -> c) -> (w a -> b) -> (w a -> c)
+   extract :: w a -> a
+\end{haskell}
+Here the composition is written in the form of an infix operator; and the unit of composition is called \hask{extract}, since it extracts a value from the context. 
+
+Let's try it with our example. It's more convenient to pass the environment as the first component of the pair:
+\begin{haskell}
+instance Comonad ((,) e) where
+  g =<= f = \ea -> g (fst ea, f ea)
+  extract = snd
+\end{haskell}
+
+As with monads, co-Kleisli composition may be used in point-free style of programming. But we can also use the dual to \hask{join}:
+\begin{haskell}
+  duplicate :: w a -> w (w a)
+\end{haskell}
+or the dual to bind:
+\begin{haskell}
+  extend :: (w a -> b) -> w a -> w b
+\end{haskell}
+
+\begin{exercise}
+Implement \hask{duplicate} in terms of \hask{extend} and vice versa.
+\end{exercise}
 
 
 \subsection{notes}
