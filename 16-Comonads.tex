@@ -97,6 +97,10 @@ smooth :: Stream Double -> Stream Double
 smooth = extend avg
 \end{haskell}
 
+Comonads are useful for structuring computations in spatially or temporally extended data structures. Such computations are local enough to define the ``current location,'' but require gathering information from neighboring locations. Signal processing or image processing are good examples. So are simulations in which differential equations have to be iteratively solved inside volumes: climate simulations, cosmological models, or nuclear reactions come to mind. Conway's Game of Life is also a good testing ground for comonadic methods.
+
+
+
 \begin{exercise}
 Implement the \hask{Comonad} instance for a bidirectional stream:
 \begin{haskell}
@@ -109,6 +113,183 @@ Hint: Consider the first stream as the past (in reverse order), the middle value
 Implement a low-pass filter for \hask{BiStream} that averages over three values: the current one, one from the immediate past, and one from the immediate future. For electrical engineers: implement a Gaussian filter. 
 \end{exercise}
 
+\section{Comonads Categorically}
+
+We can get the definition of a comonad by reversing the arrows in the definition of a monad. Our \hask{duplicate} corresponds to the reversed \hask{join}, and \hask{extract} is the reversed \hask{return}. 
+
+
+A comonad is an endofunctor $W$ equipped with two natural transformations:
+\begin{align*}
+\delta &\colon W \to W \circ W \\
+\varepsilon &\colon W \to \mathit{Id} 
+\end{align*}
+
+These transformations (corresponding to \hask{duplicate} and \hask{extract}, respectively) must satisfy the same identities as in the case of a monad, except with the arrows reversed. 
+
+These are the counit laws:
+\[
+ \begin{tikzcd}
+\text{Id} \circ W
+ \arrow[rrd, "="']
+& & W \circ W
+ \arrow[ll, "\varepsilon \circ W"']
+ \arrow[rr, "W \circ \varepsilon"]
+&& W \circ \text{Id}
+ \arrow[lld, "="]
+ \\
+ && W
+  \arrow[u, "\delta"]
+ \end{tikzcd}
+\]
+and this is the associativity law:
+\[
+ \begin{tikzcd}
+ (W \circ W) \circ W 
+ \arrow[rr, "="]
+ &&
+ W \circ (W \circ W)
+ \\
+ W \circ W 
+ \arrow[u, "\delta \circ W"]
+& & W \circ W
+ \arrow[u, "W \circ \delta"']
+ \\
+&  W
+ \arrow[ul, "\delta"]
+ \arrow[ur, "\delta"']
+ \end{tikzcd}
+\]
+
+\subsection{Comonoids}
+
+Since monadic laws followed from monoid laws, we expect that comonad laws should follow from a dual version of a monoid. Indeed, a \index{comonoid}\emph{comonoid} is an object in a monoidal category $(\mathcal{C}, \otimes, I)$ equipped with two morphisms called co-multiplication and a co-unit:
+\begin{align*}
+\delta &\colon W \to W \otimes W \\
+\varepsilon &\colon W \to I
+\end{align*}
+We can replace the tensor product with endofunctor composition and the unit object with the identity functor to get the definition of a comonad as a comonoid in the category of endofunctors.
+
+In Haskell we can define a \hask{Comonoid} typeclass for the cartesian product:
+\begin{haskell}
+class Comonoid w where
+  split   :: w -> (w, w)
+  destroy :: w -> ()
+\end{haskell}
+
+Comonoids are less talked about than monoids, mainly because they are taken for granted. In a cartesian category, every object can be made into a comonoid: we use the diagonal mapping for co-multiplication, and the counit is the unique arrow to the terminal object.
+
+In programming this is something we do without thinking. Co-multiplication means being able to duplicate a value, and counit means being able to abandon a value. In Haskell, we can easily implement the \hask{Comonoid} instance for any type:
+\begin{haskell}
+instance Comonoid w where
+  split w   = (w, w)
+  destroy w = ()
+\end{haskell}
+In fact, we don't think twice of using the argument of a function twice, or not using it at all. But, if we wanted to be explicit, functions like:
+\begin{haskell}
+f x = x + x
+g y = 42
+\end{haskell}
+could be written as:
+\begin{haskell}
+f x = let (x1, x2) = split x 
+      in x1 + x1
+g y = let () = destroy y 
+      in 42
+\end{haskell}
+
+This is all great, except in cases when the the argument is an external resource, like a file handle, network port, or a chunk of memory allocated on the heap. Such resources are supposed to have well-defined lifetimes between being allocated and deallocated. Tracking lifetimes of objects that can be easily duplicated or discarded is very difficult and a notorious source of programming errors.
+
+A programming model based on a cartesian category will always have this problem. The solution is to instead use a monoidal (closed) category that doesn't support duplication or destruction of objects. Such a category is a natural model for \index{linear types}\emph{linear types}.  Elements of linear types are used in \index{Rust}Rust and, at the time of this writing, are being tried in Haskell. In C++ there are constructs that mimic linearity, like \hask{unique_ptr} and move semantics.
+
+\section{Comonads from Adjunctions}
+
+We've seen that an adjunction $L \dashv R$ between two functors $L \colon \mathcal{D} \to \mathcal{C}$ and $R \colon \mathcal{C} \to \mathcal{D}$  gives rise to a monad $R \circ L \colon \mathcal{D} \to \mathcal{D}$. The other composition, $L \circ R$, which is an endofunctor in $\mathcal{C}$, turns out to be a comonad. 
+
+The counit of the adjunction serves as the counit of the comonad. This can be illustrated by the following string diagram:
+\[
+\begin{tikzpicture}
+\def\xleft{0.5};
+\def\xmid{1};
+\def\xright{1.5};
+
+\def \ybot{0};
+\def \ymid{1};
+\def \ytop{2 * \ymid};
+%\def \yt{2 * \ymid - 0.3};
+\def \yb{2 * \ybot + 0.3};
+
+\node [below] (a) at (\xleft, \ybot) {$R$};
+\node(b) [below] at (\xmid, \ymid) {};
+\node[below] (c) at (\xright, \ybot) {$L$};
+
+\filldraw[fill=blue!50!green!20, draw=white] (\xleft-1, \ytop) rectangle (\xright+1, \ybot);
+
+\draw [fill=orange!30] (a.north) to [out=90, in=180] (b.west) -- (b.east) to [out=0, in=90] (c.north);
+
+\filldraw[black] (b) circle (1 pt);
+\node [above] at (b) {$\varepsilon$};
+
+\node(l)[right] at (\xleft-1, \yb) {$\mathcal{C}$};
+\node(r) at (\xmid, \yb) {$\mathcal{D}$};
+
+\end{tikzpicture}
+\]
+
+The comultiplication is given by the whiskering of $\eta$:
+\[ \delta = L  \circ \eta \circ R \]
+as illustrated by this string diagram:
+\[
+\begin{tikzpicture}
+\def \xmid          {0};
+\def \xr               {0.5};
+\def \xrr             {1}
+\def \xrm            {0.25}
+\def \xrightmost {1.5}
+\def \xl {-\xr}
+\def \xll {-\xrr}
+\def \xlm {-\xrm}
+\def \xleftmost {-\xrightmost}
+
+\def \ybot           {0};
+\def \ymidbot     {-0.20};
+\def \yeps          {-0.7};
+\def \ymid          {-1};
+\def \ymidtop     {-1.60}
+\def \ytop           {-2};
+\def \ylabel        {\ytop + 0.3};
+% functors
+\node [below] at (\xlm, \ytop)  {$R$};
+\node [below] at (\xrm, \ytop) {$L$};
+
+\node [above] at (\xll, \ybot) {$R$};
+\node [above] at (\xl, \ybot) {$L$};
+\node [above] at (\xr, \ybot) {$R$};
+\node [above] at (\xrr, \ybot) {$L$};
+
+\filldraw[fill=orange!30, draw=white] (\xleftmost, \ytop) rectangle (\xrightmost, \ybot);
+
+% left area
+\path [fill=blue!50!green!20] (\xleftmost, \ybot) to  (\xll, \ybot) to (\xll, \ymidbot) [out=-90, in=90] to (\xlm, \ymidtop) to  (\xlm, \ytop) to [out=180, in=180] (\xleftmost, \ytop);
+% right area
+\path [fill=blue!50!green!20] (\xrightmost, \ybot) to (\xrr, \ybot) to (\xrr, \ymidbot) [out=-90, in=90] to (\xrm, \ymidtop) to (\xrm, \ytop) to [out=0, in=180]  (\xrightmost, \ytop);
+% cap
+\draw [fill=blue!50!green!20] (\xl, \ybot) to [out=-90, in=180] (\xmid, \yeps) to [out=0, in=-90] (\xr, \ybot);
+% left curve
+\draw (\xll, \ybot) to (\xll, \ymidbot) [out=-90, in=90] to (\xlm, \ymidtop) to  (\xlm, \ytop);
+% right curve
+\draw (\xrr, \ybot) to (\xrr, \ymidbot) [out=-90, in=90] to (\xrm, \ymidtop) to (\xrm, \ytop);
+% eta
+\filldraw [black] (\xmid, \yeps) circle (1 pt);
+\node [above] at (\xmid, \yeps) {$\eta$};
+% categories
+\node [right] at (\xleftmost, \ylabel) {$\mathcal{C}$};
+\node           at (\xmid, \ylabel)        {$\mathcal{D}$};
+\node [left]   at (\xrightmost, \ylabel) {$\mathcal{C}$};
+
+\end{tikzpicture}
+\]
+
+As before, comonad laws can be derived from triangle identities.
 
 \subsection{notes}
 
