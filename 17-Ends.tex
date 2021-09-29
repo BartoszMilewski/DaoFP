@@ -3,8 +3,127 @@
 \setcounter{chapter}{16}
 
 \chapter{Ends and Coends}
-\subsection{notes}
 
+\section{Profunctors}
+
+In the rarified air of category theory we encounter patterns that are so far removed from their origins that we have problems visualizing them. It doesn't help that the more abstract a pattern gets the more dissimilar the examples of it are. 
+
+An arrow from $A$ to $B$ is relatively easy to understand. We have a very familiar model for it: a function that consumes elements of $A$ and produces elements of $B$. A hom-set is a collection of such arrows. 
+
+A functor is an arrow between categories. It consumes objects and arrows from one category and produces objects and arrows from another. We can think of it a recipe for building such objects and arrows from materials provided by the source category. In particular, we  often think of an endofunctor as a container of building materials.
+
+A profunctor maps a pair of objects $\langle A, B \rangle$ to a set $P\langle A, B \rangle$ and a pair of arrows:
+\[ \langle f \colon S \to A, g \colon B \to T \rangle \]
+to a function:
+\[ P\langle f, g \rangle \colon P\langle A, B \rangle \to P\langle S, T \rangle\]
+
+A profunctor is an abstraction that combines elements of many other abstractions. Since it's a functor $ \mathcal{C}^{op} \times  \mathcal{C} \to \mathbf{Set}$, we can think of it as constructing a set from a pair of objects and a function from a pair of arrows (one going in the opposite direction). This doesn't help our imagination though.
+
+Fortunately, we have a good model for a profunctor: the hom-functor. The set of arrows between two objects behaves like a profunctor when you vary the objects. It also makes sense that there is a difference between varying the source and the target. 
+
+We can, therefore, think of an arbitrary profunctor as generalizing a hom-functor by providing additional bridges between objects. 
+
+There is, however one big difference between an element of the hom-set $ \mathcal{C}(A, B)$ and an element of the set $P\langle A, B \rangle$. Elements of hom-sets are arrows, and arrows can be composed. It's not immediately obvious how to compose profunctors. However, we can interpret the lifting of arrows by a profunctor as generalized composition. For instance, we can precompose $P \langle A, B \rangle$ with an arrow $f \colon S \to A$ to obtain $P \langle S, B \rangle$:
+\[ P\langle f, id_B \rangle \colon P \langle A, B \rangle \to P \langle S, B \rangle \]
+Similarly, we can postcompose it with $g \colon B \to T$:
+\[ P \langle id_A, g \rangle \colon P \langle A, B \rangle \to P \langle A, T \rangle \]
+This kind of heterogenous composition takes a composable pair consisting of an arrow and an element of a profunctor and produces an element of a profunctor.
+
+In general, a profunctor can be extended on both sides by lifting a pair of arrows:
+
+\[
+ \begin{tikzcd}
+  & S
+  \arrow[r, bend left, dashed, blue, "f"]
+ & A
+ \arrow[r, bend right, "P"]
+ & B
+  \arrow[r, bend left, dashed, blue, "g"]
+ &  T
+  \end{tikzcd}
+\]
+
+\subsection{Collages}
+
+There is no reason to restrict a profunctor to a single category. We can define a profunctor between two categories as a functor $ P \colon \mathcal{C}^{op} \times  \mathcal{D} \to \mathbf{Set}$. Such a profunctor can be used to glue two categories together by generating the missing hom-sets going from objects in $\mathcal{C}$ to objects in $\mathcal{D}$. 
+
+A collage (or a \index{cograph}cograph) of two categories $\mathcal{C}$ and $\mathcal{D}$ is a category whose objects are objects from both categories (a disjoint union). A hom-set between two objects $X$ and $Y$ is either a hom-set in $\mathcal{C}$, if both objects are in $\mathcal{C}$; a hom-set in $\mathcal{D}$, if both are from $\mathcal{D}$; or the set $P \langle X, Y\rangle$ if $X$ is from $\mathcal{C}$ and $Y$ is from $\mathcal{D}$. Otherwise the hom-set is empty. 
+
+Composition of morphisms is the usual composition, except if one of the morphisms is an element of $P \langle X, Y \rangle$. In that case we use the profunctor to lift the morphism we're trying to compose. 
+
+It's easy to see that a collage is indeed a category. The new morphisms that go between the two sides of the collage are sometimes called heteromorphisms. They can only go from $\mathcal{C}$ to $\mathcal{D}$, never the other way around. 
+
+Seen this way, a profunctor $ \mathcal{C}^{op} \times  \mathcal{C} \to \mathbf{Set}$ should really be called an endo-profunctor. It defines a collage of $\mathcal{C}$ with itself.
+
+\begin{exercise}
+Show that there is a functor from a collage of two categories to a stick-figure ``walking arrow'' category that has two objects and one arrow between them (and two identity arrows).
+\end{exercise}
+\begin{exercise}
+Show that, if there is a functor from $\mathcal{C}$ to the walking arrow category then $\mathcal{C}$ can be split into a collage of two categories. 
+\end{exercise}
+
+\subsection{Profunctors as relations}
+
+Under a microscope, a profunctor looks like a hom-functor, and the elements of the set $P \langle A, B \rangle$ look like individual arrows. But when we zoom out, we can view a profunctor as a relation between objects. But these are not the usual relations; they are \emph{proof-relevant} relations.
+
+To understand this concept better, let's consider a regular functor $F \colon \mathcal{C} \to \mathbf{Set}$ (in other words, a co-presheaf). One way to interpret it is to say that it definines a subset of objects of $\mathcal{C}$, namely those objects that are mapped to non-empty sets. Every element of $F A$ is then treated as a proof that $A$ is a member of the subset. If $F A$ is an empty set, then $A$ is not a member of the subset.
+
+We can apply the same interpretation to profunctors. If the set $P \langle A, B \rangle$ is empty, we say that $B$ is not related to $A$. If it's not empty, we say that each element of the set represents a proof that $B$ is related to $A$. We can then treat a profunctor as a proof-relevant relation. 
+
+Notice that we don't assume anything about this relation. It doesn't have to be reflexive, as it's possible for $P \langle A, A \rangle$ to be empty (in fact, $P \langle A, A \rangle$ makes sense only for endo-profunctors). It doesn't have to be symmetric either.
+
+Since the hom-functor is an example of an (endo-) profunctor, this interpretation lets us view the hom-functor in a new light, as a built-in proof-relevant relation between objects in a category. If there's an arrow between two objects, they are related. Notice that this relation is reflexive, since we have an identity morphism in every $\mathcal{C}(A, A)$. 
+
+Moreover, as we've seen, hom-functors interact with profunctors. If $A$ is related to $B$ through $P$, and the hom-sets $\mathcal{C}(S, A)$ and $\mathcal{D}(B, T)$ are non-empty, then automatically $S$ is related to $T$ through $P$. Profunctors are therefore proof-relevant relations that are compatible with the structure of the categories in which they operate.
+
+We know how to compose a profunctor with hom-functors, but how would we compose two profunctors? We can get a clue from the composition of relations. 
+
+Suppose that you want to charge your cellphone, but you don't have a charger. In order to connect you to a charger it's enough that you have a friend who owns a charger. Any friend will do. You compose the relation of having a friend with the relation of a person having a charger to get a relation of being able to charge your phone. The proof that you can charge your phone is a pair of proofs, one of friendship and one of the possession of a charger. 
+
+In general, we say that two objects are related by the composite relation if there exists an object in the middle that is related to both of them. 
+
+\subsection{Profunctor composition in Haskell}
+
+Composition of relations can be translated to profunctor composition in Haskell. Let's first recall the definition of a profunctor:
+\begin{haskell}
+class Profunctor p where
+  dimap :: (s -> a) -> (b -> t) -> (p a b -> p s t)
+\end{haskell}
+
+The key to understanding profunctor composition is that it requires the existence of the object in the middle. For object $B$ to be related to object $A$ using the composition of profunctors $P \circ Q$ there has to exist an object $X$ that bridges the gap:
+\[
+ \begin{tikzcd}
+  & A
+  \arrow[r, bend left, blue, "Q"]
+ & X
+  \arrow[r, bend left, red, "P"]
+ & B
+  \end{tikzcd}
+\]
+
+This can be encoded in Haskell using an existential type. Given two profunctors \hask{p} and \hask{q}, their composition is a new profunctor \hask{Procompose p q}:
+\begin{haskell}
+data Procompose p q a b where
+  Procompose ::  q a x -> p x b -> Procompose p q a b
+\end{haskell}
+We are using a \hask{GADT} to express the existential nature of the object \hask{x}. The two arguments to the constructor can be seen as a pair of proofs: one proves that \hask{x} is related to \hask{a}, and the other that \hask{x} is related to \hask{b}. This pair then constitutes the proof that \hask{a} is related to \hask{b}.
+
+Such composition of profunctors is indeed a profunctor, as can be seen from this instance:
+\begin{haskell}
+instance (Profunctor p, Profunctor q) => Profunctor (Procompose p q) 
+  where
+    dimap l r (Procompose qax pxb) = 
+               Procompose (dimap l id qax) (dimap id r pxb)
+\end{haskell}
+This just says that you can extend the composite profunctor by extending the first one on the left and the second one on the right.
+
+
+
+\section{Coends}
+
+\section{Ends}
+
+\subsection{notes}
 
 \begin{exercise}
 \end{exercise}
