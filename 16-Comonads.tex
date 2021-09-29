@@ -107,7 +107,24 @@ smooth = extend avg
 
 Comonads are useful for structuring computations in spatially or temporally extended data structures. Such computations are local enough to define the ``current location,'' but require gathering information from neighboring locations. Signal processing or image processing are good examples. So are simulations in which differential equations have to be iteratively solved inside volumes: climate simulations, cosmological models, or nuclear reactions come to mind. Conway's Game of Life is also a good testing ground for comonadic methods.
 
+Sometimes it's convenient to perform calculation on continuous streams of data, postponing the sampling until the very last step. Here's an example of a signal that is a function of time (represented by \hask{Double})
+\begin{haskell}
+data Signal a = Sig (Double -> a) Double
+\end{haskell}
+The second component is the current time.
 
+This is the \hask{Comonad} instance:
+\begin{haskell}
+instance Comonad Signal where
+  extract (Sig f x) = f x
+  duplicate (Sig f x) = Sig (\y -> Sig f (x - y)) x
+  extend g (Sig f x) = Sig (\y -> g (Sig f (x - y))) x
+\end{haskell}
+Here, \hask{extend} convolves the filter 
+\begin{haskell}
+g :: Signal a -> a
+\end{haskell}
+over the whole stream. 
 
 \begin{exercise}
 Implement the \hask{Comonad} instance for a bidirectional stream:
@@ -186,7 +203,7 @@ class Comonoid w where
   destroy :: w -> ()
 \end{haskell}
 
-Comonoids are less talked about than their siblings, monoids, mainly because they are taken for granted. In a cartesian category, every object can be made into a comonoid: just by using the diagonal mapping $\Delta \colon a \to a \times a$ for co-multiplication, and the unique arrow to the terminal object for counit.
+Comonoids are less talked about than their siblings, monoids, mainly because they are taken for granted. In a cartesian category, every object can be made into a comonoid: just by using the diagonal mapping $\Delta_a \colon a \to a \times a$ for co-multiplication, and the unique arrow to the terminal object for counit.
 
 In programming this is something we do without thinking. Co-multiplication means being able to duplicate a value, and counit means being able to abandon a value. 
 
@@ -209,7 +226,7 @@ g y = let () = destroy y
       in 42
 \end{haskell}
 
-There are some situations, though, when duplicating or discarding a variable is undesirable. This is the case when the the argument is an external resource, like a file handle, network port, or a chunk of memory allocated on the heap. Such resources are supposed to have well-defined lifetimes between being allocated and deallocated. Tracking lifetimes of objects that can be easily duplicated or discarded is very difficult and a notorious source of programming errors.
+There are some situations, though, when duplicating or discarding a variable is undesirable. This is the case when the argument is an external resource, like a file handle, network port, or a chunk of memory allocated on the heap. Such resources are supposed to have well-defined lifetimes between being allocated and deallocated. Tracking lifetimes of objects that can be easily duplicated or discarded is very difficult and a notorious source of programming errors.
 
 A programming model based on a cartesian category will always have this problem. The solution is to instead use a monoidal (closed) category that doesn't support duplication or destruction of objects. Such a category is a natural model for \index{linear types}\emph{linear types}.  Elements of linear types are used in \index{Rust}Rust and, at the time of this writing, are being tried in Haskell. In C++ there are constructs that mimic linearity, like \hask{unique_ptr} and move semantics.
 
@@ -379,6 +396,8 @@ We interpret the first component of \hask{Store Int c}, the function \hask{f :: 
 The second component can be interpreted as the current index. Indeed, \hask{extract} uses this index to retrieve the current value.
 
 With this interpretation, \hask{duplicate} produces an infinite stream of streams, each shifted by a different offset, and \hask{extend} performs a convolution on this stream. Of course, laziness saves the day: only the values we explicitly demand will be evaluated.
+
+Notice also that our earlier example of the \hask{Signal} comonad is reproduced by \hask{Store Double}.
 
 \begin{exercise}
 A cellular automaton can be implemented using the store comonad. This is the co-Kleisli arrow describing rule 110:
