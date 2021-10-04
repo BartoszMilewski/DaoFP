@@ -90,7 +90,7 @@ class Profunctor p where
   dimap :: (s -> a) -> (b -> t) -> (p a b -> p s t)
 \end{haskell}
 
-The key to understanding profunctor composition is that it requires the existence of the object in the middle. For object $B$ to be related to object $A$ using the composition of profunctors $P \circ Q$ there has to exist an object $X$ that bridges the gap:
+The key to understanding profunctor composition is that it requires the existence of the object in the middle. For object $B$ to be related to object $A$ using the composition of profunctors $P \diamond Q$ there has to exist an object $X$ that bridges the gap:
 \[
  \begin{tikzcd}
   & A
@@ -108,7 +108,15 @@ data Procompose p q a b where
 \end{haskell}
 We are using a \hask{GADT} to express the existential nature of the object \hask{x}. The two arguments to the constructor can be seen as a pair of proofs: one proves that \hask{x} is related to \hask{a}, and the other that \hask{x} is related to \hask{b}. This pair then constitutes the proof that \hask{a} is related to \hask{b}.
 
-Such composition of profunctors is indeed a profunctor, as can be seen from this instance:
+An existential type can be seen as a generalization of a sum type. We are summing over all possible types \hask{x}. Just like a finite sum can be constructed by injecting one of the alternatives (think of the two constructors of \hask{Either}), the existential type can be constructed by picking one particular type for \hask{x} and injecting it into the definition of \hask{Procompose}. 
+
+Just as mapping out from a sum type requires a pair of function, one per each alternative; a mapping out from an existential type requires a family of functions, one per every type. Such a family, in Haskell, is given by a polymorphic function:
+\begin{haskell}
+mapOut :: Procompose p q a b -> (forall x. q a x -> p x b -> c) -> c
+mapOut (Procompose qax pxb) f = (f qax pxb)
+\end{haskell}
+
+The composition of profunctors is again a profunctor, as can be seen from this instance:
 \begin{haskell}
 instance (Profunctor p, Profunctor q) => Profunctor (Procompose p q) 
   where
@@ -117,11 +125,201 @@ instance (Profunctor p, Profunctor q) => Profunctor (Procompose p q)
 \end{haskell}
 This just says that you can extend the composite profunctor by extending the first one on the left and the second one on the right.
 
-
+The fact that this definition of profunctor composition happens to work in Haskell is due to parametricity. The language constraints the types of profunctors in a way that makes it work. In general, though, taking a simple sum over intermediate objects would result in over-counting, so in category theory we have to compensate for that.
 
 \section{Coends}
 
+The over-counting in the naive definition of profunctor composition happens when two candidates for the object in the middle are connected by a morphism:
+\[
+ \begin{tikzcd}
+  & A
+  \arrow[r, bend left, blue, "Q"]
+  &X
+  \arrow[r, dashed, "f"]
+ & Y
+  \arrow[r, bend left, red, "P"]
+ & B
+  \end{tikzcd}
+\]
+We can either extend $Q$ on the right, by lifting $Q \langle id, f \rangle$, and use $Y$ as the middle object; or extend $P$ on the left, by lifting $P \langle f, id \rangle$, and use $X$ as the intermediary.
+
+In order to avoid the double-counting, we have to tweak our definition of a sum type when applied to profunctors. The resulting construction is called a coend. 
+
+First, let's re-formulate the problem. We are trying to sum over all objects $X$ in the product of sets:
+\[ P \langle A, X \rangle \times Q \langle X, B \rangle \]
+The double-counting happens because we can open up the gap between the two profunctors, as long as there is a morphism that can fit between them. So we are really looking at a more general product:
+\[ P \langle A, X \rangle \times Q \langle Y, B \rangle \]
+The important observation is that, if we fix the endpoints $A$ and $B$, this product is a profunctor in $\langle Y, X \rangle$. This is easily seen after a little rearrangement (up to isomorphism):
+\[P' \langle Y, X \rangle = Q \langle Y, B \rangle \times P \langle A, X \rangle \]
+We are interested in the sum of the diagonal parts of this profunctor, when $X$ is equal to $Y$. 
+
+Let's see how we would go about defining the sum of diagonal entries of a general profunctor $P$. The sum is defined by injections, one per every object in the category. Here just two of them are shown:
+\[
+ \begin{tikzcd}
+ P \langle Y, Y \rangle
+ \arrow[dr, "i_Y"']
+ \arrow[rr, dash, dashed]
+ &&P \langle X, X \rangle
+ \arrow[dl, "i_X"]
+ \\
+ &C
+ \end{tikzcd}
+\]
+
+If we were defining a sum, we'd make it a universal set equipped with such injections. But because we are dealing with profunctors, we want to identify the injections that are related by ``extending'' a common ancestor. We want the following diagram to commute, whenever there is a connecting morphism $f\colon X \to Y$:
+
+\[
+ \begin{tikzcd}
+ &P \langle Y, X \rangle
+ \arrow[ld, "{P \langle id, f \rangle}"']
+ \arrow[rd, "{P \langle f, id \rangle}"]
+ \\
+ P \langle Y, Y \rangle
+ \arrow[dr, "i_Y"']
+ &&P \langle X, X \rangle
+ \arrow[dl, "i_X"]
+ \\
+ &C
+ \end{tikzcd}
+\]
+This diagram is called a \index{co-wedge}co-wedge, and its commuting condition is called the co-wedge condition. The universal co-wedge is called a coend.
+
+Since a coend generalizes a sum to a potentially infinite domain, we write it using the integral sign, with the ``integration variable'' in the suffix position:
+\[ \int^{X\colon \mathcal{C}} P \langle X, X \rangle \]
+Universality means that, whenever there is a set $C$ with a family of functions $g_X \colon P \langle X, X \rangle \to C$, there is a unique mapping out:
+\[ h \colon \int^{X\colon \mathcal{C}} P \langle X, X \rangle \to C \]
+that factorizes every the $g_X$ through the injection $i_X$:
+\[
+ \begin{tikzcd}
+ &P \langle Y, X \rangle
+ \arrow[ld, "{P \langle id, f \rangle}"']
+ \arrow[rd, "{P \langle f, id \rangle}"]
+ \\
+ P \langle Y, Y \rangle
+ \arrow[dr, "i_Y"']
+ \arrow[ddr, bend right,  "g_Y"']
+ &&P \langle X, X \rangle
+ \arrow[dl, "i_X"]
+ \arrow[ddl, bend left,  "g_X"]
+ \\
+ &\int^X P \langle X, X \rangle
+ \arrow[d, dashed, "h"]
+ \\
+ &C
+ \end{tikzcd}
+\]
+
+Compare this with the definition of a sum of two objects:
+
+\[
+ \begin{tikzcd}
+ A
+ \arrow[dr,  bend left, "\text{Left}"']
+ \arrow[ddr, bend right, "f"']
+ && B
+ \arrow[dl, bend right, "\text{Right}"]
+ \arrow[ddl, bend left, "g"]
+ \\
+&A + B
+\arrow[d, dashed, "h"]
+\\
+& C
+ \end{tikzcd}
+\]
+Just like the sum was defined as a universal cospan, a coend is defined as a universal co-wedge. 
+
+Equipped with the definition of a coend we can now formally define the composition of two profunctors:
+
+\[ (P \diamond Q)\langle A, B \rangle = \int^{X\colon \mathcal{C}} Q \langle A, X \rangle \times P \langle X, B \rangle\]
+Compare this with:
+\begin{haskell}
+data Procompose p q a b where
+  Procompose ::  q a x -> p x b -> Procompose p q a b
+\end{haskell}
+
+The reason why, in Haskell, we don't have to worry about the co-wedge condition is analogous to the reason why all parametrically polymorphic functions automatically satisfy the naturality condition. A coend is defined using a family of injections; in Haskell they are all given as one polymorphic function:
+\begin{haskell}
+data Coend p where
+  Coend ::  p x x -> Coend p
+\end{haskell}
+
+Coends introduce a new level of abstraction for dealing with profunctors. Calculations using coends usually take advantage of their mapping-out property. To define a mapping out of a coend to some set $C$:
+\[ \int^X P \langle X, X \rangle \to C \]
+ it's enough to define a family of functions from the diagonal entries of the profunctor to $C$:
+ \[ g_X \colon P \langle X, X \rangle \to C \]
+ You can get a lot of mileage from this trick, especially when combined with the Yoneda lemma. We'll see examples of this in what follows.
+
+\begin{exercise}
+Define a \hask{Profunctor} instance for the pair of profunctors:
+\begin{haskell}
+newtype ProPair q p a b x y = ProPair (q a y, p x b)
+\end{haskell}
+Hint: Keep the first four parameters fixed:
+\begin{haskell}
+instance (Profunctor p, Profunctor q) => Profunctor (ProPair q p a b)
+\end{haskell}
+\end{exercise}
+
+\begin{exercise}
+Profunctor composition can be expressed using a coend:
+\begin{haskell}
+newtype CoEndCompose p q a b = CoEndCompose (Coend (ProPair q p a b))
+\end{haskell}
+Define a \hask{Profunctor} instance for \hask{CoEndCompose}.
+\end{exercise}
+
+
 \section{Ends}
+
+Just like a coend generalizes a sum of the diagonal elements of a profunctor; its dual, an end, generalizes the product. A product is defined by its projections, and so is an end. 
+
+The generalization of a span, used in the definition of a product, is a set $C$ with a family of projections, one per every object $X$ in the category:
+\[ \pi_X \colon C \to P \langle X, X \rangle \]
+The dual to a co-wedge is called a \index{wedge}wedge:
+\[
+ \begin{tikzcd}
+ &C
+ \arrow[ld, "\pi_X"']
+ \arrow[rd, "\pi_Y"]
+ \\
+ P \langle X X \rangle
+ \arrow[dr, "{P \langle id, f \rangle}"']
+ &&P \langle Y, Y \rangle
+ \arrow[dl, "{P \langle f, id \rangle}"]
+ \\
+ & P \langle X, Y \rangle
+ \end{tikzcd}
+\]
+
+You might think of constructing a set $C$ by first starting with a bigger set that is equipped with all the projections, and then restricting it to the elements that can be connected by way of lifting some morphism $f$. 
+
+The end is a universal wedge. We use the integral sign, too, but with the ``integration variable'' in the subscript position. 
+
+You might be wondering why we don't have such integrals based on products, rather than sums, in calculus. The problem is that most of them would trivially diverge. We don't have this problem in category theory. 
+
+\[ \pi_A \colon \left( \int_X P \langle X, X \rangle \right) \to P \langle A, A \rangle \]
+
+\[
+ \begin{tikzcd}
+ &C
+ \arrow[ddl, bend right, "g_X"']
+ \arrow[ddr, bend left, "g_Y"]
+ \arrow[d, dashed, "h"]
+ \\
+ & \int_X P \langle X, X \rangle
+ \arrow[ld, "\pi_X"']
+ \arrow[rd, "\pi_Y"]
+ \\
+ P \langle X X \rangle
+ \arrow[dr, "{P \langle id, f \rangle}"']
+ &&P \langle Y, Y \rangle
+ \arrow[dl, "{P \langle f, id \rangle}"]
+ \\
+ & P \langle X, Y \rangle
+ \end{tikzcd}
+\]
+
+
 
 \subsection{notes}
 
