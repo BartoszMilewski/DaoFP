@@ -233,6 +233,8 @@ If you were to construct a coend, you would start with a sum (discriminated unio
 and
 \[ P \langle f, id \rangle (z) = x\]
 
+Notice that in a discrete category, which is just a set of objects with no arrows between them, the co-wedge condition is trivial (there are no $f$s other than identities), so a coend is just a sum (discriminated union) of the diagonal sets $P \langle X, X \rangle$.
+
 \subsection{Profunctor composition using coends}
 
 Equipped with the definition of a coend we can now formally define the composition of two profunctors:
@@ -341,7 +343,7 @@ The Haskell implementation of an \hask{End} doesn't showcase the fact that it is
 type Coend p = exists x. p x x
 \end{haskell}
 
-The existential/universal duality between a \hask{Coend} and an \hask{End} means that it's easier to construct a \hask{Coend}---all you need is to pick one type \hask{x} for which you have a value of the type \hask{p x x}. On the other end, to construct an \hask{End} you have to provide a whole family of values \hask{p x x}, one for every type \hask{x}. The only way to do this is to use a formula that is parameterized by \hask{x}; in other words, use parametric polymorphism.
+The existential/universal duality between a \hask{Coend} and an \hask{End} means that it's easy to construct a \hask{Coend}---all you need is to pick one type \hask{x} for which you have a value of the type \hask{p x x}. On the other end, to construct an \hask{End} you have to provide a whole family of values \hask{p x x}, one for every type \hask{x}. In other words, we need a polymorphic formula that is parameterized by \hask{x}. A polymorphic function is a canonical example of such a formula.
 
 
 \subsection{Natural transformations as an end}
@@ -437,6 +439,7 @@ It can be shown that an end can be expressed as a limit, and a coend as a colimi
 \[ \mathbf{Set}\left(X, \int_A P\langle A, A \rangle \right) \cong \int_A  \mathbf{Set}(X, P\langle A, A \rangle) \]
 By analogy with a sum, we have a mapping-out formula for the coend:
 \[ \mathbf{Set}\left( \int^A P\langle A, A \rangle , X\right) \cong \int_A  \mathbf{Set}(P\langle A, A \rangle, X) \]
+Notice that the right-hand side is an end.
 
 \section{Ninja Yoneda Lemma}
 
@@ -566,7 +569,25 @@ In Haskell, we would express this idea using an existential type:
 data Lens s a where
     Lens :: (s -> (c, a), (c, a) -> s) -> Lens s a
 \end{haskell}
-This tells us that there exists some unspecified type \hask{c} such that \hask{s} can be split into and reconstructed from a product \hask{(c, a)}. In fact the \hask{get}/\hask{set} version of the lens can be implemented in terms of this existential form.
+This tells us that there exists some unspecified type \hask{c} such that \hask{s} can be split into, and reconstructed from, a product \hask{(c, a)}. 
+
+\[
+\begin{tikzpicture}
+\filldraw[fill=gray!50, draw=white] (0, 0) circle (1.2);
+\node at (0, -0.9) {$s$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) circle (1.2);
+\filldraw[fill=orange!30, draw=white] (0, 0) circle (0.6);
+\node at (0, 0) {$a$};
+\node at (0, -0.9) {$c$};
+\end{tikzpicture}
+\]
+
+
+
+The \hask{get}/\hask{set} version of the lens can be implemented in terms of this existential form.
 \begin{haskell}
 toGet :: Lens s a -> (s -> a)
 toGet (Lens (l, r)) = snd . l
@@ -577,17 +598,111 @@ toSet (Lens (l, r)) s a = r (fst (l s), a)
 
 Notice that we don't need to know anything about the type of the residue. We take advantage of the fact that the existential lens contains both the producer and the consumer of \hask{c}.
 
-It's impossible to extract a ``naked'' residue. The following code doesn't compile:
+It's impossible to extract a ``naked'' residue, as witnessed by the fact that the following code doesn't compile:
 \begin{haskell}
 getResidue :: Lens s a -> c
 getResidue (Lens (l, r)) = fst . l
 \end{haskell}
 
-\[ r_s = \frac{2 G M}{c^2} \]
+We can easily translate the new definition of the lens to category theory by expressing the existential type as a coend:
+\[ \int^{C} \mathcal{C}(S, C \times A) \times  \mathcal{C}(C \times A, S) \]
+In fact, we can generalize it to a type-changing lens, in which the focus $A$ can be replaced with a new focus of a different type $B$. Replacing $A$ with $B$ will produce a new composite object $T$:
+\[
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) circle (1.2);
+\filldraw[fill=orange!30, draw=white] (0, 0) circle (0.6);
+\node at (0, 0) {$B$};
+\node at (0, -0.9) {$C$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=gray!50, draw=white] (0, 0) circle (1.2);
+\node at (0, -0.9) {$T$};
+\end{tikzpicture}
+\]
 
-\[ m a = G \frac{m M}{r^2} \]
+The lens is now parameterized by two pairs of objects: $\langle S, T\rangle$ for the outer ones, and $ \langle A, B \rangle$ for the inner ones. The residue $C$ remains the same:
+\[ \mathcal{L}\langle S, T\rangle \langle A, B \rangle = \int^{C} \mathcal{C}(S, C \times A) \times  \mathcal{C}(C \times B, T) \]
+The product under the coend is the diagonal part of the profunctor that is covariant in $Y$ and contravariant in $X$:
+\[ \mathcal{C}(S, Y \times A) \times  \mathcal{C}(X \times B, T) \]
+\begin{exercise}
+Show that:
+\[ \mathcal{C}(S, Y \times A) \times  \mathcal{C}(X \times B, T) \]
+is a profunctor in $\langle X, Y\rangle$.
+\end{exercise}
 
-\[ G = \frac{a r^2}{M} [m\cdot s^{-2} \cdot m^2 \cdot \mathit{kg}^{-1}]\]
+
+\subsection{Existential lens in Haskell}
+In Haskell, we can define a lens as an existential type:
+\begin{haskell}
+data Lens s t a b where
+ Lens :: (s -> (c, a)) -> ((c, b) -> t) -> Lens s t a b
+\end{haskell}
+As before, we can use it to get and set the focus:
+\begin{haskell}
+toGet :: Lens s t a b -> (s -> a)
+toGet (Lens l r) = snd . l
+
+toSet :: Lens s t a b -> (s -> b -> t)
+toSet (Lens l r) s a = r (fst (l s), a)
+\end{haskell}
+
+The simplest example of a lens acts on a product. It can extract or replace one component of the product, treating the other as the residue. In Haskell, we'd implement it as:
+\begin{haskell}
+prodLens :: Lens (c, a) (c, b) a b
+prodLens = Lens id id
+\end{haskell}
+
+\subsection{Lens composition}
+
+The main advantage of using lenses is that they compose. A composition of two lenses lets us zoom in on a subcomponent of a component. 
+
+Suppose that we start with a lens that lets us access and modify the focus described by the pair \hask{a} and \hask{b}. This focus is part of a whole described by the pair \hask{s} and \hask{t}. We also have a lens that can access the focus of \hask{a'} and \hask{b'} inside the whole of \hask{a} and \hask{b}. We can now construct a new lens that can access \hask{a'} and \hask{b'} inside of \hask{s} and \hask{t}. The trick is to realize that we can take as the new residue a product of the two residues:
+\[
+\begin{tikzpicture}
+\filldraw[fill=gray!50, draw=white] (0, 0) circle (1.4);
+\node at (0, -1.1) {$s$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) circle (1.4);
+\filldraw[fill=orange!30, draw=white] (0, 0) circle (0.9);
+\node at (0, 0) {$a$};
+\node at (0, -1.1) {$c$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) circle (1.4);
+\filldraw[fill=orange!30, draw=white] (0, 0) circle (0.9);
+\filldraw[fill=red!30, draw=white] (0, 0) circle (0.4);
+\node at (0, 0) {$a'$};
+\node at (0, -0.6) {$c'$};
+\node at (0, -1.1) {$c$};
+\end{tikzpicture}
+\]
+
+
+\begin{haskell}
+compLens :: Lens a b a' b' -> Lens s t a b -> Lens s t a' b'
+compLens (Lens l2 r2) (Lens l1 r1) = Lens l3 r3
+  where l3 = assoc' . bimap id l2  . l1
+        r3 = r1 . bimap id r2 . assoc
+\end{haskell}
+We have used the associativity and functoriality of the product:
+\begin{haskell}
+assoc :: ((c, c'), b') -> (c, (c', b'))
+assoc ((c, c'), b') = (c, (c', b'))
+
+assoc' :: (c, (c', a')) -> ((c, c'), a')
+assoc' (c, (c', a')) = ((c, c'), a')
+
+instance Bifunctor (,) where
+  bimap f g (a, b) = (f a, g b)
+\end{haskell}
+
+Since lenses can be composed, you might wonder is there is a category in which lenses describe arrows. Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle S, T\rangle$ to $ \langle A, B \rangle$ are elements of  $\mathit{Lens} \langle S, T\rangle \langle A, B \rangle$.
+
+The formula for the composition of existential lenses is too complicated to be useful in practice. Fortunately, there is an alternative representation of lenses using Tambara modules in which composition of lenses is just a composition of functions.
 
 \section{Important Formulas}
 This is a handy (co-)end calculus cheat-sheet.
@@ -606,21 +721,5 @@ This is a handy (co-)end calculus cheat-sheet.
 \[ \int^{X} \mathcal{C}(A, X) \times G X \cong G A \]
 \end{itemize}
 
-
-\subsection{notes}
-
-\begin{exercise}
-\end{exercise}
-
-\begin{haskell}
-\end{haskell}
-
-\[
- \begin{tikzcd}
-  \end{tikzcd}
-\]
-
-\[   \mathbf{Set} \]
-\[   \mathcal{C} \]
 
 \end{document}
