@@ -525,7 +525,7 @@ and, after a few transformations, arrive at:
 \[ (P \diamond (Q \diamond R)) \langle S, T \rangle =  \int^A P \langle S, A \rangle \times \left( \int^B Q \langle A, B \rangle \times R \langle B,  T \rangle \right) \]
 We use the associativity of the product and the fact that we can switch the order of coends (it's called the \index{Fubini theorem} Fubini theorem). Both are true only up to isomorphism. We don't get associativity ``on the nose.''
 
-The identity profunctor turns out to be the hom-functor, which can be written symbolically as $\mathcal{C}(-, =)$. For instance:
+The identity profunctor turns out to be the hom-functor, which can be written symbolically as $\mathcal{C}(-, =)$, with placeholders for both arguments. For instance:
 \[ \left( \mathcal{C}(-, =) \diamond P \right) \langle S, T \rangle \cong \int^A  \mathcal{C}(S, A) \times P \langle A, T \rangle = P \langle S, T \rangle \]
 This is the consequence of the (contravariant) ninja co-Yoneda lemma, which is also an isomorphism---not an equality.
 
@@ -553,13 +553,15 @@ The naturality condition for a transformation $\alpha_{\langle A, B \rangle}$ be
 for every pair of arrows:
 \[ \langle f \colon S \to A, g \colon B \to T \rangle \]
 
-\section{Existential Optics}
+\section{Existential Lens}
 
 The first rule of category-theory club is that you don't talk about the internals of objects.
 
 The second rule of category-theory club is that, if you have to talk about the internals of objects, use arrows only.
 
-What does it mean for an object to be a composite, to have parts? At the very minimum, you have to be able to retrieve a part of the object. Even better if you can replace that part with a new one. This is pretty much the definition of a lens:
+\subsection{Existential lens in Haskell}
+
+What does it mean for an object to be a composite---to have parts? At the very minimum, you should be able to retrieve a part of such an object. Even better if you can replace that part with a new one. This pretty much defines a lens:
 \begin{haskell}
 get :: s -> a
 set :: s -> a -> s
@@ -591,7 +593,7 @@ This tells us that there exists some unspecified type \hask{c} such that \hask{s
 
 
 
-The \hask{get}/\hask{set} version of the lens can be implemented in terms of this existential form.
+The \hask{get}/\hask{set} version of the lens can be derived from this existential form.
 \begin{haskell}
 toGet :: Lens s a -> (s -> a)
 toGet (Lens (l, r)) = snd . l
@@ -607,6 +609,8 @@ It's impossible to extract a ``naked'' residue, as witnessed by the fact that th
 getResidue :: Lens s a -> c
 getResidue (Lens (l, r)) = fst . l
 \end{haskell}
+
+\subsection{Existential lens in category theory}
 
 We can easily translate the new definition of the lens to category theory by expressing the existential type as a coend:
 \[ \int^{C} \mathcal{C}(S, C \times A) \times  \mathcal{C}(C \times A, S) \]
@@ -636,8 +640,8 @@ is a profunctor in $\langle X, Y\rangle$.
 \end{exercise}
 
 
-\subsection{Existential lens in Haskell}
-In Haskell, we can define a lens as an existential type:
+\subsection{Type-changing lens in Haskell}
+In Haskell, we can define a type-changing lens as an existential type:
 \begin{haskell}
 data Lens s t a b where
  Lens :: (s -> (c, a)) -> ((c, b) -> t) -> Lens s t a b
@@ -656,6 +660,7 @@ The simplest example of a lens acts on a product. It can extract or replace one 
 prodLens :: Lens (c, a) (c, b) a b
 prodLens = Lens id id
 \end{haskell}
+Here, the type of the whole is a product \hask{(c, a)}. When we replace \hask{a} with \hask{b} we end up with the target type \hask{(c, b)}.
 
 \subsection{Lens composition}
 
@@ -685,6 +690,30 @@ Suppose that we start with a lens that lets us access and modify the focus descr
 \end{tikzpicture}
 \]
 
+\[
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) circle (1.4);
+\filldraw[fill=orange!30, draw=white] (0, 0) circle (0.9);
+\filldraw[fill=red!30, draw=white] (0, 0) circle (0.4);
+\node at (0, 0) {$b'$};
+\node at (0, -0.6) {$c'$};
+\node at (0, -1.1) {$c$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) circle (1.4);
+\filldraw[fill=orange!30, draw=white] (0, 0) circle (0.9);
+\node at (0, 0) {$b$};
+\node at (0, -1.1) {$c$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=gray!50, draw=white] (0, 0) circle (1.4);
+\node at (0, -1.1) {$t$};
+\end{tikzpicture}
+\]
+
+
 
 \begin{haskell}
 compLens :: Lens a b a' b' -> Lens s t a b -> Lens s t a' b'
@@ -692,6 +721,11 @@ compLens (Lens l2 r2) (Lens l1 r1) = Lens l3 r3
   where l3 = assoc' . bimap id l2  . l1
         r3 = r1 . bimap id r2 . assoc
 \end{haskell}
+The left mapping in the new lens is given by the following composite:
+\[ s \xrightarrow{l_1} (c, a)   \xrightarrow{(id, l_2)} (c, (c', a))  \xrightarrow{assoc'} ((c, c'), a)\]
+and the right mapping is given by:
+\[ ((c, c'), b') \xrightarrow{assoc}  (c, (c', b')) \xrightarrow{(id, r_2)} (c, b) \xrightarrow{r_1} t \]
+
 We have used the associativity and functoriality of the product:
 \begin{haskell}
 assoc :: ((c, c'), b') -> (c, (c', b'))
@@ -704,9 +738,34 @@ instance Bifunctor (,) where
   bimap f g (a, b) = (f a, g b)
 \end{haskell}
 
-Since lenses can be composed, you might wonder is there is a category in which lenses describe arrows. Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle S, T\rangle$ to $ \langle A, B \rangle$ are elements of  $\mathit{Lens} \langle S, T\rangle \langle A, B \rangle$.
+As an example, let's compose two product lenses:
+\begin{haskell}
+l3 :: Lens (c, (c', a')) (c, (c', b')) a' b'
+l3 = compLens prodLens prodLens
+\end{haskell}
+and apply it to a nested product:
+\begin{haskell}
+x :: (String, (Bool, Int))
+x = ("Outer", (True, 42))
+\end{haskell}
+Our composite lens lets us not only retrieve the innermost component:
+\begin{haskell}
+toGet l3 x
+> 42
+\end{haskell}
+but also replace it with a value of a different type (here, \hask{Char}):
+\begin{haskell}
+toSet l3 x 'z'
+> ("Outer",(True,'z'))
+\end{haskell}
 
-The formula for the composition of existential lenses is too complicated to be useful in practice. Fortunately, there is an alternative representation of lenses using Tambara modules in which composition of lenses is just a composition of functions.
+\subsection{Category of lenses}
+
+Since lenses can be composed, you might be wondering if there is a category in which lenses serve as hom-sets. 
+
+Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle S, T\rangle$ to $ \langle A, B \rangle$ are elements of  $\mathit{Lens} \langle S, T\rangle \langle A, B \rangle$.
+
+The formula for the composition of existential lenses is too complicated to be useful in practice. Fortunately, there is an alternative representation of lenses using Tambara modules, in which composition of lenses is just a composition of functions.
 
 \section{Important Formulas}
 This is a handy (co-)end calculus cheat-sheet.
