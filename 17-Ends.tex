@@ -765,7 +765,264 @@ Since lenses can be composed, you might be wondering if there is a category in w
 
 Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle S, T\rangle$ to $ \langle A, B \rangle$ are elements of  $\mathit{Lens} \langle S, T\rangle \langle A, B \rangle$.
 
-The formula for the composition of existential lenses is too complicated to be useful in practice. Fortunately, there is an alternative representation of lenses using Tambara modules, in which composition of lenses is just a composition of functions.
+The formula for the composition of existential lenses is too complicated to be useful in practice. In the next chapter we'll see an alternative representation of lenses using Tambara modules, in which composition of lenses is just a composition of functions.
+
+\section{Lenses and Fibrations}
+
+There is an alternative view of lenses using the language of fiber bundles. A projection $p$ that defines a fibration can be seen as ``decomposing'' the bundle $E$ into fibers. 
+
+In this view, $p$ plays the role of \hask{get}:
+\[ p \colon E \to B \]
+The base $B$ represents the type of the focus. 
+
+The other part of the lens, \hask{set}, is a mapping: 
+\[ q \colon E \times B \to E \]
+It can be interpreted as ``transporting'' an element of the bundle to a new fiber. 
+\[
+\begin{tikzpicture}
+
+\def\yb{0}; % base
+\def\yfb{0.6}; % fiber bottom
+\def\yfs{1.1}; % s
+\def\yfss{1.6}; % s'
+\def\yft{2.2}; % fiber top
+
+\def\dx{0.9};
+
+\def\xbl{0};
+\def\xbm{\xbl + \dx};
+\def\xbmr{\xbl + 2*\dx};
+\def\xbr{\xbl + 4*\dx};
+
+
+\filldraw[fill=orange!30, draw=white] (\xbl, \yfb) rectangle (\xbr, \yft);
+
+\draw (\xbl, \yb) -- (\xbr, \yb);
+
+\draw[dashed] (\xbm, \yfb) -- (\xbm, \yft); %fiber
+\draw[dashed] (\xbmr, \yfb) -- (\xbmr, \yft); %fiber
+
+\filldraw[black] (\xbm, \yfs) circle (1 pt);
+\node[left] at (\xbm, \yfs) {$s$};
+\draw[blue] (\xbm, \yfs) edge[->, bend left] (\xbmr, \yfss);
+\filldraw[black] (\xbmr, \yfss) circle (1 pt);
+\node[right] at (\xbmr, \yfss) {$q(s, a)$};
+
+\filldraw[black] (\xbmr, \yb) circle (1 pt);
+\node[below] at (\xbmr, \yb) {$a$};
+
+\node[above] at (\xbmr, \yft) {$p^{-1} a$};
+\node[right] at (\xbr, \yb) {$B$};
+\node[right] at (\xbr, \yft) {$E$};
+
+\end{tikzpicture}
+\]
+
+We know that $q(s, a)$ transports $s$ to a fiber over $a$ because of the get/set lens law:
+\begin{haskell}
+get (set s a) = a
+\end{haskell}
+We can rewrite this law in terms of $p$ and $q$:
+\[ p \circ q = \pi_1 \]
+Equivalently, we can represent it as a commuting diagram:
+\[
+ \begin{tikzcd}
+ E \times B
+ \arrow[dd, "\varepsilon \times id"']
+ \arrow[rd, "q"]
+ \\
+ & E
+ \arrow[dl, "p"]
+ \\
+ B
+  \end{tikzcd}
+\]
+Here, instead of using the projection $\pi_2$, I used a comonoidal counit $\varepsilon$:
+\[ \varepsilon \colon E \to 1 \]
+and the unit law for the product. Using a comonoid makes it easier to generalize this construction to a tensor product in a monoidal category. 
+
+Here's the set/get law:
+\begin{haskell}
+set s (get  s) = s
+\end{haskell}
+Again, it can be written in terms of a comonoidal comultiplication:
+\[ \delta \colon E \to E \times E \]
+The following composite must result in an identity:
+\[ E \xrightarrow{\delta} E \times E \xrightarrow{id \times p} E \times B \xrightarrow{q} E \]
+
+Here's the picture of the set/get law in a bundle:
+\[
+\begin{tikzpicture}
+
+\def\yb{0}; % base
+\def\yfb{0.6}; % fiber bottom
+\def\yfs{1.1}; % s
+\def\yfss{1.6}; % s'
+\def\yft{2.8}; % fiber top
+
+\def\dx{0.9};
+
+\def\xbl{0};
+\def\xbm{\xbl + \dx};
+\def\xbmr{\xbl + 2*\dx};
+\def\xbr{\xbl + 4*\dx};
+
+
+\filldraw[fill=orange!30, draw=white] (\xbl, \yfb) rectangle (\xbr, \yft);
+
+\draw (\xbl, \yb) -- (\xbr, \yb);
+
+\draw[dashed] (\xbmr, \yfb) -- (\xbmr, \yft); %fiber
+
+\node at (\xbmr, \yfss) (s) {};
+\draw[->,shorten <=6pt,shorten >=6pt, blue](s.west)arc(360:0:0.7);
+\filldraw[black] (\xbmr, \yfss) circle (1 pt);
+\node[left] at (\xbmr, \yfss) {$s = $};
+\node[right] at (\xbmr, \yfss) {$q(s, a)$};
+
+\filldraw[black] (\xbmr, \yb) circle (1 pt);
+\node[below] at (\xbmr, \yb) {$a$};
+
+\node[above] at (\xbmr, \yft) {$p^{-1} a$};
+\node[right] at (\xbr, \yb) {$B$};
+\node[right] at (\xbr, \yft) {$E$};
+
+\end{tikzpicture}
+\]
+
+Here's the set/set law:
+\begin{haskell}
+set (set s a) a' = set s a'
+\end{haskell}
+and the corresponding commuting diagram:
+\[
+ \begin{tikzcd}
+ E \times B \times B
+ \arrow[d, "id \times \varepsilon \times id"']
+ \arrow[rd, "q \times id"]
+ \\
+ E \times B
+ \arrow[d, "q"']
+ & E \times B
+ \arrow[dl, "q "]
+ \\
+ E
+  \end{tikzcd}
+\]
+Again, I used the counit rather than a projection from a product.
+
+This is what the set/set law looks like in a bundle:
+\[
+\begin{tikzpicture}
+
+\def\yb{0}; % base
+\def\yfb{0.6}; % fiber bottom
+\def\yfs{1.3}; % s'
+\def\yfss{2.1}; % s''
+\def\yft{2.8}; % fiber top
+
+\def\dx{1};
+
+\def\xbl{0};
+\def\xbm{\xbl + \dx};
+\def\xbmr{\xbl + 2.5*\dx};
+\def\xbmrr{\xbl + 4*\dx};
+\def\xbr{\xbl + 6*\dx};
+
+
+\filldraw[fill=orange!30, draw=white] (\xbl, \yfb) rectangle (\xbr, \yft);
+
+\draw (\xbl, \yb) -- (\xbr, \yb);
+
+\draw[dashed] (\xbm, \yfb) -- (\xbm, \yft); %fiber
+\draw[dashed] (\xbmr, \yfb) -- (\xbmr, \yft); %fiber
+\draw[dashed] (\xbmrr, \yfb) -- (\xbmrr, \yft); %fiber
+
+\filldraw[black] (\xbm, \yfss) circle (1 pt);
+\node[left] at (\xbm, \yfss) {$s$};
+
+\draw[red] (\xbm, \yfss)  edge[->, bend left]  (\xbmr, \yfs);
+
+\filldraw[black] (\xbmr, \yfs) circle (1 pt);
+\node[right] at (\xbmr, \yfs) {$q(s, a)$};
+\node[left] at (\xbmr, \yfs) {$s' =$};
+
+\draw[blue] (\xbmr, \yfs) edge[->, bend left] (\xbmrr, \yfss);
+
+\filldraw[black] (\xbmrr, \yfss) circle (1 pt);
+\node[right] at (\xbmrr, \yfss) {$q(a', s')$};
+
+\draw (\xbm, \yfss) edge[->, bend left] (\xbmrr, \yfss);
+
+
+\filldraw[black] (\xbmr, \yb) circle (1 pt);
+\node[below] at (\xbmr, \yb) {$a$};
+
+\filldraw[black] (\xbmrr, \yb) circle (1 pt);
+\node[below] at (\xbmrr, \yb) {$a'$};
+
+\node[above] at (\xbmr, \yft) {$p^{-1} a$};
+\node[above] at (\xbmrr, \yft) {$p^{-1} a'$};
+\node[right] at (\xbr, \yb) {$B$};
+\node[right] at (\xbr, \yft) {$E$};
+
+\end{tikzpicture}
+\]
+
+You may notice that the last two laws look like unit and composition laws for the bundle transport.
+
+
+The existential representation of the lens can also be expressed using the language of bundles. The existential residue describes a canonical fiber $F$. The two components of the existential lens:
+\[ \int^{C} \mathcal{C}(S, C \times A) \times  \mathcal{C}(C \times A, S) \]
+are the mappings:
+\begin{align*}
+ E \to F \times B \\
+ F \times B \to E 
+ \end{align*}
+They decompose the bundle into the product of the canonical fiber and the base.
+
+\[
+\begin{tikzpicture}
+
+\def\yb{0}; % base
+\def\yfb{0.6}; % fiber bottom
+\def\yfm{1.4}; % fiber mid
+\def\yft{2.2}; % fiber top
+
+\def\dx{0.8};
+
+\def\xfib{-0.6}
+\def\xbl{0};
+\def\xbm{\xbl + \dx};
+\def\xbr{\xbl + 2*\dx};
+
+\filldraw[fill=orange!30, draw=white] (\xbl, \yfb) rectangle (\xbr, \yft);
+
+\draw[blue] (\xfib, \yfb) -- (\xfib, \yft);
+\node[left] at (\xfib, \yft) {$F$};
+\filldraw[black] (\xfib, \yfm) circle (1 pt);
+\node[left] at (\xfib, \yfm) {$c$};
+
+\filldraw[black] (\xbm, \yfm) circle (1 pt);
+\node[right] at (\xbm, \yfm) {$s$};
+
+
+
+\draw (\xbl, \yb) -- (\xbr, \yb);
+
+\draw[dashed] (\xbm, \yfb) -- (\xbm, \yft); %fiber
+
+\filldraw[black] (\xbm, \yb) circle (1 pt);
+\node[below] at (\xbm, \yb) {$a$};
+\node[right] at (\xbr, \yb) {$B$};
+\node[right] at (\xbr, \yft) {$E$};
+
+\end{tikzpicture}
+\]
+
+A type-changing lens corresponds to having the freedom of replacing the base $B$ with a new base, keeping the same fiber $F$.
+
+We'll see later that this picture can be further generalized by replacing the canonical fiber with a monoidal category that can act on the fibers of $E$ in a way reminiscent of gauge transformations in physics.
 
 \section{Important Formulas}
 This is a handy (co-)end calculus cheat-sheet.
