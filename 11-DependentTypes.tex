@@ -356,32 +356,81 @@ Show that a pullback in $\mathcal{C}$ with the target $B$ is a product in the sl
 
 \subsection{Base-change functor}
 
-We used a cartesian closed category as a model for programming. To model dependent types, we need to impose an additional condition: We require the category to be \emph{locally cartesian closed}. This is a category in which all slice categories are cartesian closed. 
+We used a cartesian closed category as a model for programming. To model dependent types, we need to impose an additional condition: We require the category to be \index{locally cartesian closed category}\emph{locally cartesian closed}. This is a category in which all slice categories are cartesian closed. 
 
 In particular, such categories have all pullbacks, so it's always possible to change the base of any fibration.  Base change induces a mapping between slice categories that is functorial. 
 
-Given two slice categories $\mathcal{C}/B'$ and $\mathcal{C}/B$ and an arrow between bases $f \colon B' \to B$ the base-change functor $f^* \colon \mathcal{C}/B \to \mathcal{C}/B'$ maps a fibration $\langle E, p \rangle$ to the fibration $ f^* \langle E, p \rangle= \langle f^* E, f^* p \rangle$, which is given by the pullback:
+Given two slice categories $\mathcal{C}/B$ and $\mathcal{C}/B'$ and an arrow between bases $f \colon B \to B'$ the base-change functor $f^* \colon \mathcal{C}/B' \to \mathcal{C}/B$ maps a fibration $\langle F, p \rangle$ to the fibration $ f^* \langle F, p \rangle= \langle f^* F, f^* p \rangle$, which is given by the pullback:
 \[
  \begin{tikzcd}
-f^* E
+f^* F
 \arrow[dr, phantom,  , very near start, "\lrcorner"]
  \arrow[d, "f^*p"']
  \arrow[r, "g"]
- & E
+ & F
  \arrow[d, "p"]
  \\
- B'
+ B
  \arrow[r, "f"]
- &B
+ &B'
   \end{tikzcd}
 \]
 Notice that the functor $f^*$ goes in the opposite direction to the arrow $f$.
+
+To visualize the base-change functor let's consider how it works on sets. We have the intuition that the fibration $p$ decomposes $F$ into fibers over each point of $B'$. 
+
+But here we have another fibration $f$ that similarly decomposes $B$. Let's call these fibers ``patches.'' For instance, if $B'$ is just a two-element set, then the fibration given by $f$ splits $B$ into two patches. The pullback takes a single fiber from $F$ and plants it over the whole patch in $B$. The resulting set $f^*F$ looks like a patchwork, where each patch is planted with clones of one fiber from $F$.
+
+
+\[
+\begin{tikzpicture}
+\def\xmin{1.4};
+\def\dx{0.4};
+\def\xl{-1.4};
+
+\def\dy{0.2};
+\def\yb{0};
+\def\yt{10 * \dy}; 
+
+% bars over B'
+\filldraw[fill=blue!50!green!20, draw=white] (\xmin, \yb) rectangle (\xmin + \dx, \yt - 2*\dy);
+\filldraw[fill=red!50!green!20, draw=white] (\xmin + \dx, \yb) rectangle (\xmin + 2 * \dx, \yt);
+
+\draw (\xmin, \yb) -- (\xmin, \yt - 2*\dy);
+\draw (\xmin + \dx, \yb) -- (\xmin+ \dx, \yt);
+\draw (\xmin + 2 * \dx, \yb) -- (\xmin + 2 * \dx, \yt);
+
+\node[below] (BB) at (\xmin + \dx, \yb) {$B'$};
+\node[above] at (\xmin + \dx, 10 * \dy) {$F$};
+
+% bars over B
+
+\filldraw[fill=blue!50!green!20, draw=white] (\xl, \yb) rectangle (\xl + 5 * \dx, \yt - 2*\dy);
+\filldraw[fill=red!50!green!20, draw=white] (\xl + 2*\dx, \yb) rectangle (\xl + 5 * \dx, \yt);
+\draw (\xl, \yb) -- (\xl, \yt - 2*\dy);
+\draw (\xl + \dx, \yb) -- (\xl + \dx, \yt - 2 * \dy);
+\draw (\xl + 2 * \dx, \yb) -- (\xl + 2 * \dx, \yt);
+\draw (\xl + 3 * \dx, \yb) -- (\xl + 3 * \dx, \yt);
+\draw (\xl + 4 * \dx, \yb) -- (\xl + 4 * \dx, \yt);
+\draw (\xl + 5 * \dx, \yb) -- (\xl + 5 * \dx, \yt);
+
+\node[below] (B) at (\xl + 2 * \dx, \yb) {$B$};
+\node[above] at (\xl + \dx, 10 * \dy) {$f^* F$};
+
+\draw[->]  (B) -- (BB) node [midway, below] {$f$};
+
+
+\end{tikzpicture}
+\]
+In particular, if $B'$ is a singleton set (the terminal object), then we have only one fiber (the whole of $F$) and the bundle $f^*F$ is a cartesian product $B \times F$. Such bundle is called a \index{trivial bundle}trivial bundle.
+
+A non-trivial bundle can be \emph{locally} decomposed into products. Just as $B$ is a sum of patches (defined by $f$), so $f^*F$ is a sum of products of those patches and the corresponding fibers of $F$.
 
 In a locally cartesian closed category, the base change functor has both the left and the right adjoints. The left adjoint is called the dependent sum, and the right adjoint is called the dependent product (or dependent function).
 
 \section{Dependent Sum}
 
-In type theory, the dependent sum, or the sigma type $\Sigma_{x : B} T(x)$, is defined as a type of pairs in which the type of the second component depends on the value of the first component. Our counted vector type can be thought of as a dependent sum. An element of this type is a natural number \hask{n} paired with an element of an n-tuple \hask{(a, a, ... a)}.
+In type theory, the dependent sum, or the sigma type $\Sigma_{x : B} T(x)$, is defined as a type of pairs in which the type of the second component depends on the value of the first component. Our counted vector type can be thought of as a dependent sum. An element of this type is a natural number \hask{n} paired with an element \hask{(x_1, x_2, ... x_n)} of the n-tuple \hask{(a, a, ... a)}.
 
 The introduction rule for the dependent sum assumes that there is a family of types $T(x)$ indexed by elements of the base type $B$. Then an element of $\Sigma_{x : B} T(x)$ is constructed from a pair of elements $x \colon B$ and $y \colon T(x)$. 
 
@@ -391,15 +440,15 @@ To see this, let's first revisit the definition of a pair, which is an element o
 \[
  \begin{tikzcd}
  S
- \arrow[dr, dashed, "\phi^T"]
- \arrow[drr, bend left, "\phi"]
+ \arrow[dr, blue, dashed, "\phi^T"]
+ \arrow[drr, blue, bend left, "\phi"]
  \arrow[ddr, bend right, "q"]
  \\
- &B \times E
+ &B \times F
 \arrow[dr, phantom,  , very near start, "\lrcorner"]
  \arrow[r, "\pi_2"]
  \arrow[d, "\pi_1"']
- &E
+ &F
  \arrow[d, "!"]
  \\
  &B
@@ -412,36 +461,37 @@ We have also seen that the product can be defined using an adjunction. We can sp
 
 Notice that, if we keep $q$ fixed, we get a one-to-one correspondence between the arrows $\phi$ and $\phi^T$. This is the adjunction we're interested in.
 
-We can now put our fibrational glasses on and notice that $\langle S, q\rangle$ and $\langle B \times E, \pi_1 \rangle$ are two fibrations over the same base $B$. The commuting triangle makes $\phi^T$ a morphism in the slice category $\mathcal{C}/B$. In other words $\phi^T$ is a member of the hom-set:
- \[ (\mathcal{C}/B) \left(\left \langle {S \atop q} \right \rangle, \left \langle {B \times E \atop \pi_1} \right \rangle \right)  \]
+We can now put our fibrational glasses on and notice that $\langle S, q\rangle$ and $\langle B \times F, \pi_1 \rangle$ are two fibrations over the same base $B$. The commuting triangle makes $\phi^T$ a morphism in the slice category $\mathcal{C}/B$. In other words $\phi^T$ is a member of the hom-set:
+ \[ (\mathcal{C}/B) \left(\left \langle {S \atop q} \right \rangle, \left \langle {B \times F \atop \pi_1} \right \rangle \right)  \]
  
- We can rewrite the one-to-one correspondence between $\phi$ and $\phi^T$ as an isomorphism of hom-sets:
-\[ \mathcal{C}(S, E) \cong  (\mathcal{C}/B)\left(\left \langle {S \atop q} \right \rangle, \left \langle {B \times E \atop \pi_1} \right \rangle \right)\]
-In fact, it's an adjunction in which the left functor is the forgetful functor that maps $\langle S, q \rangle$ to $S$, thus forgetting the fibration.
+ Since $\phi$ is a member of the hom-set $ \mathcal{C}(S, F)$, we can rewrite the one-to-one correspondence between $\phi$ and $\phi^T$ as an isomorphism of hom-sets:
+\[ \mathcal{C}(S, F) \cong  (\mathcal{C}/B)\left(\left \langle {S \atop q} \right \rangle, \left \langle {B \times F \atop \pi_1} \right \rangle \right)\]
+In fact, it's an adjunction in which the left functor is the forgetful functor $L \colon \mathcal{C}/B \to \mathcal{C}$ that maps $\langle S, q \rangle$ to $S$, thus forgetting the fibration.
 
-If you squint at this adjunction hard enough, you can see the outlines of the definition of a categorical sum (coproduct). 
+If you squint at this adjunction hard enough, you can see the outlines of the definition of $S$ as a categorical sum (coproduct). 
 
-On the left we have a mapping out of $S$. Think of $S$ as a sum of fibers that are defined by the fibration $\langle S, q \rangle$. 
+Firstly, on the left you have a mapping out of $S$. Think of $S$ as the sum of fibers that are defined by the fibration $\langle S, q \rangle$. 
 
-Recall that the fibration $\langle B \times E, \pi_1 \rangle$ can be though of as a generalization of the diagonal functor, producing many copies of $E$ planted over $B$. Then the right hand side looks like a bunch of arrows, each mapping a different fiber of $S$ to the same fiber $E$. 
+Secondly, recall that the fibration $\langle B \times F, \pi_1 \rangle$ can be though of as a generalization of the diagonal functor, producing many copies of $F$ planted over $B$. Then the right hand side looks like a bunch of arrows, each mapping a different fiber of $S$ to the same fiber $F$. 
 
 For comparison, this is the definition of a coproduct of two ``fibers'', $F_1$ and $F_2$:
-\[ \mathcal{C}(F_1 + F_2, E) \cong (\mathcal{C} \times \mathcal{C}) (\langle F_1, F_2 \rangle, \Delta E) \]
-Seen in this light, a dependent sum looks like a sum of many such fibers.
+\[ \mathcal{C}(F_1 + F_2, F) \cong (\mathcal{C} \times \mathcal{C}) (\langle F_1, F_2 \rangle, \Delta F) \]
 
-We can generalize our diagram by replacing the terminal object with an arbitrary base $B'$. We now have a fibration $\langle E, p \rangle$, and we get the pullback square that defines the base-change functor $f^*$:
+Seen in this light, a dependent sum is just a sum of many such fibers. In $\mathbf{Set}$ it's a tagged union of individual sets, each being the inverse image of some element of $B$ under $q$. 
+
+We can generalize our diagram by replacing the terminal object with an arbitrary base $B'$. We now have a fibration $\langle F, p \rangle$, and we get the pullback square that defines the base-change functor $f^*$:
 \[
  \begin{tikzcd}
  S
- \arrow[dr, dashed, "\phi^T"]
- \arrow[drr, bend left, "\phi"]
+ \arrow[dr, blue, dashed, "\phi^T"]
+ \arrow[drr, blue, bend left, "\phi"]
  \arrow[ddr, bend right, "q"]
  \\
- &f^* E
+ &f^* F
 \arrow[dr, phantom,  , very near start, "\lrcorner"]
  \arrow[r, "g"]
  \arrow[d, "f^* p"']
- &E
+ &F
  \arrow[d, "p"]
  \\
  &B
@@ -452,14 +502,16 @@ We can generalize our diagram by replacing the terminal object with an arbitrary
 
 The universality of the pullback results in the following isomorphism of hom-sets:
 
-\[ (\mathcal{C}/B') \left( \left \langle {S \atop f \circ q } \right \rangle , \left \langle {E \atop p} \right \rangle \right)  \cong   (\mathcal{C}/B) \left( \left \langle {S \atop q} \right \rangle , f^* \left \langle {E \atop p} \right \rangle \right)\]
+\[ (\mathcal{C}/B') \left( \left \langle {S \atop f \circ q } \right \rangle , \left \langle {F \atop p} \right \rangle \right)  \cong   (\mathcal{C}/B) \left( \left \langle {S \atop q} \right \rangle , f^* \left \langle {F \atop p} \right \rangle \right)\]
 Here, $\phi$ is an element of the left-hand side and $\phi^T$ is the corresponding element of the right-hand side. 
 
-We interpret this isomorphism as the adjunction between the base change functor $f^*$ on the right and the dependent sum functor on the left:
+We interpret this isomorphism as the adjunction between the base change functor $f^*$ on the right and the dependent sum functor on the left. 
+\[ (\mathcal{C}/B') \left( \Sigma_f \left \langle {S \atop q} \right \rangle , \left \langle {F \atop p} \right \rangle \right)  \cong   (\mathcal{C}/B) \left( \left \langle {S \atop q} \right \rangle , f^* \left \langle {F \atop p} \right \rangle \right)\]
+The dependent sum is thus defined by this formula:
 \[ \Sigma_f \left \langle {S \atop q} \right \rangle =  \left \langle {S \atop f \circ q} \right \rangle \]
-This simply says that, if $S$ is fibered over $B$ and there is a mapping from $B$ to $B'$, then $S$ is automatically fibered over $B'$; the projection being the composition $f \circ q$. 
+This says that, if $S$ is fibered over $B$ using $q$, and there is a mapping $f$ from $B$ to $B'$, then $S$ is automatically fibered over $B'$, the projection being the composition $f \circ q$. 
 
-In $\mathbf{Set}$, if $f$ merges several elements into one, the fiber over this element is the sum of individual fibers. 
+We've seen before that, in $\mathbf{Set}$, $f$ defines patches within $B$. Fibers of $F$ are replanted in these patches to form $f^*F$.  
 
 If $f$ is identity, $\Sigma_{\mathit{id}}$ is the identity in the slice category, which confirms our intuition of $S$ being the sum of fibers.
 
@@ -587,7 +639,7 @@ In $\mathbf{Set}$, a single morphism on the left-hand side would be implemented 
 \draw (\xr + 4 * \dx, \yb) -- (\xr + 4 * \dx, \e);
 
 \node[below] at (\xr + 2 * \dx, \yb) {$B$};
-\node[above] at (\xr + 1 * \dx, 8 * \dy) {$E$};
+\node[above] at (\xr + 2 * \dx, 9 * \dy) {$E$};
 
 \draw[dashed] (\xr, \a -\dy ) -- (\xr + 1 * \dx, \b - 5 * \dy) -- (\xr + 2 * \dx, \c - \dy) -- (\xr + 3 * \dx, \d - 4*\dy) -- (\xr + 4 * \dx, \e - 3*\dy);
 
@@ -595,7 +647,7 @@ In $\mathbf{Set}$, a single morphism on the left-hand side would be implemented 
 \filldraw[black] (\xl + 3 * \dx, \yb + 4* \dy) circle (1 pt);
 \filldraw[black] (\xr + 3 * \dx, \yb + 8* \dy) circle (1 pt);
 
-\draw[->] ((\xl + 3 * \dx, \yb + 4* \dy) -- (\xr + 3 * \dx, \yb + 8* \dy);
+\draw[blue] ((\xl + 3 * \dx, \yb + 4* \dy) edge[->, bend left] (\xr + 3 * \dx, \yb + 8* \dy);
 
 \draw[dashed] (\xl, \yb + 4* \dy) -- (\xl + 4* \dx, \yb + 4* \dy);
 
@@ -703,7 +755,7 @@ Imagine, for instance, that $B'$ is a two-element set. The fibration $q$ will sp
 \draw (\xr + 4 * \dx, \yb) -- (\xr + 4 * \dx, \e);
 
 \node[below] at (\xr + 2 * \dx, \yb) {$B$};
-\node[above] at (\xr + 1 * \dx, 8 * \dy) {$E$};
+\node[above] at (\xr + 2 * \dx, 9 * \dy) {$E$};
 
 % dashed zigzag in E
 \draw[dashed] (\xr, \a -\dy ) -- (\xr + 1 * \dx, \b - 5 * \dy) -- (\xr + 2 * \dx, \c - \dy) -- (\xr + 3 * \dx, \d - 4*\dy) -- (\xr + 4 * \dx, \e - 3*\dy);
@@ -712,7 +764,7 @@ Imagine, for instance, that $B'$ is a two-element set. The fibration $q$ will sp
 \filldraw[black] (\xr + 3 * \dx, \yb + 8* \dy) circle (1 pt);
 
 % arrow from f*G to E
-\draw[->] ((\xl + 3 * \dx, \yb + 5* \dy) -- (\xr + 3 * \dx, \yb + 8* \dy);
+\draw[blue] ((\xl + 3 * \dx, \yb + 5* \dy) edge[->, bend left] (\xr + 3 * \dx, \yb + 8* \dy);
 
 % dashed slices through f*G
 \draw[dashed] (\xl, \yb + 4* \dy) -- (\xl + \dx, \yb + 4* \dy);
@@ -772,7 +824,7 @@ Let's pick $G$ to be a singleton set $1$, and let $x \colon 1 \to B'$ be a fibra
 
 \subsection{Universal quantification}
 
-The logical interpretation of the dependent product $\Pi_{x : B} \, T(x)$ is a universally quanitified proposition. An element of $\Pi_{x : B} \, T(x)$ is a section---the proof that it's possible to select an element from each member of the family $T(x)$. It means that non of them is empty. In other words, its a proof of the proposition:
+The logical interpretation of the dependent product $\Pi_{x : B} \, T(x)$ is a universally quanitified proposition. An element of $\Pi_{x : B} \, T(x)$ is a section---the proof that it's possible to select an element from each member of the family $T(x)$. It means that none of them is empty. In other words, it's a proof of the proposition:
 \[ \forall_{x : B}\, T(x) \]
 
 \section{Equality}
