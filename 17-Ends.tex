@@ -777,7 +777,14 @@ The base $B$ represents the type of the focus.
 
 The other part of the lens, \hask{set}, is a mapping: 
 \[ q \colon E \times B \to E \]
-It can be interpreted as ``transporting'' an element of the bundle to a new fiber. 
+\subsection{Transport law}
+
+We interpret $q$ as ``transporting'' an element of the bundle to a new fiber because of the get/set lens law, or the \emph{transport} law:
+\begin{haskell}
+get (set s a) = a
+\end{haskell}
+We say that $q(s, a)$ transports $s$ to a new fiber over $a$:
+
 \[
 \begin{tikzpicture}
 
@@ -818,10 +825,6 @@ It can be interpreted as ``transporting'' an element of the bundle to a new fibe
 \end{tikzpicture}
 \]
 
-We know that $q(s, a)$ transports $s$ to a fiber over $a$ because of the get/set lens law:
-\begin{haskell}
-get (set s a) = a
-\end{haskell}
 We can rewrite this law in terms of $p$ and $q$:
 \[ p \circ q = \pi_1 \]
 Equivalently, we can represent it as a commuting diagram:
@@ -841,7 +844,8 @@ Here, instead of using the projection $\pi_2$, I used a comonoidal counit $\vare
 \[ \varepsilon \colon E \to 1 \]
 and the unit law for the product. Using a comonoid makes it easier to generalize this construction to a tensor product in a monoidal category. 
 
-Here's the set/get law:
+\subsection{Unit law}
+Here's the set/get law or the \emph{unit} law:
 \begin{haskell}
 set s (get  s) = s
 \end{haskell}
@@ -889,7 +893,9 @@ Here's the illustration of this law in a bundle:
 \end{tikzpicture}
 \]
 
-Finally, here's the set/set law:
+\subsection{Composition law}
+
+Finally, here's the set/set law, or the \emph{composition} law:
 \begin{haskell}
 set (set s a) a' = set s a'
 \end{haskell}
@@ -968,31 +974,116 @@ This is what the set/set law looks like in a bundle:
 \end{tikzpicture}
 \]
 
-You may notice that the last two laws look like unit and composition for the bundle transport $q$.
+\subsection{Type-changing lens}
 
-A type-changing lens generalizes transport to act between bundles:
-\[ q \colon E \times B' \to E' \]
-where $E'$ is a bundle over $B'$.
+A type-changing lens generalizes transport to act between bundles. We have to define a whole family of bundles. We start with a category $A$ whose objects define the types that we will use for the foci of our lens. In most cases this is the full category of Haskell types. 
 
-The unit law applies to transport within one bundle, but the composition law can be extended to jump between three different bundles.
+We use a set $B$ as the set of all elements of all types. $B$ is fibrated over $A$---the projection $\pi$ sending an element of $B$ to its corresponding type. You can think of it as the coslice our under-category $1/A$.
 
-\[q (q (s, b), b') = q (s, b') \]
-or, diagrammatically:
+The bundle of bundles $E$ is a set fibrated over $B$ with the projection $p$. Since $B$ itself is fibrated over $A$, $E$ is also fibrated over $A$ with the projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. 
+
+We want to treat $E$ as a dependent type that is parameterized by the objects of $A$.
+
 \[
- \begin{tikzcd}
- E \times B \times B'
- \arrow[d, "id \times \varepsilon \times id"']
- \arrow[rd, "q \times id"]
- \\
- E \times B'
- \arrow[d, "q"']
- & E' \times B'
- \arrow[dl, "q "]
- \\
- E''
-  \end{tikzcd}
+\begin{tikzpicture}
+\def\xl{-3};
+\def\xr{0};
+\def\yb{0};
+\def\yt{2};
+
+\def\dy{0.4};
+\def\dx{0.5};
+
+\def\a{(\xl, \yb)};
+\def\b{(\xr, \yb)};
+\def\c{(\xl, \yt)};
+\def\d {(\xr, \yt)};
+
+% _a second plane
+\def\aa{(\xl + \dx, \yb + \dy)};
+\def\ba{(\xr + \dx, \yb + \dy)};
+\def\ca{(\xl + \dx, \yt + \dy)};
+\def\da{(\xr + \dx, \yt + \dy)};
+
+% _b third plane
+\def\ab{(\xl + 2*\dx, \yb + 2*\dy)};
+\def\bb{(\xr + 2*\dx, \yb + 2*\dy)};
+\def\cb{(\xl + 2*\dx, \yt + 2*\dy)};
+\def\db{(\xr + 2*\dx, \yt + 2*\dy)};
+
+% shifted walls
+\def\yshift{-1.5};
+\def\xshift{1.5};
+
+
+% E
+\draw \a rectangle \d;
+\draw[draw=black!40!green] \aa rectangle \da;
+\draw \ab rectangle \db;
+
+\draw \a -- \ab;
+\draw \b -- \bb;
+\draw \d -- \db;
+\draw \c -- \cb;
+
+\node[above] at \cb {$E$};
+
+% B
+% rebase yb (bottom)
+\def\yb{\yshift}
+% rebase xr (right wall)
+\def\xr{0};
+
+\draw \a -- \b;
+\draw \ab -- \bb;
+\draw[red] \aa -- \ba;
+% diagonal
+\draw \a -- \ab;
+\draw \b -- \bb;
+\draw \d -- \db;
+\draw \c -- \cb;
+\node[above] at \ab {$B$};
+
+
+% A
+% rebase yb (bottom)
+\def\yb{\yshift}
+% rebase xr (right wall)
+\def\xr{\xshift};
+
+\draw \b -- \bb;
+\node[right] at \bb {$A$};
+\filldraw[black] \ba circle (1 pt);
+
+%projections
+
+\draw[red, shorten <=0.2cm, shorten >=0.2cm, ->] (0 + \dx, \yshift + \dy) -- node[above]{$\pi$} (\xshift +\dx, \yshift + \dy);
+
+\draw[draw=black!40!green, shorten <=0.2cm, shorten >=0.2cm, ->] (0 - \dx, 0 + \dy) -- node[right]{$p$} (0 - \dx, \yshift + \dy);
+
+\end{tikzpicture}
 \]
 
+The projection $p$ takes an element $s \in E$ and produces an element $b \in B$ whose type is $\pi b$. This is the generalization of \hask{get}. 
+
+The transport $q$, which corresponds to \hask{set}, takes an element $s \in E$ and an element $b \in B$ and produces a new element $t \in E$. 
+
+
+The transport satisfies the following laws:
+
+The get/set law (transport):
+
+\[ p (q (b, s)) = b \]
+
+The set/get law (unit):
+
+\[ q ( p (s), s) = s \]
+
+The set/set law (composition):
+
+\[ q (c, q (b, s)) = q (c, s) \]
+
+\subsection{Existential lens}
 
 
 The existential representation of the lens can also be described using the language of bundles. The existential residue becomes a generic fiber $F$. The two components of the existential lens:
