@@ -102,7 +102,7 @@ If we want to talk about the whole family as one big set, we can take the sum of
 
 Although intuitively easy to visualize, this point of view doesn't generalize nicely to category theory, where we don't like mixing sets with objects. So we turn this picture on its head and instead of talking about injecting family members into the sum, we consider a mapping that goes in the opposite direction. 
 
-This, again, we can first visualize using sets. We have one big set $E$ describing the whole family, and a function $p$ called the projection, or a \emph{display map}, that goes from $E$ down to the indexing set $B$ (also called the \emph{base}). 
+This, again, we can first visualize using sets. We have one big set $E$ describing the whole family, and a function $p$ called the projection, or a \index{display map}\emph{display map}, that goes from $E$ down to the indexing set $B$ (also called the \emph{base}). 
 
 This function will, in general, map multiple elements to one. We can then talk about the inverse image of a particular element $x \in B$ as the set of elements that get mapped down to it by $p$. This set is called the \emph{fiber} and is written $p^{-1} x$ (even though, in general, $p$ is not invertible in the usual sense). Seen as a collection of fibers, $E$ is often called a \emph{fiber bundle} or just a bundle.
 
@@ -138,6 +138,10 @@ This function will, in general, map multiple elements to one. We can then talk a
 Now forget about sets. A \emph{fibration} in an arbitrary category is a pair of objects $E$ and $B$ and an arrow $p \colon E \to B$. 
 
 So this is really just an arrow, but the context is everything. When an arrow is called a fibration, we use the intuition from sets, and imagine its source $E$ as a collection of fibers, with $p$ projecting each fiber down to a single point in the base $B$. 
+
+We can go even further: since (small) categories form a category $\mathbf{Cat}$ with functors as arrows, we can define a fibration of a category, taking another category as its base. 
+
+\subsection{Type families as fibrations}
 
 We will therefore model type families as fibrations. For instance, our counted-vector family can be represented as a fibration whose base is the type of natural numbers. The whole family is a sum (coproduct) of consecutive powers (products) of $A$:
 \[ \mathit{List}(A) = A^0 + A^1 + A^2 + ... = \coprod_{n\colon \mathbb{N}} A^n \]
@@ -181,7 +185,7 @@ The projection $p \colon \mathit{List}(A) \to \mathbb{N}$ is the familiar $\math
 
 In category theory we like to describe things in bulk---defining internal structure of things by structure-preserving maps between them. Such is the case with fibrations. 
 
-If we fix the base object $B$ and consider all possible source objects in the category $\mathcal{C}$, and all possible projections down to $B$, we get a \emph{slice category} $\mathcal{C}/B$ (also known as an over-category). 
+If we fix the base object $B$ and consider all possible source objects in the category $\mathcal{C}$, and all possible projections down to $B$, we get a \emph{slice category} $\mathcal{C}/B$ (also known as an \index{over category}over-category). 
 
 An object in the slice category is a pair $\langle E, p \rangle$, with $p \colon E \to B$.  An arrow between two objects $\langle E, p \rangle$ and $\langle E', p' \rangle$ is an arrow $f \colon E \to E'$ that commutes with the projections, that is:
 \[p' \circ f = p \]
@@ -202,11 +206,44 @@ Again, the best way to visualize this is to notice that such an arrow maps fiber
 
 Our counted vectors can be seen as objects in the slice category $\mathcal{C}/\mathbb{N}$ given by pairs $\langle \mathit{List}(A), \mathit{length} \rangle$.
 
+\subsection{Coslice categories}
+
+There is also a dual notion of a coslice category $A / \mathcal{C}$, also known as an \index{under-category}under-category. It's a category of arrows emanating from a fixed object $A$. Objects in this category are pairs $\langle X, i \colon A \to X \rangle$. Morphisms in $A / \mathcal{C}$ are arrows that make the relevant  triangles commute.
+\[
+ \begin{tikzcd}
+& A
+ \arrow[rd, "j"]
+ \arrow[ld, "i"']
+ \\
+X
+\arrow[rr, "f"']
+&& Y
+  \end{tikzcd}
+\]
+
+In particular, if the category $\mathcal{C}$ has a terminal object $1$, then the coslice $1 / \mathcal{C}$ has, as objects, global elements of all objects of $\mathcal{C}$. 
+
+There is a forgetful functor $U \colon 1 / \mathcal{C} \to \mathcal{C}$ that maps $\langle X, i \rangle$ to $X$. This functor defines a fibration of $1 / \mathcal{C}$. Objects in the fiber over some $X$ are in one-to-one correspondence with global elements of $X$. 
+
+\[
+ \begin{tikzcd}
+& 1
+ \arrow[rd, "y"]
+ \arrow[ld, "x"']
+ \\
+X
+\arrow[rr, "f"']
+&& Y
+  \end{tikzcd}
+\]
+Morphisms of $1/  \mathcal{C}$ that correspond to an arrow $f \colon X \to Y$ map the set of global elements of $X$ to the set of global elements of $Y$. Thus this fibration justifies our intuition of types as sets of values, with values represented by global elements of types. 
+
 \subsection{Pullbacks}
 
  Let's start with a particular fibration $p \colon E \to B$ and ask ourselves the question: what happens when we change the base from $B$ to some $A$ that is related to it through a mapping $f \colon A \to B$. Can we ``pull the fibers back'' along $f$? 
  
  Again, let's think about sets first. Imagine picking a fiber in $E$ over some point $y \in B$ that is in the image of $f$. We can plant this fiber over all points in $A$ that are in the inverse image $f^{-1} y$. If multiple points in $A$ are mapped to the same point in $B$, we just duplicate the corresponding fiber. This way, every point in $A$ will have a fiber sticking out of it. The sum of all these fibers will form a new bundle $E'$.
+ 
 
 \[
 \begin{tikzpicture}
