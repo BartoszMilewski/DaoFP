@@ -840,12 +840,12 @@ Equivalently, we can represent it as a commuting diagram:
  B
   \end{tikzcd}
 \]
-Here, instead of using the projection $\pi_2$, I used a comonoidal counit $\varepsilon$:
+Here, instead of using the projection $\pi_2$, we use a comonoidal counit $\varepsilon$:
 \[ \varepsilon \colon E \to 1 \]
 and the unit law for the product. Using a comonoid makes it easier to generalize this construction to a tensor product in a monoidal category. 
 
-\subsection{Unit law}
-Here's the set/get law or the \emph{unit} law:
+\subsection{Identity law}
+Here's the set/get law or the \emph{identity} law:
 \begin{haskell}
 set s (get  s) = s
 \end{haskell}
@@ -914,7 +914,7 @@ and the corresponding commuting diagram:
  E
   \end{tikzcd}
 \]
-Again, I used the counit rather than a projection from a product.
+Again, we use the counit rather than a projection from a product.
 
 This is what the set/set law looks like in a bundle:
 \[
@@ -976,13 +976,13 @@ This is what the set/set law looks like in a bundle:
 
 \subsection{Type-changing lens}
 
-A type-changing lens generalizes transport to act between bundles. We have to define a whole family of bundles. We start with a category $A$ whose objects define the types that we will use for the foci of our lens. In most cases this is the full category of Haskell types. 
+A type-changing lens generalizes transport to act between bundles. We have to define a whole family of bundles. We start with a category $A$ whose objects define the types that we will use for the foci of our lens. In Haskell, this is the full category of Haskell types. 
 
-We use a set $B$ as the set of all elements of all types. $B$ is fibrated over $A$---the projection $\pi$ sending an element of $B$ to its corresponding type. You can think of it as the coslice our under-category $1/A$.
+We use a set $B$ as the combined set of all elements of all types. $B$ is fibrated over $A$---the projection $\pi$ sending an element of $B$ to its corresponding type. You may think of it as the set of objects of the coslice category $1/A$.
 
-The bundle of bundles $E$ is a set fibrated over $B$ with the projection $p$. Since $B$ itself is fibrated over $A$, $E$ is also fibrated over $A$ with the projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. 
+The bundle of bundles $E$ is a set that's fibrated over $B$ with the projection $p$. Since $B$ itself is fibrated over $A$, $E$ is transitively fibrated over $A$, with the composite projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. Each of these bundles represents a different Haskell type. A type-changing lens will move between these types.
 
-We want to treat $E$ as a dependent type that is parameterized by the objects of $A$.
+We can treat $E$ as a dependent type that is parameterized by objects of $A$.
 
 \[
 \begin{tikzpicture}
@@ -1064,7 +1064,7 @@ We want to treat $E$ as a dependent type that is parameterized by the objects of
 \end{tikzpicture}
 \]
 
-The projection $p$ takes an element $s \in E$ and produces an element $b \in B$ whose type is $\pi b$. This is the generalization of \hask{get}. 
+The projection $p$ takes an element $s \in E$ and produces an element $b \in B$ whose type is given by $\pi b$. This is the generalization of \hask{get}. 
 
 The transport $q$, which corresponds to \hask{set}, takes an element $s \in E$ and an element $b \in B$ and produces a new element $t \in E$. 
 
@@ -1075,7 +1075,7 @@ The get/set law (transport):
 
 \[ p (q (b, s)) = b \]
 
-The set/get law (unit):
+The set/get law (identity):
 
 \[ q ( p (s), s) = s \]
 
@@ -1083,6 +1083,7 @@ The set/set law (composition):
 
 \[ q (c, q (b, s)) = q (c, s) \]
 
+The two mappings $p$ and $q$ can be combined into one mapping between categories called a \index{cofunctor}cofunctor. 
 \subsection{Existential lens}
 
 
