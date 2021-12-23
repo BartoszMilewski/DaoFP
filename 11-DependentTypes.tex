@@ -240,6 +240,10 @@ Morphisms of $1/  \mathcal{C}$ that correspond to an arrow $f \colon X \to Y$ ma
 
 \subsection{Pullbacks}
 
+We've seen a lot of examples of commuting squares. Such a square is a graphical representation of an equation: two path between opposite corners of a square, each a result of a composition of two morphisms, are equal. 
+
+Like with every equality we may want to replace one or more of its components with an unknown, and try to solve the resulting equation. For instance, we may ask the question: Is there an object together with two arrows that would complete a commuting square? If many such objects exist, is there a universal one? If the missing piece of the puzzle is the upper left corner of a square (the source), we call it a pullback. If it's the lower right corner (the target), we call it a \index{pushout}pushout.
+
  Let's start with a particular fibration $p \colon E \to B$ and ask ourselves the question: what happens when we change the base from $B$ to some $A$ that is related to it through a mapping $f \colon A \to B$. Can we ``pull the fibers back'' along $f$? 
  
  Again, let's think about sets first. Imagine picking a fiber in $E$ over some point $y \in B$ that is in the image of $f$. We can plant this fiber over all points in $A$ that are in the inverse image $f^{-1} y$. If multiple points in $A$ are mapped to the same point in $B$, we just duplicate the corresponding fiber. This way, every point in $A$ will have a fiber sticking out of it. The sum of all these fibers will form a new bundle $E'$.
@@ -311,7 +315,7 @@ In  $\mathbf{Set}$, we can explicitly construct $E'$ as a \emph{subset} of the c
 
 This commuting square is the starting point for the categorical generalization. However, even in $\mathbf{Set}$ there are many different fibrations over $A$ that make this diagram commute. We have to pick the universal one. Such a universal construction is called a \emph{pullback}, or a \emph{fibered product}.
 
-A pullback of $p \colon E \to B$ along $f \colon A \to B$ is an object $E'$ together with two arrows $p' \colon E' \to A$ and $g \colon E' \to E$ that makes the above diagram commute, and that satisfies the universal condition. 
+A \index{pullback}pullback of $p \colon E \to B$ along $f \colon A \to B$ is an object $E'$ together with two arrows $p' \colon E' \to A$ and $g \colon E' \to E$ that makes the above diagram commute, and that satisfies the universal condition. 
 
 The universal condition says that, for any other candidate object $G$ with two arrows $q' \colon G \to E$ and $q \colon G \to A$ such that $p \circ q' = f \circ q$, there is a unique arrow $h \colon G \to E'$ that makes the two triangles commute:
 \[

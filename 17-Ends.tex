@@ -21,7 +21,7 @@ A profunctor is an abstraction that combines elements of many other abstractions
 
 Fortunately, we have a good model for a profunctor: the hom-functor. The set of arrows between two objects behaves like a profunctor when you vary the objects. It also makes sense that there is a difference between varying the source and the target of the hom-set. 
 
-We can, therefore, think of an arbitrary profunctor as generalizing a hom-functor. A profunctor thus provides additional bridges between objects. 
+We can, therefore, think of an arbitrary profunctor as generalizing a hom-functor. A profunctor provides additional bridges between objects. 
 
 There is, however one big difference between an element of the hom-set $ \mathcal{C}(A, B)$ and an element of the set $P\langle A, B \rangle$. Elements of hom-sets are arrows, and arrows can be composed. It's not immediately obvious how to compose profunctors. 
 
@@ -168,7 +168,7 @@ So let's see how we would go about defining the sum of all diagonal entries of a
  \end{tikzcd}
 \]
 
-If we were defining a sum, we'd make it a universal set equipped with such injections. But because we are dealing with profunctors, we want to identify the injections that are related by ``extending'' a common ancestor. We want the following diagram to commute, whenever there is a connecting morphism $f\colon X \to Y$:
+If we were defining a sum, we'd make it a universal set equipped with such injections. But because we are dealing with profunctors, we want to identify the injections that are related by ``extending'' a common ancestor (here, $P \langle Y, X \rangle$). We want the following diagram to commute, whenever there is a connecting morphism $f\colon X \to Y$:
 
 \[
  \begin{tikzcd}
@@ -186,9 +186,9 @@ If we were defining a sum, we'd make it a universal set equipped with such injec
 \]
 This diagram is called a \index{co-wedge}co-wedge, and its commuting condition is called the co-wedge condition. The universal co-wedge is called a coend.
 
-Since a coend generalizes a sum to a potentially infinite domain, we write it using the integral sign, with the ``integration variable'' in the suffix position:
+Since a coend generalizes a sum to a potentially infinite domain, we write it using the integral sign, with the ``integration variable'' at the top:
 \[ \int^{X\colon \mathcal{C}} P \langle X, X \rangle \]
-Universality means that, whenever there is a set $C$ with a family of functions $g_X \colon P \langle X, X \rangle \to C$, there is a unique mapping out:
+Universality means that, whenever there is a set $C$ equipped with a family of functions $g_X \colon P \langle X, X \rangle \to C$ satisfying the co-wedge condition, there is a unique mapping out:
 \[ h \colon \int^{X\colon \mathcal{C}} P \langle X, X \rangle \to C \]
 that factorizes every $g_X$ through the injection $i_X$:
 \[
@@ -302,12 +302,12 @@ The dual to a co-wedge is called a \index{wedge}wedge:
  \end{tikzcd}
 \]
 
-You can think of constructing a set $C$ by first starting with a bigger set that is equipped with all the projections, and then restricting it to the elements that can be connected by way of lifting a morphism. 
+You may think of constructing a set $C$ by first starting with a bigger set that is equipped with all the projections, and then restricting it to the elements that can be connected by way of lifting a morphism. 
 
-The end is a universal wedge. We use the integral sign for it too, but with the ``integration variable'' in the subscript position. 
+The end is a universal wedge. We use the integral sign for it too, but with the ``integration variable'' at the bottom. 
 \[ \int_X P \langle X, X \rangle \]
 
-You might be wondering why integrals based on multiplication are rarely used in calculus. That's because we can use a logarithm to replace multiplication with addition. We don't have this luxury in category theory. 
+You might be wondering why integrals based on multiplication are rarely used in calculus. That's because we can use a logarithm to replace multiplication with addition. We don't have this luxury in category theory, so ends and coends are equally important.
 
 An end is a set equipped with a family of functions (projections):
 \[ \pi_A \colon \left( \int_X P \langle X, X \rangle \right) \to P \langle A, A \rangle \]
@@ -332,9 +332,9 @@ satisfying the wedge condition. It is universal among such sets; that is, for an
  \end{tikzcd}
 \]
 
-If you were to construct this set, you'd start with a product of all $P \langle X, X \rangle$ for all the objects in the category. 
+If you were to construct this set, you'd start with a product of all $P \langle X, X \rangle$ for all objects in the category. 
 
-Imagine, for a moment, using the singleton set $1$ in place of $C$. The family $g_X$ would select one element from each $P \langle X, X \rangle$. This would give you a giant tuple. You'd weed out most of these tuples, leaving only the ones that satisfy the wedge condition. 
+Imagine for a moment using the singleton set $1$ in place of $C$. The family $g_X$ would select one element from each $P \langle X, X \rangle$. This would give you a giant tuple. You'd weed out most of these tuples, leaving only the ones that satisfy the wedge condition. 
 
 Again, in Haskell, due to parametricity, the wedge condition is automatically satisfied, and the definition of an end for a profunctor $p$ simplifies to:
 
@@ -342,7 +342,7 @@ Again, in Haskell, due to parametricity, the wedge condition is automatically sa
 type End p = forall x. p x x
 \end{haskell}
 
-The Haskell implementation of an \hask{End} doesn't showcase the fact that it is dual to a \hask{Coend}. This is because Haskell doesn't have a built-in syntax for existential types. If it did, the \hask{Coend} would be implemented as:
+The Haskell implementation of an \hask{End} doesn't showcase the fact that it is dual to a \hask{Coend}. This is because, at the time of this writing, Haskell doesn't have a built-in syntax for existential types. If it did, the \hask{Coend} would be implemented as:
 \begin{haskell}
 type Coend p = exists x. p x x
 \end{haskell}
@@ -366,7 +366,7 @@ The most interesting application of an end is in concisely defining natural tran
  \end{tikzcd}
 \]
 
-The mapping  $\langle A, B \rangle \to \mathcal{C} (F A, G B)$ is a profunctor. Its action on a pair of arrows $\langle f, g \rangle$ is a combination of pre- and post-composition of lifted arrows $(G g) \circ - \circ (F f)$. 
+The mapping  $\langle A, B \rangle \to \mathcal{C} (F A, G B)$ behaves as a profunctor. Its action on a pair of arrows $\langle f, g \rangle$ is a combination of pre- and post-composition of lifted arrows $(G g) \circ - \circ (F f)$. 
 
 Indeed, an element of the set $ \mathcal{C} (F A, G B)$ is an arrow $h \colon F A \to G B$. We are trying to lift a pair of arrows $f \colon S \to A$ and $g \colon B \to T$. We can do it with a pair of arrows in $\mathcal{C}$: the first one is $F f \colon F S \to F A$, and the second one is $G g \colon G B \to G T$. The composition $G g \circ h \circ F f$ gives us the desired result $ F S \to G T$, which is an element of $\mathcal{C} (F S, G T)$.
 \[ F S \xrightarrow{F f} F A \xrightarrow{h} G B \xrightarrow{G g} GT \]
@@ -425,11 +425,11 @@ for any $f \colon A \to B$. This is exactly the naturality condition. So an elem
 The set of natural transformations, or the hom-set in the functor category, is thus given by the end:
 \[ [\mathcal{C}, \mathcal{D}] (F, G) \cong \int_{X \colon  \mathcal{B}} \mathcal{C}(FX, GX)\]
 
-As we discussed earlier, to construct an \hask{End} we have to give it a whole family of values parameterized by types. Here, these values are polymorphic functions. 
+As we discussed earlier, to construct an \hask{End} we have to give it a whole family of values parameterized by types. Here, these values are the components of a polymorphic functions. 
 
 \section{Continuity of the Hom-Functor}
 
-In category theory, a functor is called continuous if it preserves limits (and co-continuous, if it preserves colimits). It means that, if you have a diagram in the source category, then it doesn't matter if you first use the functor to map the diagram, and then take the limit in the target category; or take the limit in the source category, and then map this limit using the functor. 
+In category theory, a functor is called continuous if it preserves limits (and co-continuous, if it preserves colimits). It means that, if you have a diagram in the source category then it doesn't matter if you first use the functor to map the diagram, and then take the limit; or take the limit in the source category, and then map this limit using the functor. 
 
 The hom-functor is an example of a functor that is continuous in its second argument. Since a product is the simplest example of a limit, we should have:
 \[ \mathcal{C}(X, A \times B) \cong \mathcal{C}(X, A) \times \mathcal{C}(X, B) \]
@@ -456,7 +456,7 @@ Expressing the set of natural transformations as an end we get:
 Similarly, we have the Yoneda lemma for a contravariant functor (a presheaf) $G$:
 \[ \int_{X \colon \mathcal{C}} \mathbf{Set} (\mathcal{C}(X, A), GX) \cong GA \]
 
-These versions of the Yoneda lemma, expressed in terms of ends, are often half-jokingly called ninja-Yoneda lemmas. The fact that the ``integration variable'' is explicit makes them somewhat easier to parse.
+These versions of the Yoneda lemma, expressed in terms of ends, are often half-jokingly called ninja-Yoneda lemmas. The fact that the ``integration variable'' is explicit makes them somewhat easier to use in complex formulas.
 
 There is also a dual set of ninja co-Yoneda lemmas that use coends instead. For a covariant functor, we have:
 \[ \int^{X \colon \mathcal{C}} \mathcal{C}(X, A) \times F X \cong F A \]
@@ -467,9 +467,9 @@ Physicists might notice the similarity of these formulas to integrals involving 
 
 Yet another name for profunctors is \index{bimodule}``bimodules.''
 
-The proof of the co-Yoneda lemma is quite instructive, as it uses a few common tricks. Most importantly, we rely on the corollary of the Yoneda lemma, which says that, if the mappings out to an arbitrary object are isomorphic, then the objects themselves are isomorphic. We'll start, therefore, with such a mapping-out to an arbitrary set $S$:
+The proof of the co-Yoneda lemma is quite instructive, as it uses a few common tricks. Most importantly, we rely on the corollary of the Yoneda lemma, which says that, if the mappings out from two objects to an arbitrary object are isomorphic, then the two objects themselves are isomorphic. We'll start, therefore, with such a mapping-out to an arbitrary set $S$:
 \[ \mathbf{Set} \left(\int^{X \colon \mathcal{C}} \mathcal{C}(X, A) \times F X, S \right) \]
-Using the co-continuity of the hom-functor, we can pull out the integral sign, replacing the coend with the end:
+Using the co-continuity of the hom-functor, we can pull out the integral sign, replacing the coend with an end:
 \[ \int_{X \colon \mathcal{C}} \mathbf{Set} \left( \mathcal{C}(X, A) \times F X, S \right) \]
 Since the category of sets is cartesian closed, we can curry the product:
 \[ \int_{X \colon \mathcal{C}} \mathbf{Set} \left( \mathcal{C}(X, A) , S^{FX} \right) \]
@@ -629,7 +629,7 @@ In fact, we can generalize it to a type-changing lens, in which the focus $A$ ca
 \end{tikzpicture}
 \]
 
-The lens is now parameterized by two pairs of objects: $\langle S, T\rangle$ for the outer ones, and $ \langle A, B \rangle$ for the inner ones. The residue $C$ remains the same:
+The lens is now parameterized by two pairs of objects: $\langle S, T\rangle$ for the outer ones, and $ \langle A, B \rangle$ for the inner ones. The existential residue $C$ remains hidden:
 \[ \mathcal{L}\langle S, T\rangle \langle A, B \rangle = \int^{C} \mathcal{C}(S, C \times A) \times  \mathcal{C}(C \times B, T) \]
 The product under the coend is the diagonal part of the profunctor that is covariant in $Y$ and contravariant in $X$:
 \[ \mathcal{C}(S, Y \times A) \times  \mathcal{C}(X \times B, T) \]
@@ -641,7 +641,7 @@ is a profunctor in $\langle X, Y\rangle$.
 
 
 \subsection{Type-changing lens in Haskell}
-In Haskell, we can define a type-changing lens as an existential type:
+In Haskell, we can define a type-changing lens as the existential type:
 \begin{haskell}
 data Lens s t a b where
  Lens :: (s -> (c, a)) -> ((c, b) -> t) -> Lens s t a b
@@ -763,7 +763,7 @@ toSet l3 x 'z'
 
 Since lenses can be composed, you might be wondering if there is a category in which lenses serve as hom-sets. 
 
-Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle S, T\rangle$ to $ \langle A, B \rangle$ are elements of  $\mathit{Lens} \langle S, T\rangle \langle A, B \rangle$.
+Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle S, T\rangle$ to $ \langle A, B \rangle$ are elements of  $\mathcal{L} \langle S, T\rangle \langle A, B \rangle$.
 
 The formula for the composition of existential lenses is too complicated to be useful in practice. In the next chapter we'll see an alternative representation of lenses using Tambara modules, in which composition of lenses is just a composition of functions.
 
@@ -980,9 +980,7 @@ A type-changing lens generalizes transport to act between bundles. We have to de
 
 We use a set $B$ as the combined set of all elements of all types. $B$ is fibrated over $A$---the projection $\pi$ sending an element of $B$ to its corresponding type. You may think of it as the set of objects of the coslice category $1/A$.
 
-The bundle of bundles $E$ is a set that's fibrated over $B$ with the projection $p$. Since $B$ itself is fibrated over $A$, $E$ is transitively fibrated over $A$, with the composite projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. Each of these bundles represents a different Haskell type. A type-changing lens will move between these types.
-
-We can treat $E$ as a dependent type that is parameterized by objects of $A$.
+The bundle of bundles $E$ is a set that's fibrated over $B$ with the projection $p$. Since $B$ itself is fibrated over $A$, $E$ is transitively fibrated over $A$, with the composite projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. Each of these bundles represents a different Haskell type. A type-changing lens will move between these bundles.
 
 \[
 \begin{tikzpicture}
@@ -1084,61 +1082,6 @@ The set/set law (composition):
 \[ q (c, q (b, s)) = q (c, s) \]
 
 The two mappings $p$ and $q$ can be combined into one mapping between categories called a \index{cofunctor}cofunctor. 
-\subsection{Existential lens}
-
-
-The existential representation of the lens can also be described using the language of bundles. The existential residue becomes a generic fiber $F$. The two components of the existential lens:
-\[ \int^{C} \mathcal{C}(S, C \times A) \times  \mathcal{C}(C \times A, S) \]
-are the mappings:
-\begin{align*}
- E \to F \times B \\
- F \times B \to E 
- \end{align*}
-They decompose the bundle into the product of the generic fiber and the base.
-
-A type-changing lens reuses the same generic fiber while switching the bundles.
-
-\[
-\begin{tikzpicture}
-
-\def\yb{0}; % base
-\def\yfb{0.6}; % fiber bottom
-\def\yfm{1.4}; % fiber mid
-\def\yft{2.2}; % fiber top
-
-\def\dx{0.8};
-
-\def\xfib{-0.6}
-\def\xbl{0};
-\def\xbm{\xbl + \dx};
-\def\xbr{\xbl + 2*\dx};
-
-\filldraw[fill=orange!30, draw=white] (\xbl, \yfb) rectangle (\xbr, \yft);
-
-\draw[blue] (\xfib, \yfb) -- (\xfib, \yft);
-\node[left] at (\xfib, \yft) {$F$};
-\filldraw[black] (\xfib, \yfm) circle (1 pt);
-\node[left] at (\xfib, \yfm) {$c$};
-
-\filldraw[black] (\xbm, \yfm) circle (1 pt);
-\node[right] at (\xbm, \yfm) {$s$};
-
-
-
-\draw (\xbl, \yb) -- (\xbr, \yb);
-
-\draw[dashed] (\xbm, \yfb) -- (\xbm, \yft); %fiber
-
-\filldraw[black] (\xbm, \yb) circle (1 pt);
-\node[below] at (\xbm, \yb) {$a$};
-\node[right] at (\xbr, \yb) {$B$};
-\node[right] at (\xbr, \yft) {$E$};
-
-\end{tikzpicture}
-\]
-
-We'll see later that this picture can be further generalized by replacing the generic fiber with a monoidal category that can act on the fibers of $E$ in a way reminiscent of gauge transformations in physics.
-
 \section{Important Formulas}
 This is a handy (co-)end calculus cheat-sheet.
 \begin{itemize}

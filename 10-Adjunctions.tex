@@ -572,4 +572,22 @@ Because functor composition is associative, the composition of adjunctions is al
 
 Adjunctions can be defined purely in terms of functors and natural transformations, that is 1-cells and 2-cells in the 2-category $\mathbf{Cat}$. There is nothing special about $\mathbf{Cat}$, and in fact adjunctions can be defined in any 2-category. Moreover, the category of adjunctions is itself a 2-category.
 
+\section{Levels of Abstraction}
+
+Category theory is about structuring knowledge. In particular, it can be applied to the knowledge of category theory itself. Hence we see a lot of mixing of abstraction levels in category theory. The structures that we see at one level can be grouped into higher-level structures which exhibit even higher levels of structure, and so on. 
+
+In programming we are used to building hierarchies of abstractions. Values are grouped into types, types into kinds. Functions that operate on values are treated differently than functions that operate on types. We often use different syntax to separate levels of abstractions. Not so in category theory.
+
+A set, categorically speaking, can be described as a discrete category. Elements of the set are objects of this category and, other than the obligatory identity morphisms, there are no arrows between them. 
+
+The same set can be seen as an object in the category $\mathbf{Set}$. Arrows in this category are functions between sets.
+
+The category $\mathbf{Set}$, in turn, is an object in the category $\mathbf{Cat}$. Arrows in $\mathbf{Cat}$ are functors. 
+
+Functors between any two categories $\mathcal{C}$ and $\mathcal{D}$ are objects in the functor category $[\mathcal{C}, \mathcal{D}]$. Arrows in this category are natural transformations.
+
+We can define functors between functor categories, product categories, opposite categories, and so on, ad infinitum. 
+
+Completing the circle, hom-sets in every category are sets. We can define mappings and isomorphisms between them, reaching across disparate categories. Adjunctions are possible because we can compare hom-sets that live in different categories.
+
 \end{document}
