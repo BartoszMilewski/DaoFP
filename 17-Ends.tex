@@ -722,7 +722,7 @@ compLens (Lens l2 r2) (Lens l1 r1) = Lens l3 r3
         r3 = r1 . bimap id r2 . assoc
 \end{haskell}
 The left mapping in the new lens is given by the following composite:
-\[ s \xrightarrow{l_1} (c, a)   \xrightarrow{(id, l_2)} (c, (c', a))  \xrightarrow{assoc'} ((c, c'), a)\]
+\[ s \xrightarrow{l_1} (c, a)   \xrightarrow{(id, l_2)} (c, (c', a'))  \xrightarrow{assoc'} ((c, c'), a')\]
 and the right mapping is given by:
 \[ ((c, c'), b') \xrightarrow{assoc}  (c, (c', b')) \xrightarrow{(id, r_2)} (c, b) \xrightarrow{r_1} t \]
 
