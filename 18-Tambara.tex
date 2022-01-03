@@ -4,6 +4,42 @@
 
 \chapter{Tambara Modules}
 
+It's not often that an obscure corner of category theory gains sudden prominence in programming. Tambara modules got a new lease on life in their application to profunctor optics. They provide a clever solution to the problem of composing optics. We've seen that, in the case of lenses, the getters compose nicely using function composition, but the composition of setters involves some shenanigans. The existential representation doesn't help much. The profunctor representation, on the other hand, makes composition a snap. 
+
+The situation is somewhat analogous to the problem of composing geometric transformations in graphics programming. For instance, if you try to compose two rotations around two different axes, the formula for the new axis and the angle is quite complicated. But if you represent rotations as matrices, you can use matrix multiplication; or, if you represent them as quaternions, you can use quaternion multiplication. Profunctor representation lets you compose optics using straightforward function composition.
+
+\section{Tannakian Reconstruction}
+
+\subsection{Monoids and their Representations}
+
+The theory or representations is a science in itself. Here, we'll approach it from the categorical perspective. Instead of groups, we'll consider monoids. A monoid can be defined as a special object in a monoidal category, but it can also be thought of as a single-object category $\cat M$. If we call this object $*$, the hom-set $\cat M( *, *)$ contains all the information we need. 
+
+Monoidal product is simply the composition of morphisms. By the laws of a category, it's associative and unital---the identity morphism serving as the monoidal unit.
+
+In this sense, every single-object category is automatically a monoid and all monoids can be made into single-object categories. 
+
+For instance, a monoid of whole numbers with addition can be thought of as a category with a single object $*$ and a morphism for every number. To compose two such morphisms, you add their numbers, as in the example below:
+\[
+ \begin{tikzcd}
+  & *
+  \arrow[r, bend left, "2"]
+  \arrow[rr, bend right, "5"']
+ & *
+ \arrow[r, bend left, "3"]
+ & *
+  \end{tikzcd}
+\]
+The morphism corresponding to zero is automatically the identity morphism. 
+
+We can represent a monoid on a set. Such a representation is a functor $F$ from $\cat M$ to $\Set$. Such a functor maps the single object $*$ to some set $S$, and it maps the hom-set $\cat M(*, *)$ to a set of functions $S \to S$. By functor laws, it maps identity to identity and composition to composition, so it preserves the structure of the monoid. 
+
+If the functor is fully faithful, its image contains exactly the same information as the monoid and nothing more. But, in general, functors cheat. The hom-set $\Set (S, S)$ may contain some other functions that are not in the image of $\cat M(*, *)$; and multiple morphisms can be mapped to a single function. 
+
+In the extreme, the whole hom-set $\cat M(*, *)$ may be mapped to the identity morphism $id_S$. So, just by looking at the set $S$---the image of $*$ under the functor $F$---we cannot dream of reconstructing the original monoid.
+
+Not all is lost, though, if we are allowed to look at all the representations of a given monoid. Such representations form a functor category $[\cat M, \Set]$, a.k.a. the co-presheaf category. Such functors map our monoid to a whole multitude of sets. 
+
+
 
 
 \end{document}
