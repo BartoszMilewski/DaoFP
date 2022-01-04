@@ -21,7 +21,7 @@ In this sense, every single-object category is automatically a monoid and all mo
 For instance, a monoid of whole numbers with addition can be thought of as a category with a single object $*$ and a morphism for every number. To compose two such morphisms, you add their numbers, as in the example below:
 \[
  \begin{tikzcd}
-  & *
+  *
   \arrow[r, bend left, "2"]
   \arrow[rr, bend right, "5"']
  & *
@@ -37,8 +37,144 @@ If the functor is fully faithful, its image contains exactly the same informatio
 
 In the extreme, the whole hom-set $\cat M(*, *)$ may be mapped to the identity morphism $id_S$. So, just by looking at the set $S$---the image of $*$ under the functor $F$---we cannot dream of reconstructing the original monoid.
 
-Not all is lost, though, if we are allowed to look at all the representations of a given monoid. Such representations form a functor category $[\cat M, \Set]$, a.k.a. the co-presheaf category. Such functors map our monoid to a whole multitude of sets. 
+Not all is lost, though, if we are allowed to look at all the representations of a given monoid simultaneously. Such representations form a functor category $[\cat M, \Set]$, a.k.a. the co-presheaf category. Arrows in this category are natural transformations. 
 
+Since the source category $\cat M$ contains only one object, naturality conditions take a particularly simple form. A natural transformation $\alpha \colon F \to G$ has only one component, a function $\alpha \colon F * \to G *$. Given a morphism $m \colon * \to *$, the naturality square reads:
+
+\[
+ \begin{tikzcd}
+ F *
+ \arrow[r, "\alpha"]
+ \arrow[d, "F m"]
+ & G *
+  \arrow[d, "G m"]
+\\
+ F *
+ \arrow[r, "\alpha"]
+ & G *
+ \end{tikzcd}
+\]
+It's a relationship between three functions acting on two sets:
+\[
+ \begin{tikzcd}
+ F *
+  \arrow[loop, "F m"']
+  \arrow[rr, bend right, "\alpha"']
+ && G *
+  \arrow[loop, "G m"']
+  \end{tikzcd}
+\]
+The naturality condition tells us that:
+\[ G m \circ \alpha = \alpha \circ F m \]
+
+In other words, if you pick an element $x \in F *$, you can map it to $G *$ using $\alpha$ and then apply the transformation corresponding to $m$; or you can first apply the thansformation $F m$ and then map the result using $\alpha$. The result is the same in both cases.
+
+Such functions are called \index{equivariant function}\emph{equivariant}. We often call $F m$ the \emph{action} of $m$ on the set $F *$. An equivariant function maps an action on one set to its corresponding action on another set. 
+
+\subsection{Tannakian reconstruction of a monoid}
+
+How much information do we need to reconstruct a monoid from its representations? Just looking at the sets is definitely not enough, since any monoid can be represented on any set. But if we include structure-preserving functions between these sets, we might have a chance. 
+
+Consider a set of functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid, $F m$. If we look at the ``neighboring'' set $G *$ and its set of functions  $\Set(G *, G *)$ we'll find there the corresponding actions $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will map these actions. It will map other morphisms as well.
+
+Imagine creating a gigantic tuple by taking one function from each of the sets $\Set (F *, F *)$, for all functors $F\colon \cat M \to \Set$. Moreover, we want the elements of the tuple to be correlated. If we pick $g \in  \Set (G*, G *)$ and  $h \in  \Set (H*,  H*)$ and there is a natural transformation (equivariant function) $\alpha$ between the two functors $G$ and $H$, we want the two function to be related:
+\[ \alpha \circ g = h \circ \alpha \]
+or, pictorially:
+\[
+ \begin{tikzcd}
+ G *
+  \arrow[loop, "g"']
+  \arrow[rr, bend right, "\alpha"']
+ && H *
+  \arrow[loop, "h"']
+  \end{tikzcd}
+\]
+Notice that this will guarantee that actions are mapped to corresponding actions if, for instance, $g = G m$ and $h = H m$. 
+
+Such tuples are exactly the elements of the end:
+\[ \int_F \Set(F *, F *) \]
+whose wedge condition provides the constraints we are looking for. 
+
+\[
+ \begin{tikzcd}
+ & \int_F \Set (F *, F *)
+ \arrow[dl, "\pi_G"']
+ \arrow[dr, "\pi_H"]
+ \\
+ \Set(G *, G *)
+ \arrow[dr, "{\Set(id, \alpha)}"']
+ && \Set (H *, H *)
+  \arrow[dl, "{\Set (\alpha, id)}"]
+\\
+ & \Set (G *, H *)
+ \end{tikzcd}
+\]
+
+Notice that this is the end over the whole functor category $[\cat M, \Set ]$, so the wedge condition relates the entries that are connected by natural transformations. In this case, natural transformations are equivariant functions. The profunctor under the end is given by:
+\[ P \langle G, H \rangle = \Set (G *, H *) \]
+It is a functor:
+\[ P \colon [\cat M, \Set]^{op} \times [\cat M, \Set] \to \Set \]
+Its action on morphisms (natural transformations) is:
+\[ P \langle \alpha, \beta \rangle = \beta \circ - \circ \alpha \]
+If we pick $f$ to be the element of $\Set (G*, G*)$ and $g$ to be the element of $\Set (H*, H*)$, the wedge condition indeed becomes:
+\[ \alpha \circ g = h \circ \alpha \]
+
+The Tannakian reconstruction theorem, in this case, tells us that:
+\[ \int_F \Set(F *, F *) \cong \cat M (*, *) \]
+In other words, we can recover the monoid from its representations.
+
+\subsection{Proof of Tannakian reconstruction}
+
+Monoid reconstruction is a special case of a more general theorem in which the single-object category is replaced with a regular category. As in the monoid case, we'll reconstruct the hom-set, only this time it will be a general hom-set. We'll prove the formula:
+\[ \int_{F \colon [\cat C, \Set]} \Set (F a, F b) \cong \cat C(a, b) \]
+The trick is to use the Yoneda lemma to represent the action of $F$:
+\[ F a \cong [\cat C, \Set] ( \cat C (a ,-), F) \]
+and the same for $F b$. We get:
+\[ \int_{F \colon [\cat C, \Set]} \Set ([\cat C, \Set] ( \cat C (a ,-), F), [\cat C, \Set] ( \cat C (b ,-), F)) \]
+The two sets of natural transformations here are hom-sets in $[\cat C, \Set]$. 
+
+Recall the corollary to the Yoneda lemma that works for any category $\cat A$:
+\[ [\cat A, \Set] (\cat A (x, -), \cat A (y, -)) \cong \cat A (y, x) \]
+We can write it using an end:
+\[ \int_{z \colon \cat C} \Set (\cat A (x, z), \cat A (y, z)) \cong \cat A (y, x) \]
+In particular, we can replace $\cat A$ with the functor category $[\cat C, \Set]$. We get:
+\[ \int_{F \colon [\cat C, \Set]} \Set ([\cat C, \Set] ( \cat C (a ,-), F), [\cat C, \Set] ( \cat C (b ,-), F)) \cong [\cat C, \Set](\cat C (b ,-), \cat C (a ,-))\]
+We can then apply the Yoneda lemma again to the right hand side to get:
+\[ \cat C (a, b) \]
+which is exactly the sought after result.
+
+\subsection{Tannakian reconstruction in Haskell}
+
+We can immediately translate this result to Haskell. We replace the end by \hask{forall}. The left hand side becomes:
+\begin{haskell}
+forall f. Functor f => f a -> f b
+\end{haskell}
+and the right hand side is \hask{a->b}.
+
+The two functions that witness the isomorphism are:
+\begin{haskell}
+fromRep :: (forall f. Functor f => f a -> f b) -> (a -> b)
+fromRep g a = unId (g (Id a))
+
+toRep :: (a -> b) -> (forall f. Functor f => f a -> f b)
+toRep g fa = fmap g fa
+\end{haskell}
+where the identity functor is defined as:
+\begin{haskell}
+data Id a = Id a 
+  
+unId :: Id a -> a
+unId (Id a) = a
+
+instance Functor Id where
+  fmap g (Id a) = Id (g a)
+\end{haskell}
+
+\subsection{Tannakian reconstruction with adjunction}
+
+So far we've seen the reconstruction of a hom-set from the $\Set$-valued representations of the category in question. We want to work with sets, because that's where we can use the Yoneda lemma. But there are many categories whose objects map to sets. Their objects are sets with some additional structure. There is usually a forgetful functor $U$ that forgets this structure and produces the underlying sets. In many cases this functor has a left adjoint $F$ that freely recovers this structure. 
+
+\[ \int_{F \colon \cat T} \Set ((U P) a, (U P) b) \]
 
 
 
