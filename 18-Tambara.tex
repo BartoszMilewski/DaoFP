@@ -170,12 +170,92 @@ instance Functor Id where
   fmap g (Id a) = Id (g a)
 \end{haskell}
 
+This kind of reconstruction might seem trivial and pointless. Why would anyone want to replace function type \hask{a->b} with a much more complicated type:
+\begin{haskell}
+type Getter a b = forall f. Functor f => f a -> f b
+\end{haskell}
+It's instructive, though, to think of \hask{a->b} as the precursor of all optics. It's a lens that focuses on the $b$ part of $a$. It tells us that $a$ contains enough information, in one form or another, to construct an $b$. It's a ``getter'' or an ``accessor.'' 
+
+Obviously, functions compose. What's interesting though is that functor representations also compose, and they compose using simple function composition:
+\begin{haskell}
+boolToStrGetter :: Getter Bool String
+boolToStrGetter = toRep (show) . toRep (bool 0 1)
+\end{haskell}
+Other optics don't compose so easily, but their functor (and profunctor) representation do. 
+\subsection{Pointed getter}
+
+Here's a little toy example in Haskell that illustrates the need for more interesting reconstructions. It's an optic that can either act as a getter or it can return a default value.
+\begin{haskell}
+data PtdGetter s t = Pt t | Fun (s -> t)
+\end{haskell}
+We can apply this getter to a source value and get a result:
+\begin{haskell}
+apply :: PtdGetter s t -> s -> t
+apply (Pt t) _ = t
+apply (Fun g) s = g s
+\end{haskell}
+
+These getters compose, but their composition is non-trivial:
+\begin{haskell}
+composePG :: PtdGetter x t -> PtdGetter s x -> PtdGetter s t
+composePG (Pt t) _ = Pt t
+composePG (Fun g) (Pt x) = Pt (g x)
+composePG (Fun g) (Fun g') = Fun (g . g')
+\end{haskell}
+The composition is associative, and there is an identity getter:
+\begin{haskell}
+idPG :: PtdGetter a a
+idPG = Fun id
+\end{haskell}
+so we do have a category in which pointed getters form hom-sets. 
+
+The functor representation for this toy optics exists, but we have to restrict the type of functors over which we take the end. Here's the definition of a class of \hask{Pointed} functors:
+\begin{haskell}
+class Functor f => Pointed f where
+  eta :: a -> f a
+\end{haskell}
+Our \hask{PointedGetter} is represented by the following Tannakian-like formula:
+\begin{haskell}
+type PtdGetterF s t = forall f. Pointed f => f s -> f t
+\end{haskell}
+We can apply this getter by encapsulating the argument in the identity functor:
+\begin{haskell}
+applyF :: PtdGetterF s t -> s -> t
+applyF g = unId . g . Id
+\end{haskell}
+Indeed, the identity functor is pointed:
+\begin{haskell}
+instance Pointed Id where
+  eta = Id
+\end{haskell}
+The equivalence of the two formulations is witnessed by this pair of functions:
+\begin{haskell}
+toPGF :: PtdGetter s t -> PtdGetterF s t
+toPGF (Pt t) = \_ -> eta t
+toPGF (Fun g) = fmap g
+
+fromPGF :: PtdGetterF s t -> PtdGetter s t
+fromPGF g = Fun (unId . g . Id)
+\end{haskell}
+This time, however, the functor representation has definite advantage over the original: a composition of two \hask{PtdGetterF} optics is just function composition.
+\begin{exercise}
+Define two composable $PtdGetter$ optics, for instance, one going from a pair \hask{(Int, Bool)} to \hask{Int} and another from \hask{Int} to \hask{String}. Compose them first using \hask{composePG}, then convert them to the functor representation, and compose them using function composition.
+\end{exercise}
+
+
 \subsection{Tannakian reconstruction with adjunction}
 
-So far we've seen the reconstruction of a hom-set from the $\Set$-valued representations of the category in question. We want to work with sets, because that's where we can use the Yoneda lemma. But there are many categories whose objects map to sets. Their objects are sets with some additional structure. There is usually a forgetful functor $U$ that forgets this structure and produces the underlying sets. In many cases this functor has a left adjoint $F$ that freely recovers this structure. 
-
-\[ \int_{F \colon \cat T} \Set ((U P) a, (U P) b) \]
 
 
+\[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \]
 
+\[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (b ,-), U P\big)\Big) \]
+
+\[ \int_{P \colon \cat T} \Set \Big(\cat T \big( F \cat C (a ,-), P\big), \cat T \big( F \cat C (b ,-), P\big)\Big) \]
+
+\[ \cat T\big( F \cat C (b ,-), F \cat C (a ,-) \big) \]
+
+\[ \cat T\big( \cat C (b ,-), (U\circ F) \cat C (a ,-) \big) \]
+
+\[ \big( (U\circ F) \cat C (a ,-) \big) b \]
 \end{document}
