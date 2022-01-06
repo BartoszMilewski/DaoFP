@@ -245,9 +245,28 @@ Define two composable $PtdGetter$ optics, for instance, one going from a pair \h
 
 \subsection{Tannakian reconstruction with adjunction}
 
+In the toy example we've seen that we can perform the reconstruction over a category of functors that are equipped with additional structure. In category theory we would describe pointed functors as co-presheaves $P \colon \cat C \to \Set$ equipped with natural transformations:
+\[ \eta \colon Id \to P \]
+They form their own category, let's call it $\cat T$,  with morphisms that are natural transformations that preserve the structure. Such a transformation $\alpha \colon (P, \eta) \to (P', \eta')$ must make the following triangle commute:
+\[
+ \begin{tikzcd}
+ & a
+ \arrow[dl, "\eta"']
+ \arrow[dr, "\eta'"]
+ \\
+ P a
+ \arrow[rr, "\alpha_a"]
+ && P' a
+ \end{tikzcd}
+\]
 
+Every pointed functor is a functor---a statement that is formalized by saying that there is a forgetful functor $U \colon \cat T \to [\cat C, \Set]$, which forgets the additional structure. 
 
+The trick in generalizing the Tannakian reconstruction is to define the end over the restricted functor category $\cat T$ but using the underlying functors: 
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \]
+The mapping $\cat T \to \Set$ given by:
+\[ P \mapsto (U P) a \]
+is sometimes called a fiber functor, so the end formula can be interpreted as a set of natural transformations between two fiber functors. 
 
 \[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (b ,-), U P\big)\Big) \]
 
