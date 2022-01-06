@@ -38,9 +38,9 @@ class Functor w => Comonad w where
    (=<=) :: (w b -> c) -> (w a -> b) -> (w a -> c)
    extract :: w a -> a
 \end{haskell}
-Here the composition is written in the form of an infix operator; and the unit of composition is called \hask{extract}, since it extracts a value from the context. 
+Here, the composition is written in the form of an infix operator; and the unit of composition is called \hask{extract}, since it extracts a value from the context. 
 
-Let's try it with our example. It's convenient to pass the environment as the first component of the pair. The comonad is then given by the functor that's a partial application of the pair constructor \hask{((,) e)}.
+Let's try it with our example. It is convenient to pass the environment as the first component of the pair. The comonad is then given by the functor that's a partial application of the pair constructor \hask{((,) e)}.
 \begin{haskell}
 instance Comonad ((,) e) where
   g =<= f = \ea -> g (fst ea, f ea)
@@ -69,13 +69,13 @@ data Stream a = Cons a (Stream a)
     deriving Functor
 \end{haskell}
 
-If we consider such a stream as a value of the type \hask{a} in the context of the infinite tail, we can provide a \hask{Comonad} instance for it:
+If we consider such a stream as a value of the type \hask{a} in the context of an infinite tail, we can provide a \hask{Comonad} instance for it:
 \begin{haskell}
 instance Comonad Stream where
   extract (Cons a as) = a
   duplicate (Cons a as) = Cons (Cons a as) (duplicate as)
 \end{haskell}
-Here, \hask{extract} returns the head of the stream and \hask{duplicate} turns a stream into a stream of streams. Each consecutive stream is the tail of the previous one. 
+Here, \hask{extract} returns the head of the stream and \hask{duplicate} turns a stream into a stream of streams, in which each consecutive stream is the tail of the previous one. 
 
 The intuition is that \hask{duplicate} sets the stage for iteration, but it does it in a very general way. The head of each of the streams defines the ``current position'' in the stream. 
 
@@ -98,20 +98,20 @@ stmTake 0 _ = []
 stmTake n (Cons a as) = a : stmTake (n - 1) as
 \end{haskell}
 
-We can run \hask{avg} over the whole stream using \hask{extend} to smooth local fluctuation. Electrical engineers might recognize this as a simple \index{low-pass filter}low-pass filter with \hask{extend} implementing a \index{convolution}convolution. It produces a running average of the original stream. 
+We can run \hask{avg} over the whole stream using \hask{extend} to smooth local fluctuation. Electrical engineers might recognize this as a simple \index{low-pass filter}low-pass filter with \hask{extend} implementing the \index{convolution}convolution. It produces a running average of the original stream. 
 \begin{haskell}
 smooth :: Stream Double -> Stream Double
 smooth = extend avg
 \end{haskell}
 
 
-Comonads are useful for structuring computations in spatially or temporally extended data structures. Such computations are local enough to define the ``current location,'' but require gathering information from neighboring locations. Signal processing or image processing are good examples. So are simulations in which differential equations have to be iteratively solved inside volumes: climate simulations, cosmological models, or nuclear reactions come to mind. Conway's Game of Life is also a good testing ground for comonadic methods.
+Comonads are useful for structuring computations in spatially or temporally extended data structures. Such computations are local enough to define the ``current location,'' but require gathering information from neighboring locations. Signal processing or image processing are good examples. So are simulations, in which differential equations have to be iteratively solved inside volumes: climate simulations, cosmological models, or nuclear reactions come to mind. Conway's Game of Life is also a good testing ground for comonadic methods.
 
 Sometimes it's convenient to perform calculation on continuous streams of data, postponing the sampling until the very last step. Here's an example of a signal that is a function of time (represented by \hask{Double})
 \begin{haskell}
 data Signal a = Sig (Double -> a) Double
 \end{haskell}
-The second component is the current time.
+The second component, the \hask{Double}, is the current time.
 
 This is the \hask{Comonad} instance:
 \begin{haskell}
@@ -135,7 +135,7 @@ Assume that both list are infinite. Hint: Consider the first list as the past (i
 \end{exercise}
 
 \begin{exercise}
-Implement a low-pass filter for \hask{BiStream} that averages over three values: the current one, one from the immediate past, and one from the immediate future. For electrical engineers: implement a Gaussian filter. 
+Implement a low-pass filter for \hask{BiStream} from the previous exercise, which averages over three values: the current one, one from the immediate past, and one from the immediate future. For electrical engineers: implement a Gaussian filter. 
 \end{exercise}
 
 \section{Comonads Categorically}
@@ -322,13 +322,13 @@ As before, comonad laws can be derived from triangle identities.
 
 \subsection{Costate comonad}
 
-We've seen that the state monad can be generated by the currying adjunction between the product and the exponential. The left functor was defined as a product with some fixed object $S$:
-\[ L_S A = A \times S \]
-and the right functor was the exponentiation, parameterized by the same object $S$:
-\[ R_S C = C^S \]
-The composition $L_S \circ R_S$ generates a comonad called the \index{costate comonad}\emph{costate comonad} or the \index{store comonad}\emph{store comonad}.
+We've seen that the state monad can be generated from the currying adjunction between the product and the exponential. The left functor was defined as a product with some fixed object $s$:
+\[ L_s a = a \times s \]
+and the right functor was the exponentiation, parameterized by the same object $s$:
+\[ R_s c = c^s \]
+The composition $L_s \circ R_s$ generates a comonad called the \index{costate comonad}\emph{costate comonad} or the \index{store comonad}\emph{store comonad}.
 
-Translated to Haskell, the right functor assigns a function type \hask{s -> c} to \hask{c}, and the left functor pairs \hask{c} with \hask{s}. The result of the composition is the endofunctor:
+Translated to Haskell, the right functor assigns a function type \hask{s->c} to \hask{c}, and the left functor pairs \hask{c} with \hask{s}. The result of the composition is the endofunctor:
 \begin{haskell}
 data Store s c = St (s -> c) s
 \end{haskell}
@@ -348,14 +348,14 @@ The counit of this adjunction, which becomes the comonadic \hask{extract}, is fu
 extract :: Store s c -> c
 extract (St f s) = f s
 \end{haskell}
-The unit of this adjunction is a natural transformation $\eta \colon \mathit{Id} \to R_S \circ L_S$. We've used it as the \hask{return} of the state monad. This is its component at \hask{c}:
+The unit of this adjunction is a natural transformation $\eta \colon \mathit{Id} \to R_s \circ L_s$. We've used it as the \hask{return} of the state monad. This is its component at \hask{c}:
 \begin{haskell}
 eta :: c -> (s -> (c, s))
 eta c = \s -> (c, s)
 \end{haskell}
 To get \hask{duplicate} we need to whisker $\eta$ it between the two functors:
-\[ \delta = L_S  \circ \eta \circ R_S \]
-Whiskering on the right means taking the component of $\eta$ at the object $R_S C$, and whiskering on the left means lifting this component using $L_S$. Since Haskell translation of whiskering is a tricky process, let's analyze it step-by-step. 
+\[ \delta = L_s  \circ \eta \circ R_s \]
+Whiskering on the right means taking the component of $\eta$ at the object $R_s c$, and whiskering on the left means lifting this component using $L_s$. Since Haskell translation of whiskering is a tricky process, let's analyze it step-by-step. 
 
 For simplicity, let's fix the type \hask{s} to, say, \hask{Int}. We encapsulate the left functor into a \hask{newtype}:
 \begin{haskell}
@@ -372,7 +372,7 @@ eta :: forall c. c -> Fun (Pair c)
 eta c = \s -> P (c, s)
 \end{haskell}
 
-We can now implement comultiplication as the whiskering of \hask{eta}. The whiskering on the right is encoded in the type signature, by using the component of \hask{eta} at \hask{Fun c}. The whiskering on the left is done by lifting \hask{eta} using the \hask{fmap} defined for the \hask{Pair} functor. We use the language pragma \hask{TypeApplications} to make it explicit:
+We can now implement comultiplication as the whiskering of \hask{eta}. The whiskering on the right is encoded in the type signature, by using the component of \hask{eta} at \hask{Fun c}. The whiskering on the left is done by lifting \hask{eta} using the \hask{fmap} defined for the \hask{Pair} functor. We use the language pragma \hask{TypeApplications} to make it explicit which \hask{fmap} is to be used:
 \begin{haskell}
 delta :: forall c. Pair (Fun c) -> Pair (Fun (Pair (Fun c)))
 delta = fmap @Pair eta
@@ -420,26 +420,26 @@ Run a few generation of this automaton. Hint: Use the function \hask{iterate} fr
 
 \subsection{Comonad coalgebras}
 
-Dually to monad algebras we have comonad coalgebras. Given a comonad $(W, \varepsilon, \delta)$, we can construct a coalgebra, which consists of a carrier object $A$ and an arrow $\phi \colon A \to W A$. For this coalgebra to compose nicely with the comonad, we'll require that we can extract the value that was injected using $\phi$, and that the lifting of $\phi$ is equivalent to duplication when acting on the result of $\phi$:
+Dually to monad algebras we have comonad coalgebras. Given a comonad $(W, \varepsilon, \delta)$, we can construct a coalgebra, which consists of a carrier object $a$ and an arrow $\phi \colon a \to W a$. For this coalgebra to compose nicely with the comonad, we'll require that we can extract the value that was injected using $\phi$, and that the lifting of $\phi$ is equivalent to duplication, when acting on the result of $\phi$:
 \[
  \begin{tikzcd}
- A
- & W A
- \arrow[l, "\varepsilon_A"']
+ a
+ & W a
+ \arrow[l, "\varepsilon_a"']
  \\
- & A
- \arrow[ul, "id_A"]
+ & a
+ \arrow[ul, "id_a"]
 \arrow[u, red, "\phi"']
  \end{tikzcd}
   \hspace{30pt}
  \begin{tikzcd}
-W(W A) 
-&WA
+W(W a) 
+&W a
 \arrow[l, red, "W \phi "']
 \\
-W A
-\arrow[u, "\delta_A"']
-& A
+W a
+\arrow[u, "\delta_a"']
+& a
 \arrow[l, red, "\phi"']
 \arrow[u, red, "\phi"']
  \end{tikzcd}
@@ -449,7 +449,7 @@ Just like with monad algebras, comonad coalgebras form a category. Given a comon
 
 There is a co-Kleisli subcategory of $\mathcal{C}^W$ denoted by $\mathcal{C}_W$
 
-Given a comonad $W$, we can construct an adjunction using either $\mathcal{C}^W$ or $\mathcal{C}_W$ that gives rise to $W$. The construction is fully analogous to the one for monads.
+Given a comonad $W$, we can construct an adjunction using either $\mathcal{C}^W$ or $\mathcal{C}_W$ that reproduces the comonad $W$. The construction is fully analogous to the one for monads.
 
 \subsection{Lenses}
 
@@ -468,7 +468,7 @@ With this interpretation \hask{get} lets us extract the focus, and \hask{set} re
 
 Lenses were first introduced to describe the retrieval and modification of data in database records. Then they found application is working with data structures. A lens objectifies the idea of having read/write access to a part of a larger object. For instance, a lens can focus on one of the components of a pair or a particular component of a record. We'll discuss lenses and optics in the next chapter.
 
-Let's apply the laws of the comonad coalgebra to a lens. For simplicity, let's omit data constructors from the equations. We get:
+Let's apply the laws of the comonad coalgebra to a lens. For simplicity, let's omit data constructors from the equations. We get the following simplified definitions:
 \begin{haskell}
 phi s = (set s, get s)
 epsilon (f, a) = f a
@@ -479,7 +479,7 @@ The first law  tells us that applying the result of \hask{set} to the result of 
 \begin{haskell}
 set s (get  s) = s
 \end{haskell}
-This is called the set/get law of the lens. Nothing changes when you replace the focus with the same focus.
+This is called the set/get law of the lens. Nothing should change when you replace the focus with the same focus.
 
 The second law requires the application of \hask{fmap phi} to the result of \hask{phi}:
 \begin{haskell}
@@ -493,7 +493,7 @@ Comparing the two, we get:
 \begin{haskell}
 phi . set s = \x -> (set s, x)
 \end{haskell}
-We can apply it to some \hask{a}:
+Let's apply it to some \hask{a}:
 \begin{haskell}
 phi (set s a) = (set s, a)
 \end{haskell}
@@ -501,7 +501,7 @@ Using the definition of \hask{phi} gives us:
 \begin{haskell}
 (set (set s a), get (set s a)) = (set s, a)
 \end{haskell}
-We get two equalitiies. The first components are functions, so we apply them to some \hask{a'} and get the set/set lens law:
+We have two equalities. The first components are functions, so we apply them to some \hask{a'} and get the set/set lens law:
 \begin{haskell}
 set (set s a) a' = set s a'
 \end{haskell}
