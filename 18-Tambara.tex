@@ -149,15 +149,19 @@ We can immediately translate this result to Haskell. We replace the end by \hask
 \begin{haskell}
 forall f. Functor f => f a -> f b
 \end{haskell}
-and the right hand side is \hask{a->b}.
+and the right hand side is the function type \hask{a->b}. 
 
-The two functions that witness the isomorphism are:
+We've seen polymorphic functions before: they were functions defined for all types, or sometimes for classes of types. Here we have a function that is defined for all functors. It says: give me a functorful of \hask{a}'s and I'll produce a functorful of \hask{b}'s---no matter what functor you use. The only way this can be implemented (using parametric polymorphism) is if this function has secretly captured a function of the type \hask{a->b} and is applying it using \hask{fmap}. 
+
+Indeed, one direction of the isomorphism is just that: capturing a function and \hask{fmap}ping it over the argument:
+\begin{haskell}
+toRep :: (a -> b) -> (forall f. Functor f => f a -> f b)
+toRep g fa = fmap g fa
+\end{haskell}
+The other direction uses the identity trick:
 \begin{haskell}
 fromRep :: (forall f. Functor f => f a -> f b) -> (a -> b)
 fromRep g a = unId (g (Id a))
-
-toRep :: (a -> b) -> (forall f. Functor f => f a -> f b)
-toRep g fa = fmap g fa
 \end{haskell}
 where the identity functor is defined as:
 \begin{haskell}
@@ -209,7 +213,7 @@ idPG = Fun id
 \end{haskell}
 so we do have a category in which pointed getters form hom-sets. 
 
-The functor representation for this toy optics exists, but we have to restrict the type of functors over which we take the end. Here's the definition of a class of \hask{Pointed} functors:
+The functor representation for this toy optic exists, but we have to restrict the type of functors over which we take the end. Here's the definition of a class of \hask{Pointed} functors:
 \begin{haskell}
 class Functor f => Pointed f where
   eta :: a -> f a
@@ -218,7 +222,9 @@ Our \hask{PointedGetter} is represented by the following Tannakian-like formula:
 \begin{haskell}
 type PtdGetterF s t = forall f. Pointed f => f s -> f t
 \end{haskell}
-We can apply this getter by encapsulating the argument in the identity functor:
+This time we are defining a function that is polymorphic not over all functors but over a restricted class of \hask{Pointed} functors.
+
+As before, we can apply this optic to retrieve the target. The trick is to encapsulate the source in the identity functor:
 \begin{haskell}
 applyF :: PtdGetterF s t -> s -> t
 applyF g = unId . g . Id
@@ -228,6 +234,7 @@ Indeed, the identity functor is pointed:
 instance Pointed Id where
   eta = Id
 \end{haskell}
+
 The equivalence of the two formulations is witnessed by this pair of functions:
 \begin{haskell}
 toPGF :: PtdGetter s t -> PtdGetterF s t
@@ -239,15 +246,15 @@ fromPGF g = Fun (unId . g . Id)
 \end{haskell}
 This time, however, the functor representation has definite advantage over the original: a composition of two \hask{PtdGetterF} optics is just function composition.
 \begin{exercise}
-Define two composable $PtdGetter$ optics, for instance, one going from a pair \hask{(Int, Bool)} to \hask{Int} and another from \hask{Int} to \hask{String}. Compose them first using \hask{composePG}, then convert them to the functor representation, and compose them using function composition.
+Define two composable \hask{PtdGetter} optics---for instance, one going from a pair \hask{(Int, Bool)} to \hask{Int} and another from \hask{Int} to \hask{String}. Compose them first using \hask{composePG}, then convert them to the functor representation, and compose them using function composition.
 \end{exercise}
 
 
 \subsection{Tannakian reconstruction with adjunction}
 
-In the toy example we've seen that we can perform the reconstruction over a category of functors that are equipped with additional structure. In category theory we would describe pointed functors as co-presheaves $P \colon \cat C \to \Set$ equipped with natural transformations:
+In the toy example, we performed the reconstruction over a category of functors that were equipped with additional structure. In category theory we would describe pointed functors as endofunctors $P \colon \Set \to \Set$ equipped with natural transformations:
 \[ \eta \colon Id \to P \]
-They form their own category, let's call it $\cat T$,  with morphisms that are natural transformations that preserve the structure. Such a transformation $\alpha \colon (P, \eta) \to (P', \eta')$ must make the following triangle commute:
+They form their own category, let's call it $\mathbf{Ptd}$,  with morphisms that are natural transformations that preserve the structure. Such a transformation $\alpha \colon (P, \eta) \to (P', \eta')$ must make the following triangle commute:
 \[
  \begin{tikzcd}
  & a
@@ -260,21 +267,41 @@ They form their own category, let's call it $\cat T$,  with morphisms that are n
  \end{tikzcd}
 \]
 
-Every pointed functor is a functor---a statement that is formalized by saying that there is a forgetful functor $U \colon \cat T \to [\cat C, \Set]$, which forgets the additional structure. 
+Every pointed functor is a functor---a statement that is formalized by saying that there is a forgetful functor $U \colon\mathbf{Ptd} \to [\Set, \Set]$, which forgets the additional structure. Notice that this is a functor between functor categories. 
 
-The trick in generalizing the Tannakian reconstruction is to define the end over the restricted functor category $\cat T$ but using the underlying functors: 
+This functor has a left adjoint. Any endofunctor $P \colon \Set \to \Set$ can be freely made into a pointed functor using the coproduct:
+\[ (F Q) a = a + Q a \]
+together with a natural transformation:
+\[ \eta_a = \text{Left} \]
+
+The trick in generalizing the Tannakian reconstruction is to define the end over a specialized functor category $\cat T$, 
+ but applying the forgetful functor to its functors. We assume that we have the free/forgetful adjunction $F \dashv U$:
+\[ \cat T (F Q, P) \cong  [\cat C, \Set] ( Q, U P )\]
+
+Our starting point is the end:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \]
 The mapping $\cat T \to \Set$ given by:
 \[ P \mapsto (U P) a \]
 is sometimes called a fiber functor, so the end formula can be interpreted as a set of natural transformations between two fiber functors. 
 
+As we did before, we first apply the Yoneda lemma to get:
 \[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (b ,-), U P\big)\Big) \]
-
+We can now use the adjunction:
 \[ \int_{P \colon \cat T} \Set \Big(\cat T \big( F \cat C (a ,-), P\big), \cat T \big( F \cat C (b ,-), P\big)\Big) \]
-
+We end up with a mapping between two natural transformations in the functor category $\cat T$. We can simplify it using the corollary to the Yoneda lemma:
 \[ \cat T\big( F \cat C (b ,-), F \cat C (a ,-) \big) \]
-
+We apply the adjunction once more:
 \[ \cat T\big( \cat C (b ,-), (U\circ F) \cat C (a ,-) \big) \]
-
+and the Yoneda lemma again:
 \[ \big( (U\circ F) \cat C (a ,-) \big) b \]
+The final observation is that the compostion $U \circ F$ of adjoint functors is a monad in the functor category. Let's call this monad $\Phi$. The result is the following identity:
+\[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \cong \big( \Phi \cat C (a ,-) \big) b \]
+The right-hand side is the action of the monad $\Phi$ on the representable functor $\cat C (a, -)$ evaluated at $b$. 
+
+In our toy example, the monad $\Phi$ is given by:
+\[ (\Phi Q) b = b + Q b \]
+which is just the action of the free functor $F$ followed by forgetting the $\eta$. Replacing $Q$ with the representable $\cat C (a, -)$ we get:
+\[ b + \cat C (a, b) \]
+In Haskell, this translates directly to our \hask{PtdGetter}.
+
 \end{document}
