@@ -294,9 +294,9 @@ We apply the adjunction once more:
 \[ \cat T\big( \cat C (b ,-), (U\circ F) \cat C (a ,-) \big) \]
 and the Yoneda lemma again:
 \[ \big( (U\circ F) \cat C (a ,-) \big) b \]
-The final observation is that the compostion $U \circ F$ of adjoint functors is a monad in the functor category. Let's call this monad $\Phi$. The result is the following identity:
+The final observation is that the compostion $U \circ F$ of adjoint functors is a monad in the functor category. Let's call this monad $\Phi$. The result is the following identity that will serve as the foundation for profunctor optics:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \cong \big( \Phi \cat C (a ,-) \big) b \]
-The right-hand side is the action of the monad $\Phi$ on the representable functor $\cat C (a, -)$ evaluated at $b$. 
+The right-hand side is the action of the monad $\Phi = U \circ F$ on the representable functor $\cat C (a, -)$ evaluated at $b$. 
 
 In our toy example, the monad $\Phi$ is given by:
 \[ (\Phi Q) b = b + Q b \]
