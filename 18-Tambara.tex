@@ -304,4 +304,185 @@ which is just the action of the free functor $F$ followed by forgetting the $\et
 \[ b + \cat C (a, b) \]
 In Haskell, this translates directly to our \hask{PtdGetter}.
 
+The bottom line is that we were able to reconstruct a hom-set in a category of simple optics from the category of functors with some additional structure. 
+
+\section{Profunctor Lenses}
+
+Our goal is to find a functor representation for other optics. We've seen before that, for instance, type-changing lenses can be seen as hom-sets in the $\mathbf{Lens}$ category. The objects in $\mathbf{Lens}$ are pairs of objects from some category $\cat C$, and a hom-set from one such pair $\langle s, t \rangle$ to another  $\langle a, b \rangle$ is given by the coend formula:
+\[ \mathcal{L}\langle s, t\rangle \langle a, b \rangle = \int^{c} \mathcal{C}(s, c \times a) \times  \mathcal{C}(c \times b, t) \]
+Notice that the pair of hom-sets in this formula can be seen as a single hom-set in the product category $\cat C^{op} \times \cat C$:
+\[  \mathcal{L}\langle s, t\rangle \langle a, b \rangle =  \int^{c} (\cat C^{op} \times \cat C )(c \bullet \langle a, b \rangle, \langle s, t \rangle)  \]
+where we define the action of $c$ on a pair $\langle a, b \rangle$ as:
+\[ c \bullet \langle a, b \rangle = \langle c \times a, c \times b \rangle \]
+
+This suggests that, to represent such optics, we should be looking at co-presheaves on the category $\cat C^{op} \times \cat C$, that is, we should be considering profunctor representations. 
+
+\subsection{Iso}
+As a quick check of this idea, let's apply our reconstruction formula to the simple case of $\cat T = \cat C^{op} \times \cat C$. In that case we don't need to use the forgetful functors, or the monad $\Phi$, and we get:
+\[  \mathcal{O}\langle s, t\rangle \langle a, b \rangle =\int_{P \colon \cat C^{op} \times \cat C} \Set \big(P \langle a, b\rangle, P \langle s, t\rangle \big) \cong \big( (\cat C^{op} \times \cat C) (\langle a, b\rangle ,-) \big) \langle s, t\rangle \]
+The right hans side evaluates to:
+\[ (\cat C^{op} \times \cat C) (\langle a, b\rangle , \langle s, t\rangle) = \cat C (s, a) \times \cat C (b, t) \]
+
+This optic is known in Haskell as \hask{Iso}:
+\begin{haskell}
+type Iso s t a b = (s -> a, b -> t)
+\end{haskell}
+and it, indeed, has a profunctor representation:
+\begin{haskell}
+type Iso s t a b = forall p. Profunctor p => p a b -> p s t
+\end{haskell}
+Given a pair of functions it's easy to construct this profunctor-polymorphic function:
+\begin{haskell}
+toIsoP :: (s -> a, b -> t) -> Iso s t a b
+toIsoP (f, g) = dimap f g
+\end{haskell}
+This is simply saying that any profunctor can be used to lift a pair of functions. 
+
+Conversely, we may ask the question: How can a function map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$ for \emph{every} profunctor imaginable? The only thing this function knows about the profunctor is that it can lift a pair of functions. Therefore it must either contain or be able to produce these two functions. 
+
+\begin{exercise}
+Implement the function:
+\begin{haskell}
+fromIsoP :: Iso s t a b -> (s -> a, b -> t)
+\end{haskell}
+Hint: Use the fact that a pair of identity functions can be used to construct the following profunctor:
+\begin{haskell}
+data Adapter a b s t = Ad (s -> a, b -> t)
+\end{haskell}
+\end{exercise}
+
+\subsection{Profunctors and lenses}
+
+Let's try to apply the same logic to lenses. We have to find a class of profunctors to plug into our profunctor representation. Let's assume that the forgetful functor $U$ only forgets additional structure but doesn't change the sets, so the set $P \langle a, b \rangle$ is the same as the set $(U P) \langle a, b \rangle$. 
+
+Let's start with the existential representation. We are given an object $c$ and a pair of functions:
+\[  \langle f, g \rangle \colon \cat C(s, c \times a) \times \cat C(c \times b, t) \]
+We want to build a profunctor representation, so we have to be able to map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$. We could get $P \langle s, t \rangle$ by lifting these two functions, but we would have to start from $P \langle c \times a, c \times b \rangle$. Indeed:
+\[ P \langle f, g \rangle \colon P \langle c \times a, c \times b \rangle \to P \langle s, t \rangle \]
+What we are missing is the mapping:
+\[ P \langle a, b \rangle \to P \langle c \times a, c \times b \rangle \]
+And this is exactly the additional structure we shall demand from our profunctor class. 
+
+\subsection{Tambara module}
+
+A profunctor $P$ equipped with the family of transformations:
+\[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \times a, c \times b \rangle \]
+is called a \emph{Tambara module}. 
+
+We want this family to be a natural in $a$ and $b$, but what should we demand from $c$? The problem with $c$ is that it appears twice, once in a contravariant, and once in a covariant position. So, if we want to interact nicely with arrows like $h \colon c \to c'$, we have to modify the naturality condition. We may consider a more general profunctor $P \langle c' \times a, c \times b \rangle$ and treat $\alpha$ as producing its diagonal elements, ones for which $c'$ is the same as $c$. 
+
+A transformation $\alpha$ between diagonal parts of two profunctors $P$ and $Q$ is called a \index{dinatural transformation}\emph{dinatural transformation} (\emph{di}-agonally natural) if the following diagram commutes for any $f \colon c \to c'$:
+
+\[
+ \begin{tikzcd}
+ & P \langle c', c \rangle
+ \arrow[dl, "{P \langle f, c \rangle}"']
+ \arrow[dr, "{P \langle c', f \rangle}"]
+ \\
+ P \langle c, c \rangle 
+  \arrow[d, "\alpha_c"']
+ && P \langle c', c' \rangle
+ \arrow[d, "\alpha_{c'}"]
+ \\
+ Q \langle c, c \rangle
+   \arrow[dr, "{P \langle c, f \rangle}"']
+ &&  Q \langle c', c' \rangle
+ \arrow[dl,"{P \langle f, c \rangle}"]
+\\
+&Q \langle c, c' \rangle
+ \end{tikzcd}
+\]
+(I used the common shorthand $P \langle f, c \rangle$ for $P \langle f, id_c \rangle$.)
+
+In our case, the dinaturality condition simplifies to:
+\[
+ \begin{tikzcd}
+ & P \langle a, b \rangle
+ \arrow[dl, "{\alpha_{\langle a, b \rangle, c}}"']
+ \arrow[dr, "{\alpha_{\langle a, b \rangle, c'}}"]
+ \\
+ P \langle c \times a, c \times b \rangle
+   \arrow[dr, "{P \langle c \times a, f \times b \rangle}"']
+ &&  P \langle c' \times a, c'  \times b\rangle
+ \arrow[dl,"{P \langle f \times b, c \times b \rangle}"]
+\\
+&P \langle c \times a, c' \times b \rangle
+ \end{tikzcd}
+\]
+(Here, again $P \langle f \times b, c \times b \rangle$ stands for $P \langle f \times id_b, id_{c \times b} \rangle$.)
+
+There is one more consistency condition on Tambara modules: they must preserve the monoidal structure. The action of multiplying by $c$ makes sense in a cartesian category: we have to have a product for any pair of objects, and we want to have the terminal object to serve as the unit of multiplication. Tambara modules have to respect unit and preserve multiplication. For the unit (terminal object), we impose the following condition:
+\[ \alpha_{\langle a, b \rangle, 1} = id _{P \langle a, b \rangle}\]
+For multiplication, we have:
+\[ \alpha_{\langle a, b \rangle, c' \times c} \cong  \alpha_{\langle c \times a, c \times b \rangle, c'} \circ  \alpha_{\langle a, b \rangle, c}\]
+or, pictorially:
+\[
+ \begin{tikzcd}
+ P \langle a, b \rangle
+ \arrow[rr, "{\alpha_{\langle a, b \rangle, c' \times c } }"]
+ \arrow[rdd, "{ \alpha_{\langle a, b \rangle, c}}"']
+ &&
+ P \langle c' \times c \times a, c' \times c \times b \rangle
+ \\
+ \\
+ & P \langle c \times a, c \times b \rangle
+  \arrow[ruu, "{\alpha_{\langle c \times a, c \times b \rangle, c'}}"']
+\end{tikzcd}
+\]
+Notice that the product is associative up to isomorphism, so there is a hidden associator in this diagram.
+
+Since we want Tambara modules to form a category, we have to define morphisms between them. These are natural transformations that preserve the additional structure. Let's say we have a natural transformation between two Tambara modules $\rho \colon (P, \alpha) \to (Q, \beta) $. We can either apply $\alpha$ and then $\rho$, or do $\rho$ first and then  $\beta$. We want the result to be the same:
+\[
+ \begin{tikzcd}
+  P \langle a, b \rangle
+ \arrow[d, "{ \rho_{\langle a, b \rangle}}"']
+ \arrow[r, "{ \alpha_{\langle a, b \rangle, c}}"]
+  &  P \langle c \times a, c \times b \rangle
+  \arrow[d, "{ \rho_{\langle c \times a, c \times b \rangle}}"]
+\\
+   Q \langle a, b \rangle
+ \arrow[r, "{ \beta_{\langle a, b \rangle, c}}"]
+ &  Q \langle c \times a, c \times b \rangle
+ \end{tikzcd}
+\]
+
+
+\subsection{Profunctor lenses}
+
+Now that we have some intuition about how Tambara modules are related to lenses, let's go back to our main formula:
+\[  \mathcal{L}\langle s, t\rangle \langle a, b \rangle =\int_{P \colon \cat T} \Set \big((U P) \langle a, b\rangle, (U P) \langle s, t\rangle \big) \cong \big( \Phi (\cat C^{op} \times \cat C) (\langle a, b\rangle ,-) \big) \langle s, t\rangle \]
+This time we're taking the end over the Tambara category. The only missing part is the monad $\Phi = U \circ F$ or the functor $F$ that freely generates Tambara modules.
+
+It turns out that, instead of guessing the monad, it's easier to guess the comonad. There is a comonad in the category of profunctors that takes a profunctor $P$ and produces another profunctor $\Theta P$. Here's the formula:
+\[(\Theta P) \langle a, b \rangle = \int_c P \langle c \times a, c \times b \rangle \]
+You can check that this is indeed a comonad by implementing $\varepsilon$ and $\delta$ (\hask{extract} and \hask{duplicate}). For instance, $\varepsilon$ maps $\Theta P \to P$ using the projection $\pi_1$ for the terminal object (the unit of cartesian product).
+
+What's interesting about this comonad is that its coalgebras are Tambara modules. Again, these are coalgebras that map profunctors to profunctors. They are natural transformations $P \to \Theta P$. We can write such a natural transformation as an end:
+\[\int_{\langle a, b \rangle} \Set \big (P \langle a, b \rangle, (\Theta P) \langle a, b \rangle \big) = \int_{\langle a, b \rangle} \int_c \Set \big( P\langle a, b \rangle , P \langle c \times a, c \times b \rangle \big) \]
+I used the continuity of the hom-functor to pull out the end over $c$. The resulting end encodes a set of natural (dinatural in $c$) transformations that define a Tambara module:
+\[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \times a, c \times b \rangle \]
+In fact, these coalgebras are comonad coalgebras, that is they are compatible with the comonad $\Theta$. In other words, Tambara modules form the Eilenberg-Moore category of coalgebras for the comonad $\Theta$.
+
+The left adjoint to $\Theta$ is a monad $\Phi$ given by the formula:
+\[(\Phi P)  \langle s, t \rangle = \int^{\langle u, v \rangle, c} (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle\big) \times P \langle u, v \rangle \]
+where:
+\[ (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle\big) = \cat C(s, c \times s) \times \cat C(c \times v, t) \]
+
+This adjunction can be easily checked using some end/coend manipulations. The mapping out of $\Phi P$ to some profunctor $Q$ can be written as an end. The coends in $\Phi$ can then be taken out using co-continuity of the hom-functor. Finally, applying the ninja-Yoneda lemma produces the mapping into $\Theta Q$. We get:
+\[ [(\cat C^{op} \times \cat C, \Set] (P \Phi, Q) \cong [(\cat C^{op} \times \cat C, \Set] (P, \Theta Q) \]
+
+Replacing $Q$ with $P$ we immediately see that the set of algebras for $\Phi$ is isomorphic to the set of coalgebras for $\Theta$. In fact they are monad algebras for $\Phi$. This means that the Eilenberg-Moore category for the monad $\Phi$ is the same as the Tambara category.
+
+Recall that the Eilenberg-Moore construction factorizes a monad into a free/forgetful adjunction. This is exactly the adjunction we were looking for in deriving the formula for profunctor optics. What remains is to evaluate the action of $\Phi$ on the representable functor:
+\[ \big( \Phi (\cat C^{op} \times \cat C) (\langle a, b\rangle ,-) \big) \langle s, t\rangle = \int^{\langle u, v \rangle, c} (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle \big) \times  (\cat C^{op} \times \cat C) \big(\langle a, b\rangle , \langle u, v\rangle \big)\]
+Applying the co-Yoneda lemma, we get:
+\[ \int^c (\cat C^{op} \times \cat C) \big(c \bullet \langle a, b\rangle , \langle s, t \rangle\big) = \int^c \cat C(s, c \times a) \times \cat C (c \times b, t)\]
+which is exactly the existential representation of the lens.
+
+\subsection{Profunctor lenses in Haskell}
+
+\begin{haskell}
+\end{haskell}
+
+
 \end{document}
