@@ -474,7 +474,13 @@ and for the contravariant one we have:
 
 Physicists might notice the similarity of these formulas to integrals involving the Dirac delta function (actually, a distribution). This is why profunctors are sometimes called \index{distributors}distributors, following the adage that ``distributors are to functors as distributions are to functions.'' 
 
-Yet another name for profunctors is \index{bimodule}``bimodules.''
+This intuition is often expressed by saying that we can perform the integration over $x$ in this formula by replacing $x$ with $a$ in the integrand $G x$. 
+
+If $\cat C$ is a discrete category, the coend reduces to the sum (coproduct), and the hom-functor reduces to the unit matrix (the Kronecker delta). The co-Yoneda lemma becomes:
+\[ \sum_j \delta_i^j v_j = v_i \]
+In fact, a lot of linear algebra translates directly to the theory of $\Set$-valued functors. You may often view of such functors as vectors in a vector space, in which hom-functors form a basis.
+
+Yet another name for profunctors, especially in Australia, is \index{bimodule}``bimodules.'' This is because the lifting of morphisms by a profunctor is somewhat similar to the left and right actions on sets. 
 
 The proof of the co-Yoneda lemma is quite instructive, as it uses a few common tricks. Most importantly, we rely on the corollary of the Yoneda lemma, which says that, if the mappings out from two objects to an arbitrary object are isomorphic, then the two objects themselves are isomorphic. We'll start, therefore, with such a mapping-out to an arbitrary set $S$:
 \[ \mathbf{Set} \left(\int^{x \colon \mathcal{C}} \mathcal{C}(x, a) \times F x, S \right) \]
@@ -521,6 +527,79 @@ The second says that if you have a functorful of \hask{a} then you can create a 
 \begin{haskell}
 coyoneda_1 :: Functor f => f a -> Coend (CoY f a)
 coyoneda_1 fa = Coend (CoY id fa)
+\end{haskell}
+
+\section{Day Convolution}
+
+Electrical engineers are familiar with the idea of convolution. We can convolve two streams by shifting one of them and summing its product with the other one: 
+\[ (f \star g)(x) = \int^{\infty}_{-\infty} f(y) g(x - y) dy \]
+This formula can be translated almost verbatim to category theory. We can start by replacing the integral with a coend. The problem is, we don't know how to subtract objects. We do however know how to add them, in a co-cartesian category. 
+
+Notice that the sum of the arguments to the functions is equal to $x$. We could enforce this condition by introducing the Dirac delta function or the ``impulse function,'' $\delta(a + b - x)$. In category theory we use the hom-functor to do the same. Thus we can define a convolution of two $\Set$-valued functors:
+\[ (F \star G) x = \int^{a, b} \cat C (a + b, x) \times F a \times G b \]
+Informally, if we could define subtraction as the right adjoint to coproduct, we'd write:
+\[ \int^{a, b} \cat C (a + b, x) \times F a \times G b \cong \int^{a, b} \cat C (a, b - x) \times F a \times G b \cong \int^b F (b - x) \times G b\]
+
+There is nothing special about coproduct so, in general, Day convolution is defined for any monoidal category with a tensor product:
+\[ (F \star G) x = \int^{a, b} \cat C (a \otimes b, x) \times F a \times G b \]
+
+In fact, Day convolution for a monoidal category $(\cat C, \otimes, I)$ endows the category of co-presheaves $[\cat C, \Set]$ with a monoidal structure. It's easy to check that Day convolution is associative (up to isomorphism) and that $\cat C(I, -)$ serves as the unit object. For instance, we have:
+\[ (\cat C(I, -) \star G) x =  \int^{a, b} \cat C (a \otimes b, x) \times \cat C(I, a) \times G b \cong 
+  \int^{b} \cat C (I \otimes b, x) \times  G b \cong G x\]
+If the tensor product is symmetric, then the corresponding Day convolution is also symmetric (up to isomorphism).
+
+In the special case of a cartesian closed category, we can use the currying adjunction to simplify the formula:
+\[ (F \star G) x = \int^{a, b} \cat C (a \times b, x) \times F a \times G b \cong  \int^{a, b} \cat C (a, x^b) \times F a \times G b \cong  \int^{b}  F (x^b) \times G b\]
+
+In Haskell, the product-based Day convolution can be defined using an existential type:
+\begin{haskell}
+data Day f g x where
+  Day :: ((a, b) -> x) -> f a -> g b -> Day f g x
+\end{haskell}
+
+\begin{exercise}
+Define the \hask{Functor} instance for \hask{Day}.
+\end{exercise}
+
+\begin{exercise}
+Implement the associator for \hask{Day}.
+\begin{haskell}
+assoc :: Day f (Day g h) x -> Day (Day f g) h x
+\end{haskell}
+\end{exercise}
+
+
+\subsection{Applicative functors as monoids}
+ 
+ We've seen before the definition of applicative functors as lax monoidal functors. It turns out that, just like monads, applicative functors can also be defined as monoids. 
+ 
+Recall that a monoid is an object in a monoidal category. The category we're interested in is the co-presheaf category $[\cat C, \Set]$. If $\cat C$ is cartesian, then the co-presheaf category is monoidal with respect to Day convolution, with the unit object $\cat C(1, -)$. A monoid in this category is a functor $F$ equipped with two natural transformations that serve as unit and multiplication:
+\[ \eta \colon \cat C(1, -) \to F \]
+\[ \mu \colon F \star F \to F \]
+Since $\cat C(1, a)$ is isomorphic to $a$, the component of unit at $a$ is:
+\[ \eta_a \colon a \to F a \] 
+You may recognize this function as \hask{pure} in the definition of \hask{Applicative}.
+\begin{haskell}
+pure :: a -> f a
+\end{haskell}
+or, eqivalently, as \hask{unit} in the definition of \hask{Monoidal}
+\begin{haskell}
+unit :: f a
+\end{haskell}
+
+Let's consider the set of natural transformations from which $\mu$ is taken. We'll write it as an end:
+\[ \mu \in \int_x \Set \big( (F \star F) x, F x \big) \]
+Pluggin in the definition of Day convolution, we get:
+\[ \int_x \Set \big( \int^{a, b} \cat C (a \times b, x) \times F a \times  F b, F x \big) \]
+We can pull out the coend using co-continuity of the hom-functor:
+\[ \int_{x, a, b} \Set \big( \cat C (a \times b, x) \times F a \times  F b, F x \big) \]
+We then use the currying adjunction in $\Set$ to obtain:
+\[ \int_{x, a, b} \Set \big( \cat C (a \times b, x),  \Set( F a \times  F b, F x) \big) \]
+Finally, we apply the Yoneda lemma to perform the integration over $x$:
+\[ \int_{a, b}  \Set \big( F a \times  F b, F (a \times b) \big) \]
+The result is the set of natural transformations that define the second part of the lax monoidal functor:
+\begin{haskell}
+  (>*<) :: f a -> f b -> f (a, b)
 \end{haskell}
 
 \section{The Bicategory of Profunctors}

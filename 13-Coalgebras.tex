@@ -22,7 +22,7 @@ By the same token, if you grow a recursive data structure using an anamorphism, 
 
 \section{Coalgebras from Endofunctors}
 
-A coalgebra for an endofunctor $F$ is a pair consisting of a carrier $A$ and a structure map: an arrow $A \to F A$. 
+A coalgebra for an endofunctor $F$ is a pair consisting of a carrier $a$ and a structure map: an arrow $a \to F a$. 
 
 In Haskell, we define:
 \begin{haskell}
@@ -55,54 +55,54 @@ You can convince yourself that a recursive application of this coalgebra creates
 
 By analogy with algebra morphisms, we can define coalgebra morphisms as the arrows between carriers that satisfy a commuting condition. 
 
-Given two coalgebras $(A, \alpha)$ and $(B, \beta)$, the arrow $f \colon A \to B$ is a coalgebra morphism if the following diagram commutes:
+Given two coalgebras $(a, \alpha)$ and $(b, \beta)$, the arrow $f \colon a \to b$ is a coalgebra morphism if the following diagram commutes:
 
 \[
  \begin{tikzcd}
- A 
+ a 
  \arrow[r, "f"]
  \arrow[d, "\alpha"]
- & B
+ & b
 \arrow[d, "\beta"]
  \\
-F  A
+F  a
  \arrow[r, "F f"]
- & F B
-  \end{tikzcd}
+ & F b
+  \end{tikzcd}\tau
 \]
 
 The interpretation is that it doesn't matter if we first map the carriers and then apply the coalgebra $\beta$, or first apply the coalgebra $\alpha$ and then apply the arrow to its contents, using the lifting $F f$.
 
 Coalgebra morphisms can be composed, and the identity arrow is automaticaly a coalgebra morphism. It's easy to see that coalgebras, just like algebras, form a category. 
 
-This time, however, we are interested in the terminal object in this category---a \emph{terminal coalgebra}. If a terminal coalgebra $(T, j)$ exists, it satisfies the dual of the Lambek's lemma. 
+This time, however, we are interested in the terminal object in this category---a \emph{terminal coalgebra}. If a terminal coalgebra $(t, \tau)$ exists, it satisfies the dual of the Lambek's lemma. 
 
 \begin{exercise}{Lambek's lemma:}
-Show that the structure map $j$ of the terminal coalgebra $(T, j)$ is an isomorphism. Hint: The proof is dual to the one for the initial algebra.
+Show that the structure map $\tau$ of the terminal coalgebra $(t, \tau)$ is an isomorphism. Hint: The proof is dual to the one for the initial algebra.
 \end{exercise}
 
 As a consequence of the Lambek's lemma, the carrier of the terminal algebra is a fixed point of the endofunctor in question. 
-\[ F T \cong T \]
-with $j$ and $j^{-1}$ serving as the witnesses of this isomorphism. 
+\[ F t \cong t \]
+with $\tau$ and $\tau^{-1}$ serving as the witnesses of this isomorphism. 
 
-It also follows that $(T, j^{-1})$ is an algebra; just as  $(I, i^{-1})$ is a coalgebra, assuming that $(I, i)$ is the initial algebra.
+It also follows that $(t, \tau^{-1})$ is an algebra; just as  $(i, \iota^{-1})$ is a coalgebra, assuming that $(i, \iota)$ is the initial algebra.
 
 We've seen before that the carrier of the initial algebra is a fixed point. In principle, there may be many fixed points for the same endofunctor. The initial algebra is the least fixed point and the terminal coalgebra the greatest fixed point. 
 
 The greatest fixed point of an endofunctor $F$ is denoted by $\nu F$, so we have:
-\[ T = \nu F \]
+\[ t = \nu F \]
 
 We can also see that there must be a unique algebra morphism (a catamorphism) from the initial algebra to the terminal coalgebra. That's because the terminal coalgebra is an algebra. 
 
-Similarly, there is a unique coalgebra morphism from the initial algebra (which is also a coalgebra) to the terminal coalgebra. In fact, it can be shown that it's the same underlying morphism $\kappa \colon \mu F \to \nu F$ in both cases. 
+Similarly, there is a unique coalgebra morphism from the initial algebra (which is also a coalgebra) to the terminal coalgebra. In fact, it can be shown that it's the same underlying morphism $\tau \colon \mu F \to \nu F$ in both cases. 
 
-In the category of sets, the carrier set of the initial algebra is a subset of the carrier set of the terminal coalgebra, with the function $\kappa$ embedding the former in the latter. 
+In the category of sets, the carrier set of the initial algebra is a subset of the carrier set of the terminal coalgebra, with the function $\tau$ embedding the former in the latter. 
 \[
 \begin{tikzpicture}
          \draw (-1,0)[fill=blue!25!white] ellipse (0.7 and 1);
          \draw (2,0)[fill=blue!5!white] ellipse (1.4 and 2);
          \draw (2,0)[fill=blue!25!white] ellipse (0.7 and 1);
-         \node[above] at (0, 1) {$\kappa$};
+         \node[above] at (0, 1) {$\tau$};
        	\draw[dashed, blue] (-1, 1) -- (2, 1);
 	\draw[dashed, blue] (-1, -1) -- (2, -1);
         \node at (-1, 0) { $\mu F$ };
@@ -126,23 +126,23 @@ Show that the empty set is the carrier of the initial algebra for the identity f
 
 \section{Anamorphisms}
 
-The terminal coalgebra $(T, j)$ is defined by its universal property: there is a unique coalgebra morphism $h$ from any coalgebra $(A, \alpha)$ to $(T, j)$.  This morphism is called the \emph{anamorphism}. Being a coalgebra morphism, it makes the following diagram commute:
+The terminal coalgebra $(t, \tau)$ is defined by its universal property: there is a unique coalgebra morphism $h$ from any coalgebra $(a, \alpha)$ to $(t, \tau)$.  This morphism is called the \emph{anamorphism}. Being a coalgebra morphism, it makes the following diagram commute:
 \[
  \begin{tikzcd}
- A 
+ a 
  \arrow[r, dashed, "h"]
  \arrow[d, "\alpha"]
- & T
-\arrow[d, "j"]
+ & t
+\arrow[d, "\tau"]
  \\
- F A
+ F a
  \arrow[r,  "F h"]
- & F T
+ & F t
   \end{tikzcd}
 \]
  
  Just like with algebras, we can use the Lambek's lemma to ``solve'' for \hask{h}:
- \[ h = j^{-1} \circ F h \circ \alpha \]
+ \[ h = \tau^{-1} \circ F h \circ \alpha \]
  
  Since the terminal coalgebra (just like the initial algebra) is a fixed point of a functor, the above recursive formula can be translated directly to Haskell as:
  \begin{haskell}
@@ -348,11 +348,11 @@ At face value, the idea that we could construct a terminal coalgebra by applying
 To turn this loose reasoning into a rigorous proof, we have to tame the infinity, which means we have to define some kind of a limiting procedure. 
 
 As an example, let's consider the product functor:
-\[F_A X = A \times X \]
+\[F_a X = a \times X \]
 Its terminal coalgebra is an infinite stream. We'll approximate it it by starting with the terminal object $1$. The next step is:
-\[ F_A 1 = A \times 1 \cong A \]
+\[ F_a 1 = a \times 1 \cong a \]
 which we could imagine is a stream of length one. We can continue with:
-\[ F_A (F_A 1) = A \times (A \times 1) \cong A \times A \]
+\[ F_a (F_a 1) = a \times (a \times 1) \cong a \times a \]
 a stream of length two, and so on. 
 
 This looks promising, but what we need is one object that would combine all these approximations. We need a way to glue the next approximation to the previous one.
@@ -389,7 +389,7 @@ has the same elements as $F(F 1)$.
 We can continue extending this diagram to infinity. The limit of the infinite chain is the fixed point carrier of the terminal coalgebra.
 \[
  \begin{tikzcd}
-  && T
+  && t
   \arrow[ddll, "\pi_0"']
   \arrow[ddl, "\pi_1"]
   \arrow[dd, "\pi_2"]

@@ -600,8 +600,8 @@ The second, corresponding to \hask{return}, maps the identity functor to $T$:
 
 Compare this with our earlier definition of a monoid in a monoidal category:
 \begin{align*}
-\mu &\colon M \otimes M \to M \\
-\eta &\colon I \to M
+\mu &\colon m \otimes m \to m \\
+\eta &\colon i \to m
 \end{align*}
 The similarity is striking. This is why we often call the natural transformation $\mu$ \emph{monadic multiplication}. But in what category can the composition of functors be considered a tensor product? 
 
@@ -669,7 +669,7 @@ and this is the associativity law:
 \]
 We used the whiskering notation for horizontal composition of $\mu \circ T$ and $T \circ \mu$.
 
-These are the monad laws in terms of $\mu$ and $\eta$. They can be directly translated to the laws for \hask{join} and \hask{return}. They are also equivalent to the laws of the Kleisli category built from arrows $A \to T B$.
+These are the monad laws in terms of $\mu$ and $\eta$. They can be directly translated to the laws for \hask{join} and \hask{return}. They are also equivalent to the laws of the Kleisli category built from arrows $a \to T b$.
 
 \section{Monoidal Functors}
 
@@ -677,10 +677,10 @@ We've seen several examples of monoidal cateogries. Such categories are equipped
 
 Every time we have more than one instance of some structure, we may ask ourselves the question: is there a whole category of such things? In this case: do monoidal categories form their own category? For this to work we would have to define arrows between monoidal categories.
 
-A \emph{monoidal functor} $F$ from a monoidal category $(\mathcal{C}, \otimes, I)$ to another monoidal category $(\mathcal{D}, \oplus, J)$ maps tensor product to tensor product and unit to unit---all up to isomorphism:
+A \emph{monoidal functor} $F$ from a monoidal category $(\mathcal{C}, \otimes, i)$ to another monoidal category $(\mathcal{D}, \oplus, j)$ maps tensor product to tensor product and unit to unit---all up to isomorphism:
 \begin{align*}
-F A \oplus F B &\cong F (A \otimes B) \\
-J &\cong F I 
+F a \oplus F b &\cong F (a \otimes b) \\
+j &\cong F i 
 \end{align*}
 Here, on the left-hand side we have the tensor product and the unit in the target category, and on the right their counterparts in the source category. 
 
@@ -692,30 +692,30 @@ The category of monoidal categories with monoidal functors as arrows is called $
 
 One of the perks of monoidal categories is that they allow us to define monoids. You can easily convince yourself that monoidal functors map monoids to monoids. It turns out that you don't need the full power of monoidal functors to accomplish this task. Let's consider what the minimal requirements are  for a functor to map a monoid to a monoid. 
 
-Let's start with a monoid $(M, \mu, \eta)$ in the monoidal category $(\mathcal{C}, \otimes, I)$. Consider a functor $F$ that maps $M$ to $F M$. We want $F M$ to be a monoid in the target monoidal category $(\mathcal{D}, \oplus, J)$. For that we need to find two mappings:
+Let's start with a monoid $(m, \mu, \eta)$ in the monoidal category $(\mathcal{C}, \otimes, i)$. Consider a functor $F$ that maps $m$ to $F m$. We want $F m$ to be a monoid in the target monoidal category $(\mathcal{D}, \oplus, j)$. For that we need to find two mappings:
 \begin{align*}
-\eta' &\colon J \to F M \\
- \mu' &\colon F M \oplus F M \to F M 
+\eta' &\colon j \to F m \\
+ \mu' &\colon F m \oplus F m \to F m 
 \end{align*}
 satisfying monoidal laws.
 
-Since $M$ is a monoid, we do have at our disposal the liftings of the original mappings:
+Since $m$ is a monoid, we do have at our disposal the liftings of the original mappings:
 \begin{align*}
- F \eta &\colon F I \to F M \\
- F \mu &\colon F (M \otimes M) \to F M
+ F \eta &\colon F i \to F m \\
+ F \mu &\colon F (m \otimes m) \to F m
 \end{align*}
 
 What we are missing, in order to implement $\eta'$ and $\mu'$, are two additional arrows:
 \begin{align*}
-J &\to F I\\
- F M \oplus F M &\to F (M \otimes M)
+j &\to F i\\
+ F m \oplus F m &\to F (m \otimes m)
  \end{align*}
 A monoidal functor would provide such arrows as halves of the defining isomorphisms. However, for what we're trying it accomplish, we don't need the other halves, so we can relax the isomorphisms. 
 
 A \emph{lax monoidal functor} is a functor equipped with a one-way morphism and a natural transformation:
 \begin{align*}
-\phi_I &\colon J \to F I \\
-\phi_{A B} &\colon F A \oplus F B \to F (A \otimes B)
+\phi_i &\colon j \to F i \\
+\phi_{a b} &\colon F a \oplus F b \to F (a \otimes b)
 \end{align*}
 satisfying the appropriate untiality and associativity conditions.
 
@@ -726,7 +726,7 @@ class Monoidal f where
   unit  :: f ()
   (>*<) :: f a -> f b -> f (a, b)
 \end{haskell}
-Corresponding to $\phi_{A B}$ we have an infix operator which, according to Haskell conventions, it's written in its curried form.
+Corresponding to $\phi_{a b}$ we have an infix operator which, according to Haskell conventions, it's written in its curried form.
 
 \begin{exercise}
 Implement the \hask{Monoidal} instance for the list functor.
@@ -762,7 +762,7 @@ strength (e, as) = fmap (e, ) as
 The notation \hask{(e, )} is called a \index{tuple section}\emph{tuple section} and is equivalent to the partial application of the pair constructor: \hask{(,) e}.
 
 In category theory, strength for an endofunctor $F$ is defined as a natural transformation:
-\[ \sigma \colon A \otimes F(B) \to F (A \otimes B) \]
+\[ \sigma \colon a \otimes F(b) \to F (a \otimes b) \]
 There are some additional conditions which ensure that it works nicely with the unitors and the associator of the monoidal category in question.
 
 The fact that we were able to implement \hask{strength} for any functor means that, in Haskell, every functor is strong. This is the reason why we don't have to worry about accessing the environment from inside a functor. 
@@ -841,17 +841,17 @@ If you squint at the definition of the splat operator:
 \end{haskell}
 you may see it as mapping a function object to a function object. 
 
-This becomes clearer if you consider a functor between two categories, both of them closed. You may start with a function object $B^A$ in the source category and apply the functor $F$ to it:
-\[ F (B^A) \]
-Alternatively, you may map the two objects $A$ and $B$ and construct a function object between them in the target category:
-\[ (F B)^{F A} \]
+This becomes clearer if you consider a functor between two categories, both of them closed. You may start with a function object $b^a$ in the source category and apply the functor $F$ to it:
+\[ F (b^a) \]
+Alternatively, you may map the two objects $a$ and $b$ and construct a function object between them in the target category:
+\[ (F b)^{F a} \]
 If we demand that the two ways be isomorphic, we get a strict \emph{closed functor}. But, as was the case with monoidal functors, we are more interested in the lax version, which is equipped with a one-way natural transformation:
-\[ F (B^A) \to (F B)^{F A} \]
+\[ F (b^a) \to (F b)^{F a} \]
 If $F$ is an endofunctor, this translates directly into the definition of the splat operator. 
 
 The full definition of a lax closed functor includes the mapping of the monoidal unit and some coherence conditions. 
 
-In a closed monoidal category, the exponential is related to the cartesian product through an adjunction. It's no surprise then that, in such a category, lax monoidal and lax closed endofunctors are the same. 
+In a closed cartesian category, the exponential is related to the cartesian product through the currying adjunction. It's no surprise then that, in such a category, lax monoidal and lax closed endofunctors are the same. 
 
 We can easily express this in Haskell:
 \begin{haskell}

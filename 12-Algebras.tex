@@ -91,18 +91,18 @@ Algebras for a given endofunctor $F$ form a category. An arrow in that category 
 
 Preserving structure in this case means that the arrow must commute with the two structure maps. This is where functoriality comes into play. To switch from one structure map to another, we have to be able to lift an arrow that goes between their carriers. 
 
-Given an endofunctor $F$, an \emph{algebra morphism} between two algebras $(A, \alpha)$ and $(B, \beta)$ is an arrow $f \colon A \to B$ that makes this diagram commute:
+Given an endofunctor $F$, an \emph{algebra morphism} between two algebras $(a, \alpha)$ and $(b, \beta)$ is an arrow $f \colon a \to b$ that makes this diagram commute:
 \[
  \begin{tikzcd}
- F A 
+ F a 
  \arrow[r, "F f"]
  \arrow[d, "\alpha"]
- & F B
+ & F b
 \arrow[d, "\beta"]
  \\
- A
+ a
  \arrow[r, "f"]
- & B
+ & b
   \end{tikzcd}
 \]
 In other words, the following equation must hold:
@@ -122,22 +122,22 @@ Show that \hask{show} is not an algebra morphism. Hint: Consider what happens to
 
 The initial object in the category of algebras is called the \emph{initial algebra} and, as we'll see, it plays a very important role.
 
-By definition, the initial algebra $(I, i)$ has a unique algebra morphism $f$ from it to any other algebra $(A, \alpha)$. Diagrammatically:
+By definition, the initial algebra $(i, \iota)$ has a unique algebra morphism $f$ from it to any other algebra $(a, \alpha)$. Diagrammatically:
 
 \[
  \begin{tikzcd}
- F I 
+ F i 
  \arrow[r, "F f"]
- \arrow[d, "i"]
- & F A
+ \arrow[d, "\iota"]
+ & F a
 \arrow[d, "\alpha"]
  \\
- I
+ i
  \arrow[r, dashed, "f"]
- & A
+ & a
   \end{tikzcd}
 \]
- This unique morphism is called a \emph{catamorphism} for the algebra $(A, \alpha)$.
+ This unique morphism is called a \emph{catamorphism} for the algebra $(a, \alpha)$.
 
 
 \begin{exercise}
@@ -163,57 +163,57 @@ Make a convincing argument that \hask{log} (logarithm) is an algebra morphism be
 \section{Lambek's Lemma and Fixed Points}
 
 
-Lambek's lemma says that the structure map $i$ of the initial algebra is an isomorphism. 
+Lambek's lemma says that the structure map $\iota$ of the initial algebra is an isomorphism. 
 
-The reason for it is the self-similarity of algebras. You can lift any algebra $(A, \alpha)$ using $F$, and the result $(F A, F \alpha)$ is also an algebra with the structure map $F \alpha \colon F (F A) \to F A$. 
+The reason for it is the self-similarity of algebras. You can lift any algebra $(a, \alpha)$ using $F$, and the result $(F a, F \alpha)$ is also an algebra with the structure map $F \alpha \colon F (F a) \to F a$. 
 
-In particular, if you lift the initial algebra $(I, i)$, you get an algebra with the carrier $F I$ and the structure map $F i \colon F (F I) \to F I$. It follows then that there must be a unique algebra morphism from the initial algebra to it:
+In particular, if you lift the initial algebra $(i, \iota)$, you get an algebra with the carrier $F i$ and the structure map $F \iota \colon F (F i) \to F i$. It follows then that there must be a unique algebra morphism from the initial algebra to it:
 \[
  \begin{tikzcd}
- F I 
+ F i 
  \arrow[r, "F h"]
- \arrow[d, "i"]
- & F (F I)
-\arrow[d, "F i"]
+ \arrow[d, "\iota"]
+ & F (F i)
+\arrow[d, "F \iota"]
  \\
- I
+ i
  \arrow[r, dashed, "h"]
- & F I
+ & F i
   \end{tikzcd}
 \]
-This $h$ is the inverse of $i$. To see that, let's consider the composition $i \circ h$. It is the arrow at the bottom of the following diagram
+This $h$ is the inverse of $\iota$. To see that, let's consider the composition $\iota \circ h$. It is the arrow at the bottom of the following diagram
 \[
  \begin{tikzcd}
- F I 
+ F i 
  \arrow[r, "F h"]
- \arrow[d, "i"]
- & F (F I)
-\arrow[d, "F i"]
-\arrow[r, "F i"]
-& F I
-\arrow[d, "i"]
+ \arrow[d, "\iota"]
+ & F (F i)
+\arrow[d, "F \iota"]
+\arrow[r, "F \iota"]
+& F i
+\arrow[d, "\iota"]
  \\
- I
+ i
  \arrow[r, dashed, "h"]
- & F I
- \arrow[r, "i"]
- & I
+ & F i
+ \arrow[r, "\iota"]
+ & i
   \end{tikzcd}
 \]
-This is a pasting of the original diagram with a trivially commuting diagram. Therefore the whole rectangle commutes. We can interpret this as $i \circ h$ being an algebra morphism from $(I, i)$ to itself. But there already is such an algebra morphism---the identity. So, by uniqueness of the mapping out from the initial algebra, these two must be equal:
-\[ i \circ h = id_I \] 
+This is a pasting of the original diagram with a trivially commuting diagram. Therefore the whole rectangle commutes. We can interpret this as $\iota \circ h$ being an algebra morphism from $(i, \iota)$ to itself. But there already is such an algebra morphism---the identity. So, by uniqueness of the mapping out from the initial algebra, these two must be equal:
+\[ \iota \circ h = id_i \] 
 
 Knowing that, we can now go back to the previous diagram, which states that:
-\[ h \circ i = F i \circ F h \]
+\[ h \circ \iota = F \iota \circ F h \]
 Since $F$ is a functor, it maps composition to composition and identity to identity. Therefore the right hand side is equal to:
-\[ F (i \circ h) = F (id_I) = id_{F I} \]
+\[ F (\iota \circ h) = F (id_i) = id_{F i} \]
 
-We have thus shown that $h$ is the inverse of $i$, which means that $i$ is an isomorphism. In other words:
-\[ F I \cong I \]
-We interpret this identity as stating that $I$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $I$ ``doesn't change it.''
+We have thus shown that $h$ is the inverse of $\iota$, which means that $\iota$ is an isomorphism. In other words:
+\[ F i \cong i \]
+We interpret this identity as stating that $i$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $i$ ``doesn't change it.''
 
 There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. The least point of an endofunctor $F$ is denoted $\mu F$, so we have:
-\[ I = \mu F \]
+\[ i = \mu F \]
 \subsection{Fixed point in Haskell}
 Let's consider how the definition of the fixed point works with our original example:
 \begin{haskell}
@@ -273,21 +273,21 @@ Our goal, as programmers, is to be able to perform a computation over a recursiv
 The data structure is defined as a fixed point of a functor. An algebra for this functor defines the operation we want to perform. We've seen the fixed point and the algebra combined in the following diagram:
 \[
  \begin{tikzcd}
- F I 
+ F i 
  \arrow[r, "F f"]
- \arrow[d, "i"]
- & F A
+ \arrow[d, "\iota"]
+ & F a
 \arrow[d, "\alpha"]
  \\
- I
+ i
  \arrow[r, dashed, "f"]
- & A
+ & a
   \end{tikzcd}
 \]
-that defines the catamorphism $f$ for the algebra $(A, \alpha)$.
+that defines the catamorphism $f$ for the algebra $(a, \alpha)$.
 
-The final piece of information is the Lambek's lemma, which tells us that $i$ could be inverted because it's an isomorphism. It means that we can read this diagram as:
-\[ f = \alpha \circ F f \circ i^{-1} \]
+The final piece of information is the Lambek's lemma, which tells us that $\iota$ could be inverted because it's an isomorphism. It means that we can read this diagram as:
+\[ f = \alpha \circ F f \circ \iota^{-1} \]
 and interpret it as a recursive definition of $f$. 
 
 Let's redraw this diagram using Haskell notation. The catamorphism depends on the algebra so, for the algebra with the carrier \hask{a} and the evaluator \hask{alg}, we'll have the catamorphism \hask{cata alg}.
@@ -537,7 +537,7 @@ Similarly, \hask{Just Nothing} shows up in all powers starting with two.
 
 \hask{Just(Just(Nothing))} shows up in all powers starting with three, and so on...
 
-But there is a way to get rid of all these duplicates. The trick is to replace the sum by the colimit. Instead of a diagram consisting of discrete objects, we can construct a chain. Let's call this chain $\Gamma$, and its colimit $I = Colim \, \Gamma$.
+But there is a way to get rid of all these duplicates. The trick is to replace the sum by the colimit. Instead of a diagram consisting of discrete objects, we can construct a chain. Let's call this chain $\Gamma$, and its colimit $i = Colim \, \Gamma$.
 
 \[
  \begin{tikzcd}
@@ -558,12 +558,12 @@ But there is a way to get rid of all these duplicates. The trick is to replace t
  & ...
  \\
  \\
- &&I
+ &&i
   \end{tikzcd}
 \]
 It's almost the same as the sum, but with additional arrows at the base of the cocone. These arrows are the liftings of the unique arrow $\mbox{!`}$ that goes from the initial object to $F 0$ (we called it \hask{absurd} in Haskell). The effect of these arrows is to collapse the set of infinitely many copies of the same tree down to just one representative. 
 
-To see that, consider for instance a tree of depth $n$. It can be first found as an element of $F^n 0$, that is to say, as an arrow $t \colon 1 \to F^n 0$. It is injected into the colimit $I$ as the composite $i_n \circ t$. 
+To see that, consider for instance a tree of depth $n$. It can be first found as an element of $F^n 0$, that is to say, as an arrow $t \colon 1 \to F^n 0$. It is injected into the colimit $i$ as the composite $i_n \circ t$. 
 
 \[
  \begin{tikzcd}
@@ -580,7 +580,7 @@ To see that, consider for instance a tree of depth $n$. It can be first found as
  & F^{n+1} 0
  \arrow[dl, "i_{n+1}"]
  \\
- &  I
+ &  i
   \end{tikzcd}
 \]
 The same shape of a tree is also found in $F^{n+1} 0$, as the composite $t' = F^n (\mbox{!`}) \circ t$. It is injected into the colimit as the composite $i_{n+1} \circ t' = i_{n+1} \circ F^n (\mbox{!`}) \circ t$. 
@@ -591,13 +591,13 @@ which means that
 \[ i_{n+1} \circ t' =  i_{n+1} \circ F^n (\mbox{!`}) \circ t =  i_n \circ t\]
 The two copies of the tree have been identified in the colimit. You can convince yourself that this procedure removes all duplicates.
 
-We can  prove directly that $I = Colim\, \Gamma$ is the initial algebra. There is however one assumptions that we have to make: the functor $F$ must preserve the colimit. The colimit of $F \Gamma$ must be equal to $F I$.
-\[ \text{Colim} (F \Gamma) \cong F I \]
+We can  prove directly that $i = Colim\, \Gamma$ is the initial algebra. There is however one assumptions that we have to make: the functor $F$ must preserve the colimit. The colimit of $F \Gamma$ must be equal to $F i$.
+\[ \text{Colim} (F \Gamma) \cong F i \]
 Fortunately, this assumption holds in $\mathbf{Set}$. 
 
-Here's the sketch of the proof: First we'll construct an arrow $I \to F I$ and then an arrow in the opposite direction. We'll skip the proof that they are the inverse of each other.
+Here's the sketch of the proof: First we'll construct an arrow $i \to F i$ and then an arrow in the opposite direction. We'll skip the proof that they are the inverse of each other.
 
-We start with the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $Colim (F \Gamma)$ then, by universality, there must be an arrow from $I$ to $Colim F \Gamma$. And the latter, by our assumption, is isomorphic to $F I$. So we'll have a mapping $I \to F I$.
+We start with the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $Colim (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $Colim F \Gamma$. And the latter, by our assumption, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
 
 To construct this cocone, notice that $Colim (F \Gamma$) is, by definition, the apex of a cocone $F \Gamma$. 
 
@@ -664,10 +664,10 @@ The spokes of the cocone we are looking for are marked in red in the diagram bel
  &&Colim (F \Gamma)
   \end{tikzcd}
 \]
-And since $I = Colim \Gamma$ is the apex of the universal cocone based on $\Gamma$, there must be a unique mapping out of it to $Colim (F \Gamma)$, which is $F I$:
-\[ I \to F I \]
+And since $i = Colim \Gamma$ is the apex of the universal cocone based on $\Gamma$, there must be a unique mapping out of it to $Colim (F \Gamma)$, which is $F i$:
+\[ i \to F i \]
 
-Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be embedded in it. It means that we can construct a cocone from $F \Gamma$ to the apex $I$ by going through (a sub-chain of) $\Gamma$. 
+Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be embedded in it. It means that we can construct a cocone from $F \Gamma$ to the apex $i$ by going through (a sub-chain of) $\Gamma$. 
 
 \[
  \begin{tikzcd}
@@ -701,16 +701,16 @@ Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be 
  & ...
  \\
  \\
- &&I
+ &&i
   \end{tikzcd}
 \]
 
 
 From the universality of $Colim (F \Gamma)$ it follows that there is a mapping out 
-\[Colim (F \Gamma) \cong F I \to I \]
-This shows that $I$ is a carrier of an algebra. In fact, it can be shown that the two mappings are the inverse of each other, as we would expect from the Lambek's lemma.
+\[Colim (F \Gamma) \cong F i \to i \]
+This shows that $i$ is a carrier of an algebra. In fact, it can be shown that the two mappings are the inverse of each other, as we would expect from the Lambek's lemma.
 
-To show that this is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(A, \alpha \colon F A \to A)$. Again, we can use universality, if we can construct a cocone from $\Gamma$ to $A$. 
+To show that this is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(a, \alpha \colon F a \to a)$. Again, we can use universality, if we can construct a cocone from $\Gamma$ to $a$. 
 
 \[
  \begin{tikzcd}
@@ -731,18 +731,18 @@ To show that this is indeed the initial algebra, we have to construct a mapping 
  & ...
  \\
  \\
- &&A
+ &&a
   \end{tikzcd}
 \]
 
 
-The zero'th spoke of this cocone goes from $0$ to $A$, so it's just $f_0 = \mbox{!`}$.
+The zero'th spoke of this cocone goes from $0$ to $a$, so it's just $f_0 = \mbox{!`}$.
 
-The first one, $F 0 \to A$, is $f_1 = \alpha \circ F f_0$, because $F f_0 \colon F 0 \to F A$.
+The first one, $F 0 \to a$, is $f_1 = \alpha \circ F f_0$, because $F f_0 \colon F 0 \to F a$.
 
-The third one, $F (F 0) \to A$ is  $f_2 = \alpha \circ F f_1$.  And so on...
+The third one, $F (F 0) \to a$ is  $f_2 = \alpha \circ F f_1$.  And so on...
 
-The unique mapping from $I$ to $A$ is then our catamorphism. With some more diagram chasing, it can be shown that it's indeed an algebra morphism. 
+The unique mapping from $i$ to $a$ is then our catamorphism. With some more diagram chasing, it can be shown that it's indeed an algebra morphism. 
 
 Notice that this construction only works if we can ``prime'' the process by creating the leaves of the functor. If, on the other hand, $F 0 \cong 0$, then there are no leaves, and all further iterations will just reproduce the $0$. 
 
