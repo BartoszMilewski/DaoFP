@@ -481,8 +481,109 @@ which is exactly the existential representation of the lens.
 
 \subsection{Profunctor lenses in Haskell}
 
+To define profunctor representation in Haskell we introduce a class of profunctors that are Tambara modules with respect to cartesian product (we'll see more general Tambara modules later). In the Haskell library this class is called \hask{Strong}. It also appears in the literature as \hask{Cartesian}:
 \begin{haskell}
+class Profunctor p => Cartesian p where
+  alpha :: p a b -> p (c, a) (c, b)
+\end{haskell}
+The polymorphic function \hask{alpha} has all the relevant naturality properties guaranteed by parametric polymorphism. 
+
+The profunctor lens is just a type synonym for a function type that is polymorphic in \hask{Cartesian} profunctors:
+\begin{haskell}
+type LensP s t a b = forall p. Cartesian p => p a b -> p s t
 \end{haskell}
 
+The easiest way to implement such a function is to start from the existential representation of a lens and apply \hask{alpha} followed by \hask{dimap} to the profunctor argument:
+\begin{haskell}
+toLensP :: Lens s t a b -> LensP s t a b
+toLensP (Lens from to) = dimap from to . alpha
+\end{haskell}
+
+Because profunctor lenses are just functions, we can compose them as such:
+\begin{haskell}
+lens1 :: LensP s t x y 
+-- p s t -> p x y
+lens2 :: LensP x y a b 
+-- p x y -> p a b
+lens3 :: LensP s t a b 
+-- p s t -> p a b
+lens3 = lens2 . lens1
+\end{haskell}
+
+\section{General Optics}
+Tambara modules were originally defined for an arbitrary monoidal category\footnote{In fact, Tambara modules were originally defined for an enriched category} with a tensor product $\otimes$ and a unit object $I$. Their structure maps have the form:
+\[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \otimes a, c \otimes b \rangle \]
+You can easily convince yourself that all coherency laws translate directly to this case, and the derivation of profunctor optics works without change.
+
+\subsection{Prisms}
+
+From the programming point of view there are two obvious monoidal structures to explore: the product and the sum. We've seen that the product gives rise to lenses. The sum, or the coproduct, gives rise to prisms. 
+
+We get the existential representation simply by replacing the product by the sum in the definition of a lens:
+\[ \mathcal{P}\langle s, t\rangle \langle a, b \rangle = \int^{c} \mathcal{C}(s, c + a) \times  \mathcal{C}(c + b, t) \]
+To simplify this, notice that the mapping out of a sum is equivalent to the product of mappings:
+\[ \int^{c} \mathcal{C}(s, c + a) \times  \mathcal{C}(c + b, t) \cong  \int^{c} \mathcal{C}(s, c + a) \times  \mathcal{C}(c, t) \times  \mathcal{C}(b, t) \]
+Using the co-Yoneda lemma, we can get rid of the coend to get:
+\[ \mathcal{C}(s, t + a) \times  \mathcal{C}(b, t) \]
+
+In Haskell, this defines a pair of functions:
+\begin{haskell}
+match :: s -> Either t a
+build :: b -> t
+\end{haskell}
+
+To understand this, let's first translate the existential form of the prism:
+\begin{haskell}
+data Prism s t a b where
+  Prism :: (s -> Either c a) -> (Either c b -> t) -> Prism s t a b
+\end{haskell}
+Here \hask{s} either contains the focus \hask{a} or the residue \hask{c}. Conversely, \hask{t} can be built either from the new focus \hask{b}, or from the residue \hask{c}. 
+
+This logic is reflected in the conversion functions:
+\begin{haskell}
+toMatch :: Prism s t a b -> (s -> Either t a)
+toMatch (Prism from to) s =
+  case from s of
+    Left  c -> Left (to (Left c))
+    Right a -> Right a
+\end{haskell}
+
+\begin{haskell}
+toBuild :: Prism s t a b -> (b -> t)
+toBuild (Prism from to) b = to (Right b)
+\end{haskell}
+
+\begin{haskell}
+toPrism :: (s -> Either t a) -> (b -> t) -> Prism s t a b
+toPrism match build = Prism from to
+  where
+    from = match
+    to (Left  c) = c
+    to (Right b) = build b
+\end{haskell}
+
+The profunctor representation of the prism is almost identical to that of the lens, except for swapping the product for the sum. 
+
+The class of Tambara modules for the sum type is called \hask{Choice} in the Haskell library, or \hask{Cocartesian} in the literature:
+\begin{haskell}
+class Profunctor p => Cocartesian p where
+  alpha' :: p a b -> p (Either c a) (Either c b)
+\end{haskell}
+The profunctor representation is a polymorphic function type:
+\begin{haskell}
+type PrismP s t a b = forall p. Cocartesian p => p a b -> p s t
+\end{haskell}
+
+The conversion from the existential prism is virtually identical to that of the lens:
+\begin{haskell}
+toPrismP :: Prism s t a b -> PrismP s t a b
+toPrismP (Prism from to) = dimap from to . alpha'
+\end{haskell}
+
+Again, profunctor prisms compose using function composition.
+\subsection{Traversals}
+
+\begin{haskell}
+\end{haskell}
 
 \end{document}
