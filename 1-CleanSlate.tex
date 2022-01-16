@@ -13,20 +13,20 @@ Paraphrasing Lao Tzu: \emph{The type that can be described is not the eternal ty
 
 Instead of calling it a \emph{type}, we could as well call it an \emph{object} or a \emph{proposition}. These are the words that are used to describe it in different areas of mathematics (type theory, category theory, and logic, respectively).
 
-There may be more than one type, so we need a way to name them. We could do it by pointing fingers at them, but since we want to effectively communicate with other people, we usually name them. So we'll talk about type $A$, $B$, $C$; or \hask{Int}, \hask{Bool}, \hask{Double}, and so on. These are just names.
+There may be more than one type, so we need a way to name them. We could do it by pointing fingers at them, but since we want to effectively communicate with other people, we usually name them. So we'll talk about type $a$, $b$, $c$; or \hask{Int}, \hask{Bool}, \hask{Double}, and so on. These are just names.
 
 A type by itself has no meaning. What makes it special is how it connects to other types. The connections are described by arrows. An arrow has one type as its source and one type as its target. The target could be the same as the source, in which case the arrow loops around.
 
 An arrow between types is called a \emph{function}. An arrow between objects is called a \emph{morphism}. An arrow between propositions is called an \emph{entailment}. These are just words that are used to describe arrows in different areas of mathematics. You can use them interchangeably.
 
-A proposition is something that may be true. In logic, we interpret an arrow between two objects as $A$ entails $B$, or $B$ is derivable from $A$. 
+A proposition is something that may be true. In logic, we interpret an arrow between two objects as $a$ entails $b$, or $b$ is derivable from $a$. 
 \pagebreak
 
-There may be more than one arrow between two types, so we need to name them. For instance, here's an arrow called $f$ that goes from type $A$ to type $B$
+There may be more than one arrow between two types, so we need to name them. For instance, here's an arrow called $f$ that goes from type $a$ to type $b$
 
-\[ A \xrightarrow f B \]
+\[ a \xrightarrow f b \]
 
-One way to interpret this is to say that the function $ f$ takes an argument of type $A$ and produces a result of type $B$. Or that $ f$ is a proof that if $A$ is true then $B$ is also true.
+One way to interpret this is to say that the function $ f$ takes an argument of type $a$ and produces a result of type $b$. Or that $ f$ is a proof that if $a$ is true then $b$ is also true.
 
 Note: The connection between type theory, lambda calculus (which is the foundation of programming), logic, and category theory is known as Curry-Howard-Lambek correspondence.
 
@@ -42,7 +42,7 @@ Its dual is an object that has a unique incoming arrow from every object. It's c
 
 In mathematics, the initial object is often denoted by $0$ and the terminal object by $1$.
 
-The initial object is the source of everything. As a type it's known as \hask{Void}. It symbolizes the chaos from which everything arises. Since there is an arrow from \hask{Void} to everything, there is also an arrow from \hask{Void} to itself. 
+The initial object is the source of everything. As a type it's known, in Haskell, as \hask{Void}. It symbolizes the chaos from which everything arises. Since there is an arrow from \hask{Void} to everything, there is also an arrow from \hask{Void} to itself. 
 
 \[
  \begin{tikzcd}
@@ -91,21 +91,23 @@ The terminal object has the simplest structure. There is only one incoming arrow
 
 Because the terminal object is so simple, we can use it to probe other, more complex objects. 
 
-If there is more than one arrow coming from the terminal object to some object A, it means that A has some structure: there is more than one way of looking at it. Since the terminal object behaves like a point, we can visualize each arrow from it as picking a different point or element of its target. 
+If there is more than one arrow coming from the terminal object to some object $a$, it means that $a$ has some structure: there is more than one way of looking at it. Since the terminal object behaves like a point, we can visualize each arrow from it as picking a different point or element of its target. 
 
-In category theory we say that $ x$ is a \emph{global element} of $ A$ if it's an arrow
+In category theory we say that $ x$ is a \emph{global element} of $a$ if it's an arrow
 
-\[ 1 \xrightarrow x A \]
+\[ 1 \xrightarrow x a \]
 
 We'll often simply call it an element (omitting ``global'').
 
-In type theory, $ x \colon A$ means that $ x$ is of type $ A$.
+In type theory, $ x \colon A$ means that $x$ is of type $A$.
 
 In Haskell, we use the double-colon notation instead:
 \begin{haskell}
 x :: A
 \end{haskell}
-We say that \hask{x} is a term of type \hask{A}, but we'll interpret it as an arrow $x : 1 \to A$, a global element of \hask{A}. \footnote{The Haskell type system distinguishes between \hask{x :: A} and \hask{x :: ()->A}. However, they denote the same thing in categorical semantics.}
+(Haskell uses capitalized names for concrete types, and lower-cased names for type variables.)
+
+We say that \hask{x} is a term of type \hask{A} but, categorically, we'll interpret it as an arrow $x : 1 \to A$, a global element of \hask{A}. \footnote{The Haskell type system distinguishes between \hask{x :: A} and \hask{x :: () -> A}. However, they denote the same thing in categorical semantics.}
 
 In logic, such $ x$ is called the proof of $ A$, since it corresponds to the implication $ \top \to A$ (if \textbf{True} is true then \textbf{A} is true). Notice that there may be many different proofs of $A$.
 
@@ -117,21 +119,21 @@ Note: In category theory there is no prohibition against the initial object havi
 
 \section{The Object of Arrows}
 
-We describe an object by looking at its arrows. Can we describe an arrow in a similar way? Could an arrow from $A$ to $B$ be represented as an element of some special \emph{object of arrows}? After all, in programming we talk about the \emph{type} of functions from \hask{A} to \hask{B}. In Haskell we write:
+We describe an object by looking at its arrows. Can we describe an arrow in a similar way? Could an arrow from $a$ to $b$ be represented as an element of some special \emph{object of arrows}? After all, in programming we talk about the \emph{type} of functions from \hask{a} to \hask{b}. In Haskell we write:
 \begin{haskell}
-f :: A -> B
+f :: a -> b
 \end{haskell}
-meaning that \hask{f} is of the type ``function from A to B''. Here, \hask{A->B} is just the name we are giving to this type. To fully define this type, we would have to describe its relation to other objects, in particular to A and B. We don't have the tools to do that yet, but we'll get there. 
+meaning that \hask{f} is of the type ``function from \hask{a} to \hask{b}''. Here, \hask{a->b} is just the name we are giving to this type. To fully define this type, we would have to describe its relation to other objects, in particular to \hask{a} and \hask{b}. We don't have the tools to do that yet, but we'll get there. 
 
-For now, let's keep in mind the following distinction: On the one hand we have an arrow which connects two objects \hask{A} and \hask{B}. On the other hand we have an element of the \emph{object of arrows} from  \hask{A} to \hask{B}. This element is itself defined as an arrow from the terminal object \hask{()} to the object we call \hask{A->B}. 
+For now, let's keep in mind the following distinction: On the one hand we have an arrow which connects two objects \hask{a} and \hask{b}. On the other hand we have an element of the \emph{object of arrows} from  \hask{a} to \hask{b}. This element is itself defined as an arrow from the terminal object \hask{()} to the object we call \hask{a->b}. 
 
-The notation we use in programming tends to blur this distinction. This is why in category theory we call the object of arrows an \emph{exponential} and write it as $ B^A$ (the source is in the exponent). So the statement:
+The notation we use in programming tends to blur this distinction. This is why in category theory we call the object of arrows an \emph{exponential} and write it as $ b^a$ (the source is in the exponent). So the statement:
 \begin{haskell}
-f :: A -> B
+f :: a -> b
 \end{haskell}
 is equivalent to
 
-\[ 1 \xrightarrow f B^A\]
+\[ 1 \xrightarrow f b^a\]
 
 In logic, an arrow $ A \to B$ is an implication: it states the fact that ``if A then B.'' An exponential object $ B^A$ is the corresponding proposition. It could be true or it could be false, we don't know. You have to prove it. Such a proof is an element of $ B^A$. 
 

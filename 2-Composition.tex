@@ -9,23 +9,23 @@ Programming is about composition. Paraphrasing Wittgenstein, one could say: ``Of
 
 The reason we have built the vocabulary of objects and arrows is precisely to express the idea of composition.  
 
-Given an arrow $f$ from $A$ to $B$ and an arrow $g$ from $B$ to $C$, their composition is an arrow that goes directly from $A$ to $C$. In other words, if there are two arrows, the target of one being the same as the source of the other, we can always compose them to get a third arrow.
+Given an arrow $f$ from $a$ to $b$ and an arrow $g$ from $b$ to $c$, their composition is an arrow that goes directly from $a$ to $c$. In other words, if there are two arrows, the target of one being the same as the source of the other, we can always compose them to get a third arrow.
 
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[rr, bend left, "h"]
  \arrow[r, "f"']
- & B
+ & b
  \arrow[r, "g"']
-& C
+& c
  \end{tikzcd}
 \]
 
 In math we denote composition using a little circle
 \[h = g \circ f\]
 We read this: ``$h$ is equal to $g$ after $f$.'' The order of composition might seem backward, but this is because we think of functions as taking arguments on the right.
-In Haskell we replaced the circle with a dot:
+In Haskell we replace the circle with a dot:
 \begin{haskell}
 h = g . f
 \end{haskell}
@@ -43,7 +43,7 @@ Composition is the source of two mappings of arrows called pre-composition and p
 
 When an arrow $f$ is post-composed after an arrow $h$, it produces the arrow $f \circ h$. Of course, $f$ can be post-composed only after arrows whose target is the source of $f$. Post-composition by $f$ is written as $(f \circ -)$, leaving a hole for $h$. As Lao Tzu would say, ``Usefulness of post-composition comes from what is not there.''
 
-Thus an arrow $f \colon A \to B$ induces a mapping of arrows $(f \circ -)$ that maps arrows which are probing $A$ to arrows which are probing $B$. 
+Thus an arrow $f \colon a \to b$ induces a mapping of arrows $(f \circ -)$ that maps arrows which are probing $a$ to arrows which are probing $b$. 
 
 \[
  \begin{tikzcd}
@@ -51,7 +51,7 @@ Thus an arrow $f \colon A \to B$ induces a mapping of arrows $(f \circ -)$ that 
  \node (a2) at (-0.5, 2) {};
  \node (a3) at (0.5, 2) {};
  \node (aa) at (0.5, 1) {};
- \node(a) at (0, 0) {A};
+ \node(a) at (0, 0) {a};
  \draw[->, red] (a1) -- (a);
  \draw[->] (a2) -- (a);
  \draw[->, blue] (a3) -- (a);
@@ -59,7 +59,7 @@ Thus an arrow $f \colon A \to B$ induces a mapping of arrows $(f \circ -)$ that 
  \node (b2) at (3-0.5, 2) {};
  \node (b3) at (3+0.5, 2) {};
  \node (bb) at (2.5, 1) {};
- \node(b) at (3, 0) {B};
+ \node(b) at (3, 0) {b};
  \draw[->, red] (b1) -- (b);
  \draw[->] (b2) -- (b);
  \draw[->, blue] (b3) -- (b);
@@ -67,11 +67,11 @@ Thus an arrow $f \colon A \to B$ induces a mapping of arrows $(f \circ -)$ that 
  \draw[->, dashed] (aa) -- node[above]{(f \circ -)} (bb);
   \end{tikzcd}
 \]
-Since objects have no internal structure, when we say that $f$ transforms $A$ to $B$, this is exactly what we mean. 
+Since objects have no internal structure, when we say that $f$ transforms $a$ to $b$, this is exactly what we mean. 
 
 Post-composition lets us shift focus from one object to another.
 
-Dually, you can pre-compose $f$, or apply $(- \circ f)$ to arrows originating in $B$ and map them to arrows originating in $A$. 
+Dually, you can pre-compose $f$, or apply $(- \circ f)$ to arrows originating in $b$ and map them to arrows originating in $a$. 
 
 \[
  \begin{tikzcd}
@@ -79,7 +79,7 @@ Dually, you can pre-compose $f$, or apply $(- \circ f)$ to arrows originating in
  \node (a2) at (-0.5, -2) {};
  \node (a3) at (0.5, -2) {};
  \node (aa) at (0.5, -1) {};
- \node(a) at (0, 0) {A};
+ \node(a) at (0, 0) {a};
  \draw[<-, red] (a1) -- (a);
  \draw[<-] (a2) -- (a);
  \draw[<-, blue] (a3) -- (a);
@@ -87,7 +87,7 @@ Dually, you can pre-compose $f$, or apply $(- \circ f)$ to arrows originating in
  \node (b2) at (3-0.5, -2) {};
  \node (b3) at (3+0.5, -2) {};
  \node (bb) at (2.5, -1) {};
- \node(b) at (3, 0) {B};
+ \node(b) at (3, 0) {b};
  \draw[<-, red] (b1) -- (b);
  \draw[<-] (b2) -- (b);
  \draw[<-, blue] (b3) -- (b);
@@ -104,10 +104,10 @@ In programming, an outgoing arrow is interpreted as extracting data from the sou
 
 Do the following exercises to convince yourself that shifts in focus and perspective are composable.
 \begin{exercise}\label{ex-yoneda-composition}
-Suppose that you have two arrows, $f \colon A \to B$ and $g \colon B \to C$. Their composition $g \circ f$ induces a mapping of arrows $((g \circ f) \circ -)$. Show that the result is the same if you first apply $(f \circ -)$ and follow it by $(g \circ -)$. Symbolically:
+Suppose that you have two arrows, $f \colon a \to b$ and $g \colon b \to c$. Their composition $g \circ f$ induces a mapping of arrows $((g \circ f) \circ -)$. Show that the result is the same if you first apply $(f \circ -)$ and follow it by $(g \circ -)$. Symbolically:
 \[((g \circ f) \circ -) = (g \circ -) \circ (f \circ -)\]
 
-Hint: Pick an arbitrary object $X$ and an arrow $h \colon X \to A$ and see if you get the same result. 
+Hint: Pick an arbitrary object $x$ and an arrow $h \colon x \to a$ and see if you get the same result. 
 \end{exercise}
 
 \begin{exercise}
@@ -121,70 +121,70 @@ Show that pre-composition $(- \circ f)$ is composable, but the order of composit
 
 \section{Function application}
 
-We are ready to write our first program. There is a saying: ``A journey of a thousand miles begins with a single step.'' Our journey is from $1$ to $B$. The single step is an arrow from the terminal object $1$ to $A$. It's an element of $A$. We can write it as
-\[1 \xrightarrow x A \]
+We are ready to write our first program. There is a saying: ``A journey of a thousand miles begins with a single step.'' Our journey is from $1$ to $b$. The single step is an arrow from the terminal object $1$ to $a$. It's an element of $a$. We can write it as
+\[1 \xrightarrow x a \]
 The rest of the journey is the arrow 
-\[A \xrightarrow f B\]
-These two arrows are composable (they share the object $A$) and their composition is the arrow $y$ from $1$ to $B$. In other words, $y$ is an \emph{element} of $B$
+\[a \xrightarrow f b\]
+These two arrows are composable (they share the object $a$ in the middle) and their composition is the arrow $y$ from $1$ to $b$. In other words, $y$ is an \emph{element} of $b$
 
 \[
  \begin{tikzcd}
  1
  \arrow[rr, bend left, "y"]
  \arrow[r, "x"']
- & A
+ & a
  \arrow[r, "f"']
-& B
+& b
  \end{tikzcd}
 \]
 We can write it as
 \[y = f \circ x \]
 
-We used $f$ to map an \emph{element} of $A$ to an \emph{element} of $B$. Since this is something we do quite often, we call it the \emph{application} of a function $f$ to $x$, and use the shorthand notation
+We used $f$ to map an \emph{element} of $a$ to an \emph{element} of $b$. Since this is something we do quite often, we call it the \emph{application} of a function $f$ to $x$, and use the shorthand notation
 \[y = f x \]
-Let's translate it to Haskell. We start with an element of $A$ (a shorthand for \hask{()->A})
+Let's translate it to Haskell. We start with an element $x$ of $a$ (a shorthand for \hask{()->a})
 \begin{haskell}
-x :: A
+x :: a
 \end{haskell}
-We declare the function $f$ as an element of the ``object of arrows'' from $A$ to $B$
+We declare a function $f$ as an element of the ``object of arrows'' from $a$ to $b$
 \begin{haskell}
-f :: A -> B
+f :: a -> b
 \end{haskell}
-with the understanding (which will be elaborated upon later) that it corresponds to an arrow from \hask{A} to \hask{B}. The result is an element of $B$
+with the understanding (which will be elaborated upon later) that it corresponds to an arrow from \hask{a} to \hask{b}. The result is an element of $b$
 \begin{haskell}
-y :: B
+y :: b
 \end{haskell}
 and it is defined as
 \begin{haskell}
 y = f x
 \end{haskell}
-We call this the application of a function to an argument, but we expressed it purely in terms of function composition. (Note: In other programming languages function application requires the use of parentheses, e.g., \hask{y = f(x)}.)
+We call this the application of a function to an argument, but we were able to express it purely in terms of function composition. (Note: In other programming languages function application requires the use of parentheses, e.g., \hask{y = f(x)}.)
 
 \section{Identity}
 
-You may think of arrows as representing change: object $A$ becomes object $B$. An arrow that loops back represents a change in an object itself. But change has its dual: lack of change, inaction or, as Lao Tzu would say \emph{wu wei}. 
+You may think of arrows as representing change: object $a$ becomes object $b$. An arrow that loops back represents a change in an object itself. But change has its dual: lack of change, inaction or, as Lao Tzu would say \emph{wu wei}. 
 
 Every object has a special arrow called the identity, which leaves the object unchanged. It means that, when you compose this arrow with any other arrow, either incoming or outgoing, you get that arrow back. Identity arrow does nothing to an arrow. 
 
-An identity arrow on the object $A$ is called $id_A$. So if we have an arrow $f \colon A \to B$, we can compose it with identities on either side
+An identity arrow on the object $a$ is called $id_a$. So if we have an arrow $f \colon a \to b$, we can compose it with identities on either side
 
-\[id_B \circ f = f = f \circ id_A \]
+\[id_b \circ f = f = f \circ id_a \]
 or, pictorially:
 \[
  \begin{tikzcd}
- A
- \arrow[loop, "id_A"']
+ a
+ \arrow[loop, "id_a"']
  \arrow[r, "f"]
- & B
- \arrow[loop, "id_B"']
+ & b
+ \arrow[loop, "id_b"']
  \end{tikzcd}
 \]
 
-We can easily check what an identity does to elements. Let's take an element $x \colon 1 \to A$ and compose it with $id_A$. The result is:
-\[id_A \circ x = x\]
+We can easily check what an identity does to elements. Let's take an element $x \colon 1 \to a$ and compose it with $id_a$. The result is:
+\[id_a \circ x = x\]
 which means that identity leaves elements unchanged.
 
-In Haskell, we use the same name \hask{id} for all identity functions (we don't subscript it with the type it's acting on). The above equation, which specifies the action of $id$ on elements, translates directly to
+In Haskell, we use the same name \hask{id} for all identity functions (we don't subscript it with the type it's acting on). The above equation, which specifies the action of $id$ on elements, translates directly to:
 \begin{haskell}
 id x = x
 \end{haskell}
@@ -203,7 +203,7 @@ We've seen before that both the initial object and the terminal object have uniq
  \end{tikzcd}
 \]
 
-In logic, identity arrow translates to a tautology. It's a trivial proof that, ``if $A$ is true then $A$ is true.'' It's also called the \emph{identity rule}.
+In logic, identity arrow translates to a tautology. It's a trivial proof that, ``if $a$ is true then $a$ is true.'' It's also called the \emph{identity rule}.
 
 
 If identity does nothing then why do we care about it? Imagine going on a trip, composing a few arrows, and finding yourself back at the starting point. The question is: Have you done anything, or have you wasted your time? The only way to answer this question is to compare your path with the identity arrow. 
@@ -212,7 +212,7 @@ Some round trips bring change, others don't.
 
 
 \begin{exercise}\label{ex-yoneda-identity}
-What does $(id_A \circ -)$ do to arrows terminating in $A$? What does $(- \circ id_A)$ do to arrows originating from $A$?
+What does $(id_a \circ -)$ do to arrows terminating in $a$? What does $(- \circ id_a)$ do to arrows originating from $a$?
 \end{exercise}
 
 
