@@ -582,7 +582,52 @@ toPrismP (Prism from to) = dimap from to . alpha'
 
 Again, profunctor prisms compose using function composition.
 \subsection{Traversals}
+A traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list must match the number of nodes otherwise bad things happen. 
 
+A type-safe implementation of a traversals requires us to keep track of the sizes of lists. In other words, it requires dependent types.
+
+In Haskell, a (non-type-safe) traversal is often written as:
+\begin{haskell}
+type Traversal s t a b = s -> ([b] -> t, [a])
+\end{haskell}
+with the understanding that the sizes of the two lists are determined by \hask{s} and must be the same. 
+
+When translating this to categorical language, we'll express this condition using a sum over the sizes of the list. A counted list of size $n$ is an $n$-tuple, or an element of $a^n$, so we can write:
+\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \Set \big( s, \sum_n (\Set (b^n, t) \times a^n) \big) \]
+We interpret a traversal as a function that, given a source $s$ produces an existential type that is hiding an $n$. It says that there exists an $n$ and a pair consisting of a function $b^n \to t$ and a tuple $a^n$. 
+
+The existential form of a traversal must take into account the fact that the residues for different $n$'s should have, in principle, different types. For instance, you can decompose a tree into an n-tuple of leaves $a^n$ and the residue $c_n$ with $n$ holes. So the correct existential representation for a traversal must involve a coend over all sequences $c_n$ indexed by natural numbers:
+\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \int^{c_n} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
+The sums here are coproducts in $\cat C$.
+
+One way to look at sequences $c_n$ is to interpret them as fibrations. For instance, in $\Set$ we would start with a set $C$ and a projection $p \colon C \to \mathbb N$, where $\mathbb N$ is a set of natural numbers. Similarly $a^n$ could be interpreted as a fibration of the free monoid on $a$ (the set of lists of $a$'s) with the projection that extracts the length of the list.
+
+Or we can look at $c_n$'s as mappings from the set of natural numbers to $\cat C$. In fact, we can treat natural numbers as a discrete category $\cat N$, in which case $c_n$'s are functors $\cat N \to \cat C$.
+
+\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
+
+To show the equivalence of the two representations, we first write the mapping out of a sum as a product of mappings:
+\[\int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \prod_k \cat C (c_k \times b^k, t) \]
+and use the currying adjunction:
+\[\int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \prod_k \cat C (c_k,  [b^k, t]) \]
+Here, $[b^k, t]$ is the internal hom, which is an alternative notation for the exponential object $t^{b^k}$.
+
+The next step is to recognize that a product in this formula represents a set of natural transformations in $[\cat N, \cat C]$. Indeed, we could write it as an end:
+ \[ \prod_k \cat C (c_k,  [b^k, t] \cong \int_{k : \cat N} C (c_k,  [b^k, t]) \]
+This is because an end over a discrete category is but a product. Alternatively, we could write it as a hom-set in the functor category:
+\[ [\cat N, \cat C](c_{-}, [b^{-}, t]) \]
+with placeholders replacing the arguments to the two functors.
+
+We can then use the co-Yoneda lemma in the functor category $[\cat N, \cat C]$:
+\[\int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times  [\cat N, \cat C]\big(c_{-}, [b^{-}, t]\big) \cong \cat C(s, \sum_m [b^m, t] \times a^m)\]
+This result is more general than our original formula, but it reproduces it when restricted to the category of sets.
+
+
+
+\begin{haskell}
+\end{haskell}
+\begin{haskell}
+\end{haskell}
 \begin{haskell}
 \end{haskell}
 
