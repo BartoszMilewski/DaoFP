@@ -616,19 +616,29 @@ The next step is to recognize that a product in this formula represents a set of
  \[ \prod_k \cat C (c_k,  [b^k, t] \cong \int_{k : \cat N} C (c_k,  [b^k, t]) \]
 This is because an end over a discrete category is but a product. Alternatively, we could write it as a hom-set in the functor category:
 \[ [\cat N, \cat C](c_{-}, [b^{-}, t]) \]
-with placeholders replacing the arguments to the two functors.
+with placeholders replacing the arguments to the two functors:
+\[ k \mapsto c_k \]
+\[ k \mapsto [b^k, t] \]
 
-We can then use the co-Yoneda lemma in the functor category $[\cat N, \cat C]$:
+We can now use the co-Yoneda lemma in the functor category $[\cat N, \cat C]$:
 \[\int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times  [\cat N, \cat C]\big(c_{-}, [b^{-}, t]\big) \cong \cat C(s, \sum_m [b^m, t] \times a^m)\]
-This result is more general than our original formula, but it reproduces it when restricted to the category of sets.
+This result is more general than our original formula, but it turns into it when restricted to the category of sets.
 
+To derive a profunctor representation for traversals, we should look more closely at the kind of transformations that are involved. We define the action of a functor $c \colon [\cat N, \cat C]$ on $a$ as:
+\[ c \bullet a = \sum_m c_m \times a^m \]
+These actions can be composed by expanding the formula using distributivity laws:
+\[ c \bullet (c' \bullet a) = \sum_m c_m \times (\sum_n c'_n \times a^n)^m \]
+If the target category is $\Set$, this is equivalent to the following Day convolution (for non-$\Set$ categories, one could use the enriched version of Day convolution):
+\[ (c \star c')_k = \int^{m, n} \cat N (m + n, k) \times c_m \times c'_n \]
+This gives monoidal structure to the category $[\cat N, \cat C]$. 
 
+The existential representation of traversals can be written is terms of the action of this monoidal category on $\cat C$:
+\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, c \bullet a) \times \cat C (c \bullet b, t) \]
 
-\begin{haskell}
-\end{haskell}
-\begin{haskell}
-\end{haskell}
-\begin{haskell}
-\end{haskell}
+The derive the profunctor representation of traversals, we have to generalize Tambara modules to the action of a monoidal category:
+\[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \bullet a, c \bullet b \rangle \]
+It turns out that the original derivation of profunctor optics still works for these generalized Tambara modules, and traversals can be written as polymorphic functions:
+\[  \mathcal{T}\langle s, t\rangle \langle a, b \rangle =\int_{P \colon \cat T} \Set \big((U P) \langle a, b\rangle, (U P) \langle s, t\rangle \big) \]
+where the end is taken over a generalized Tambara module.
 
 \end{document}
