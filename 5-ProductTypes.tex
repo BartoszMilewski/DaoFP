@@ -10,21 +10,21 @@ data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 But if we combine two digits into a single data structure, a two-digit decimal number, we'll able to encode a hundred numbers. Or, as Lao Tzu would say, with just four digits you can encode ten thousand numbers.
 
-A data type that combines two types in this manner is called a product. Its defining quality is the elimination rule: there are two arrows coming from $A \times B$; one called ``$\text{fst}$'' goes to $A$, and another called ``$\text{snd}$'' goes to $B$. They are called \emph{projections}. They let us retrive $A$ and $B$ from the product $A \times B$.
+A data type that combines two types in this manner is called a product, or a \emph{cartesian} product. Its defining quality is the elimination rule: there are two arrows coming from $a \times b$; one called ``$\text{fst}$'' goes to $a$, and another called ``$\text{snd}$'' goes to $b$. They are called \emph{projections}. They let us retrive $a$ and $b$ from the product $a \times b$.
 
 \[
  \begin{tikzcd}
-& A \times B
+& a \times b
  \arrow[dl,  "\text{fst}"]
  \arrow[dr,   "\text{snd}"']
 \\
-A && B
+a && b
  \end{tikzcd}
 \]
 
-Suppose that somebody gave you an element of a product, that is an arrow $h$ from the terminal object $1$ to $A \times B$. You can easily retrieve a pair of elements, just by using composition: an element of $A$ given by 
+Suppose that somebody gave you an element of a product, that is an arrow $h$ from the terminal object $1$ to $a \times b$. You can easily retrieve a pair of elements, just by using composition: an element of $a$ given by 
 \[a = \text{fst} \circ h \]
-and an element of $B$ given by
+and an element of $b$ given by
 \[b = \text{snd} \circ h \]
 
 \[
@@ -34,32 +34,32 @@ and an element of $B$ given by
  \arrow[ddl, bend right, "a"']
  \arrow[ddr, bend left, "b"]
 \\
-&A \times B
+&a \times b
  \arrow[dl,  "\text{fst}"]
  \arrow[dr,   "\text{snd}"']
 \\
-A && B
+a && b
  \end{tikzcd}
 \]
 
-In fact, given an arrow from an arbitrary object $C$ to $A \times B$, we can define, by composition, a pair of arrows $f \colon C \to A$ and $g \colon C \to B$
+In fact, given an arrow from an arbitrary object $c$ to $a \times b$, we can define, by composition, a pair of arrows $f \colon c \to a$ and $g \colon c \to b$
 
 \[
  \begin{tikzcd}
- & C
+ & c
 \arrow[d, dashed, "h"]
  \arrow[ddl, bend right, "f"']
  \arrow[ddr, bend left, "g"]
 \\
-&A \times B
+&a \times b
  \arrow[dl,  "\text{fst}"]
   \arrow[dr,   "\text{snd}"']
 \\
-A && B
+a && b
  \end{tikzcd}
 \]
 
-As we did before with the sum type, we can turn this idea around, and use this diagram to define the product type: A pair of functions $f$ and $g$ should be in one-to-one correspondence with a \emph{mapping in} from $C$ to $A \times B$. This is the \emph{introduction} rule for the product.
+As we did before with the sum type, we can turn this idea around, and use this diagram to \emph{define} the product type: A pair of functions $f$ and $g$ should be in one-to-one correspondence with a \index{mapping in}\emph{mapping in} from $c$ to $a \times b$. This is the \emph{introduction} rule for the product.
 
 In particular, the mapping out of the terminal object is used in Haskell to define a product type. Given two elements, \hask{a :: A} and \hask{b :: B}, we construct the product 
 
@@ -72,7 +72,7 @@ We should never lose sight of the purpose of programming: to decompose complex p
 
 \subsection{Logic}
 
-In logic, a product type corresponds to logical conjunction. In order to prove $A \times B$ ($A$ and $B$), you need to provide the proofs of \emph{both} $A$ and $B$. These are the arrows targeting $A$ and $B$. The elimination rule says that if you have a proof of $A \times B$, then you can get the proof of $A$ (through $\text{fst}$) and the proof of $B$ (through $\text{snd}$).
+In logic, a product type corresponds to logical conjunction. In order to prove $A \times B$ ($A$ and $B$), you need to provide the proofs of \emph{both} $A$ and $B$. These are the arrows targeting $A$ and $B$. The elimination rule says that if you have a proof of $A \times B$, then you automatically get the proof of $A$ (through $\text{fst}$) and the proof of $B$ (through $\text{snd}$).
 
 \subsection{Tuples and Records}
 
@@ -80,7 +80,7 @@ As Lao Tzu would say, a product of ten thousand objects is just an object with t
 
 We can form such products in Haskell using the tuple notation. For instance, a product of three types is written as \hask{(A, B, C)}. A term of this type can be constructed from three elements: \hask{(a, b, c)}. 
 
-In what mathematicians call ``abuse of notation'', a product of zero types is written as \hask{()}, an empty tuple, which happens to be the same as the terminal object, or unit type. This is because the product behaves very much like multiplication of numbers, with the terminal object playing the role of unit.
+In what mathematicians call ``abuse of notation'', a product of zero types is written as \hask{()}, an empty tuple, which happens to be the same as the terminal object, or unit type. This is because the product behaves very much like multiplication of numbers, with the terminal object playing the role of one.
 
 In Haskell, rather than defining separate projections for all tuples, we use the pattern-matching syntax. For instance, to extract the third component from a triple we would write
 
@@ -108,113 +108,112 @@ In Haskell, we can define a product of any two types. A category in which all pr
 
 \subsection{Tuple Arithmetic}
 
-The identities satisfied by the product can be derived using the mapping-in property. For instance, to show that $A \times B \cong B \times A$ consider the following two diagrams:
+The identities satisfied by the product can be derived using the mapping-in property. For instance, to show that $a \times b \cong b \times a$ consider the following two diagrams:
 
 \[
  \begin{tikzcd}
- &X
+ &x
  \arrow[d, dashed, "h"]
  \arrow[ddl, bend right, "f"']
  \arrow[ddr, bend left, "g"]
  \\
- & A \times B
+ & a \times b
   \arrow[dl,  "\text{fst}"]
  \arrow[dr,   "\text{snd}"']
  \\
-A && B
+a && b
  \end{tikzcd}
  \qquad
  \begin{tikzcd}
- &X
+ &x
  \arrow[d, dashed, "h'"]
  \arrow[ddl, bend right, "g"']
  \arrow[ddr, bend left, "f"]
  \\
- & B \times A
+ & b \times a
   \arrow[dl,  "\text{fst}"]
  \arrow[dr,   "\text{snd}"']
 \\
-B && A
+b && a
   \end{tikzcd}
 \]
 
-They show that, for any object $X$ the arrows to $A \times B$ are in one-to-one correspondence with arrows to $B \times A$. This is because each of these arrows is determined by the same pair $f$ and $g$. 
+They show that, for any object $x$ the arrows to $a \times b$ are in one-to-one correspondence with arrows to $b \times a$. This is because each of these arrows is determined by the same pair $f$ and $g$. 
 
-You can check that the naturality condition is satisfied because, when you shift the perspective using $k \colon X' \to X$, all arrows originating in $X$ are shifted by pre-composition $(- \circ k)$.
+You can check that the naturality condition is satisfied because, when you shift the perspective using $k \colon x' \to x$, all arrows originating in $x$ are shifted by pre-composition $(- \circ k)$.
 
 In Haskell, this isomorphism can be implemented as a function which is its own inverse:
 \begin{haskell}
 swap :: (a, b) -> (b, a)
 swap x = (snd x, fst x)
 \end{haskell}
-This is the same function written using pattern matching:
+Here's the same function written using pattern matching:
 \begin{haskell}
 swap (x, y) = (y, x)
 \end{haskell}
 
 It's important to keep in mind that the product is symmetric only ``up to isomorphism.'' It doesn't mean that swapping the order of pairs won't change the behavior of a program. Symmetry means that the information content of a swapped pair is the same, but access to it needs to be modified.
 
-Here's the diagram that can be used to prove that the terminal object is the unit of the product, $1 \times A \cong A$.
+Here's the diagram that can be used to prove that the terminal object is the unit of the product, $1 \times a \cong a$.
 \[
  \begin{tikzcd}
- &X
+ &x
  \arrow[d, dashed, "h"]
  \arrow[ddl, bend right, "!"']
  \arrow[ddr, bend left, "f"]
  \\
- & 1 \times A
+ & 1 \times a
   \arrow[dl,  "\text{fst}"]
  \arrow[dr,   "\text{snd}"']
  \\
-1 && A
+1 && a
  \end{tikzcd}
  \qquad
  \begin{tikzcd}
- X
+ x
  \arrow[dd, "f"]
 \\
 \\
-A
+a
   \end{tikzcd}
 \]
-The unique arrow from $X$ to $1$ is called $!$ (pronounced, \emph{bang}). Because of its uniqueness, the mapping-in, $h$, is totally determined by $f$.
+The unique arrow from $x$ to $1$ is called \index{!}$!$ (pronounced, \emph{bang}). Because of its uniqueness, the mapping-in, $h$, is totally determined by $f$.
 
-The invertible arrow that witnesses the isomorphism between $1 \times A$ and $A$ is called the \emph{left unitor}:
-\[ \lambda \colon 1 \times A \to A \]
+The invertible arrow that witnesses the isomorphism between $1 \times a$ and $a$ is called the \emph{left unitor}:
+\[ \lambda \colon 1 \times a \to a \]
 
 Here are some other isomorphisms written in Haskell (without proofs of having the inverse). This is associativity:
 \begin{haskell}
 assoc :: ((a, b), c) -> (a, (b, c))
 assoc ((a, b), c) = (a, (b, c))
 \end{haskell}
-
 And this is the left unit
 \begin{haskell}
 lunit :: ((), a) -> a
 lunit (_, a) = a
 \end{haskell}
 
-These functions correspond to the \emph{associator}
-\[ \alpha \colon (A \times B) \times C \to A \times (B \times C) \]
-and the \emph{right unitor}:
-\[ \rho \colon A \times 1 \to A \]
+These two functions correspond to the \index{associator}\emph{associator}
+\[ \alpha \colon (a \times b) \times c \to a \times (b \times c) \]
+and the \index{unitor}\emph{right unitor}:
+\[ \rho \colon a \times 1 \to a \]
 
 \begin{exercise}
-Show that the bijection in the proof of left unit is natural. Hint, change focus using an arrow $g \colon A \to B$.
+Show that the bijection in the proof of left unit is natural. Hint, change focus using an arrow $g \colon a \to b$.
 \end{exercise}
 
 \begin{exercise}
 Construct an arrow 
-\[ h \colon B + A \times B \to (1 + A) \times B \]
+\[ h \colon b + a \times b \to (1 + a) \times b \]
 Is this arrow unique?
 
 Hint: It's a mapping into a product, so it's given by a pair of arrow. These arrows, in turn, map out of a sum, so each is given by a pair of arrows. 
 
-Hint: The mapping $B \to 1 + A$ is given by $(\text{Left} \, \circ \, !)$
+Hint: The mapping $b \to 1 + a$ is given by $(\text{Left} \, \circ \, !)$
 \end{exercise}
 
 \begin{exercise}
-Re-do the previous exercise, this time treating $h$ as a mapping \emph{out} of a sum. 
+Redo the previous exercise, this time treating $h$ as a mapping \emph{out} of a sum. 
 \end{exercise}
 
 \begin{exercise}
@@ -223,65 +222,65 @@ Implement a Haskell function \hask{maybeAB :: Either b (a, b) -> (Maybe a, b)}. 
 
 \subsection{Functoriality}
 
-Suppose that we have arrows that map $A$ and $B$ to some $A'$ and $B'$:
-\[f \colon A \to A' \]
-\[g \colon B \to B'\]
+Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
+\[f \colon a \to a' \]
+\[g \colon b \to b'\]
 The composition of these arrows with the projections $\text{fst}$ and $\text{snd}$, respectively, can be used to define the mapping of the products:
 
 \[
  \begin{tikzcd}
- & A \times B
+ & a \times b
 \arrow[d, dashed, "h"]
  \arrow[dl,  "\text{fst}"']
  \arrow[dr,   "\text{snd}"]
 \\
-A
+a
 \arrow[d, "f"']
-&A' \times B'
+&a' \times b'
  \arrow[dl,  "\text{fst}"]
   \arrow[dr,   "\text{snd}"']
-& B
+& b
 \arrow[d, "g"]
 \\
-A' && B'
+a' && b'
  \end{tikzcd}
 \]
 The shorthand notation for this diagram is:
-\[ A \times B \xrightarrow{f \times g} A' \times B' \]
+\[ a \times b \xrightarrow{f \times g} a' \times b' \]
 
 This property of the product is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the product. 
 
 \section{Duality}
 
 When a child sees an arrow, it knows which end points at the source, and which points at the target
-\[A \to B \]
-But maybe this is just a pre-conception. Would the Universe be very different if we called $B$ the source and $A$ the target? 
+\[a \to b \]
+But maybe this is just a preconception. Would the Universe be very different if we called $b$ the source and $a$ the target? 
 
 We would still be able to compose this arrow with this one
-\[B \to C\]
-whose ``target'' $B$ is the same as the same as the ``source'' of $A \to B$, and the result would still be an arrow 
-\[A \to C\]
- only now we would say that it goes from $C$ to $A$.
+\[b \to c\]
+whose ``target'' $b$ is the same as the same as the ``source'' of $a \to b$, and the result would still be an arrow 
+\[a \to c\]
+ only now we would say that it goes from $c$ to $a$.
 
 In this dual Universe, the object that we call ``initial'' would be called ``terminal,'' because it's the ``target'' of unique arrows coming from all objects. Conversely, the terminal object would be called initial.
 
 Now consider this diagram that we used to define the sum object:
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "f"']
- && B
+ && b
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "g"]
  \\
-&A + B
+&a + b
 \arrow[d, dashed, "h"]
 \\
-& C
+& c
  \end{tikzcd}
 \]
-In the new interpretation, the arrow $h$ maps ``from'' an arbitrary object $C$ ``to'' the object we call $A + B$. This arrow is uniquely defined by a pair of arrows $(f, g)$ whose ``source'' is $C$. If we rename $\text{Left}$ to $\text{fst}$ and $\text{Right}$ to $\text{snd}$, we will get  the defining diagram for a product. 
+In the new interpretation, the arrow $h$ would go ``from'' an arbitrary object $c$ ``to'' the object we call $a + b$. This arrow is uniquely defined by a pair of arrows $(f, g)$ whose ``source'' is $c$. If we rename $\text{Left}$ to $\text{fst}$ and $\text{Right}$ to $\text{snd}$, we will get  the defining diagram for a product. 
 
 A product is the sum with arrows reversed. 
 
@@ -293,26 +292,26 @@ Every construction in category theory has its dual.
 
 \medskip
 
-If the direction of arrows is just a matter of interpretation, then what makes sum types so different from product types in programming? The difference goes back to one assumption we made at the start: There are no incoming arrows to the initial object (other than the identity arrow). This is in contrast with the terminal object having lots of outgoing arrows, which we used to define (global) elements. In fact, we assume that every object of interest has elements, and the ones that don't are isomorphic to \hask{Void}. 
+If the direction of arrows is just a matter of interpretation, then what makes sum types so different from product types, in programming? The difference goes back to one assumption we made at the start: There are no incoming arrows to the initial object (other than the identity arrow). This is in contrast with the terminal object having lots of outgoing arrows, arrows that we used to define (global) elements. In fact, we assume that every object of interest has elements, and the ones that don't are isomorphic to \hask{Void}. 
 
 We'll see an even deeper difference when we talk about function types.
 
 \section{Monoidal Category}
 
 We have seen that the product satisfies these simple rules:
-\[1 \times A \cong A\]
-\[A \times B \cong B \times A \]
-\[(A \times B) \times C \cong A \times (B \times C) \]
+\[1 \times a \cong a\]
+\[a \times b \cong b \times a \]
+\[(a \times b) \times c \cong a \times (b \times c) \]
 and is functorial. 
 
-A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen this structure before when working with sums and the initial object. 
+A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen a similar structure before when working with sums and the initial object. 
 
 A category can have multiple monoidal structures at the same time. When you don't want to name your monoidal structure, you replace the plus sign or the product sign with a tensor sign, and the neutral element with the letter $I$. The rules of a symmetric monoidal category can then be written as:
-\[I \otimes A \cong A\]
-\[A \otimes B \cong B \otimes A \]
-\[(A \otimes B) \otimes C \cong A \otimes (B \otimes C) \]
+\[I \otimes a \cong a\]
+\[a \otimes b \cong b \otimes a \]
+\[(a \otimes b) \otimes c \cong a \otimes (b \otimes c) \]
 
-You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, but it requires both objects $A$ and $B$; and it has no elimination rule---no projections. Some interesting examples of tensor products are not even symmetric. 
+You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, but it requires both objects $a$ and $b$; and it has no elimination rule---no projections. Some interesting examples of tensor products are not even symmetric. 
 
 \subsection{Monoids}
 
@@ -328,12 +327,12 @@ A category with a single object is called a monoid. The combining operation is t
 
 This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
 
-In a category, we are forced to define the operation in bulk, rather than looking at individual elements. We start with an object $M$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can generalize it to an arrow from a product $M \times M$ to $M$:
-\[ \mu \colon M \times M \to M \]
+In a category, we are forced to define operations in bulk, rather than looking at individual elements. We start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
+\[ \mu \colon m \times m \to m \]
 The unit element can be defined as an arrow from the terminal object $1$:
-\[ \eta \colon 1 \to M \]
+\[ \eta \colon 1 \to m \]
 
-We can translate this description directly to Haskell by defining a class of types equipped with two methods, traditionally called \hask{mappend} and \hask{mempty}:
+We can translate this description directly to Haskell by defining a \index{type class}class of types equipped with two methods, traditionally called \hask{mappend} and \hask{mempty}:
 \begin{haskell}
 class Monoid m where
   mappend :: (m, m) -> m
@@ -342,90 +341,91 @@ class Monoid m where
 
 The two arrows $\mu$ and $\eta$ have to satisfy monoid laws but, again, we have to formulate them in bulk, without any recourse to elements.
 
-To formulate the left unit law, we first create the product $1 \times M$. We then use $\eta$ to ``pick the unit element in $M$'' or, in terms of arrows, turn $1$ into $M$. Since we are operating on a product $1 \times M$, we  lift the pair $\langle \eta, id_M \rangle$, which ensures that we ``do not touch'' the $M$. We then perform the ``multiplication'' using $\mu$. 
+To formulate the left unit law, we first create the product $1 \times m$. We then use $\eta$ to ``pick the unit element in $m$'' or, in terms of arrows, turn $1$ into $m$. Since we are operating on a product $1 \times m$, we have to lift the pair $\langle \eta, id_m \rangle$, which ensures that we ``do not touch'' the $m$. We then perform the ``multiplication'' using $\mu$. 
 
-We want the result to be the same as the original element of $M$, but without mentioning elements. So we just use the left unitor $\lambda$ to go from $1 \times M$ to $M$ without ``stirring things up.''
+We want the result to be the same as the original element of $m$, but without mentioning elements. So we just use the left unitor $\lambda$ to go from $1 \times m$ to $m$ without ``stirring things up.''
 \[
  \begin{tikzcd}
- 1 \times M
- \arrow[rr, "\eta \times id_M"]
+ 1 \times m
+ \arrow[rr, "\eta \times id_m"]
  \arrow[rrd, "\lambda"']
-& & M \times M
+& & m \times m
  \arrow[d, "\mu"]
  \\
- && M
+ && m
   \end{tikzcd}
 \]
 Here is the analogous law for the right unit:
 \[
  \begin{tikzcd}
- M \times M
+ m \times m
  \arrow[d, "\mu"]
- && M \times 1
- \arrow[ll, "id_M \times \eta"']
+ && m \times 1
+ \arrow[ll, "id_m \times \eta"']
  \arrow[lld, "\rho"]
  \\
- M
+ m
  \end{tikzcd}
 \]
 To formulate the law of associativity, we have to start with a triple product and act on it in bulk. Here, $\alpha$ is the associator that rearranges the product without ``stirring things up.''
 \[
  \begin{tikzcd}
- (M \times M) \times M 
+ (m \times m) \times m 
  \arrow[rr, "\alpha"]
  \arrow[d, "\mu \times id"]
  &&
- M \times (M \times M)
+ m \times (m \times m)
  \arrow[d, "id \times \mu"]
  \\
- M \times M 
+ m \times m 
  \arrow[dr, "\mu"]
-& & M \times M
+& & m \times m
  \arrow[dl, "\mu"']
  \\
-&  M
+&  m
  \end{tikzcd}
 \]
 
-Notice that we didn't have to assume a lot about the categorical product that we used on the objects $M$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in a monoidal category. It doesn't even have to be symmetric. All we have to assume is that there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
+Notice that we didn't have to assume a lot about the categorical product that we used with the objects $m$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in a monoidal category. It doesn't even have to be symmetric. All we have to assume is that there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
 
 Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category. 
 
-A \index{monoid}\emph{monoid} in a monoidal category is an object $M$ equipped with two morphisms:
-\[ \mu \colon M \otimes M \to M \]
-\[ \eta \colon I \to M \]
+A \index{monoid}\emph{monoid} in a monoidal category is an object $m$ equipped with two morphisms:
+\[ \mu \colon m \otimes m \to m \]
+\[ \eta \colon I \to m \]
 satisfying the unit and associativity laws:
 \[
  \begin{tikzcd}
- 1 \otimes M
- \arrow[rr, "\eta \otimes id_M"]
+ 1 \otimes m
+ \arrow[rr, "\eta \otimes id_m"]
  \arrow[rrd, "\lambda"']
-& & M \otimes M
+& & m \otimes m
  \arrow[d, "\mu"']
-&& M \otimes 1
- \arrow[ll, "id_M \otimes \eta"']
+&& m \otimes 1
+ \arrow[ll, "id_m \otimes \eta"']
  \arrow[lld, "\rho"]
  \\
- && M
+ && m
   \end{tikzcd}
 \]
 
 \[
  \begin{tikzcd}
- (M \otimes M) \otimes M 
+ (m \otimes m) \otimes m 
  \arrow[rr, "\alpha"]
- \arrow[d, "\mu \otimes id"]
+ \arrow[d, "\mu \otimes id_m"]
  &&
- M \otimes (M \otimes M)
- \arrow[d, "id \otimes \mu"]
+ m \otimes (m \otimes m)
+ \arrow[d, "id_m \otimes \mu"]
  \\
- M \otimes M 
+ m \otimes m 
  \arrow[dr, "\mu"]
-& & M \otimes M
+& & m \otimes m
  \arrow[dl, "\mu"']
  \\
-&  M
+&  m
  \end{tikzcd}
 \]
+We used the functoriality of $\otimes$ in lifting pairs of arrows, as in $\eta \otimes id_m$, $\mu \otimes id_m$, etc.
 
 \end{document}
