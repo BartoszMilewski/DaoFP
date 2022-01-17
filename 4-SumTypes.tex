@@ -30,7 +30,7 @@ data Bool where
   True  :: () -> Bool
   False :: () -> Bool
 \end{haskell}
-It corresponds to the same diagram, only with some Haskell renamings:
+It corresponds to the same diagram (only with some Haskell renamings):
 \[
  \begin{tikzcd}
  \hask{()}
@@ -55,13 +55,13 @@ We can now define a term of the type \hask{Bool}, for instance
 x :: Bool
 x = True
 \end{haskell}
-The first line declares \hask{x} to be an element of \hask{Bool} (really, a function \hask{()->Bool}), and the second line tells us which one of the two.
+The first line declares \hask{x} to be an element of \hask{Bool} (secretly a function \hask{()->Bool}), and the second line tells us which one of the two.
 
 The functions \hask{True} and \hask{False} that we used in the definition of \hask{Bool} are called \emph{data constructors}. They can be used to construct specific terms, like in the example above. As a side note, in Haskell, function names start with lower-case letters, except when they are data constructors. 
 
-Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it. We have to be able to define arrows that go out of \hask{Bool}---the \emph{mappings ou}t of \hask{Bool}. 
+Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it. We have to be able to define arrows that go out of \hask{Bool}---the \index{mapping out}\emph{mappings ou}t of \hask{Bool}. 
 
-The first observation is that, if we have an arrow \hask{h} from \hask{Bool} to some type \hask{A} then we automatically get two arrows $x$ and $y$ from unit to \hask{A}, just by composition. The following diagram commutes:
+The first observation is that, if we have an arrow \hask{h} from \hask{Bool} to some concrete type \hask{A} then we automatically get two arrows \hask{x} and \hask{y} from unit to \hask{A}, just by composition. The following two (distorted) triangles commute:
 
 \[
  \begin{tikzcd}
@@ -105,7 +105,7 @@ What this means is that we can interpret the diagram above in two ways: Given \h
 
 We have a ``buddy system,'' or a bijection, at work here. This time it's a one-to-one mapping between a pair of elements $(x, y)$ and an arrow $h$. 
 
-In Haskell, this definition of \hask{h} is encapsulated in the \hask{if}, \hask{then}, \hask{else} construct. Given
+In Haskell, this definition of \hask{h} is encapsulated in the \index{\hask{if} statement}\hask{if}, \hask{then}, \hask{else} construct. Given
 \begin{haskell}
 x :: A
 y :: A
@@ -117,9 +117,9 @@ h b = if b then x else y
 \end{haskell}
 Here, \hask{b} is a term of type \hask{Bool}. 
 
-In general, a data type is created using \emph{introduction} rules and deconstructed using \emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and another using \hask{False}. The \hask{if}, \hask{then}, \hask{else} construct defines the elimination rule. 
+In general, a data type is created using \index{introduction rule}\emph{introduction} rules and deconstructed using \index{elimination rule}\emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and another using \hask{False}. The \hask{if}, \hask{then}, \hask{else} construct defines the elimination rule. 
 
-The fact that, given \hask{h}, we can reconstruct the two terms used to define it, is called the \emph{computation} rule. It tells us how to compute the result of \hask{h}. If we call \hask{h} with \hask{True}, then the result is \hask{x}; if we call it with \hask{False}, the result is \hask{y}.
+The fact that, given \hask{h}, we can reconstruct the two terms used to define it, is called the \index{computation rule}\emph{computation} rule. It tells us how to compute the result of \hask{h}. If we call \hask{h} with \hask{True}, the result is \hask{x}; if we call it with \hask{False}, the result is \hask{y}.
 
 We should never lose sight of the purpose of programming: to decompose complex problems into a series of simpler ones. The definition of \hask{Bool} illustrates this idea. Whenever we have to construct a mapping out of \hask{Bool}, we decompose it into two smaller tasks of constructing a pair of elements of the target type. We traded one larger problem for two simpler ones.
 
@@ -147,7 +147,7 @@ The interesting case is functions from \hask{Bool} to \hask{Bool}. Let's plug \h
 \text{Bool}
  \end{tikzcd}
 \]
-How many pairs of functions from \hask{()} to \hask{Bool} do we have at our disposal? There are only two such functions, \hask{True} and \hask{False}, so we can form four pairs. These are $(True, True)$, $(False, False)$, $(True, False)$, and $(False, True)$. Therefore there can only be four functions from \hask{Bool} to \hask{Bool}. 
+How many pairs $(x, y)$ of functions from \hask{()} to \hask{Bool} do we have at our disposal? There are only two such functions, \hask{True} and \hask{False}, so we can form four pairs. These are $(True, True)$, $(False, False)$, $(True, False)$, and $(False, True)$. Therefore there can only be four functions from \hask{Bool} to \hask{Bool}. 
 
 We can write them in Haskell using the  \hask{if}, \hask{then}, \hask{else} construct. For instance, the last one, which we'll call \hask{not} is defined as:
 \begin{haskell}
@@ -155,7 +155,7 @@ not :: Bool -> Bool
 not b = if b then False else True
 \end{haskell}
 
-We can also look at functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential $A^2$, where $2$ is the \hask{Bool} object. Accoording to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra, where numbers actually meant numbers.
+We can also look at functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential $A^2$, where $2$ is the \hask{Bool} object. Accoording to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra, where numbers actually mean numbers.
 
 \begin{exercise}
 Write the implementations of the three other functions \hask{Bool->Bool}.
@@ -195,7 +195,7 @@ h :: Bool -> A
 h True  = x
 h False = y
 \end{haskell}
-In fact, there is a third way of writing the same thing using the \hask{case} pattern:
+In fact, there is a third way of writing the same thing using the \index{\hask{case} statement}\hask{case} pattern:
 \begin{haskell}
 h c = case c of
   Red   -> x
@@ -221,7 +221,7 @@ There is a giant enumeration of Unicode characters called \hask{Char}. Their con
 c :: Char
 c = 'a'
 \end{haskell}
-A pattern of ten thousand things would take many years to complete, therefore people came up with the wildcard pattern, the underscore, which matches everything. 
+As Lao Tzu would say, a pattern of ten thousand things would take many years to complete, therefore people came up with the wildcard pattern, the underscore, which matches everything. 
 
 Because the patterns are matched in order, you should make the wildcard pattern the last:
 \begin{haskell}
@@ -236,7 +236,7 @@ But why should we stop at that? The type \hask{Int} could be thought of as an en
 
 In practice, the types \hask{Char} for Unicode characters, \hask{Int} for fixed-precision integers, \hask{Double} for double-precision floating point numbers, and several others, are built into the language.
 
-These are not infinite types. Their elements can be enumerated, even if it takes ten thousand years. The type \hask{Integer} is infinite, though.
+These are not infinite types. Their elements can be enumerated, even if it would take ten thousand years. The type \hask{Integer} is infinite, though.
 
 \subsection{Short Haskell Digression}
 
@@ -264,7 +264,7 @@ absurd v = undefined
 \end{haskell}
 We use \hask{undefined} to placate the compiler. In this case, we are absolutely sure that the function \hask{absurd} can never be called, because it's impossible to construct an argument of type \hask{Void}.
 
-You can use \hask{undefined} when you're only interested in compiling, as opposed to running, your code. For instance, you may need to plug a function \hask{f} to check if your definitions work together:
+You may use \hask{undefined} when you're only interested in compiling, as opposed to running, your code. For instance, you may need to plug a function \hask{f} to check if your definitions work together:
 \begin{haskell}
 f :: a -> x
 f = undefined
@@ -278,18 +278,18 @@ import Prelude hiding (Either, Left, Right)
 
 \section{Sum Types}
 
-The \hask{Bool} type could be seen as the sum $2 = 1 + 1$. But nothing stops us from replacing $1$ with another type, or even replacing each of the $1$s with different types. We can define a new type $A + B$ by using two arrows. Let's call them \hask{Left} and \hask{Right}. The defining diagram is the introduction rule:
+The \hask{Bool} type could be seen as the sum $2 = 1 + 1$. But nothing stops us from replacing $1$ with another type, or even replacing each of the $1$s with different types. We can define a new type $a + b$ by using two arrows. Let's call them \hask{Left} and \hask{Right}. The defining diagram is the introduction rule:
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr,  "\text{Left}"']
- && B
+ && b
  \arrow[dl, "\text{Right}"]
  \\
-&A + B
+&a + b
  \end{tikzcd}
 \]
-In Haskell, the type $A + B$ is called \hask{Either a b}. By analogy with \hask{Bool}, we can define it as
+In Haskell, the type $a + b$ is called \hask{Either a b}. By analogy with \hask{Bool}, we can define it as
 \begin{haskell}
 data Either a b where
   Left  :: a -> Either a b
@@ -297,20 +297,20 @@ data Either a b where
 \end{haskell}
  (Note the use of lower-case letters for type variables.)
  
-Similarly, the mapping out from $A + B$ to some type $C$ is determined by this commuting diagram:
+Similarly, the mapping out from $a + b$ to some type $c$ is determined by this commuting diagram:
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "f"']
- && B
+ && b
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "g"]
  \\
-&A + B
+&a + b
 \arrow[d, dashed, "h"]
 \\
-& C
+& c
  \end{tikzcd}
 \]
 Given a function $h$, we get a pair of functions $f$ and $g$ just by composing it with \hask{Left} and \hask{Right}. Conversely, such a pair of functions uniquely determines $h$. This is the elimination rule.
@@ -322,17 +322,17 @@ When we want to translate this diagram to Haskell, we need to select elements of
  \arrow[ld, "a"']
  \arrow[rd, "b"]
  \\
- A
+ a
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "f"']
- && B
+ && b
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "g"]
  \\
-&A + B
+&a + b
 \arrow[d, dashed, "h"]
 \\
-& C
+& c
  \end{tikzcd}
 \]
 Follow the arrows in this diagram to get
@@ -361,7 +361,7 @@ So what is the essence of a data type? It is but a recipe for manipulating arrow
 
 \subsection{Maybe}
 
-A very useful data type, \hask{Maybe} is defined as a sum $1 + A$, for any $A$. This is its definition in Haskell:
+A very useful data type, \hask{Maybe} is defined as a sum $1 + a$, for any $a$. This is its definition in Haskell:
 \begin{haskell}
 data Maybe a where
   Nothing :: () -> Maybe a
@@ -376,9 +376,9 @@ data Maybe a = Nothing | Just a
 
 \subsection{Logic}
 
-In logic, the proposition $A + B$ is called the alternative, or \emph{logical or}. You can prove it by providing the proof of $A$ or the proof of $B$. Either one will suffice. 
+In logic, the proposition $A + B$ is called the \index{alternative}alternative, or \emph{logical or}. You can prove it by providing the proof of $A$ or the proof of $B$. Either one will suffice. 
 
-If you want to prove that $C$ follows from $A+B$, you have to be prepared for two eventualities: either somebody proved $A+B$ by proving $A$ or by proving $B$. In the first case, you have to show that $C$ follows from $A$. In the second case you need a proof that $C$ follows from $B$. These are exactly the arrows in the elimination rule for $A+B$.
+If you want to prove that $C$ follows from $A+B$, you have to be prepared for two eventualities: either somebody proved $A+B$ by proving $A$ (and $B$ could be false) or by proving $B$ (and $A$ could be false). In the first case, you have to show that $C$ follows from $A$. In the second case you need a proof that $C$ follows from $B$. These are exactly the arrows in the elimination rule for $A+B$.
 
 \section{Cocartesian Categories}
 
@@ -389,7 +389,7 @@ In Haskell, we can define a sum of any two types using \hask{Either}. A category
 \subsection{One Plus Zero}
 Let's first show that $1 + 0 \cong 1$, meaning the sum of the terminal object and the initial object is isomorphic to the terminal object. The standard procedure for this kind of proofs is to use the Yoneda trick. Since sum types are defined by mapping out, we should compare arrows coming \emph{out} of either side. 
  
-Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's defined by a pair $(x, \mbox{!`})$, where $x$ is an element of $X$ and $\mbox{!`}$ is the unique arrow from the initial object to $X$ (the \hask{absurd} function in Haskell). 
+Look at the definition of $1 + 0$ and it's mapping out to any object $a$. It's defined by a pair $(x, \mbox{!`})$, where $x$ is an element of $a$ and $\mbox{!`}$ is the unique arrow from the initial object to $a$ (the \hask{absurd} function in Haskell). 
 
 \[
  \begin{tikzcd}
@@ -403,7 +403,7 @@ Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's d
 &1 + 0
 \arrow[d, dashed, "h"]
 \\
-& X
+& a
  \end{tikzcd}
  \qquad
  \begin{tikzcd}
@@ -411,17 +411,17 @@ Look at the definition of $1 + 0$ and it's mapping out to any object $X$. It's d
  \arrow[dd, "x"]
  \\
  \\
- X
+ a
  \end{tikzcd}
 \]
 We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \mbox{!`})$, we can simply map it to the arrow $x$ originating in $1$. Since there is only one $\mbox{!`}$, the mapping is a bijection. 
 
-So our $\beta_X$ maps any pair $(x, \mbox{!`})$ to $x$. Conversely, $\beta^{-1}_X$ maps $x$ to the pair $(x, \mbox{!`})$. But is it a natural transformation? 
+So our $\beta_a$ maps any pair $(x, \mbox{!`})$ to $x$. Conversely, $\beta^{-1}_a$ maps $x$ to the pair $(x, \mbox{!`})$. But is it a natural transformation? 
 
-To answer that, we need to consider what happens when we change focus from $X$ to some $Y$ that is connected to it through an arrow $g \colon X \to Y$. We have two options now:
+To answer that, we need to consider what happens when we change focus from $a$ to some $b$ that is connected to it through an arrow $g \colon a \to b$. We have two options now:
 \begin{itemize}
-\item Make $h$ switch focus by post-composing both $x$ and $\mbox{!`}$ with $g$. We get a new pair $(y = g \circ x, \mbox{!`})$. Follow it by $\beta_Y$.
-\item Use $\beta_X$ to map $(x, \mbox{!`})$ to $x$. Follow it with the post-composition $(g \circ -)$. 
+\item Make $h$ switch focus by post-composing both $x$ and $\mbox{!`}$ with $g$. We get a new pair $(y = g \circ x, \mbox{!`})$. Follow it by $\beta_b$.
+\item Use $\beta_a$ to map $(x, \mbox{!`})$ to $x$. Follow it with the post-composition $(g \circ -)$. 
 \end{itemize}
 In both cases we get the same arrow $y = g \circ x$. So the transformation $\beta$ is natural. Therefore $1 + 0$ is isomorphic to $1$.
 
@@ -436,29 +436,29 @@ f_1 _ = Left ()
 \end{haskell}
 The underscore wildcard in a function definition means that the argument is ignored. The second clause in the definition of \hask{f} is redundant, since there are no terms of the type \hask{Void}. 
 
-\subsection{A Plus Zero}
-A very similar argument can be used to show that $A + 0 \cong A$. The following diagram explains it.
+\subsection{Something Plus Zero}
+A very similar argument can be used to show that $a + 0 \cong a$. The following diagram explains it.
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "f"']
  && 0
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "\mbox{!`}"]
  \\
-&A + 0
+&a + 0
 \arrow[d, dashed, "h"]
 \\
-& X
+& x
  \end{tikzcd}
  \qquad
  \begin{tikzcd}
- A
+ a
  \arrow[dd, "f"]
  \\
  \\
- X
+ x
  \end{tikzcd}
 \]
 
@@ -468,45 +468,45 @@ We can translate this argument to Haskell by implementing a (polymorphic) functi
 Implement, in Haskell, the two functions that form the isomorphism between \hask{Either a Void} and \hask{a}.
 \end{exercise}
 
-We could use a similar argument to show that $0 + A \cong A$, but there is a more general property of sum types that obviates that.
+We could use a similar argument to show that $0 + a \cong a$, but there is a more general property of sum types that obviates that.
 \subsection{Commutativity}
 
-There is a nice left-right symmetry in the diagrams that define the sum type which suggests that it satisfies the commutativity rule, $A + B \cong B + A$. 
+There is a nice left-right symmetry in the diagrams that define the sum type, which suggests that it satisfies the commutativity rule, $a + b \cong b + a$. 
 
 Let's consider mappings out of both sides. You can easily see that, for every $h$ that is determined by a pair $(f, g)$ on the left, there is a corresponding $h'$ given by a pair $(g, f)$ on the right. That establishes the bijection of arrows.
 
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "f"']
- && B
+ && b
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "g"]
  \\
-&A + B
+&a + b
 \arrow[d, dashed, "h"]
 \\
-& X
+& x
  \end{tikzcd}
  \qquad
  \begin{tikzcd}
- B
+ b
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "g"']
- && A
+ && a
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "f"]
  \\
-&B + A
+&b + a
 \arrow[d, dashed, "h'"]
 \\
-& X
+& x
  \end{tikzcd}
 \]
 
 \begin{exercise}
-Show that the bijection defined above is natural. Hint: Both $f$ and $g$ change focus by post-composition with $k \colon X \to Y$.
+Show that the bijection defined above is natural. Hint: Both $f$ and $g$ change focus by post-composition with $k \colon x \to y$.
 \end{exercise}
 \begin{exercise}
 Implement, in Haskell, the function that witnesses the isomorphism between \hask{Either a b} and \hask{Either b a}. Notice that this function is its own inverse.
@@ -515,7 +515,7 @@ Implement, in Haskell, the function that witnesses the isomorphism between \hask
 \subsection{Associativity}
 
 Just like in arithmetic, the sum that we have defined is associative:
-\[(A + B) + C \cong A + (B + C) \]
+\[(a + b) + c \cong a + (b + c) \]
 It's easy to write the mapping out for the left hand side:
 \begin{haskell}
 h :: Either (Either a b) c -> x
@@ -532,64 +532,64 @@ h' (Right (Right c)) = f3 c
 \end{haskell}
 This establishes a one-to-one mapping between triples of functions that define the two mappings out. This mapping is natural because all changes of focus are done using post-composition. Therefore the two sides are isomorphic.
 
-This code can also be displayed in diagrammatical form. Here's the left hand side diagram.
+This code can also be displayed in diagrammatical form. Here's the diagram for the left hand side of the isomorphism:
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[rd, "L"']
  \arrow[rrddd, bend right, red, "f_1"']
- && B
+ && b
  \arrow[ld, "R"]
  \arrow[ddd, bend left=60, red, "f_2"]
-&&C
+&&c
  \arrow[lldd, "R"]
  \arrow[llddd, bend left, red, "f_3"]
  \\
- & A + B
+ & a + b
   \arrow[rd, "L"']
  \\
-&&(A + B) + C
+&&(a + b) + c
  \arrow[d, dashed, "h"]
 \\
-&& X
+&& x
  \end{tikzcd}
 \]
 \subsection{Functoriality}
 Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the foci of the arrows that define the product. But what happens when we move the sources of those arrows? 
 
-Suppose that we have arrows that map $A$ and $B$ to some $A'$ and $B'$:
-\[f \colon A \to A' \]
-\[g \colon B \to B'\]
+Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
+\[f \colon a \to a' \]
+\[g \colon b \to b'\]
 The composition of these arrows with the constructors $\text{Left}$ and $\text{Right}$, respectively, can be used to define the mapping of the sums:
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[d, "f"]
  \arrow[dr,  bend left, "\text{Left}"']
-  && B
+  && b
  \arrow[d, "g"]
  \arrow[dl, bend right, "\text{Right}"]
  \\
- A'
+ a'
  \arrow[rd, "\text{Left}"']
-&A + B
+&a + b
 \arrow[d, dashed, "h"]
-& B'
+& b'
 \arrow[ld, "\text{Right}"]
 \\
-& A' + B'
+& a' + b'
  \end{tikzcd}
 \]
-The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon A + B \to A' + B'$.
+The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon a + b \to a' + b'$.
 
 This property of the sum is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the sum. 
 
 \begin{exercise}
-Show that functoriality preserves composition. Hint: take two composable arrows, $g \colon B \to B'$ and $g' \colon B' \to B''$ and show that applying $g' \circ g$ gives the same result as first applying $g$ to transform $A + B$ to $A + B'$ and then applying $g'$ to transform $A + B'$ to $A + B''$.
+Show that functoriality preserves composition. Hint: take two composable arrows, $g \colon b \to b'$ and $g' \colon b' \to b''$ and show that applying $g' \circ g$ gives the same result as first applying $g$ to transform $a + b$ to $a + b'$ and then applying $g'$ to transform $a + b'$ to $a + b''$.
 \end{exercise}
 
 \begin{exercise}
-Show that functoriality preserves identity. Hint: use $id_B$ and show that it is mapped to $id_{A+B}$.
+Show that functoriality preserves identity. Hint: use $id_b$ and show that it is mapped to $id_{a+b}$.
 \end{exercise}
 
 \subsection{Symmetric Monoidal Category}
@@ -597,12 +597,12 @@ When a child learns addition we call it arithmetics. When a grownup learns addit
 
 Whether we are adding numbers, composing arrows, or constructing sums of objects, we are re-using the same idea of decomposing complex things into their simpler components.  
 
-When things come together to form a new thing, and the operation is associative, and it has a neutral element, we know how to deal with ten thousand things.
+As Lao Tzu would say, when things come together to form a new thing, and the operation is associative, and it has a neutral element, we know how to deal with ten thousand things.
 
 The sum type we have defined satisfies these properties:
-\[A + 0 \cong A\]
-\[A + B \cong B + A \]
-\[(A + B) + C \cong A + (B + C) \]
+\[a + 0 \cong a\]
+\[a + b \cong b + a \]
+\[(a + b) + c \cong a + (b + c) \]
 and it's functorial. A category with this type of operation is called \emph{symmetric monoidal}. When the operation is the sum (coproduct), it's called \emph{cocartesian}. In the next chapter we'll see another monoidal structure that's called \emph{cartesian} without the ``co.''
 
 
