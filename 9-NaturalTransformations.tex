@@ -4,21 +4,21 @@
 
 \chapter{Natural Transformations}
 
-We've seen that, when two objects $A$ and $B$ are isomorphic, they generate bijections between sets of arrows, which we can now express as isomorphisms between hom-sets:
-\[\mathcal{C}(A, X) \cong \mathcal{C}(B, X)\]
-\[\mathcal{C}(X, A) \cong \mathcal{C}(X, B)\]
+We've seen that, when two objects $a$ and $b$ are isomorphic, they generate bijections between sets of arrows, which we can now express as isomorphisms between hom-sets:
+\[\mathcal{C}(a, x) \cong \mathcal{C}(b, x)\]
+\[\mathcal{C}(x, a) \cong \mathcal{C}(x, b)\]
 The converse is not true, though. An isomorphism between hom-sets does not result in an isomorphism between object \emph{unless} additional naturality conditions are satisfied. We'll now re-formulate these naturality conditions in progressively more general settings.
 
 \section{Natural Transformations Between Hom-Functors}
 
 One way an isomorphism between two objects can be established is by directly providing two arrows---one the inverse of the other. But quite often it's easier to do it indirectly, by defining bijections between arrows, either the ones impinging on the two objects, or the ones emanating from the two objects. 
 
-For instance, as we've seen before, we may have, for every $X$, an invertible mapping of arrows $\alpha_X$.
+For instance, as we've seen before, we may have, for every $x$, an invertible mapping of arrows $\alpha_x$.
 \[
  \begin{tikzcd}
- \node(x) at (0, 2) {X};
- \node(a) at (-2, 0) {A};
- \node(b) at (2, 0) {B};
+ \node(x) at (0, 2) {x};
+ \node(a) at (-2, 0) {a};
+ \node(b) at (2, 0) {b};
  \node(c1) at (-1, 1.5) {};
  \node(c2) at (-1.5, 1) {};
  \node(c3) at (-1, 2) {};
@@ -35,76 +35,76 @@ For instance, as we've seen before, we may have, for every $X$, an invertible ma
   \draw[->] (x) .. controls (d1)  and (d2) .. (b); % bend
  \draw[->, green] (x) .. controls (d3)  and (d4) .. (b); % bend
  \draw[->, blue] (x) -- (b); 
- \draw[->, red, dashed] (aa) -- node[above]{\alpha_X} (bb);
+ \draw[->, red, dashed] (aa) -- node[above]{\alpha_x} (bb);
  \end{tikzcd}
 \]
-In other words, for every $X$, there is a mapping of hom-sets:
-\[ \alpha_X \colon \mathcal{C}(X, A) \to \mathcal{C}(X, B) \]
+In other words, for every $x$, there is a mapping of hom-sets:
+\[ \alpha_x \colon \mathcal{C}(x, a) \to \mathcal{C}(x, b) \]
 
-When we vary $X$, the two hom-sets become two (contravariant) functors, and $\alpha$ can be seen as a mapping between two functors:  $\mathcal{C}(-, A)$ and $\mathcal{C}(-, B)$. Such a mapping, or a transformation, is really a family of individual mappings $\alpha_X$, one per each object $X$ in the category $\mathcal{C}$. 
+When we vary $x$, the two hom-sets become two (contravariant) functors, and $\alpha$ can be seen as a mapping between two functors:  $\mathcal{C}(-, a)$ and $\mathcal{C}(-, b)$. Such a mapping, or a transformation, is really a family of individual mappings $\alpha_x$, one per each object $x$ in the category $\mathcal{C}$. 
 
-The functor $\mathcal{C}(-, A)$ describes the way the worlds sees $A$, and the functor $\mathcal{C}(-, B)$ describes the way the world sees $B$. 
+The functor $\mathcal{C}(-, a)$ describes the way the worlds sees $a$, and the functor $\mathcal{C}(-, b)$ describes the way the world sees $b$. 
 
-The transformation $\alpha$ switches back and forth between these two views. Every component of $\alpha$, the bijection $\alpha_X$, shows that the view of $A$ from $X$ is isomorphic to the view of $B$ from $X$. 
+The transformation $\alpha$ switches back and forth between these two views. Every component of $\alpha$, the bijection $\alpha_x$, shows that the view of $a$ from $x$ is isomorphic to the view of $b$ from $x$. 
 
 The naturality condition we discussed before was the condition:
 
-\[ \alpha_Y \circ (- \circ g) = (- \circ g) \circ \alpha_X \]
-It relates components of $\alpha$ taken at different objects. In other words, it relates the views from two different observers $X$ and $Y$, who are connected by the arrow $g \colon Y \to X$. 
+\[ \alpha_y \circ (- \circ g) = (- \circ g) \circ \alpha_x \]
+It relates components of $\alpha$ taken at different objects. In other words, it relates the views from two different observers $x$ and $y$, who are connected by the arrow $g \colon y \to x$. 
 
-Both sides of this equation are acting on the hom-set $\mathcal{C}(X, A)$. The result is in the hom-set $\mathcal{C}(Y, B)$
+Both sides of this equation are acting on the hom-set $\mathcal{C}(x, a)$. The result is in the hom-set $\mathcal{C}(y, b)$
 
-Precomposition with $g \colon Y \to X$ is also a mapping of hom-sets. In fact it is the lifting of $g$ by the contravariant hom-functor. We can write it as $\mathcal{C}(g, A)$ and $\mathcal{C}(g, B)$, respectively.
+Precomposition with $g \colon y \to x$ is also a mapping of hom-sets. In fact it is the lifting of $g$ by the contravariant hom-functor. We can write it as $\mathcal{C}(g, a)$ and $\mathcal{C}(g, b)$, respectively.
 
 The naturality condition can therefore be rewritten as:
-\[ \alpha_Y \circ \mathcal{C}(g, A) = \mathcal{C}(g, B) \circ \alpha_X \]
+\[ \alpha_y \circ \mathcal{C}(g, a) = \mathcal{C}(g, b) \circ \alpha_x \]
 It can be illustrated by this commuting diagram:
 \[
  \begin{tikzcd}
- \mathcal{C}(X, A)
- \arrow[d, "\alpha_X"]
- \arrow[r, "{\mathcal{C}(g, A)}"]
+ \mathcal{C}(x, a)
+ \arrow[d, "\alpha_x"]
+ \arrow[r, "{\mathcal{C}(g, a)}"]
  &
- \mathcal{C}(Y, A)
-  \arrow[d, "\alpha_Y"]
+ \mathcal{C}(y, a)
+  \arrow[d, "\alpha_y"]
  \\
- \mathcal{C}(X, B)
- \arrow[r, "{\mathcal{C}(g, B)}"]
-& \mathcal{C}(Y, B)
+ \mathcal{C}(x, b)
+ \arrow[r, "{\mathcal{C}(g, b)}"]
+& \mathcal{C}(y, b)
  \end{tikzcd}
 \]
 
-We can now say that  an invertible transformation $\alpha$ between the functors $\mathcal{C}(-, A)$ and $\mathcal{C}(-, B)$ that satisfies the naturality condition is equivalent to an isomorphism between $A$ and $B$.
+We can now say that  an invertible transformation $\alpha$ between the functors $\mathcal{C}(-, a)$ and $\mathcal{C}(-, b)$ that satisfies the naturality condition is equivalent to an isomorphism between $a$ and $b$.
 
 We can follow exactly the same reasoning for the outgoing arrows. This time we start with a transformation $\beta$ whose components are:
-\[ \beta_X \colon \mathcal{C}(A, X) \to \mathcal{C}(B, X) \]
-The two (covariant) functors $\mathcal{C}(A, -)$ and $\mathcal{C}(B, -)$ describe the view of the world from the perspective of $A$ and $B$, respectively. The invertible transformation $\beta$ tells us that these two views are equivalent, and the naturality condition 
-\[ (g \circ -) \circ \beta_X = \beta_Y \circ (g \circ -) \]
+\[ \beta_x \colon \mathcal{C}(a, x) \to \mathcal{C}(b, x) \]
+The two (covariant) functors $\mathcal{C}(a, -)$ and $\mathcal{C}(b, -)$ describe the view of the world from the perspective of $a$ and $b$, respectively. The invertible transformation $\beta$ tells us that these two views are equivalent, and the naturality condition 
+\[ (g \circ -) \circ \beta_x = \beta_y \circ (g \circ -) \]
 tells us that they behave nicely when we switch focus.
 
 Here's the commuting diagram that illustrates the naturality condition:
 \[
  \begin{tikzcd}
- \mathcal{C}(A, X)
- \arrow[d, "\beta_X"]
- \arrow[r, "{\mathcal{C}(A, g)}"]
+ \mathcal{C}(a, x)
+ \arrow[d, "\beta_x"]
+ \arrow[r, "{\mathcal{C}(a, g)}"]
  &
- \mathcal{C}(A, Y)
-  \arrow[d, "\beta_Y"]
+ \mathcal{C}(a, y)
+  \arrow[d, "\beta_y"]
  \\
- \mathcal{C}(B, X)
- \arrow[r, "{\mathcal{C}(B, g)}"]
-& \mathcal{C}(B, Y)
+ \mathcal{C}(b, x)
+ \arrow[r, "{\mathcal{C}(b, g)}"]
+& \mathcal{C}(b, y)
  \end{tikzcd}
 \]
 
-Again, such an invertible natural transformation $\beta$ establishes the isomorphism between $A$ and $B$.
+Again, such an invertible natural transformation $\beta$ establishes the isomorphism between $a$ and $b$.
 
 \section{Natural Transformation Between Functors}
 
 The two hom-functors from the previous section were
-\[ F X =   \mathcal{C}(A, X)\]
-\[ G X =   \mathcal{C}(B, X)\]
+\[ F x =   \mathcal{C}(a, x)\]
+\[ G x =   \mathcal{C}(b, x)\]
 They both map the category $\mathcal{C}$ to  $\mathbf{Set}$, because that's where the hom-sets live. We can say that they create two different \emph{models} of $\mathcal{C}$ inside $\mathbf{Set}$. 
 
 A natural transformation is a structure-preserving mapping between such models. 
@@ -116,33 +116,33 @@ may be seen as two different models of $\mathcal{C}$ inside $\mathcal{D}$.
 
 To transform one model into another we connect the corresponding dots using arrows in $\mathcal{D}$. 
 
-For every object $X$ in $\mathcal{C}$ we pick an arrow that goes from $F X$ to $G X$:
-\[ \alpha_X \colon F X \to G X \]
+For every object $x$ in $\mathcal{C}$ we pick an arrow that goes from $F x$ to $G x$:
+\[ \alpha_x \colon F x \to G x \]
 A natural transformation thus maps objects to arrows.
 
-The structure of the models, though, has as much to do with objects as it does with arrows, so let's see what happens to arrows. For every arrow $f \colon X \to Y$ in $\mathcal{C}$, there are two corresponding arrows in $\mathcal{D}$:
-\[ F f \colon F X \to F Y\]
-\[ G f \colon G X \to G Y \]
+The structure of a model, though, has as much to do with objects as it does with arrows, so let's see what happens to arrows. For every arrow $f \colon x \to y$ in $\mathcal{C}$, we have two corresponding arrows in $\mathcal{D}$:
+\[ F f \colon F x \to F y\]
+\[ G f \colon G x \to G y \]
 These are the two liftings of $f$. You can use them to move within the bounds of each of the two models. Then there are the components of $\alpha$ which let you switch between models. 
 
 Naturality says that it shouldn't matter whether you first move inside the first model and then jump to the second one, or first jump to the second one and then move within it. This is illustrated by the commuting \emph{naturality square}:
 
 \[
  \begin{tikzcd}
- F X
- \arrow[d, "\alpha_X"]
+ F x
+ \arrow[d, "\alpha_x"]
  \arrow[r, "F f"]
  &
-F Y
-  \arrow[d, "\alpha_Y"]
+F y
+  \arrow[d, "\alpha_y"]
  \\
-G X
+G x
  \arrow[r, "G f"]
-& G Y
+& G y
  \end{tikzcd}
 \]
 
-A family of arrows $\alpha_X$ that satisfies the naturality condition is called a \emph{natural transformation}.
+A family of arrows $\alpha_x$ that satisfies the naturality condition is called a \emph{natural transformation}.
 
 This is a diagram that shows a pair of categories, two functors between them, and a natural transformation $\alpha$ between the functors:
 \[
@@ -159,7 +159,7 @@ This is a diagram that shows a pair of categories, two functors between them, an
 
 Since for every arrow in $\mathcal{C}$ there is a corresponding naturality square, we can say that a natural transformation maps objects to arrows, and arrows to commuting squares.
 
-If every component $\alpha_X$ of a natural transformation is an isomorphism, $\alpha$ is called a \emph{natural isomorphism}. 
+If every component $\alpha_x$ of a natural transformation is an isomorphism, $\alpha$ is called a \emph{natural isomorphism}. 
 
 We can now restate the main result about isomorphisms: Two objects are isomorphic if and only if there is a natural isomorphism between their hom-functors (either the covariant, or the contravariant ones---either one will do).
 
@@ -179,22 +179,22 @@ data Natural :: (Type -> Type) -> (Type -> Type) -> Type where
 \end{haskell}
 The \hask{forall} quantifier tells the compiler that the function is polymorphic---that is, it's defined for every type \hask{a}. As long as \hask{f} and \hask{g} are functors, this formula defines a natural transformation. 
 
-The types defined by \hask{forall} are very special, though. The are polymorphic in the sense of \emph{parametric polymorphism}. It means that a single formula is used for all types. We've seen the example of the identity function, which can be written as:
+The types defined by \hask{forall} are very special, though. The are polymorphic in the sense of \index{parametric polymorphism}\emph{parametric polymorphism}. It means that a single formula is used for all types. We've seen the example of the identity function, which can be written as:
 \begin{haskell}
 id :: forall a. a -> a
 id x = x
 \end{haskell}
 The body of this function is very simple, just the variable \hask{x}. It doesn't matter what type \hask{x} is, the formula remains the same.
 
-This is in contrast to \emph{ad-hoc polymorphism}. An ad-hoc polymorphic function may use different implementations for different types. An example of such a function is \hask{fmap}, the member function of the \hask{Functor} typeclass. There is one implementation of \hask{fmap} for lists, a different one for \hask{Maybe}, and so on, case by case. 
+This is in contrast to \index{ad-hoc polymorphism}\emph{ad-hoc polymorphism}. An ad-hoc polymorphic function may use different implementations for different types. An example of such a function is \hask{fmap}, the member function of the \hask{Functor} typeclass. There is one implementation of \hask{fmap} for lists, a different one for \hask{Maybe}, and so on, case by case. 
 
-It turns out that limiting the type of a natural transformation to adhere to parametric polymorphism has far reaching consequences. Such a function automatically satisfies the naturality condition. It's an example of parametricity producing so called \emph{theorems for free}. 
+It turns out that limiting the type of a natural transformation to adhere to parametric polymorphism has far reaching consequences. Such a function automatically satisfies naturality conditions. It's an example of \index{parametricity}parametricity producing so called \index{theorems for free}\emph{theorems for free}. 
 
 The standard definition of a (parametric) natural transformation in Haskell uses a \emph{type synonym:}
 \begin{haskell}
 type Natural f g = forall a. f a -> g a
 \end{haskell}
-A \hask{type} declaration introduces an alias, a shorthand, for the right-hand-side.
+A \index{\hask{type} synonym}\hask{type} declaration introduces an alias, a shorthand, for the right-hand-side.
 
 Here's an example of a useful function that is a natural transformation between the list functor and the \hask{Maybe} functor:
 \begin{haskell}
@@ -212,7 +212,7 @@ reverse (a : as) = reverse as ++ [a]
 \end{haskell}
 Incidentally, this is a very inefficient implementation. The actual library function uses an optimized algorithm.
 
-A useful intuition for understanding natural transformations builds on the idea that functors acts like containers of data. There are two completely orthogonal things that you can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure of moving ``stuff'' between containers without knowing what kind of ``stuff'' it is. 
+A useful intuition for understanding natural transformations builds on the idea that functors acts like containers for data. There are two completely orthogonal things that you can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure for moving ``stuff'' between containers without knowing what kind of ``stuff'' it is. 
 
 Naturality condition enforces the orthogonality of these two operations. It doesn't matter if you first modify the data and then move it to another container; or first move it, and then modify. 
 
@@ -252,42 +252,42 @@ Indeed, suppose that we have a natural transformation $\alpha$ between two funct
 \]
 
 
-Let's look at the components of these transformations at some object $X$
-\[ \alpha_X \colon F \, X \to G \, X \]
-\[ \beta_X \colon G \, X \to H \, X \]
+Let's look at the components of these transformations at some object $x$
+\[ \alpha_x \colon F \, x \to G \, x \]
+\[ \beta_x \colon G \, x \to H \, x \]
 These are just two arrows in $\mathcal{D}$ that are composable. So we can define a composite natural transformation $\gamma$ as follows:
 \[ \gamma \colon F \to H\]
-\[ \gamma_X = \beta_X \circ \alpha_X \]
+\[ \gamma_x = \beta_x \circ \alpha_x \]
  This is called the \emph{vertical composition} of natural transformations. You'll see it written using a dot $\gamma = \beta \cdot \alpha$ or a simple juxtaposition $\gamma = \beta \alpha$.
 
 Naturality condition for $\gamma$ can be shown by pasting together (vertically) two naturality squares for $\alpha$ and $\beta$:
 \[
  \begin{tikzcd}
- F X
- \arrow[d, "\alpha_X"]
+ F x
+ \arrow[d, "\alpha_x"]
  \arrow[r, "F f"]
- \arrow[dd, bend right = 60, "\gamma_X"']
+ \arrow[dd, bend right = 60, "\gamma_x"']
  &
-F Y
-  \arrow[d, "\alpha_Y"]
- \arrow[dd, bend left = 60, "\gamma_Y"]
+F y
+  \arrow[d, "\alpha_y"]
+ \arrow[dd, bend left = 60, "\gamma_y"]
  \\
-G X
+G x
  \arrow[r, "G f"]
- \arrow[d, "\beta_X"]
-& G Y
-\arrow[d, "\beta_Y"]
+ \arrow[d, "\beta_x"]
+& G y
+\arrow[d, "\beta_y"]
 \\
-H X
+H x
 \arrow[r, "H f"]
-& H Y
+& H y
  \end{tikzcd}
 \]
 
 Since the composition of natural transformations is defined in terms of composition of arrows, it is automatically associative. 
 
-There is also an identity natural transformation $id_F$ defined for every functor $F$. Its component at $X$ is the usual identity arrow at the object $F X$:
-\[ (id_F)_X = id_{F X} \]
+There is also an identity natural transformation $id_F$ defined for every functor $F$. Its component at $x$ is the usual identity arrow at the object $F x$:
+\[ (id_F)_x = id_{F x} \]
 
 To summarize, for every pair of categories $\mathcal{C}$ and $\mathcal{D}$ there is a category of functors $[\mathcal{C}, \mathcal{D}]$ with natural transformations as arrows. 
 
@@ -298,7 +298,7 @@ with the name of the category followed by the names of the two objects (here, fu
 
 \begin{exercise}
 Prove the naturality condition of the composition of natural transformations:
-\[ \gamma_Y \circ F f = H f \circ \gamma_X \]
+\[ \gamma_y \circ F f = H f \circ \gamma_x \]
 Hint: Use the definition of $\gamma$ and the two naturality conditions for $\alpha$ and $\beta$.
 \end{exercise}
 
@@ -309,7 +309,7 @@ The second kind of composition of natural transformations is induced by composit
  F \colon \mathcal{C} \to \mathcal{D}
 &&G \colon \mathcal{D} \to \mathcal{E} 
 \end{align*}
-and that this pair is parallel to another pair of composable functors:
+and, in parallel, another pair of composable functors:
 \begin{align*}
  F' \colon \mathcal{C} \to \mathcal{D}
 && G' \colon \mathcal{D} \to \mathcal{E} 
@@ -337,42 +337,42 @@ Pictorially:
 \]
 The \emph{horizontal composition} $\beta \circ \alpha$ maps $G \circ F$ to $G' \circ F'$.
 
-Let's pick an object $X$ in $\mathcal{C}$. We use $\alpha$ to map it to an arrow 
-\[ \alpha_X \colon F X \to F' X \]
+Let's pick an object $x$ in $\mathcal{C}$. We use $\alpha$ to map it to an arrow 
+\[ \alpha_x \colon F x \to F' x \]
 We can lift this arrow using $G$
-\[ G (\alpha_X) \colon G (F X) \to G (F' X) \]
-What we need to define $\beta \circ \alpha$ is an arrow from $G (F X)$ to $G' (F' X)$. To get there, we can use the appropriate component of $\beta$
-\[ \beta_{F' X} \colon G (F' X) \to G' (F' X) \]
+\[ G (\alpha_x) \colon G (F x) \to G (F' x) \]
+What we need in order to define $\beta \circ \alpha$ is an arrow from $G (F x)$ to $G' (F' x)$. To get there, we can use the appropriate component of $\beta$
+\[ \beta_{F' x} \colon G (F' x) \to G' (F' x) \]
 Altogether, we have
-\[ (\beta \circ \alpha)_X = \beta_{F' X} \circ G (\alpha_X) \]
+\[ (\beta \circ \alpha)_x = \beta_{F' x} \circ G (\alpha_x) \]
 
 But there is another equally plausible candidate: 
-\[ (\beta \circ \alpha)_X = G'(\alpha_X) \circ \beta_{F X}\]
+\[ (\beta \circ \alpha)_x = G'(\alpha_x) \circ \beta_{F x}\]
 Fortunately, the are equal due to naturality of $\beta$. 
 
 \[
  \begin{tikzcd}
-  && G(F X)
-  \arrow[dd, red, "G(\alpha_X)"]
-  \arrow[dr, blue, "\beta_{F X}"]
+  && G(F x)
+  \arrow[dd, red, "G(\alpha_x)"]
+  \arrow[dr, blue, "\beta_{F x}"]
   \\
-  & F X
+  & F x
   \arrow[rr, bend right=10, dashed, gray]
   \arrow[ur, bend right=10, dashed]
-  \arrow[dd, red, "\alpha_X"]
- && G' (F X)
-  \arrow[dd, red, "G'(\alpha_X)"]
+  \arrow[dd, red, "\alpha_x"]
+ && G' (F x)
+  \arrow[dd, red, "G'(\alpha_x)"]
  \\
- X
+ x
  \arrow[ur, dashed]
  \arrow[dr, gray, dashed]
- && G(F' X)
-  \arrow[dr, blue, "\beta_{F' X}"]
+ && G(F' x)
+  \arrow[dr, blue, "\beta_{F' x}"]
  \\
- &F' X
+ &F' x
   \arrow[rr, bend right=10, dashed, gray]
  \arrow[ur, bend right=10, dashed]
- && G'(F' X)
+ && G'(F' x)
 \end{tikzcd}
 \]
 The proof of naturality of $\beta \circ \alpha$ is left as an exercise to a dedicated reader.
@@ -396,7 +396,7 @@ Because of the characteristic shape of the diagram, such composition is called `
 \end{tikzcd}
 \]
 In components, we have:
-\[ (\beta \circ F)_X = \beta_{F X} \]
+\[ (\beta \circ F)_x = \beta_{F x} \]
 
 Let's consider how we would translate this to Haskell. A natural transformation is a polymorphic function. Because of parametricity, it's defined by the same formula for all types. So whiskering on the right doesn't change the formula, it changes function signature. 
 
@@ -406,7 +406,7 @@ beta :: G x -> G' x
 \end{haskell}
 then its whiskered version would be:
 \begin{haskell}
-beta_f :: G (F x) -> G' (F x)
+beta_F :: G (F x) -> G' (F x)
 \end{haskell}
 Because of Haskell's type inference, this shift is often implicit.
 
@@ -425,9 +425,9 @@ Similarly, $id_G \circ \alpha$ is written as $G \circ \alpha$.
 \end{tikzcd}
 \]
 In components:
-\[(G \circ \alpha)_X = G (\alpha_X) \]
+\[(G \circ \alpha)_x = G (\alpha_x) \]
 
-In Haskell, the lifting of $\alpha_X$ by $G$ is done using \hask{fmap}, so given:
+In Haskell, the lifting of $\alpha_x$ by $G$ is done using \hask{fmap}, so given:
 \begin{haskell}
 alpha :: F x -> F' x
 \end{haskell}
@@ -467,7 +467,7 @@ We've seen definitions of sums, products, exponentials, natural numbers, and lis
 
 The old-school approach to defining such data types is to explore their internals. This is the set-theory way: we look at how the elements of new sets are constructed from the elements of old sets. An element of a sum is either an element of the first set, or the second set. An element of a product is a pair of elements. And so on. We are looking at objects from the engineering point of view.
 
-In category theory we take the opposite approach. We are not interested in what's inside the object or how it's implemented. We are interested in the purpose of the object, how it can be used, and how it interacts with other objects. We are looking at objects from the user's point of view.
+In category theory we take the opposite approach. We are not interested in what's inside the object or how it's implemented. We are interested in the purpose of the object, how it can be used, and how it interacts with other objects. We are looking at objects from the utilitarian point of view.
 
 Both approaches have their advantages. The categorical approach came later, because you need to study a lot of examples before clear patterns emerge. But once you see the patterns, you discover unexpected connections between things, like the duality between sums and products.
 
@@ -483,13 +483,13 @@ Being able to compress a lot of facts into small elegant formulas helps us see n
 
 But first we'll study several examples in greater detail to get some understanding of the terse language of category theory. We'll try, for instance, to decode the statement that the sum, or the coproduct of two objects, is defined by the following natural isomorphism:
 
-\[ [\mathbf{2}, \mathcal{C}](D, \Delta_X]  \cong \mathcal{C}(A + B, X) \]
+\[ [\mathbf{2}, \mathcal{C}](D, \Delta_x]  \cong \mathcal{C}(a + b, x) \]
 
 
 
 \subsection{Picking objects}
 
-Even such a simple task as pointing at objects has a special interpretation in category theory. We have already seen that pointing at an element of a set is equivalent to selecting a function from the singleton set to it. Similarly, picking an object in a category can be replaced by selecting a functor from the single-object category. Or it can be done using a constant functor from any category. 
+Even such a simple task as pointing at an object has a special interpretation in category theory. We have already seen that pointing at an element of a set is equivalent to selecting a function from the singleton set to it. Similarly, picking an object in a category is equivalent to selecting a functor from the single-object category. Or it can be done using a constant functor from another category. 
 
 Quite often we want to pick a pair of objects. That, too, can be accomplished by selecting a functor from a two-object stick-figure category. Similarly, picking an arrow is equivalent to selecting a functor from the ``walking arrow'' category, and so on.
 
@@ -501,14 +501,14 @@ The definition of a sum requires the selection of two objects to be summed; and 
 
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "f"']
- && B
+ && b
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "g"]
  \\
-&A + B
+&a + b
 \arrow[d, dashed, "h"]
 \\
 & C
@@ -517,115 +517,115 @@ The definition of a sum requires the selection of two objects to be summed; and 
 This diagram can be further decomposed into two simpler shapes called \emph{cospans}:
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr, "f"']
- && B
+ && b
  \arrow[dl, "g"]
  \\
- & X
+ & x
  \end{tikzcd}
 \]
 
 To construct a cospan we first have to pick a pair of objects. To do that we'll start with a two-object category $\mathbf{2}$. We'll call its objects $1$ and $2$. 
 We'll use a functor 
 \[ D \colon \mathbf{2} \to \mathcal{C}\]
-to select the objects $A$ and $B$: 
-\[D\, 1 = A\]
-\[ D\, 2 = B \]
+to select the objects $a$ and $b$: 
+\[D\, 1 = a\]
+\[ D\, 2 = b \]
 ($D$ stands for ``diagram'', since the two objects form a very simple diagram consisting of two dots in $\mathcal{C}$.)
 
 We'll use the constant functor 
-\[ \Delta_X \colon \mathbf{2} \to \mathcal{C} \]
-to select the object $X$. This functor maps both $1$ and $2$ to $X$ (and the two identity arrows to $id_X$).
+\[ \Delta_x \colon \mathbf{2} \to \mathcal{C} \]
+to select the object $x$. This functor maps both $1$ and $2$ to $x$ (and the two identity arrows to $id_x$).
 
 Since both functors go from $\mathbf{2}$ to $\mathcal{C}$, we can define a natural transformation $\alpha$ between them. In this case, it's just a pair of arrows:
-\[ \alpha_1 \colon D \, 1 \to \Delta_X 1 \]
-\[ \alpha_2 \colon D \, 2 \to \Delta_X 2 \]
+\[ \alpha_1 \colon D \, 1 \to \Delta_x 1 \]
+\[ \alpha_2 \colon D \, 2 \to \Delta_x 2 \]
 These are exactly the two arrows $f$ and $g$ in the cospan. 
 
 Naturality condition for $\alpha$ is trivial, since there are no arrows (other than identities) in $\mathbf{2}$.
 
-There may be many cospans sharing the same three objects---meaning: there may be many natural transformations between the two functors $D$ and  $\Delta_X$. These natural transformations form a hom-set in the functor category $[\mathbf{2}, \mathcal{C}]$, namely:
-\[ [\mathbf{2}, \mathcal{C}](D, \Delta_X) \]
+There may be many cospans sharing the same three objects---meaning: there may be many natural transformations between the two functors $D$ and  $\Delta_x$. These natural transformations form a hom-set in the functor category $[\mathbf{2}, \mathcal{C}]$, namely:
+\[ [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
 
 \subsection{Functoriality of cospans}
 
-Let's consider what happens when we start varying the object $X$ in a cospan. We get a mapping from $X$ to the set of cospans $F$:
-\[ F X = [\mathbf{2}, \mathcal{C}](D, \Delta_X) \]
-This mapping turns out to be functorial in $X$.
+Let's consider what happens when we start varying the object $x$ in a cospan. We get a mapping $F$ from $x$ to the set of cospans:
+\[ F x = [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
+This mapping turns out to be functorial in $x$.
 
-To see that, consider an arrow $m \colon X \to Y$. The lifting of this arrow is a mapping between two sets of natural transformations:
-\[ [\mathbf{2}, \mathcal{C}](D, \Delta_X) \to [\mathbf{2}, \mathcal{C}](D, \Delta_{Y}) \] 
+To see that, consider an arrow $m \colon x \to y$. The lifting of this arrow is a mapping between two sets of natural transformations:
+\[ [\mathbf{2}, \mathcal{C}](D, \Delta_x) \to [\mathbf{2}, \mathcal{C}](D, \Delta_{y}) \] 
  
 This might look very abstract until you remember that natural transformations have components, and these components are just regular arrows. An element of the left-hand side is a natural transformation:
-\[ \mu \colon D \to \Delta_X \]
+\[ \mu \colon D \to \Delta_x \]
 It has two components corresponding to the two objects in $\mathbf{2}$. For instance, we have
-\[ \mu_1 \colon D \, 1 \to \Delta_X 1 \]
+\[ \mu_1 \colon D \, 1 \to \Delta_x 1 \]
 or, using the definitions of $D$ and $\Delta$:
-\[ \mu_1 \colon A \to X \]
+\[ \mu_1 \colon a \to x \]
 This is just the arrow $f$ in our diagram. 
 
 Similarly, the element of the right-hand side is:
-\[ \nu \colon D \to \Delta_{Y} \]
+\[ \nu \colon D \to \Delta_{y} \]
 Its component at $1$ is an arrow
-\[ \nu_1 \colon A \to Y \]
-We can get from $\mu_1$ to $\nu_1$ simply by post-composing it with $m \colon X \to Y$. So the lifting of $h$ is a component-by-component post-compositon $(m \circ -)$. 
+\[ \nu_1 \colon a \to y \]
+We can get from $\mu_1$ to $\nu_1$ simply by post-composing it with $m \colon x \to y$. So the lifting of $h$ is a component-by-component post-compositon $(m \circ -)$. 
 
 \subsection{Sum as a universal cospan}
 
-Of all the cospans that you can build on the pair $A$ and $B$, the one with the arrows we called $Left$ and $Right$ converging on $A + B$  is very special. There is a unique mapping out of it to any other cospan---a mapping that makes two triangles commute.  
+Of all the cospans that you can build on the pair $a$ and $b$, the one with the arrows we called $Left$ and $Right$ converging on $a + b$  is very special. There is a unique mapping out of it to any other cospan---a mapping that makes two triangles commute.  
 \[
  \begin{tikzcd}
- A
+ a
  \arrow[dr,  bend left, "\text{Left}"']
  \arrow[ddr, bend right, "f"']
- && B
+ && b
  \arrow[dl, bend right, "\text{Right}"]
  \arrow[ddl, bend left, "g"]
  \\
-&A + B
+&a + b
 \arrow[d, dashed, "h"]
 \\
-& X
+& x
  \end{tikzcd}
 \]
 
-We are now in a position to translate this condition into a statement about natural transformations and hom-sets. The arrow $h$ is an element of the hom-set 
-\[ \mathcal{C}(A + B, X)\]
-A cospan centered at $X$ is a natural transformation, that is an element of the hom-set in the functor category:
-\[ [\mathbf{2}, \mathcal{C}](D, \Delta_X) \]
+We are now in a position to translate this condition to a statement about natural transformations and hom-sets. The arrow $h$ is an element of the hom-set 
+\[ \mathcal{C}(a + b, x)\]
+A cospan centered at $x$ is a natural transformation, that is an element of the hom-set in the functor category:
+\[ [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
 
-Both are hom-sets in their respective categories. But they are just sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. 
+Both are hom-sets in their respective categories. And both are just sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. 
 
 As Lao Tzu would say, ``Sometimes a set is just a set.''
 
 Our universal construction is the bijection or the isomorphism of sets:
-\[ [\mathbf{2}, \mathcal{C}](D, \Delta_X)  \cong \mathcal{C}(A + B, X) \]
+\[ [\mathbf{2}, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}(a + b, x) \]
 
-Moreover, if we vary the object $X$, the two sides behave like functors from  $\mathcal{C}$ to $\mathbf{Set}$. Therefore it makes sense to ask if this mapping of functors is a natural isomorphism. 
+Moreover, if we vary the object $x$, the two sides behave like functors from  $\mathcal{C}$ to $\mathbf{Set}$. Therefore it makes sense to ask if this mapping of functors is a natural isomorphism. 
 
 Indeed, it can be shown that the naturality condition for this isomorphism translates into commuting conditions for the triangles in the definition of the sum. So the definition of the sum can be replaced by a single equation.
 
 \subsection{Product as a universal span}
 
-An analogous argument can be made about the universal construction of the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
-\[ \alpha \colon \Delta_X \to D \]
+An analogous argument can be made about the universal construction for the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
+\[ \alpha \colon \Delta_x \to D \]
 Such a natural transformation is a pair of arrows that form a \emph{span}:
 \[
  \begin{tikzcd}
- &X
+ &x
  \arrow[dl, "f"']
  \arrow[dr, "g"]
  \\
- A
- && B
+ a
+ && b
   \end{tikzcd}
 \]
 Collectively, these natural transformations form a hom-set in the functor category :
-\[[\mathbf{2}, \mathcal{C}](\Delta_X, D) \]
+\[[\mathbf{2}, \mathcal{C}](\Delta_x, D) \]
 
-Every element of this hom-set is in one-to-one correspondence with a unique mapping $h$ into the product $A \times B$. Such a mapping is a member of the hom-set $\mathcal{C}(X, A \times B)$. This correspondence is expressed as the isomorphism:
-\[ [\mathbf{2}, \mathcal{C}](\Delta_X, D)  \cong \mathcal{C}(X, A \times B) \]
+Every element of this hom-set is in one-to-one correspondence with a unique mapping $h$ into the product $a \times b$. Such a mapping is a member of the hom-set $\mathcal{C}(x, a \times b)$. This correspondence is expressed as the isomorphism:
+\[ [\mathbf{2}, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, a \times b) \]
 It can be shown that the naturality of this isomorphism guarantees that the triangles in this diagram commute:
 \[
  \begin{tikzcd}
@@ -634,11 +634,11 @@ It can be shown that the naturality of this isomorphism guarantees that the tria
  \arrow[ddl, bend right, "f = \alpha_1"']
  \arrow[ddr, bend left, "g = \alpha_2"]
 \\
-&A \times B
+&a \times b
  \arrow[dl,  "\text{fst}"]
   \arrow[dr,   "\text{snd}"']
 \\
-A = D\, 1 && B = D \, 2
+a = D\, 1 && b = D \, 2
  \end{tikzcd}
 \]
 
@@ -647,42 +647,42 @@ A = D\, 1 && B = D \, 2
 The exponentials, or function objects, are defined by this commuting diagram:
 \[
  \begin{tikzcd}
- X \times A
- \arrow[d, dashed, "h \times id_A"']
+ x \times a
+ \arrow[d, dashed, "h \times id_a"']
  \arrow[rd, "f"]
  \\
- B^A \times A
- \arrow[r, "\varepsilon_{A, B}"']
-& B
+ b^a \times a
+ \arrow[r, "\varepsilon_{a, b}"']
+& b
  \end{tikzcd}
 \]
-Here, $f$ is an element of the hom-set $\mathcal{C}(X \times A, B)$ and $h$ is an element of $\mathcal{C}(X, B^A)$. 
+Here, $f$ is an element of the hom-set $\mathcal{C}(x \times a, b)$ and $h$ is an element of $\mathcal{C}(x, b^a)$. 
 
-The isomorphism between these sets, natural in $X$, defines the exponential object. 
-\[\mathcal{C}(X \times A, B) \cong \mathcal{C}(X, B^A)\]
+The isomorphism between these sets, natural in $x$, defines the exponential object. 
+\[\mathcal{C}(x \times a, b) \cong \mathcal{C}(x, b^a)\]
 
 The $f$ in the diagram above is an element of the left-hand side, and $h$ is the corresponding element of the right-hand side. The transformation $\alpha$ maps $f$ to $h$. In Haskell, we call it \hask{curry}. Its inverse, $\alpha^{-1}$ is known as \hask{uncurry}.
 
 Unlike in the previous examples, here both hom-sets are in the same category, and it's easy to analyze the isomorphism in more detail. In particular, we'd like to see how the commuting condition:
-\[  f = \varepsilon_{A, B} \circ (h \times id_A) \]
+\[  f = \varepsilon_{a, b} \circ (h \times id_a) \]
 arises from naturality.
 
-The standard Yoneda trick is to make a substitution for $X$ that would reduce one of the hom-sets to an endo-hom-set, that is a hom-set whose source is the same the target. This will allow us to pick a special element of that hom-set, namely the identity arrow.
+The standard Yoneda trick is to make a substitution for $x$ that would reduce one of the hom-sets to an endo-hom-set, that is a hom-set whose source is the same the target. This will allow us to pick a special element of that hom-set, namely the identity arrow.
 
-In our case, substituting $B^A$ for $X$ will allow us to pick $h = id_{(B^A)}$.
+In our case, substituting $b^a$ for $x$ will allow us to pick $h = id_{(b^a)}$.
 \[
  \begin{tikzcd}
- B^A \times A
- \arrow[d, dashed, "id_{(B^A)} \times id_A"']
+ b^a \times a
+ \arrow[d, dashed, "id_{(b^a)} \times id_a"']
  \arrow[rd, "f"]
  \\
- B^A \times A
- \arrow[r, "\varepsilon_{A, B}"']
-& B
+ b^a \times a
+ \arrow[r, "\varepsilon_{a, b}"']
+& b
  \end{tikzcd}
 \]
-The commuting condition in this case tells us that $f = \varepsilon_{A, B}$. In other words, we get the formula for $\varepsilon_{A, B}$ in terms of $\alpha$:
-\[ \varepsilon_{A, B} = \alpha^{-1} (id_{(B^A)}) \]
+The commuting condition in this case tells us that $f = \varepsilon_{a, b}$. In other words, we get the formula for $\varepsilon_{a, b}$ in terms of $\alpha$:
+\[ \varepsilon_{a, b} = \alpha^{-1} (id_{(b^a)}) \]
 Since we recognize $\alpha^{-1}$ as \hask{uncurry}, and $\varepsilon$ as function application, we can write it in Haskell as:
 \begin{haskell}
 apply :: (a -> b, a) -> b
@@ -702,8 +702,8 @@ They are both contravariant functors in the type variable \hask{x}.
 instance Contravariant (LeftFunctor a b) where
   contramap g (LF f) = LF (f . bimap g id)
 \end{haskell}
-This says that the lifting of $g \colon X \to Y$ acting on $ \mathcal{C}(Y \times A, B)$ is given by
-\[ (- \circ (g \times id_A)) \colon\mathcal{C}(Y \times A, B) \to  \mathcal{C}(X \times A, B)\]
+This says that the lifting of $g \colon x \to y$ acting on $ \mathcal{C}(y \times a, b)$ is given by
+\[ (- \circ (g \times id_a)) \colon\mathcal{C}(y \times a, b) \to  \mathcal{C}(x \times a, b)\]
 
 Similarly
 \begin{haskell}
@@ -711,7 +711,7 @@ instance Contravariant (RightFunctor a b) where
   contramap g (RF h) = RF (h . g)
 \end{haskell}
 translates to 
-\[ (- \circ g) \colon  \mathcal{C}(Y, B^A) \to \mathcal{C}(X, B^A) \]
+\[ (- \circ g) \colon  \mathcal{C}(y, b^a) \to \mathcal{C}(x, b^a) \]
 
 The natural transformation $\alpha$ is just a thin encapsulation of \hask{curry}; and its inverse is \hask{uncurry}:
 
@@ -725,45 +725,45 @@ alpha_1 :: forall a b x. RightFunctor a b x -> LeftFunctor a b x
 alpha_1 (RF h) = LF (uncurry h)
 \end{haskell}
 
-Using the two formulas for the lifting of $g \colon X \to Y$, here's the naturality square:
+Using the two formulas for the lifting of $g \colon x \to y$, here's the naturality square:
 
 \[
  \begin{tikzcd}
- \mathcal{C}(Y \times A, B)
- \arrow[rr, "(- \circ (g \times id_A))"]
- \arrow[d,  "\alpha_Y"]
+ \mathcal{C}(y \times a, b)
+ \arrow[rr, "(- \circ (g \times id_a))"]
+ \arrow[d,  "\alpha_y"]
 & &
-\mathcal{C}(X \times A, B)
-  \arrow[d, "\alpha_X"]
+\mathcal{C}(x \times a, b)
+  \arrow[d, "\alpha_x"]
  \\
- \mathcal{C}(Y, B^A)
+ \mathcal{C}(y, b^a)
  \arrow[rr, "(- \circ g)"]
 & &
-\mathcal{C}(X, B^A)
+\mathcal{C}(x, b^a)
  \end{tikzcd}
 \]
 
-Let's now apply the Yoneda trick to it and replace $Y$ with $B^A$. This also allows us to substitute $g$, which now goes for $X$ to $B^A$, with $h$. 
+Let's now apply the Yoneda trick to it and replace $y$ with $b^a$. This also allows us to substitute $g$, which now goes for $x$ to $b^a$, with $h$. 
 
 \[
  \begin{tikzcd}
- \mathcal{C}(B^A \times A, B)
- \arrow[rr, "(- \circ (h \times id_A))"]
- \arrow[d,  "\alpha_{(B^A)}"]
+ \mathcal{C}(b^a \times a, b)
+ \arrow[rr, "(- \circ (h \times id_a))"]
+ \arrow[d,  "\alpha_{(b^a)}"]
 & &
-\mathcal{C}(X \times A, B)
-  \arrow[d,  "\alpha_X"]
+\mathcal{C}(x \times a, b)
+  \arrow[d,  "\alpha_x"]
  \\
- \mathcal{C}(B^A, B^A)
+ \mathcal{C}(b^a, b^a)
  \arrow[rr, "(- \circ h)"]
 & &
-\mathcal{C}(X, B^A)
+\mathcal{C}(x, b^a)
  \end{tikzcd}
 \]
 
-We know that the hom-set $\mathcal{C}(B^A, B^A)$ contains at least the identity arrow, so we can pick the element $id_{(B^A)}$ in the lower left corner. 
+We know that the hom-set $\mathcal{C}(b^a, b^a)$ contains at least the identity arrow, so we can pick the element $id_{(b^a)}$ in the lower left corner. 
 
-$\alpha^{-1}$ acting on it produces $\varepsilon_{A, B}$ in the upper left corner (that's the \hask{uncurry id} trick). 
+$\alpha^{-1}$ acting on it produces $\varepsilon_{a, b}$ in the upper left corner (that's the \hask{uncurry id} trick). 
 
 Pre-composition with $h$ acting on identity produces $h$ in the lower right corner. 
 
@@ -773,12 +773,12 @@ $\alpha^{-1}$ acting on $h$ produces $f$ in the upper right corner.
  \begin{tikzcd}[
   every arrow/.style={draw,mapsto}
 ]
- \varepsilon_{A, B}
- \arrow[rr, "(- \circ (h \times id_A))"]
+ \varepsilon_{a, b}
+ \arrow[rr, "(- \circ (h \times id_a))"]
 & &
 f
  \\
- id_{(B^A)}
+ id_{(b^a)}
  \arrow[u, "\alpha^{-1}"]
  \arrow[rr, "(- \circ h)"]
 & &
@@ -789,8 +789,8 @@ h
 (The $\mapsto$ arrows denote the action of functions on elements of sets.)
 
 
-So the selection of $id_{(B^A)}$ in the lower left corner fixes the other three corners. In particular, we can see that the upper arrow applied to $\varepsilon_{A, B}$ produces $f$, which is exactly the commuting condition:
-\[ \varepsilon_{A, B} \circ (h \times id_A) = f \]
+So the selection of $id_{(b^a)}$ in the lower left corner fixes the other three corners. In particular, we can see that the upper arrow applied to $\varepsilon_{a, b}$ produces $f$, which is exactly the commuting condition:
+\[ \varepsilon_{a, b} \circ (h \times id_a) = f \]
 the one that we set out to derive.
 
 \section{Limits and Colimits}
@@ -801,20 +801,20 @@ Nothing prevents us from replacing the category $\mathbf{2}$ with something more
 
 There is a whole vocabulary built around such constructions. 
 
-We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can replace $\mathbf{2}$ with an arbitrary indexing category $\mathbf{I}$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \mathbf{I} \to \mathcal{C}$. It picks objects in $\mathcal{C}$ as well as some of the arrows between them.
+We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can replace $\mathbf{2}$ with an arbitrary indexing category $\mathbf{I}$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \mathbf{I} \to \mathcal{C}$. It picks objects in $\mathcal{C}$ as well as some arrows between them.
 
-As the second functor we'll still use the constant functor $\Delta_X \colon \mathbf{I} \to \mathcal{C}$.
+As the second functor we'll still use the constant functor $\Delta_x \colon \mathbf{I} \to \mathcal{C}$.
 
 A  natural transformation that's an element of the hom-set
-\[ [\mathbf{I}, \mathcal{C}](\Delta_X, D)  \]
+\[ [\mathbf{I}, \mathcal{C}](\Delta_x, D)  \]
 is now called a \emph{cone}. Its dual, an element of
-\[ [\mathbf{I}, \mathcal{C}](D, \Delta_X)  \]
+\[ [\mathbf{I}, \mathcal{C}](D, \Delta_x)  \]
 is called a \emph{cocone}. They generalize the span and the cospan, respectively.
 
 Diagramatically, cones and cocones look like this:
 \[
  \begin{tikzcd}
-  & X
+  & x
 \arrow[ddr, "g"]
  \arrow[ddl, "f"']
  \arrow[ddd, "h"]
@@ -842,24 +842,24 @@ D 1
  \arrow[dd, "h"]
  \\
  \\
- & X
+ & x
  \end{tikzcd}
  \]
 
-Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_X$ shrinks all vertices to one, so naturality squares turn into triangles. Naturality means that all triangles with $X$ in their apex must now commute. 
+Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_x$ shrinks all vertices to one, so naturality squares turn into triangles. Naturality means that all triangles with $X$ in their apex must now commute. 
 
-The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}_D$. Universality means that it satisfies the following isomorphism, natural in $X$:
-\[ [\mathbf{I}, \mathcal{C}](\Delta_X, D)  \cong \mathcal{C}(X, \text{Lim}_D) \]
+The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}_D$. Universality means that it satisfies the following isomorphism, natural in $x$:
+\[ [\mathbf{I}, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}_D) \]
 Dually, the universal cocone is called a \emph{colimit}, and is described by the following natural isomorphism:
-\[ [\mathbf{I}, \mathcal{C}](D, \Delta_X)  \cong \mathcal{C}( \text{Colim}_D, X) \]
+\[ [\mathbf{I}, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}_D, x) \]
 
 We can now say that a product is a limit, and a sum is a colimit, of a diagram from the indexing category $\mathbf{2}$.
 
 Limits and colimits distill the essence of a pattern. 
 
-A limit, like a product, it is defined by its mapping-in property. 
+A limit, like a product, is defined by its mapping-in property. 
 
-A colimit, like a sum, it is defined by its mapping out property.
+A colimit, like a sum, is defined by its mapping-out property.
 
 There are many interesting limits and colimits, and we'll see some when we discuss algebras and coalgebras.
 
@@ -871,41 +871,41 @@ Show that the limit of a ``walking arrow'' category, that is a two-object catego
 
 A functor from some category $\mathcal{C}$ to the category of sets can be thought of as a model of this category in $\mathbf{Set}$. Modeling, in general, is a lossy process: it discards some information. A constant functor is an extreme example: it maps the whole category to a single set and its identity function. 
 
-A hom-functor produces a model of the category as viewed from a certain vantage point. The functor $\mathcal{C}(A, -)$, for instance, offers the panorama of $\mathcal{C}$ from the vantage point of $A$. It organizes all the arrows emanating from $A$ into neat packages that are connected by images of arrows that go between them, all in accordance with the original structure of the source category. 
+A hom-functor produces a model of the category as viewed from a certain vantage point. The functor $\mathcal{C}(a, -)$, for instance, offers the panorama of $\mathcal{C}$ from the vantage point of $a$. It organizes all the arrows emanating from $a$ into neat packages that are connected by images of arrows that go between them, all in accordance with the original structure of the source category. 
 
-Some vantage points are better than others. For instance, the view from the initial object is quite sparse. Every object $X$ is mapped to a singleton set corresponding to the unique mapping $0 \to X$. 
+Some vantage points are better than others. For instance, the view from the initial object is quite sparse. Every object $x$ is mapped to a singleton set corresponding to the unique mapping $0 \to x$. 
 
 The view from the terminal object is more interesting: it maps all objects to their sets of (global) elements. 
 
 The Yoneda lemma may be considered one of the most profound statements, or one of the most trivial statements in category theory. Let's start with the profound version. 
 
-Consider two models of $\mathcal{C}$ in $\mathbf{Set}$: one given by the hom-functor  $\mathcal{C}(A, -)$, that is the panoramic view of $\mathcal{C}$ from the vantage point of $A$; and another given by some functor $F \colon \mathcal{C} \to \mathbf{Set}$. A natural transformation between them embeds one model in the other. It turns out that the set of such natural transformations is fully determined by the value of $F$ at $A$.
+Consider two models of $\mathcal{C}$ in $\mathbf{Set}$: one given by the hom-functor  $\mathcal{C}(a, -)$, that is the panoramic view of $\mathcal{C}$ from the vantage point of $a$; and another given by some functor $F \colon \mathcal{C} \to \mathbf{Set}$. A natural transformation between them embeds one model in the other. It turns out that the set of such natural transformations is fully determined by the value of $F$ at $a$.
 
 The set of natural transformation is the hom-set in the functor category $[\mathcal{C}, \mathbf{Set}]$, so this is the formal statement of the Yoneda lemma:
 
-\[ [\mathcal{C}, \mathbf{Set}]( \mathcal{C}(A, -), F) \cong F A \]
+\[ [\mathcal{C}, \mathbf{Set}]( \mathcal{C}(a, -), F) \cong F a \]
 
 The reason this works is because all the mappings involved in this theorem are bound by the requirements of preserving the structure of the category $\mathcal{C}$ and the structure of its models. In particular, naturality conditions impose a huge set of constraints on the way the mapping propagates from one point to another. 
 
 The proof of the Yoneda lemma starts with a single identity arrow and lets naturality propagate it across the whole category.
 
-Here's the sketch of the proof. It consists of two parts: First, given a natural transformation we construct an element of $F A$. Second, given an element of $F A$ we construct the corresponding natural transformation. 
+Here's the sketch of the proof. It consists of two parts: First, given a natural transformation we construct an element of $F a$. Second, given an element of $F a$ we construct the corresponding natural transformation. 
 
-First, let's pick an arbitrary element on the left-hand side: a natural transformation $\alpha$. Its component at $X$ is a function
-\[ \alpha_X \colon \mathcal{C}(A, X) \to F X \]
-We can now apply the Yoneda trick: substitute $A$ for $X$ and pick the identity $id_A$ as the element of $\mathcal{C}(A, A)$. This gives us an element $\alpha_A (id_A)$ in the set $F A$.
+First, let's pick an arbitrary element on the left-hand side: a natural transformation $\alpha$. Its component at $x$ is a function
+\[ \alpha_x \colon \mathcal{C}(a, x) \to F x \]
+We can now apply the Yoneda trick: substitute $a$ for $x$ and pick the identity $id_a$ as the element of $\mathcal{C}(a, a)$. This gives us an element $\alpha_a (id_a)$ in the set $F a$.
 
-Now the other way around. Take an element $y$ of the set $F A$. We want to implement a natural transformation that takes an arrow $h$ from $ \mathcal{C}(A, X)$ and produces an element of $F X$. This is simply done by lifting the arrow $h$ using $F$. We get a function
-\[F h \colon F A \to F X \]
-We can apply this function to $y$ to get an element of $F X$. We take this element as the action of $\alpha_X$ on $h$.
+Now the other way around. Take an element $p$ of the set $F a$. We want to implement a natural transformation that takes an arrow $h$ from $ \mathcal{C}(a, x)$ and produces an element of $F x$. This is simply done by lifting the arrow $h$ using $F$. We get a function
+\[F h \colon F a \to F x \]
+We can apply this function to $p$ to get an element of $F x$. We take this element as the action of $\alpha_x$ on $h$.
 
 \begin{exercise}
 Show that the mapping 
-\[ \mathcal{C}(A, X) \to F X\]
-defined above is a natural transformation. Hint: Vary $X$ using some $f \colon X \to Y$.
+\[ \mathcal{C}(a, x) \to F x\]
+defined above is a natural transformation. Hint: Vary $x$ using some $f \colon x \to y$.
 \end{exercise}
 
-The isomorphism in the Yoneda lemma is natural not only in $A$ but also in $F$. In other words, you can ``move'' from the functor $F$ to another functor $G$ by applying an arrow in the functor category, that is a natural transformation. This is quite a leap in the levels of abstraction, but all the definitions of functoriality and naturality work equally well in the functor category, where objects are functors, and arrows are natural transformations.
+The isomorphism in the Yoneda lemma is natural not only in $a$ but also in $F$. In other words, you can ``move'' from the functor $F$ to another functor $G$ by applying an arrow in the functor category, that is a natural transformation. This is quite a leap in the levels of abstraction, but all the definitions of functoriality and naturality work equally well in the functor category, where objects are functors, and arrows are natural transformations.
 
 \subsection{Yoneda lemma in programming}
 
@@ -938,9 +938,9 @@ Continuation-passing style is difficult to work with because the composition of 
 
 \subsection{The contravariant Yoneda lemma}
 
-By reversing a few arrow, the Yoneda lemma can be applied to contravariant functors as well. It works on natural transformations between the contravariant hom-functor $\mathcal{C}(-, A)$ and a contravariant functor $F$:
+By reversing a few arrow, the Yoneda lemma can be applied to contravariant functors as well. It works on natural transformations between the contravariant hom-functor $\mathcal{C}(-, a)$ and a contravariant functor $F$:
 
-\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, A), F) \cong F A \]
+\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, a), F) \cong F a \]
 
 This is the Haskell implementation of the mapping:
 \begin{haskell}
@@ -955,43 +955,45 @@ coyoneda_1 y = \h -> contramap h y
 
 \section{Yoneda Embedding}
 
-In a closed category, we have exponential objects that serve as stand-ins for hom-sets. This is obviously a thing in the category of sets, where hom-sets, being sets, are automatically objects. But in the category of categories  $\mathbf{Cat}$, hom-sets are sets of functors, and it's not immediately obvious that they can be promoted to objects---that is categories. But, as we've seen, they can! Functors between any two categories form a functor category, with natural transformations as arrows.
+In a closed category, we have exponential objects that serve as stand-ins for hom-sets. This is obviously a thing in the category of sets, where hom-sets, being sets, are automatically objects. 
+
+But in the category of categories  $\mathbf{Cat}$, hom-sets are \emph{sets} of functors, and it's not immediately obvious that they can be promoted to objects---that is categories. But, as we've seen, they can! Functors between any two categories form a functor \emph{category}.
 
 Because of that, it's possible to curry functors just like we curried functions. A functor from a product category can be viewed as a functor returning a functor. In other words, $\mathbf{Cat}$ is a closed (symmetric) monoidal category.
 
-In particular, we can apply currying to the hom-functor $\mathcal{C}(A, B)$. It is a profunctor, or a functor from the product category:
+In particular, we can apply currying to the hom-functor $\mathcal{C}(a, b)$. It is a profunctor, or a functor from the product category:
 \[ \mathcal{C}^{op} \times \mathcal{C} \to  \mathbf{Set} \]
-But it's also a contravariant functor in $A$. For every $A$ in  $\mathcal{C}^{op}$  it produces a functor $\mathcal{C}(A, -)$, that is an object in the functor category $ [\mathcal{C},  \mathbf{Set}] $. We can write this mapping as:
+But it's also a contravariant functor in $a$. For every $a$ in  $\mathcal{C}^{op}$  it produces a functor $\mathcal{C}(a, -)$, that is an object in the functor category $ [\mathcal{C},  \mathbf{Set}] $. We can write this mapping as:
 \[ \mathcal{C}^{op} \to [\mathcal{C},  \mathbf{Set}] \]
-Alternatively, we can focus on $B$ and get a contravariant functor $\mathcal{C}(-, B)$. This mapping can be written as
+Alternatively, we can focus on $b$ and get a contravariant functor $\mathcal{C}(-, b)$. This mapping can be written as
 \[ \mathcal{C} \to [\mathcal{C}^{op},  \mathbf{Set}] \]
 Both mappings are functorial, which means that, for instance, an arrow in $\mathcal{C}$ is mapped to a natural transformation in $[\mathcal{C}^{op},  \mathbf{Set}]$.
 
-These $\mathbf{Set}$-valued functor categories are common enough that they have special names. The functors in $[\mathcal{C}^{op},  \mathbf{Set}]$ are called \emph{presheaves}, and the ones in $[\mathcal{C},  \mathbf{Set}]$ are called \emph{co-presheaves}. (The names come from algebraic topology.)
+These $\mathbf{Set}$-valued functor categories are common enough that they have special names. The functors in $[\mathcal{C}^{op},  \mathbf{Set}]$ are called \index{presheaves}\emph{presheaves}, and the ones in $[\mathcal{C},  \mathbf{Set}]$ are called \index{co-presheaves}\emph{co-presheaves}. (The names come from algebraic topology.)
 
 Let's focus our attention on the following reading of the hom-functor:
 \[ \mathcal{Y} \colon \mathcal{C} \to [\mathcal{C}^{op},  \mathbf{Set}] \]
-It takes an object $X$ and maps it to a presheaf $\mathcal{C}(-, X)$, which can be visualized as the totality of views of $X$ from all possible directions.
+It takes an object $x$ and maps it to a presheaf $\mathcal{C}(-, x)$, which can be visualized as the totality of views of $x$ from all possible directions.
 
-Let's also review its action on arrows. The functor $\mathcal{Y}$ lifts an arrow $f \colon X \to Y$ to a mapping of presheaves:
-\[ \alpha \colon \mathcal{C}(-, X) \to \mathcal{C}(-, Y) \]
-The component of this natural transformation at some $Z$ is a function between hom-sets:
-\[ \alpha_Z \colon \mathcal{C}(Z, X) \to \mathcal{C}(Z, Y) \]
+Let's also review its action on arrows. The functor $\mathcal{Y}$ lifts an arrow $f \colon x \to y$ to a mapping of presheaves:
+\[ \alpha \colon \mathcal{C}(-, x) \to \mathcal{C}(-, y) \]
+The component of this natural transformation at some $z$ is a function between hom-sets:
+\[ \alpha_z \colon \mathcal{C}(z, x) \to \mathcal{C}(z, y) \]
 which is simply implemented as the post-composition $(f \circ -)$.
 
 Such a functor $\mathcal{Y}$ can be thought of as creating a model of $\mathcal{C}$ in the presheaf category. But this is no run-of-the-mill model---it's an \emph{embedding} of one category inside another. This particular one is called the \emph{Yoneda embedding}. 
 
-First of all, every object of $\mathcal{C}$ is mapped to a different object (presheaf) in $[\mathcal{C}^{op},  \mathbf{Set}]$. We say that it's ``injective on objects.'' But that's not all: every arrow in $\mathcal{C}$ is mapped to a different arrow. We say that the embedding functor is \emph{faithful}. If that weren't enough, the mapping of hom-sets is also surjective, meaning that every arrow between objects in $[\mathcal{C}^{op},  \mathbf{Set}]$ comes from some arrow in $\mathcal{C}$. We say that the functor is \emph{full}. Altoghether, the embedding is \emph{fully faithful}.
+First of all, every object of $\mathcal{C}$ is mapped to a different object (presheaf) in $[\mathcal{C}^{op},  \mathbf{Set}]$. We say that it's ``injective on objects.'' But that's not all: every arrow in $\mathcal{C}$ is mapped to a different arrow. We say that the embedding functor is \index{faithful functor}\emph{faithful}. If that weren't enough, the mapping of hom-sets is also surjective, meaning that every arrow between objects in $[\mathcal{C}^{op},  \mathbf{Set}]$ comes from some arrow in $\mathcal{C}$. We say that the functor is \index{full functor}\emph{full}. Altoghether, the embedding is \emph{fully faithful}.
 
 The latter fact is the direct consequence of the Yoneda lemma. We know that, for any functor $F \colon \mathcal{C}^{op} \to \mathbf{Set}$, we have a natural isomorphism:
 
-\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, X), F) \cong F X \]
-In particular, we can substitute another hom-functor $\mathcal{C}(-, Y)$ for $F$:
-\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, X), \mathcal{C}(-, Y)) \cong \mathcal{C}(X, Y)\]
+\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, x), F) \cong F x \]
+In particular, we can substitute another hom-functor $\mathcal{C}(-, y)$ for $F$:
+\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, x), \mathcal{C}(-, y)) \cong \mathcal{C}(x, y)\]
 The left-hand side is the hom-set in the presheaf category and the right-hand side is the hom-set in $\mathcal{C}$. They are isomorphic, which proves that the embedding is fully faithful.
 
-Let's have a closer look at this isomorphism. Let's pick an element of the set $\mathcal{C}(X, Y)$---an arrow $f$. The isomorphism maps it to a natural transformation whose component at $Z$ is a function:
-\[ \mathcal{C}(Z, X) \to \mathcal{C}(Z, Y) \]
+Let's have a closer look at this isomorphism. Let's pick an element of the right-hand set $\mathcal{C}(x, y)$---an arrow $f$. The isomorphism maps it to a natural transformation whose component at $z$ is a function:
+\[ \mathcal{C}(z, x) \to \mathcal{C}(z, y) \]
 This mapping is implemented as post-composition $(f \circ -)$.
 
 In Haskell, we would write it as:
@@ -1013,24 +1015,24 @@ fromNat alpha = alpha id
 This isomorphism maps identity to identity and composition to composition. That's because it's implemented as post-composition, and post-composition preserves both identity and composition. We've seen this in the chapter on isomorphisms:
 \[ ((f \circ g) \circ -) = (f \circ -) \circ (g \circ -) \]
 
-Because it preserves composition and identity, this isomorphism also preserves \emph{isomorphisms}. So if $X$ is isomorphic to $Y$ then the presheaves $ \mathcal{C}(-, X)$ and $ \mathcal{C}(-, Y)$ are isomorphic, and vice versa. 
+Because it preserves composition and identity, this isomorphism also preserves \emph{isomorphisms}. So if $x$ is isomorphic to $y$ then the presheaves $ \mathcal{C}(-, x)$ and $ \mathcal{C}(-, y)$ are isomorphic, and vice versa. 
 
 This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. 
 
 \section{Representable Functors}
 
-Objects in a  co-presheaf category are functors that assign sets to objects in $\mathcal{C}$. Some of these functors work by picking a reference object $A$ and assigning,  to all objects $X$, their hom-sets  $\mathcal{C}(A, X)$. Such functors, and all the functors isomorphic to those, are called \emph{representable}. The whole functor is ``represented'' by a single object $A$. 
+Objects in a  co-presheaf category are functors that assign sets to objects in $\mathcal{C}$. Some of these functors work by picking a reference object $a$ and assigning,  to all objects $x$, their hom-sets  $\mathcal{C}(a, x)$. Such functors, and all the functors isomorphic to those, are called \emph{representable}. The whole functor is ``represented'' by a single object $a$. 
 
-In a closed category, the functor which assigns the set of elements of $X^A$ to every object $X$ is represented by $A$, because the set of elements of $X^A$ is isomorphic to $\mathcal{C}(A, X)$:
-\[\mathcal{C}(1, X^A) \cong \mathcal{C}(1 \times A, X) \cong \mathcal{C} (A, X)\]
+In a closed category, the functor which assigns the set of elements of $x^a$ to every object $x$ is represented by $a$, because the set of elements of $x^a$ is isomorphic to $\mathcal{C}(a, x)$:
+\[\mathcal{C}(1, x^a) \cong \mathcal{C}(1 \times a, x) \cong \mathcal{C} (a, x)\]
 
-Seen this way, the representing object $A$ is like a logarithm of a functor. 
+Seen this way, the representing object $a$ is like a logarithm of a functor. 
 
 The analogy goes deeper: just like a logarithm of a product is a sum of logarithms, a representing object for a product data type is a sum. For instance, the functor that squares its argument using a product, $F x = x \times x$, is represented by $2$, which is the sum $1 + 1$. 
 
-Representable functors play a very special role in the category of $ \mathbf{Set}$-valued functors. Notice that the Yoneda embedding maps objects of $\mathcal{C}$ to representable presheaves. It maps an object $X$ to a presheaf represented by $X$: 
+Representable functors play a very special role in the category of $ \mathbf{Set}$-valued functors. Notice that the Yoneda embedding maps objects of $\mathcal{C}$ to representable presheaves. It maps an object $x$ to a presheaf represented by $x$: 
 
-\[  \mathcal{Y} \colon X \mapsto \mathcal{C}(-, X) \]
+\[  \mathcal{Y} \colon x \mapsto \mathcal{C}(-, x) \]
 
 We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded inside the presheaf category as representable functors. The question is, what else is there in the presheaf category ``in between'' representable functors?
 
@@ -1040,7 +1042,7 @@ Just like rational numbers are dense among real numbers, so representables are `
 
 The idea that objects can be described by the way they interact with other objects is sometimes illustrated by playing imaginary guessing games. One category theorist picks a secret object in a category, and the other has to guess which object it is (up to isomorphism, of course). 
 
-The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond, each time, with a set: the set of arrows from the probing object $A$ to the secret object $X$. This, of course, is the hom-set $\mathcal{C}(A, X)$. 
+The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond, each time, with a set: the set of arrows from the probing object $a$ to the secret object $x$. This, of course, is the hom-set $\mathcal{C}(a, x)$. 
 
 The totality of these answers, as long as the opponent is not cheating, will define a presheaf $F \colon \mathcal{C} \to \mathbf{Set}$, and the object they are hiding is its representing object. 
 
