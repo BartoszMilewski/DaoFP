@@ -12,7 +12,7 @@ The situation is somewhat analogous to the problem of composing geometric transf
 
 \subsection{Monoids and their Representations}
 
-The theory or representations is a science in itself. Here, we'll approach it from the categorical perspective. Instead of groups, we'll consider monoids. A monoid can be defined as a special object in a monoidal category, but it can also be thought of as a single-object category $\cat M$. If we call this object $*$, the hom-set $\cat M( *, *)$ contains all the information we need. 
+The theory or representations is a science in itself. Here, we'll approach it from the categorical perspective. Instead of groups, we'll consider monoids. A monoid can be defined as a special object in a monoidal category, but it can also be thought of as a single-object category $\cat M$. If we call its object $*$, the hom-set $\cat M( *, *)$ contains all the information we need. 
 
 Monoidal product is simply the composition of morphisms. By the laws of a category, it's associative and unital---the identity morphism serving as the monoidal unit.
 
@@ -37,7 +37,7 @@ If the functor is fully faithful, its image contains exactly the same informatio
 
 In the extreme, the whole hom-set $\cat M(*, *)$ may be mapped to the identity morphism $id_S$. So, just by looking at the set $S$---the image of $*$ under the functor $F$---we cannot dream of reconstructing the original monoid.
 
-Not all is lost, though, if we are allowed to look at all the representations of a given monoid simultaneously. Such representations form a functor category $[\cat M, \Set]$, a.k.a. the co-presheaf category. Arrows in this category are natural transformations. 
+Not all is lost, though, if we are allowed to look at all the representations of a given monoid simultaneously. Such representations form a functor category $[\cat M, \Set]$, a.k.a. the co-presheaf category over $\cat M$. Arrows in this category are natural transformations. 
 
 Since the source category $\cat M$ contains only one object, naturality conditions take a particularly simple form. A natural transformation $\alpha \colon F \to G$ has only one component, a function $\alpha \colon F * \to G *$. Given a morphism $m \colon * \to *$, the naturality square reads:
 
@@ -75,9 +75,9 @@ Such functions are called \index{equivariant function}\emph{equivariant}. We oft
 
 How much information do we need to reconstruct a monoid from its representations? Just looking at the sets is definitely not enough, since any monoid can be represented on any set. But if we include structure-preserving functions between these sets, we might have a chance. 
 
-Consider a set of functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid, $F m$. If we look at the ``neighboring'' set $G *$ and its set of functions  $\Set(G *, G *)$ we'll find there the corresponding actions $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will map these actions. It will map other morphisms as well.
+Consider a set of all functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid, $F m$. If we look at the ``neighboring'' set $G *$ and its set of functions  $\Set(G *, G *)$ we'll find there the corresponding actions $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will map these actions. It will map other morphisms as well.
 
-Imagine creating a gigantic tuple by taking one function from each of the sets $\Set (F *, F *)$, for all functors $F\colon \cat M \to \Set$. Moreover, we want the elements of the tuple to be correlated. If we pick $g \in  \Set (G*, G *)$ and  $h \in  \Set (H*,  H*)$ and there is a natural transformation (equivariant function) $\alpha$ between the two functors $G$ and $H$, we want the two function to be related:
+Now imagine creating a gigantic tuple by taking one function from each of the sets $\Set (F *, F *)$, for all functors $F\colon \cat M \to \Set$. We are interested only in tuples whose elements are correlated. Here's what I mean: If we pick $g \in  \Set (G*, G *)$ and  $h \in  \Set (H*,  H*)$ and there is a natural transformation (equivariant function) $\alpha$ between the two functors $G$ and $H$, we want the two function to be related:
 \[ \alpha \circ g = h \circ \alpha \]
 or, pictorially:
 \[
@@ -125,7 +125,7 @@ In other words, we can recover the monoid from its representations.
 
 \subsection{Proof of Tannakian reconstruction}
 
-Monoid reconstruction is a special case of a more general theorem in which the single-object category is replaced with a regular category. As in the monoid case, we'll reconstruct the hom-set, only this time it will be a general hom-set. We'll prove the formula:
+Monoid reconstruction is a special case of a more general theorem in which instead of the single-object category we use a regular category. As in the monoid case, we'll reconstruct the hom-set, only this time it will be a regular hom-set between two objects. We'll prove the formula:
 \[ \int_{F \colon [\cat C, \Set]} \Set (F a, F b) \cong \cat C(a, b) \]
 The trick is to use the Yoneda lemma to represent the action of $F$:
 \[ F a \cong [\cat C, \Set] ( \cat C (a ,-), F) \]
@@ -158,7 +158,7 @@ Indeed, one direction of the isomorphism is just that: capturing a function and 
 toRep :: (a -> b) -> (forall f. Functor f => f a -> f b)
 toRep g fa = fmap g fa
 \end{haskell}
-The other direction uses the identity trick:
+The other direction uses the Yoneda trick:
 \begin{haskell}
 fromRep :: (forall f. Functor f => f a -> f b) -> (a -> b)
 fromRep g a = unId (g (Id a))
@@ -178,21 +178,21 @@ This kind of reconstruction might seem trivial and pointless. Why would anyone w
 \begin{haskell}
 type Getter a b = forall f. Functor f => f a -> f b
 \end{haskell}
-It's instructive, though, to think of \hask{a->b} as the precursor of all optics. It's a lens that focuses on the $b$ part of $a$. It tells us that $a$ contains enough information, in one form or another, to construct an $b$. It's a ``getter'' or an ``accessor.'' 
+It's instructive, though, to think of \hask{a->b} as the precursor of all optics. It's a lens that focuses on the $b$ part of $a$. It tells us that $a$ contains enough information, in one form or another, to construct a $b$. It's a ``getter'' or an ``accessor.'' 
 
-Obviously, functions compose. What's interesting though is that functor representations also compose, and they compose using simple function composition:
+Obviously, functions compose. What's interesting though is that functor representations also compose, and they compose using simple function composition, as seen in this example:
 \begin{haskell}
 boolToStrGetter :: Getter Bool String
 boolToStrGetter = toRep (show) . toRep (bool 0 1)
 \end{haskell}
-Other optics don't compose so easily, but their functor (and profunctor) representation do. 
+Other optics don't compose so easily, but their functor (and profunctor) representations do. 
 \subsection{Pointed getter}
 
 Here's a little toy example in Haskell that illustrates the need for more interesting reconstructions. It's an optic that can either act as a getter or it can return a default value.
 \begin{haskell}
 data PtdGetter s t = Pt t | Fun (s -> t)
 \end{haskell}
-We can apply this getter to a source value and get a result:
+We can apply this getter to a source value and get a result of type \hask{t}:
 \begin{haskell}
 apply :: PtdGetter s t -> s -> t
 apply (Pt t) _ = t
@@ -229,7 +229,7 @@ As before, we can apply this optic to retrieve the target. The trick is to encap
 applyF :: PtdGetterF s t -> s -> t
 applyF g = unId . g . Id
 \end{haskell}
-Indeed, the identity functor is pointed:
+This works because the identity functor is pointed:
 \begin{haskell}
 instance Pointed Id where
   eta = Id
@@ -267,20 +267,20 @@ They form their own category, let's call it $\mathbf{Ptd}$,  with morphisms that
  \end{tikzcd}
 \]
 
-Every pointed functor is a functor---a statement that is formalized by saying that there is a forgetful functor $U \colon\mathbf{Ptd} \to [\Set, \Set]$, which forgets the additional structure. Notice that this is a functor between functor categories. 
+Every pointed functor is a functor---a statement that is formalized by saying that there is a forgetful functor $U \colon\mathbf{Ptd} \to [\Set, \Set]$, which forgets the additional structure. Notice that $U$ is a functor between functor categories. 
 
-This functor has a left adjoint. Any endofunctor $P \colon \Set \to \Set$ can be freely made into a pointed functor using the coproduct:
+This functor has a left adjoint, the free functor $F$. Any endofunctor $Q \colon \Set \to \Set$ can be freely made into a pointed functor using the coproduct:
 \[ (F Q) a = a + Q a \]
-together with a natural transformation:
+together with the natural transformation:
 \[ \eta_a = \text{Left} \]
 
 The trick in generalizing the Tannakian reconstruction is to define the end over a specialized functor category $\cat T$, 
- but applying the forgetful functor to its functors. We assume that we have the free/forgetful adjunction $F \dashv U$:
+ but applying the forgetful functor to its functors. We assume that we have the free/forgetful adjunction $F \dashv U$ between $\cat T$ and $[\cat C, \Set]$:
 \[ \cat T (F Q, P) \cong  [\cat C, \Set] ( Q, U P )\]
 
-Our starting point is the end:
+Our starting point for Tannakian reconstruction is the end:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \]
-The mapping $\cat T \to \Set$ given by:
+The mapping $\cat T \to \Set$ parameterized by the object $a$, and given by the formula:
 \[ P \mapsto (U P) a \]
 is sometimes called a fiber functor, so the end formula can be interpreted as a set of natural transformations between two fiber functors. 
 
@@ -288,9 +288,9 @@ As we did before, we first apply the Yoneda lemma to get:
 \[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (b ,-), U P\big)\Big) \]
 We can now use the adjunction:
 \[ \int_{P \colon \cat T} \Set \Big(\cat T \big( F \cat C (a ,-), P\big), \cat T \big( F \cat C (b ,-), P\big)\Big) \]
-We end up with a mapping between two natural transformations in the functor category $\cat T$. We can simplify it using the corollary to the Yoneda lemma:
+We end up with a mapping between two natural transformations in the functor category $\cat T$. We can simplify it using the corollary to the Yoneda lemma, resulting in:
 \[ \cat T\big( F \cat C (b ,-), F \cat C (a ,-) \big) \]
-We apply the adjunction once more:
+We can apply the adjunction once more:
 \[ \cat T\big( \cat C (b ,-), (U\circ F) \cat C (a ,-) \big) \]
 and the Yoneda lemma again:
 \[ \big( (U\circ F) \cat C (a ,-) \big) b \]
@@ -338,7 +338,7 @@ toIsoP (f, g) = dimap f g
 \end{haskell}
 This is simply saying that any profunctor can be used to lift a pair of functions. 
 
-Conversely, we may ask the question: How can a function map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$ for \emph{every} profunctor imaginable? The only thing this function knows about the profunctor is that it can lift a pair of functions. Therefore it must either contain or be able to produce these two functions. 
+Conversely, we may ask the question: How can a function map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$ for \emph{every} profunctor imaginable? The only thing this function knows about the profunctor is that it can lift a pair of functions. Therefore it must either contain or be able to produce a pair of functions. 
 
 \begin{exercise}
 Implement the function:
@@ -355,7 +355,7 @@ data Adapter a b s t = Ad (s -> a, b -> t)
 
 Let's try to apply the same logic to lenses. We have to find a class of profunctors to plug into our profunctor representation. Let's assume that the forgetful functor $U$ only forgets additional structure but doesn't change the sets, so the set $P \langle a, b \rangle$ is the same as the set $(U P) \langle a, b \rangle$. 
 
-Let's start with the existential representation. We are given an object $c$ and a pair of functions:
+Let's start with the existential representation. We have at our disposal an object $c$ and a pair of functions:
 \[  \langle f, g \rangle \colon \cat C(s, c \times a) \times \cat C(c \times b, t) \]
 We want to build a profunctor representation, so we have to be able to map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$. We could get $P \langle s, t \rangle$ by lifting these two functions, but we would have to start from $P \langle c \times a, c \times b \rangle$. Indeed:
 \[ P \langle f, g \rangle \colon P \langle c \times a, c \times b \rangle \to P \langle s, t \rangle \]
@@ -369,7 +369,7 @@ A profunctor $P$ equipped with the family of transformations:
 \[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \times a, c \times b \rangle \]
 is called a \emph{Tambara module}. 
 
-We want this family to be a natural in $a$ and $b$, but what should we demand from $c$? The problem with $c$ is that it appears twice, once in a contravariant, and once in a covariant position. So, if we want to interact nicely with arrows like $h \colon c \to c'$, we have to modify the naturality condition. We may consider a more general profunctor $P \langle c' \times a, c \times b \rangle$ and treat $\alpha$ as producing its diagonal elements, ones for which $c'$ is the same as $c$. 
+We want this family to be natural in $a$ and $b$, but what should we demand from $c$? The problem with $c$ is that it appears twice, once in a contravariant, and once in a covariant position. So, if we want to interact nicely with arrows like $h \colon c \to c'$, we have to modify the naturality condition. We may consider a more general profunctor $P \langle c' \times a, c \times b \rangle$ and treat $\alpha$ as producing its diagonal elements, ones for which $c'$ is the same as $c$. 
 
 A transformation $\alpha$ between diagonal parts of two profunctors $P$ and $Q$ is called a \index{dinatural transformation}\emph{dinatural transformation} (\emph{di}-agonally natural) if the following diagram commutes for any $f \colon c \to c'$:
 
@@ -473,7 +473,7 @@ This adjunction can be easily checked using some end/coend manipulations. The ma
 
 Replacing $Q$ with $P$ we immediately see that the set of algebras for $\Phi$ is isomorphic to the set of coalgebras for $\Theta$. In fact they are monad algebras for $\Phi$. This means that the Eilenberg-Moore category for the monad $\Phi$ is the same as the Tambara category.
 
-Recall that the Eilenberg-Moore construction factorizes a monad into a free/forgetful adjunction. This is exactly the adjunction we were looking for in deriving the formula for profunctor optics. What remains is to evaluate the action of $\Phi$ on the representable functor:
+Recall that the Eilenberg-Moore construction factorizes a monad into a free/forgetful adjunction. This is exactly the adjunction we were looking for when deriving the formula for profunctor optics. What remains is to evaluate the action of $\Phi$ on the representable functor:
 \[ \big( \Phi (\cat C^{op} \times \cat C) (\langle a, b\rangle ,-) \big) \langle s, t\rangle = \int^{\langle u, v \rangle, c} (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle \big) \times  (\cat C^{op} \times \cat C) \big(\langle a, b\rangle , \langle u, v\rangle \big)\]
 Applying the co-Yoneda lemma, we get:
 \[ \int^c (\cat C^{op} \times \cat C) \big(c \bullet \langle a, b\rangle , \langle s, t \rangle\big) = \int^c \cat C(s, c \times a) \times \cat C (c \times b, t)\]
@@ -582,9 +582,9 @@ toPrismP (Prism from to) = dimap from to . alpha'
 
 Again, profunctor prisms compose using function composition.
 \subsection{Traversals}
-A traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list must match the number of nodes otherwise bad things happen. 
+A traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list that delivers the replacements must match the number of nodes, otherwise bad things happen. 
 
-A type-safe implementation of a traversals requires us to keep track of the sizes of lists. In other words, it requires dependent types.
+A type-safe implementation of a traversals would require us to keep track of the sizes of lists. In other words, it would require dependent types.
 
 In Haskell, a (non-type-safe) traversal is often written as:
 \begin{haskell}
@@ -592,11 +592,11 @@ type Traversal s t a b = s -> ([b] -> t, [a])
 \end{haskell}
 with the understanding that the sizes of the two lists are determined by \hask{s} and must be the same. 
 
-When translating this to categorical language, we'll express this condition using a sum over the sizes of the list. A counted list of size $n$ is an $n$-tuple, or an element of $a^n$, so we can write:
+When translating traversals to categorical language, we'll express this condition using a sum over the sizes of the list. A counted list of size $n$ is an $n$-tuple, or an element of $a^n$, so we can write:
 \[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \Set \big( s, \sum_n (\Set (b^n, t) \times a^n) \big) \]
 We interpret a traversal as a function that, given a source $s$ produces an existential type that is hiding an $n$. It says that there exists an $n$ and a pair consisting of a function $b^n \to t$ and a tuple $a^n$. 
 
-The existential form of a traversal must take into account the fact that the residues for different $n$'s should have, in principle, different types. For instance, you can decompose a tree into an n-tuple of leaves $a^n$ and the residue $c_n$ with $n$ holes. So the correct existential representation for a traversal must involve a coend over all sequences $c_n$ indexed by natural numbers:
+The existential form of a traversal must take into account the fact that the residues for different $n$'s should have, in principle, different types. For instance, you can decompose a tree into an n-tuple of leaves $a^n$ and the residue $c_n$ with $n$ holes. So the correct existential representation for a traversal must involve a coend over all sequences $c_n$ that are indexed by natural numbers:
 \[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \int^{c_n} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
 The sums here are coproducts in $\cat C$.
 
@@ -614,9 +614,9 @@ Here, $[b^k, t]$ is the internal hom, which is an alternative notation for the e
 
 The next step is to recognize that a product in this formula represents a set of natural transformations in $[\cat N, \cat C]$. Indeed, we could write it as an end:
  \[ \prod_k \cat C (c_k,  [b^k, t] \cong \int_{k : \cat N} C (c_k,  [b^k, t]) \]
-This is because an end over a discrete category is but a product. Alternatively, we could write it as a hom-set in the functor category:
+This is because an end over a discrete category is just a product. Alternatively, we could write it as a hom-set in the functor category:
 \[ [\cat N, \cat C](c_{-}, [b^{-}, t]) \]
-with placeholders replacing the arguments to the two functors:
+with placeholders replacing the arguments to the two functors in question:
 \[ k \mapsto c_k \]
 \[ k \mapsto [b^k, t] \]
 
@@ -644,7 +644,7 @@ where the end is taken over a generalized Tambara module.
 
 \section{General Optics}
 
-Whenever we have an action of a monoidal category $\cat M$ we can define the corresponding optic. A category with such an action is called and \index{actegory}\emph{actegory}. We can go even further by considering two separate actions. Suppose that $\cat M$ can act on both $\cat C$ and $\cat D$. We'll use the same notation for both actions:
+Whenever we have an action of a monoidal category $\cat M$ on $\cat C$ we can define the corresponding optic. A category with such an action is called an \index{actegory}\emph{actegory}. We can go even further by considering two separate actions. Suppose that $\cat M$ can act on both $\cat C$ and $\cat D$. We'll use the same notation for both actions:
 \[ \bullet \colon \cat M \times \cat C \to \cat C \]
 \[ \bullet \colon \cat M \times \cat D \to \cat D \]
 We can then define the \index{mixed optics}\emph{mixed optics} as:
