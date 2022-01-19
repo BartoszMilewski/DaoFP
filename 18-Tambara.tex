@@ -593,18 +593,18 @@ type Traversal s t a b = s -> ([b] -> t, [a])
 with the understanding that the sizes of the two lists are determined by \hask{s} and must be the same. 
 
 When translating this to categorical language, we'll express this condition using a sum over the sizes of the list. A counted list of size $n$ is an $n$-tuple, or an element of $a^n$, so we can write:
-\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \Set \big( s, \sum_n (\Set (b^n, t) \times a^n) \big) \]
+\[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \Set \big( s, \sum_n (\Set (b^n, t) \times a^n) \big) \]
 We interpret a traversal as a function that, given a source $s$ produces an existential type that is hiding an $n$. It says that there exists an $n$ and a pair consisting of a function $b^n \to t$ and a tuple $a^n$. 
 
 The existential form of a traversal must take into account the fact that the residues for different $n$'s should have, in principle, different types. For instance, you can decompose a tree into an n-tuple of leaves $a^n$ and the residue $c_n$ with $n$ holes. So the correct existential representation for a traversal must involve a coend over all sequences $c_n$ indexed by natural numbers:
-\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \int^{c_n} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
+\[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \int^{c_n} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
 The sums here are coproducts in $\cat C$.
 
 One way to look at sequences $c_n$ is to interpret them as fibrations. For instance, in $\Set$ we would start with a set $C$ and a projection $p \colon C \to \mathbb N$, where $\mathbb N$ is a set of natural numbers. Similarly $a^n$ could be interpreted as a fibration of the free monoid on $a$ (the set of lists of $a$'s) with the projection that extracts the length of the list.
 
 Or we can look at $c_n$'s as mappings from the set of natural numbers to $\cat C$. In fact, we can treat natural numbers as a discrete category $\cat N$, in which case $c_n$'s are functors $\cat N \to \cat C$.
 
-\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
+\[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
 
 To show the equivalence of the two representations, we first write the mapping out of a sum as a product of mappings:
 \[\int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \prod_k \cat C (c_k \times b^k, t) \]
@@ -633,12 +633,27 @@ If the target category is $\Set$, this is equivalent to the following Day convol
 This gives monoidal structure to the category $[\cat N, \cat C]$. 
 
 The existential representation of traversals can be written is terms of the action of this monoidal category on $\cat C$:
-\[ \mathcal{T} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, c \bullet a) \times \cat C (c \bullet b, t) \]
+\[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, c \bullet a) \times \cat C (c \bullet b, t) \]
 
 The derive the profunctor representation of traversals, we have to generalize Tambara modules to the action of a monoidal category:
 \[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \bullet a, c \bullet b \rangle \]
 It turns out that the original derivation of profunctor optics still works for these generalized Tambara modules, and traversals can be written as polymorphic functions:
-\[  \mathcal{T}\langle s, t\rangle \langle a, b \rangle =\int_{P \colon \cat T} \Set \big((U P) \langle a, b\rangle, (U P) \langle s, t\rangle \big) \]
+\[  \mathcal{TR}\langle s, t \rangle \langle a, b \rangle 
+ =\int_{P \colon \cat T} \Set \big((U P) \langle a, b\rangle, (U P) \langle s, t\rangle \big) \]
 where the end is taken over a generalized Tambara module.
+
+\section{General Optics}
+
+Whenever we have an action of a monoidal category $\cat M$ we can define the corresponding optic. A category with such an action is called and \index{actegory}\emph{actegory}. We can go even further by considering two separate actions. Suppose that $\cat M$ can act on both $\cat C$ and $\cat D$. We'll use the same notation for both actions:
+\[ \bullet \colon \cat M \times \cat C \to \cat C \]
+\[ \bullet \colon \cat M \times \cat D \to \cat D \]
+We can then define the \index{mixed optics}\emph{mixed optics} as:
+\[ \mathcal{O} \langle s, t \rangle \langle a, b \rangle = \int^{m \colon \cat M} \cat C(s, m \bullet a) \times \cat D(m \bullet b, t) \]
+These mixed optics have profunctor representations in terms of profunctors:
+\[ P \colon \cat C ^{op} \times \cat D \to \Set \]
+and the corresponding Tambara modules that use two separate actions:
+\[ \alpha_{\langle a, b\rangle, m} \colon P \langle a, b \rangle \to P \langle m \bullet a, m \bullet b \rangle \]
+with $a$ an object of $\cat C$, $b$ and object of $\cat D$, and $m$ and object of $\cat M$.
+
 
 \end{document}
