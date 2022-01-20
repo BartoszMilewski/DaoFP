@@ -546,6 +546,8 @@ There is nothing special about coproduct so, in general, Day convolution is defi
 In fact, Day convolution for a monoidal category $(\cat C, \otimes, I)$ endows the category of co-presheaves $[\cat C, \Set]$ with a monoidal structure. It's easy to check that Day convolution is associative (up to isomorphism) and that $\cat C(I, -)$ serves as the unit object. For instance, we have:
 \[ (\cat C(I, -) \star G) x =  \int^{a, b} \cat C (a \otimes b, x) \times \cat C(I, a) \times G b \cong 
   \int^{b} \cat C (I \otimes b, x) \times  G b \cong G x\]
+So the unit of Day convolution is the Yoneda functor taken at monoidal unit, which lends itself to the slogan, ``ONE of DAY is a YONEDA of ONE.''
+
 If the tensor product is symmetric, then the corresponding Day convolution is also symmetric (up to isomorphism).
 
 In the special case of a cartesian closed category, we can use the currying adjunction to simplify the formula:
