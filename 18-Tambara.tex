@@ -282,7 +282,7 @@ Our starting point for Tannakian reconstruction is the end:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \]
 The mapping $\cat T \to \Set$ parameterized by the object $a$, and given by the formula:
 \[ P \mapsto (U P) a \]
-is sometimes called a fiber functor, so the end formula can be interpreted as a set of natural transformations between two fiber functors. 
+is sometimes called a \index{fiber functor}\emph{fiber functor}, so the end formula can be interpreted as a set of natural transformations between two fiber functors. 
 
 As we did before, we first apply the Yoneda lemma to get:
 \[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (b ,-), U P\big)\Big) \]
@@ -511,7 +511,7 @@ lens3 = lens2 . lens1
 \end{haskell}
 
 \section{General Optics}
-Tambara modules were originally defined for an arbitrary monoidal category\footnote{In fact, Tambara modules were originally defined for an enriched category} with a tensor product $\otimes$ and a unit object $I$. Their structure maps have the form:
+Tambara modules were originally defined for an arbitrary monoidal category\footnote{In fact, Tambara modules were originally defined for a category enriched over vector spaces} with a tensor product $\otimes$ and a unit object $I$. Their structure maps have the form:
 \[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \otimes a, c \otimes b \rangle \]
 You can easily convince yourself that all coherency laws translate directly to this case, and the derivation of profunctor optics works without change.
 
@@ -655,5 +655,8 @@ and the corresponding Tambara modules that use two separate actions:
 \[ \alpha_{\langle a, b\rangle, m} \colon P \langle a, b \rangle \to P \langle m \bullet a, m \bullet b \rangle \]
 with $a$ an object of $\cat C$, $b$ and object of $\cat D$, and $m$ and object of $\cat M$.
 
+\begin{exercise}
+What are the mixed optics for the action of the cartesian product when one of the categories is the terminal category? What if the first category is $\cat C^{op} \times \cat C$ and the second is terminal?
+\end{exercise}
 
 \end{document}
