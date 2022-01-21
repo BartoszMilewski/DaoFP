@@ -648,7 +648,7 @@ We've seen before that categories, functors, and natural transformations form a 
 
 This category is automatically equipped with a monoidal structure. The tensor product is the composition of 1-cells, and the unit object is the identity 1-cell, $I$. In $[\cat C, \cat C]$ this product is the composition of endofunctors and the unit is the identity functor. 
 
-If we now focus our attention on just one endo-1-cell $F$, we can ``square'' it, that is use the monoidal product to multiply it by itself. In other words, use the 1-cell composition to create $F \circ F$. We define a monad if we can find 2-cells:
+If we now focus our attention on just one endo-1-cell $F$, we can ``square'' it, that is use the monoidal product to multiply it by itself. In other words, use the 1-cell composition to create $F \circ F$. We say that $F$ is a monad if we have 2-cells:
 \[ \mu \colon F \circ F \to F \]
 \[ \eta \colon I \to F \]
 that behave like multiplication and unit, that is make the associativity and unit diagrams commute. 
@@ -660,24 +660,31 @@ that behave like multiplication and unit, that is make the associativity and uni
         \path[->,draw] (star) to  [ in=35,out=145, loop,distance=7cm] node[auto] {$F \circ F$} (star);
     \end{tikzpicture}
 \]
-In fact a monad can be defined like this in an arbitrary bicategory, not just the 2-category $\Cat{Cat}$. 
+In fact a monad can be defined in an arbitrary bicategory, not just the 2-category $\Cat{Cat}$. 
 
-\subsection{Arrows and monads in $\Cat{Prof}$}
+\subsection{Prearrows as monads in $\Cat{Prof}$}
 
-Since $\Cat{Prof}$ is a bicategory, we can define a monad in it. It is an endo-profunctor:
+Since $\Cat{Prof}$ is a bicategory, we can define a monad in it. It is an endo-profunctor (a 1-cell):
 \[ P \colon \cat C^{op} \times \cat C \to \Set \]
-equipped with two natural transformations:
+equipped with two natural transformations (2-cells):
 \[ \mu \colon P \diamond P \to P \]
 \[ \eta \colon \cat C(-, =) \to P \]
 that satisfy the associativity and unit conditions.
 
-Let's rewrite these sets of natural transformations as ends. We get:
+Let's rewrite the sets of natural transformations as ends. We get:
 \[ \mu = \int_{\langle a, b \rangle} \Set \big( \int^x P \langle a, x \rangle \times P \langle x, b \rangle,  P\langle a, b \rangle \big) \]
 By co-continuity, this is equivalent to:
 \[ \mu \cong \int_{\langle a, b \rangle, x} \Set \big(P \langle a, x \rangle \times P \langle x, b \rangle,  P\langle a, b \rangle \big) \]
 The unit is:
 \[ \eta = \int_{\langle a, b \rangle} \Set (\cat C(a, b), P\langle a, b \rangle) \]
 
+In Haskell, such profunctor monads are called pre-arrows:
+\begin{haskell}
+class Profunctor p => PreArrow p where
+  (>>>) :: p a x -> p x b -> p a b
+  arr   :: (a -> b) -> p a b
+\end{haskell}
+An \hask{Arrow} is a \hask{PreArrow} that is also a Tambara module. We'll talk about Tambara modules in the next chapter.
 
 \section{Existential Lens}
 
