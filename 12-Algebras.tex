@@ -11,7 +11,8 @@ The first things to observe about algebraic expressions like $2 (x + y)$ or $a x
 
 In programming, expressions are virtually synonymous to (parsing) trees. Consider this simple example of an arithmetic expression:
 \begin{haskell}
-data Expr = Val Int | Plus Expr Expr
+data Expr = Val Int 
+          | Plus Expr Expr
 \end{haskell}
 It's a recipe for building trees. We start with little trees using the \hask{Val} constructor. We then plant these seedlings into nodes, and so on.
 \begin{haskell}
@@ -37,7 +38,8 @@ The idea of planting smaller trees into nodes requires that we formalize what it
 
 For instance, the endofunctor from our earlier example would be defined by the following data structure, where \hask{x} marks the spots:
 \begin{haskell}
-data ExprF x = ValF Int | PlusF x x
+data ExprF x = ValF Int 
+             | PlusF x x
 \end{haskell}
 Information about all possible shapes of expressions is abstracted into a single functor. 
 
@@ -48,29 +50,29 @@ Thinking recursively, let's assume that we know how to evaluate all subtrees of 
 For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation of the subtrees. It's pretty obvious what we should do in the last step. If the top of the tree is a leaf \hask{ValF} (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers in it. This recipe can be encoded as:
 \begin{haskell}
 eval :: ExprF Int -> Int
-eval (ValF n)   = n
+eval (ValF n)    = n
 eval (PlusF m n) = m + n
 \end{haskell}
 
 We have made some seemingly obvious assumptions based on our experience. For instance, since the node was called \hask{PlusF} we assumed that we should add the two numbers. But multiplication or subtraction would work equally well.
 
-Since the leaf \hask{ValF} contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string, and using concatenation instead of addition:
+Since the leaf \hask{ValF} contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string, and which uses concatenation instead of addition:
 \begin{haskell}
 pretty :: ExprF String -> String
-pretty (ValF n)   = show n
+pretty (ValF n)    = show n
 pretty (PlusF s t) = s ++ " + " ++ t
 \end{haskell}
 
 In fact there are infinitely many evaluators, some sensible, others less so, but we shouldn't be judgmental. Any choice of the target type and any choice of the evaluator should be equally valid. This leads to the following definition:
 
-An \emph{algebra} for an endofunctor $F$ is a pair $(A, \alpha)$. The object $A$ is called the \emph{carrier} of the algebra, and the evaluator $\alpha \colon F A \to A$ is called the \emph{structure map}.
+An \emph{algebra} for an endofunctor $F$ is a pair $(c, \alpha)$. The object $c$ is called the \emph{carrier} of the algebra, and the evaluator $\alpha \colon F c \to c$ is called the \emph{structure map}.
 
 In Haskell, given the functor \hask{f} we define:
 \begin{haskell}
-type Algebra f a = f a -> a
+type Algebra f c = f c -> c
 \end{haskell}
 
-Notice that the evaluator is \emph{not} a polymorphic function. It's a specific choice of a function for a specific type \hask{a}. There may be many choices of the carrier types and there be many different evaluators for a given type. They all define separate algebras.
+Notice that the evaluator is \emph{not} a polymorphic function. It's a specific choice of a function for a specific type \hask{c}. There may be many choices of the carrier types and there be many different evaluators for a given type. They all define separate algebras.
 
 We have previously defined two algebras for \hask{ExprF}. This one has \hask{Int} as a carrier:
 \begin{haskell}
@@ -109,13 +111,13 @@ In other words, the following equation must hold:
 \[f \circ \alpha = \beta \circ F f \]
 
 The composition of two algebra morphisms is again an algebra morphism, which can be seen by pasting together two such diagrams. The identity arrow is also an algebra morphism, because 
-\[ id_A \circ \alpha = \alpha \circ F (id_A) \]
+\[ id_a \circ \alpha = \alpha \circ F (id_a) \]
 (a functor maps identity to identity).
 
 The commuting condition in the definition of an algebra morphism is very restrictive. Consider for instance a function that maps an integer to a string. In Haskell there is a \hask{show} function (actually, a method of the \hask{Show} class) that does it. It is \emph{not} an algebra morphism from \hask{eval} to \hask{pretty}. 
 
 \begin{exercise}
-Show that \hask{show} is not an algebra morphism. Hint: Consider what happens to a \hask{PlusF} node.
+Show that \hask{show} is not an algebra morphism. Hint: Consider what happens to the \hask{PlusF} node.
 \end{exercise}
 
 \subsection{Initial algebra}
@@ -212,7 +214,7 @@ We have thus shown that $h$ is the inverse of $\iota$, which means that $\iota$ 
 \[ F i \cong i \]
 We interpret this identity as stating that $i$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $i$ ``doesn't change it.''
 
-There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. The least point of an endofunctor $F$ is denoted $\mu F$, so we have:
+There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. The least fixed point of an endofunctor $F$ is denoted $\mu F$, so we have:
 \[ i = \mu F \]
 \subsection{Fixed point in Haskell}
 Let's consider how the definition of the fixed point works with our original example:
@@ -427,7 +429,7 @@ and then flip the arguments. We get:
 cata' :: Functor f => Fix f -> forall a. Algebra f a -> a
 cata' (In x) = \alg -> alg (fmap (flip cata' alg) x)
 \end{haskell}
-The function \hask{flip} reverses the order of arguments to a function:
+The function \index{\hask{flip}}\hask{flip} reverses the order of arguments to a function:
 \begin{haskell}
 flip :: (a -> b -> c) -> (b -> a -> c)
 flip f b a = f a b
@@ -501,9 +503,9 @@ m2 = Nothing
 m2' = Just Nothing
 \end{haskell}
 
-We can continue this process, adding deeper and deeper trees at each step. In the $n$-th iteration, the type $F^n 0$ ($n$-fold application of $f$ to the initial object) describes all trees of depth up to $n$. However, for every $n$, there are still infinitely many trees of depth greater than $n$ that are not covered. 
+We can continue this process, adding deeper and deeper trees at each step. In the $n$-th iteration, the type $F^n 0$ ($n$-fold application of $F$ to the initial object) describes all trees of depth up to $n$. However, for every $n$, there are still infinitely many trees of depth greater than $n$ that are not covered. 
 
-If we knew how to define $F^{\infty} 0$, it would cover all possible trees. But the next best thing we could try is to gather all these partial trees into one infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. 
+If we knew how to define $F^{\infty} 0$, it would cover all possible trees. The next best thing we could try is to gather all these partial trees into one infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. 
 
 An infinite sum (a coproduct):
 $$ \coprod_{n = 0}^{\infty} F^n 0$$
@@ -591,7 +593,7 @@ which means that
 \[ i_{n+1} \circ t' =  i_{n+1} \circ F^n (\mbox{!`}) \circ t =  i_n \circ t\]
 The two copies of the tree have been identified in the colimit. You can convince yourself that this procedure removes all duplicates.
 
-We can  prove directly that $i = Colim\, \Gamma$ is the initial algebra. There is however one assumptions that we have to make: the functor $F$ must preserve the colimit. The colimit of $F \Gamma$ must be equal to $F i$.
+We can  prove directly that $i = Colim\, \Gamma$ is the initial algebra. There is however one assumption that we have to make: the functor $F$ must preserve the colimit. The colimit of $F \Gamma$ must be equal to $F i$.
 \[ \text{Colim} (F \Gamma) \cong F i \]
 Fortunately, this assumption holds in $\mathbf{Set}$. 
 
