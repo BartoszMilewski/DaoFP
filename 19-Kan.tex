@@ -16,8 +16,97 @@ Kan extensions raise the level of abstraction even higher. Mac Lane said: ``All 
 
 \section{Closed Monoidal Categories}
 
+We've seen how a function object can be defined as the right adjoint to the categorical product:
+\[ \cat C (a \times b, c) \cong \cat C (a, [b, c]) \]
+Here I used the alternative notation $[b, c]$ for the exponential $c^b$. 
+
+An adjunction between two functors can be thought of as them being half-inverse of each other. Their composition is related to the identity functor through unit and counit. For instance, if you squint hard enough, the counit of the currying adjunction:
+\[ \varepsilon_{b, c} \colon [b, c] \times b \to c \]
+suggests that $[b, c]$ embodies, in a sense, the inverse of multiplication. It plays a similar role as $c/b$ in:
+\[ c/b \times b = c \]
+
+In a typical categorical manner, we may ask the question: What if we replace the product with something else? The obvious thing, replacing it with a coproduct, doesn't work (so, we have no analog of subtraction). But maybe there are other well-behaved binary operations that have a right adjoint.
+
+A natural setting for generalizing a product is a monoidal category with a tensor product $\otimes$ and a unit object $I$. If we have an adjunction:
+\[ \cat C (a \otimes b, c) \cong \cat C (a, [b, c]) \]
+we'll call the category \emph{closed monoidal}. In a typical categorical abuse of notation, unless it leads to confusion, we'll use the same symbol (a pair of square brackets)  for the monoidal internal hom as we did for the cartesian hom.
+
+The definition of internal hom works well for a symmetric monoidal category. If the tensor product is not symmetric, the adjunction defines a \emph{left closed} monoidal category. The left internal hom is adjoint to the ``post-multiplication'' functor $(- \otimes b)$. The right-closed structure is defined as the right adjoint to the ``pre-multiplication'' functor $(b \otimes -)$. If both are defined than the category is called \index{bi-closed monoidal category}\emph{bi-closed}.
+
+
+\subsection{Internal hom for Day convolution}
+
+As an example, consider the symmetric monoidal structure in the category of co-presheaves with Day convolution:
+\[ (F \star G) x = \int^{a, b} \cat C (a \otimes b, x) \times F a \times G b \]
+We are looking for the adjunction:
+\[ [\cat C, \Set] (F \star G, H) \cong  [\cat C, \Set] (F, [G, H]_{\text{Day}}) \]
+The natural transformation in the left-hand side can be written as an end:
+\[ \int_x \Set \big( \int^{a, b} \cat C (a \otimes b, x) \times F a \times G b, H x \big) \]
+We can use co-continuity to pull out the coends:
+\[ \int_{x, a, b} \Set \big( \cat C (a \otimes b, x) \times F a \times G b, H x \big) \]
+We can then use the currying adjunction in $\Set$ (the square brackets stand for the internal hom in $\Set$, that is the exponential object):
+\[ \int_{x, a, b} \Set \big( F a, [C (a \otimes b, x)  \times G b, H x] \big) \]
+Finally, we use the continuity of the hom-set to move the two ends:
+\[ \int_{a} \Set \big( F a, \int_{x, b} [C (a \otimes b, x)  \times G b, H x] \big) \]
+We get that the right adjoint to Day convolution is given by:
+\[ \big([G, H]_{\text{Day}}\big) a = \int_{x, y} \big[\cat C(a \otimes x, y), [G x, H y]\big] \cong \int_x [G x, H (a \otimes x)]\]
+The last transformation is the application of the Yoneda lemma in $\Set$.
+\begin{exercise}
+Implement the internal hom for Day convolution in Haskell. Hint: Use a type alias.
+\end{exercise}
+
+\subsection{Powering and co-powering}
+
+In $\Set$, the internal hom or the exponential is isomorphic to the external hom:
+\[ \Set (A \times B, C) \cong \Set \big(A, \Set (B, C)\big) \]
+The external hom in any category is always a set. We can therefore generalize this adjunction to the case where $B$ and $C$ are not sets but objects in some category $\cat C$. Such an adjunction defines the action of a set $A$ on an object $B$:
+\[ \cat C (A \cdot b, c) \cong \Set \big( A, \cat C (b, c)\big) \]
+or a \emph{co-power}.
+
+You may think of this action as adding together (taking a coproduct of) $A$ copies of $b$. In particular, if $A$ is a two-element set $\mathbf 2$, we get:
+\[ \cat C (\mathbf 2 \cdot b, c) \cong \Set \big( \mathbf 2, \cat C (b, c)\big) \cong \cat C(b, c) \times \cat C(b, c) \cong \cat C(b + b, c) \]
+In other words, 
+\[ \mathbf 2 \cdot b \cong b + b \]
+In this sense a co-power defines multiplication as iterated addition. 
+
+As expected, in $\Set$, the co-power decays to the cartesian product.
+\[ \Set (A \cdot B, C) \cong \Set \big( A, \Set(B, C)\big) \cong \Set (A \times B, C) \]
+
+Similarly, we can express powering as iterated multiplication. We use the same right-hand side, but this time we use the mapping-in to define the \emph{power}:
+\[ \cat C (b, A \pitchfork c) \cong \Set  \big(A, \cat C(b, c)\big) \]
+You may think of the power as multiplying together $A$ copies of $c$. Indeed, replacing $A$ with $\mathbf 2$ results in:
+\[ \cat C (b, \mathbf 2 \pitchfork c) \cong \Set  \big(\mathbf 2, \cat C(b, c)\big) \cong \cat C(b, c) \times \cat C(b, c) \cong \cat C (b, c \times c)\]
+In other words:
+\[ \mathbf 2 \pitchfork c \cong c \times c \]
+which is a fancy way of writing $c^2$.
+
+In $\Set$, the power decays to the exponential, which is the same as the hom-set:
+\[ A \pitchfork C \cong C^A \cong \Set (A, C) \]
+This is the consequence of the symmetry of the product.
+\[ \Set(B, A \pitchfork C) \cong \Set (A, \Set(B, C)) \cong \Set (A \times B, C) \]
+\[ \cong \Set (B \times A, C) \cong \Set (B, \Set (A, C))\]
+
+\section{Right Kan extensions}
+
+\[ \cat C (a \otimes b, c) \cong \cat C (a, [b, c]) \]
+\[ G^* F = F \circ G \]
+\[ (F \circ G, H) \cong (F, \text{Ran}_G H) \]
+ 
+ \[ (\cat C \times \cat C) (\Delta a , \langle b, c \rangle) \cong (a, b \times c) \]
+ 
+ \[ (Ran_G H) c' \cong \int_c \cat C ' (c', G c) \pitchfork H c \]
+ \begin{haskell}
+ newtype Ran k d a = Ran (forall i. (a -> k i) -> d i)
+ Lan k d a = exists i. (k i -> a, d i)
+ \end{haskell}
+
+\section{Left Kan extensions}
+\[ (\text{Lan}_G F , H) \cong (F, H \circ G) \]
+
+\[ (Lan_G H) c' \cong \int^{c} \cat C'(G c, c') \cdot H c \]
+
+
 \begin{itemize}
-\item (co-) tensoring 
 \item Kan extensions as the adjoints to functor pre-composition
 \item (co-) end representation
 
@@ -28,5 +117,22 @@ Kan extensions raise the level of abstraction even higher. Mac Lane said: ``All 
 \item pointwise tensor product
 
 \item Day convolution as Kan extension
+
+\item Kan lift as an adjoint to functor post-composition
 \end{itemize}
+
+\subsection{Notes}
+
+\section{Useful Formulas}
+\begin{itemize}
+\item Co-power:
+\[ \cat C (A \cdot b, c) \cong \Set \big( A, \cat C (b, c)\big) \]
+\item Power:
+\[ \cat C (b, A \pitchfork c) \cong \Set  \big(A, \cat C(b, c)\big) \]
+\item Right Kan extension:
+\item Left Kan extension:
+
+\end{itemize}
+
+
 \end{document}
