@@ -86,27 +86,174 @@ This is the consequence of the symmetry of the product.
 \[ \Set(B, A \pitchfork C) \cong \Set (A, \Set(B, C)) \cong \Set (A \times B, C) \]
 \[ \cong \Set (B \times A, C) \cong \Set (B, \Set (A, C))\]
 
-\section{Right Kan extensions}
+\section{Inverting a functor}
+
+One side of category theory is discarding information by performing lossy transformations, the other is recovering the lost information. We've seen examples of making up for lost data with free functors,---the adjoints to forgetful functors. Kan extensions are another example. Both make up for data that is lost by a functor.
+
+There are two reasons why a functor might not be invertible. One is that it may map multiple objects or arrows into a single object or arrow. In other words, it's not injective on objects or arrows. The other reason is that its image may not cover the whole target category. 
+
+Consider for instance an adjunction $L \dashv R$. Suppose that $R$ collapses two object $c$ and $c'$ into a single object $d$
+\begin{align*}
+R c &= d \\
+R c' &= d
+\end{align*}
+$L$ has no chance of undoing it. It can't map $d$ to both $c$ and $c'$. The best it can do is to map $d$ to an object that has arrows to both $c$ and $c'$ such that the counit of the adjunction can be made natural:
+\[ \varepsilon \colon L \circ R \to Id \]
+In components:
+\[ \varepsilon_c \colon L d \to c \]
+\[ \varepsilon_{c'} \colon L d \to c' \]
+Moreover, if $R$ is not surjective on objects, the functor $L$ must somehow be defined on those objects of $\cat D$ that are not in the image of $R$. Again, naturality of the unit and counit constrain possible choices, as long as there are arrows connecting these objects to the image of $R$. 
+
+Obviously, all these constraints mean that an adjunction can only be defined in very special cases. Kan extensions are even weaker than adjunctions. If adjoint functors work like inverses, Kan extensions work like fractions. 
+
+This is best seen if we redraw the diagrams defining the counit and the unit of an adjunction. In the first diagram, $L$ seems to play the role of $1/R$. In the second diagram $R$ pretends to be $1/L$.
+
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "Id", "" {name=ID, below} ]
+ \arrow[d, bend right, "R"']
+ && \cat C
+ \\
+ \cat D
+  \arrow[urr, bend right, "L"']
+ \arrow[Rightarrow, "\varepsilon",  to=ID]
+ \end{tikzcd}
+ \qquad
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat D
+ \arrow[rr, "Id", "" {name=ID, below} ]
+ \arrow[d, bend right, "L"']
+ && \cat D
+ \\
+ \cat C
+  \arrow[urr, bend right, "R"']
+ \arrow[Rightarrow, "\eta",  from=ID]
+ \end{tikzcd}
+\]
+
+The right Kan extension $\text{Ran}_P F$ and the left Kan extension $\text{Lan}_P F$ generalize these by replacing the identity functor with a functor $F \colon \cat C \to \cat D$. The Kan extensions then play the role of fractions $F/P$. Conceptually, they undo the action of $P$ and follow it with the action of $F$.
+
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "F", "" {name=ID, below} ]
+ \arrow[d, bend right, "P"']
+ && \cat D
+ \\
+ \cat B
+  \arrow[urr, bend right, "\text{Ran}_P F"']
+ \arrow[Rightarrow, "\varepsilon",  to=ID]
+ \end{tikzcd}
+ \qquad
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "F", "" {name=ID, below} ]
+ \arrow[d, bend right, "P"']
+ && \cat D
+ \\
+ \cat B
+  \arrow[urr, bend right, "\text{Lan}_P F"']
+ \arrow[Rightarrow, "\eta",  from=ID]
+ \end{tikzcd}
+\]
+
+Just like with adjunctions, the ``undoing'' is not complete. The composition $\text{Ran}_P F \circ P$ doesn't reproduce $F$; instead it's related to it through the natural transformation $\varepsilon$ called the counit. Similiarly, the composition $\text{Lan}_P F \circ P$ is related to $F$ through the unit $\eta$.
+
+Notice that the more information $F$ discards, the easier it is for Kan extensions to ``invert'' the functor $P$. In as sense, it only has to invert $P$ ``modulo $F$''.
+
+\section{Right Kan extension}
+
+
+
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[r, "F"]
+ \arrow[d, "P"']
+ & \cat D
+ \\
+ \cat B
+  \arrow[ur, "\text{Ran}_P F"']
+ \end{tikzcd}
+\]
+
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "F", "" {name=ID, below} ]
+ \arrow[d, bend right, "P"']
+ && \cat D
+ \\
+ \cat B
+  \arrow[urr, bend right, "\text{Ran}_P F"']
+ \arrow[Rightarrow, "\varepsilon",  to=ID]
+ \end{tikzcd}
+\]
+
+
+
+\[
+\begin{tikzcd}[row sep=2cm, column sep=2cm]
+\cat C  \ar[d, "P"', "" {name=P}]
+            \ar[r, "F", ""  {name=F, below, near start, bend right}]
+&
+\cat D
+\\
+\cat B
+    \ar[ur, bend left, "G", "" {name=G, below}]
+    \ar[ur, bend right, "\text{Ran}_P F"', "" {name=Ran}]
+\arrow[Rightarrow, "\sigma", from=G, to=Ran]
+\end{tikzcd}
+\]
 
 \[ \cat C (a \otimes b, c) \cong \cat C (a, [b, c]) \]
-\[ G^* F = F \circ G \]
-\[ (F \circ G, H) \cong (F, \text{Ran}_G H) \]
+
+\[ P^* G = G \circ P \]
+\[ (G \circ P, F) \cong (G, \text{Ran}_P F) \]
  
  \[ (\cat C \times \cat C) (\Delta a , \langle b, c \rangle) \cong (a, b \times c) \]
  
- \[ (Ran_G H) c' \cong \int_c \cat C ' (c', G c) \pitchfork H c \]
+ \[ (\text{Ran}_P F) e \cong \int_c \cat B (e, P c) \pitchfork F c \]
+ 
+  \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \Set (e, P c), F c\big) \]
+
  \begin{haskell}
- newtype Ran k d a = Ran (forall i. (a -> k i) -> d i)
- Lan k d a = exists i. (k i -> a, d i)
+ newtype Ran p f e = Ran (forall c. (e -> p c) -> f c)
  \end{haskell}
 
-\section{Left Kan extensions}
-\[ (\text{Lan}_G F , H) \cong (F, H \circ G) \]
+\section{Left Kan extension}
+\[ (\text{Lan}_P F , G) \cong (F, G \circ P) \]
+\[
+\begin{tikzcd}[row sep=2cm, column sep=2cm]
+\cat C  \ar[d, "P"', "" {name=P}]
+            \ar[r, "F", ""  {name=F, below, near start, bend right}]
+&
+\cat D
+\\
+\cat B
+    \ar[ur, bend left, "G", "" {name=G, below}]
+    \ar[ur, bend right, "\text{Lan}_P F"', "" {name=Lan}]
+\arrow[Rightarrow, "", from=Lan, to=G]
+\end{tikzcd}
+\]
 
-\[ (Lan_G H) c' \cong \int^{c} \cat C'(G c, c') \cdot H c \]
 
 
+\[ (\text{Lan}_P F) e \cong \int^{c} \cat B(P c, e) \cdot F c \]
+
+\[ (\text{Lan}_P F) e \cong \int^{c} \Set (P c, e) \times F c \]
+
+ \begin{haskell}
+ Lan p f e = exists c. (p c -> e, f c)
+ \end{haskell}
+
+ \begin{haskell}
+ data Lan p f e where
+   Lan :: (p c -> e) -> f c -> Lan p f e
+ \end{haskell}
 \begin{itemize}
+
 \item Kan extensions as the adjoints to functor pre-composition
 \item (co-) end representation
 
@@ -130,9 +277,14 @@ This is the consequence of the symmetry of the product.
 \item Power:
 \[ \cat C (b, A \pitchfork c) \cong \Set  \big(A, \cat C(b, c)\big) \]
 \item Right Kan extension:
+ \[ (\text{Ran}_P F) e \cong \int_c \cat B (e, P c) \pitchfork F c \]
+\item Right Kan extension in $\Set$:
+  \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \Set (e, P c), F c\big) \]
 \item Left Kan extension:
+\[ (\text{Lan}_P F) e \cong \int^{c} \cat B(P c, e) \cdot F c \]
+\item Left Kan extension in $\Set$:
+\[ (\text{Lan}_P F) e \cong \int^{c} \Set (P c, e) \times F c \]
 
 \end{itemize}
-
 
 \end{document}
