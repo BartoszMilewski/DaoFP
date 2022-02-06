@@ -333,7 +333,10 @@ or, pictorially:
   \end{tikzcd}
 \]
 
-It turns out that an adjunction can be alternatively defined in terms of the two natural transformations, $\eta$ and $\varepsilon$, as long as the  triangle identities are satisfied. 
+It turns out that an adjunction can be alternatively defined in terms of the two natural transformations, $\eta$ and $\varepsilon$, as long as the  triangle identities are satisfied:
+
+\[ (\varepsilon \circ L) \cdot (L \circ \eta) = id_L \]
+\[ (R \circ \epsilon) \cdot (\eta \circ R) = id_R \]
 
 The mapping of hom-sets can be easily recovered. For instance, let's start with an arrow $f \colon x \to R y$, which is an element of $\mathcal{D}( x , R y)$. We can lift it to 
 \[L f \colon L x \to L (R y)\]
