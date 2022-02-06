@@ -59,7 +59,7 @@ Implement the internal hom for Day convolution in Haskell. Hint: Use a type alia
 
 In $\Set$, the internal hom or the exponential is isomorphic to the external hom:
 \[ \Set (A \times B, C) \cong \Set \big(A, \Set (B, C)\big) \]
-The external hom in any category is always a set. We can therefore generalize this adjunction to the case where $B$ and $C$ are not sets but objects in some category $\cat C$. Such an adjunction defines the action of a set $A$ on an object $B$:
+The external hom in any category is always a set. We can therefore generalize this adjunction to the case where $B$ and $C$ are not sets but objects in some category $\cat C$. Such an adjunction defines the action of a set $A$ on an object $b$:
 \[ \cat C (A \cdot b, c) \cong \Set \big( A, \cat C (b, c)\big) \]
 or a \emph{co-power}.
 
@@ -68,6 +68,13 @@ You may think of this action as adding together (taking a coproduct of) $A$ copi
 In other words, 
 \[ \mathbf 2 \cdot b \cong b + b \]
 In this sense a co-power defines multiplication as iterated addition. 
+
+If we multiply $b$ by the hom-set $\cat C (c, b)$ and take the coend over $c$'s, the result is isomorphic to $c$:
+\[ \cat \int^b C(c, b) \cdot b \cong c \]
+Indeed, the mappings to an arbitrary $x$ from both sides are isomorphic due to the Yoneda lemma:
+\[ \cat C \big( \int^b \cat C(c, b) \cdot b, x\big) \cong \int_b \Set \big( \cat C(c, b), \cat C (b, x)\big) \cong \cat C (c, x)\]
+
+
 
 As expected, in $\Set$, the co-power decays to the cartesian product.
 \[ \Set (A \cdot B, C) \cong \Set \big( A, \Set(B, C)\big) \cong \Set (A \times B, C) \]
@@ -80,6 +87,12 @@ In other words:
 \[ \mathbf 2 \pitchfork c \cong c \times c \]
 which is a fancy way of writing $c^2$.
 
+If we power $c$ by the hom-set $\cat C(c', c)$ and take an end over all $c$'s, the result is isomorphic to $c'$:
+\[ \int_c \cat C (c', c) \pitchfork c \cong c' \]
+This follows from the Yoneda lemma. Indeed the mappings from any $x$ to both sides are isomorphic:
+\[ \cat C \big(x, \int_c \cat C (c', c) \pitchfork c\big) \cong \int_c \Set \big( \cat C(c', c), \cat C(x, c)\big)  \cong \cat C (x, c') \]
+
+
 In $\Set$, the power decays to the exponential, which is the same as the hom-set:
 \[ A \pitchfork C \cong C^A \cong \Set (A, C) \]
 This is the consequence of the symmetry of the product.
@@ -88,7 +101,7 @@ This is the consequence of the symmetry of the product.
 
 \section{Inverting a functor}
 
-One side of category theory is discarding information by performing lossy transformations, the other is recovering the lost information. We've seen examples of making up for lost data with free functors,---the adjoints to forgetful functors. Kan extensions are another example. Both make up for data that is lost by a functor.
+One side of category theory is discarding information by performing lossy transformations, the other is recovering the lost information. We've seen examples of making up for lost data with free functors---the adjoints to forgetful functors. Kan extensions are another example. Both make up for data that is lost by a functor.
 
 There are two reasons why a functor might not be invertible. One is that it may map multiple objects or arrows into a single object or arrow. In other words, it's not injective on objects or arrows. The other reason is that its image may not cover the whole target category. 
 
@@ -104,7 +117,9 @@ In components:
 \[ \varepsilon_{c'} \colon L d \to c' \]
 Moreover, if $R$ is not surjective on objects, the functor $L$ must somehow be defined on those objects of $\cat D$ that are not in the image of $R$. Again, naturality of the unit and counit constrain possible choices, as long as there are arrows connecting these objects to the image of $R$. 
 
-Obviously, all these constraints mean that an adjunction can only be defined in very special cases. Kan extensions are even weaker than adjunctions. If adjoint functors work like inverses, Kan extensions work like fractions. 
+Obviously, all these constraints mean that an adjunction can only be defined in very special cases. Kan extensions are even weaker than adjunctions. 
+
+If adjoint functors work like inverses, Kan extensions work like fractions. 
 
 This is best seen if we redraw the diagrams defining the counit and the unit of an adjunction. In the first diagram, $L$ seems to play the role of $1/R$. In the second diagram $R$ pretends to be $1/L$.
 
@@ -162,22 +177,34 @@ Just like with adjunctions, the ``undoing'' is not complete. The composition $\t
 
 Notice that the more information $F$ discards, the easier it is for Kan extensions to ``invert'' the functor $P$. In as sense, it only has to invert $P$ ``modulo $F$''.
 
-\section{Right Kan extension}
-
-
-
+Here's the intuition behind Kan extensions. We start with a functor $F$:
 \[
- \begin{tikzcd} [row sep=1cm, column sep=1cm]
- \cat C
+ \begin{tikzcd} \cat C
+ \arrow[r, "F"]
+ & \cat D
+  \end{tikzcd}
+\]
+There is a second functor $P$ that embeds $\cat C$ in another category $\cat B$. This embedding may be lossy and non-surjective. Our task is to extend the definition of $F$ to the whole of $\cat B$. 
+
+In the ideal world we would like the following diagram to commute:
+\[
+ \begin{tikzcd} \cat C
  \arrow[r, "F"]
  \arrow[d, "P"']
  & \cat D
  \\
  \cat B
-  \arrow[ur, "\text{Ran}_P F"']
- \end{tikzcd}
+\arrow[ur, "Kan_P F"']
+  \end{tikzcd}
 \]
+But that would involve equality of functors, which is something we try to avoid. 
 
+The next best thing would be to ask for a natural isomorphism between the two paths through this diagram. But even that seems like asking too much. So we finally settle down on demanding that one path be deformable into another, meaning there is a one-way natural transformation between them. The direction of this transformation distinguishes between right and left Kan extensions.
+
+\section{Right Kan extension}
+
+The right Kan extension is a functor $Ran_P F$ equipped with a natural transformation $\varepsilon$, the counit of the Kan extension:
+\[ \varepsilon \colon \text{Ran}_P F \circ P \to F\]
 \[
  \begin{tikzcd} [row sep=1cm, column sep=1cm]
  \cat C
@@ -191,8 +218,22 @@ Notice that the more information $F$ discards, the easier it is for Kan extensio
  \end{tikzcd}
 \]
 
+The pair $(Ran_P F, \varepsilon)$ is universal among such pairs $(G, \alpha)$, where $G$ is a functor $G \colon \cat B \to \cat D$ and $\alpha$ is a natural transformation:
+\[ \alpha \colon G \circ P \to F \]
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "F", "" {name=ID, below} ]
+ \arrow[d, bend right, "P"']
+ && \cat D
+ \\
+ \cat B
+  \arrow[urr, bend right, "G"']
+ \arrow[Rightarrow, "\alpha",  to=ID]
+ \end{tikzcd}
+\]
 
-
+Universality means that for any such $(G, \alpha)$ there is a unique natural transformation $\sigma \colon G \to \text{Ran}_P F$
 \[
 \begin{tikzcd}[row sep=2cm, column sep=2cm]
 \cat C  \ar[d, "P"', "" {name=P}]
@@ -206,24 +247,386 @@ Notice that the more information $F$ discards, the easier it is for Kan extensio
 \arrow[Rightarrow, "\sigma", from=G, to=Ran]
 \end{tikzcd}
 \]
+ which factorizes $\alpha$, that is:
+\[ \alpha = \varepsilon \cdot (\sigma \circ P) \]
+Notice that this is a combination of vertical and horizontal compositions of natural transformations in which $\sigma \circ P$ is the whiskering of $\sigma$. Here's the same equation in terms of string diagrams:
 
-\[ \cat C (a \otimes b, c) \cong \cat C (a, [b, c]) \]
+\[
+\begin{tikzpicture}
+\def \dx {0.7}
+\def \dy {0.7}
 
-\[ P^* G = G \circ P \]
-\[ (G \circ P, F) \cong (G, \text{Ran}_P F) \]
+\def \xa{-3 * \dx};
+\def \xb{-2 * \dx};
+\def \xc{-1 * \dx};
+\def \xd{0};
+\def \xe{1 * \dx};
+
+\def \ya{0};
+\def \yb{1 * \dy};
+\def \yc{2 * \dy};
+\def \yd{3 * \dy};
+\def \ye{4 * \dy};
+
+% left background
+\filldraw[fill=blue!50!green!20, draw=white] (\xa, \ye) rectangle (\xc, \ya);
+% right background
+\filldraw[fill=orange!30, draw=white] (\xc, \ye) rectangle (\xe, \ya);
+% fill shape\yb
+\path [fill=orange!10, draw=white]  (\xb, \ya) to (\xb, \yb) to [out=90, in=180]  (\xc, \yc) to  [out=0, in=90] (\xd, \yb) to (\xd, \ya);
+
+% cup
+\draw (\xb, \ya) to (\xb, \yb) to [out=90, in=180]  (\xc, \yc) to  [out=0, in=90] (\xd, \yb) to (\xd, \ya);
+\draw (\xc, \yc) -- (\xc, \ye);
+
+% natural transformations
+\filldraw[black] (\xc, \yc) circle (1 pt);
+\node [below] at (\xc, \yc) {$\alpha$};
+
+% categories
+\node[right] at (\xa, \ye - 0.3) {$\mathcal{C}$};
+\node[left] at (\xe, \ye - 0.3) {$\mathcal{D}$};
+\node[above] at (\xc, \ya) {$\mathcal{B}$};
+% functors
+\node [below] at (\xb, \ya) {$P$};
+\node [below] at (\xd, \ya) {$G$};
+\node [above] at (\xc, \ye) {$F$};
+
+%-----------------
+\node (eq) at (3 * \dx, \yc) {$=$};
+% right diagram
+
+\def \xa{5 * \dx};
+\def \xb{6 * \dx};
+\def \xc{7 * \dx};
+\def \xd{8 * \dx};
+\def \xe{9 * \dx + 0.3};
+
+% left background
+\filldraw[fill=blue!50!green!20, draw=white] (\xa, \ye) rectangle (\xc, \ya);
+% right background
+\filldraw[fill=orange!30, draw=white] (\xc, \ye) rectangle (\xe, \ya);
+% fill shape
+\path [fill=orange!10, draw=white]  (\xb, \ya) to (\xb, \yc) to [out=90, in=180]  (\xc, \yd) to  [out=0, in=90] (\xd, \yc) to (\xd, \ya);
+
+% cup
+\draw (\xb, \ya) to (\xb, \yc) to [out=90, in=180]  (\xc, \yd) to  [out=0, in=90] (\xd, \yc) to (\xd, \ya);
+\draw (\xc, \yd) -- (\xc, \ye);
+
+% natural transformations
+\filldraw[black] (\xc, \yd) circle (1 pt);
+\node [below] at (\xc, \yd) {$\varepsilon$};
+
+\filldraw[black] (\xd, \yb) circle (1 pt);
+\node [right] at (\xd, \yb) {$\sigma$};
+
+% categories
+\node[right] at (\xa, \ye - 0.3) {$\mathcal{C}$};
+\node[left] at (\xe, \ye - 0.3) {$\mathcal{D}$};
+\node[above] at (\xc, \ya) {$\mathcal{B}$};
+% functors
+\node [below] at (\xb, \ya) {$P$};
+\node [below] at (\xd, \ya) {$G$};
+\node [above] at (\xc, \ye) {$F$};
+\node [right] at (\xd, \yc) {$\text{Ran}$};
+
+\end{tikzpicture}
+\]
+
+As usual, a universal construction can be generalized to an adjunction---this time it's an adjunction between functor categories:
+\[ [\cat C, \cat D](G \circ P, F) \cong [\cat B, \cat D](G, \text{Ran}_P F) \]
+For every $\alpha$ that is an element of the left-hand side, there is a unique $\sigma$ that is an element of the right-hand side.
+
+In other words, the right Kan extension, if it exists for every $F$, is the right adjoint to functor pre-composition:
+\[ (- \circ P) \dashv \text{Ran}_P \]
+The component of the counit of this adjunction at $F$ is $\varepsilon$.
+
+This is somewhat reminiscent of the currying adjunction:
+\[ \cat C (a \times b, c) \cong \cat C (a, [b, c]) \]
+in which the product is replaced by functor composition. (Of course, composition can be considered a tensor product only in the category of endofunctors.)
+
+\subsection{Limits as Kan extensions}
+ We have previously defined limits as universal cones. The definition of a cone involves two categories: the indexing category $\cat I$ that defines the shape of the diagram, and the target category $\cat C$. A diagram is a functor $D \colon \cat I \to \cat C$. 
  
- \[ (\cat C \times \cat C) (\Delta a , \langle b, c \rangle) \cong (a, b \times c) \]
+ We can introduce a third category $\mathbf 1$: the terminal category that contains a single object and a single identity arrow. We can then use a functor $X$ from that category $\cat C$ to pick the apex $x$ of the cone. Since $\mathbf 1$ is terminal in $\mathbf{Cat}$, we also have the unique functor from $\cat I$ to it, which we'll call $!$.
  
- \[ (\text{Ran}_P F) e \cong \int_c \cat B (e, P c) \pitchfork F c \]
+It turns out that the limit of $D$ is the right Kan extension of the diagram $D$ along $!$. First, let's observe that the composition $X \circ !$ maps the shape $\cat I$ to a single object $x$, so it does the job of the constant functor picking the apex of a cone. A cone with the apex $x$ is a natural transformation $\gamma$: 
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat I
+ \arrow[rr, "D", "" {name=ID, below} ]
+ \arrow[d, bend right, "!"']
+ && \cat C
+ \\
+ \mathbf 1
+  \arrow[urr, bend right, "X"']
+ \arrow[Rightarrow, "\gamma",  to=ID]
+ \end{tikzcd}
+\]
+
+The following diagrams illustrate this. On the left we have two categories: $\mathbf 1$ with a single object $*$, and $\cat I$ with three objects forming a shape for the diagram. On the right we have the image of $D$ and the image of $X \circ !$, which is the apex $x$. The three components of $\gamma$ connect the apex $x$ with the diagram. 
+
+\[
+ \begin{tikzcd}
+  & *
+ \\
+\\
+1 
+\arrow[rr, red]
+\arrow[rd, red]
+&& 2
+\arrow[dl, red]
+\\
+& 3
+ \end{tikzcd}
+ \qquad
+ \begin{tikzcd}
+  & x
+\arrow[ddr, "\gamma_2"]
+ \arrow[ddl, "\gamma_1"']
+ \arrow[ddd, "\gamma_3"]
+ \\
+\\
+D 1 
+\arrow[rr, red]
+\arrow[rd, red]
+&& D 2
+\arrow[dl, red]
+\\
+& D 3
+ \end{tikzcd}
+ \]
+
+
+
+The right Kan extension $(Ran_! D, \varepsilon)$ is the universal such cone. $Ran_! D$ is a functor from $\mathbf 1$ to $\cat C$, so it selects an object in $\cat C$. This is the apex $c$ of the universal cone. 
+
+Universality means that for any pair $(X, \gamma)$ there is a natural transformation $\sigma \colon X \to Ran_! D$ 
+\[
+\begin{tikzcd}[row sep=2cm, column sep=2cm]
+\cat I  \ar[d, "!"', "" {name=P}]
+            \ar[r, "D", ""  {name=F, below, near start, bend right}]
+&
+\cat C
+\\
+\mathbf 1
+    \ar[ur, bend left, "X", "" {name=G, below}]
+    \ar[ur, bend right, "\text{Ran}_! D"', "" {name=Ran}]
+\arrow[Rightarrow, "\sigma", from=G, to=Ran]
+\end{tikzcd}
+\]
+which factorizes $\gamma$. 
+
+$\sigma$ has only one component $\sigma_*$, which is an arrow $h$ connecting the apex $x$ to the apex $c$. The factorization:
+ \[ \gamma = \varepsilon \cdot (\sigma \circ !) \]
+reads, in components:
+\[ \gamma_i = \epsilon_i \circ h \]
+It makes the triangles in the following diagram commute:
+\[
+ \begin{tikzcd}[row sep=1cm]
+  & x
+\arrow[dddl, "\gamma_1"']
+\arrow[ddddr, "\gamma_3"]
+\arrow[dddrr, "\gamma_2"]
+\arrow[dd, dashed, "h"']
+ \\
+ \\
+ & c
+\arrow[dl, blue, "\varepsilon_1"]
+\arrow[ddr, blue, "\varepsilon_3"']
+\arrow[drr, blue, "\varepsilon_2"]
+\\
+D 1 
+\arrow[rrr, red]
+\arrow[rrd, red]
+&&& D 2
+\arrow[dl, red]
+\\
+&& D 3
+ \end{tikzcd}
+ \]
+This makes $c$ the limit $\text{Lim} D$ of the diagram $D$.
  
-  \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \Set (e, P c), F c\big) \]
+ 
+ 
+
+\subsection{Right Kan extension as an end}
+
+Right Kan extensions can be calculated using ends (as long as these ends exist). We could start from the definition of the right Kan extension as the right adjoint to functor pre-composition. The sets of natural transformations in that adjunction can be expressed as ends, and we could cleverly use the Yoneda lemma in reverse to derive the formula. But it's easier to start with the final formula and prove that it works. 
+
+The hint to the final formula is the pitchfork Yoneda lemma:
+\[ \int_c \cat C (c', c) \pitchfork c \cong c' \]
+We can think of it as the right Kan extension of identity along identity.
+ 
+The right Kan extension is given by the following end:
+ \[ (\text{Ran}_P F) b \cong \int_c \cat B (b, P c) \pitchfork F c \]
+ 
+ The proof essentially writes itself: at every step there is only one thing one can do. We start with the adjunction:
+  \[ [\cat C, \cat D](G \circ P, F) \cong [\cat B, \cat D](G, \text{Ran}_P F) \]
+and rewrite it using ends:
+ \[ \int_c \cat D \big(G ( P c), F c\big) \cong \int_b \cat D\big(G b, (\text{Ran}_P F) b\big) \]
+We substitute our formula:
+ \[  \int_b \cat D(G b, (\text{Ran}_P F) b) \cong  \int_b \cat D\big(G b,\int_c \cat B (b, P c) \pitchfork F c \big)\]
+use the continuity of the hom-functor to pull the end in front:
+\[  \cong  \int_b \int_c \cat D\big(G b, \cat B (b, P c) \pitchfork F c \big) \]
+use the definition of power:
+\[ \int_b \int_c \Set \big(  \cat B (b, P c), \cat D (G b, F c) \big) \]
+and apply the Yoneda lemma:
+\[ \int_c  \cat D \big(G (P c), F c\big) \]
+This result is the left-hand side of the adjunction.
+ 
+If all three categories are $\Set$, we can replace the power with the exponential/hom-set to get:
+  \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \Set (b, P c), F c\big) \]
+This can be immediatly translated to Haskell:
+ \begin{haskell}
+ newtype Ran p f b = Ran (forall c. (b -> p c) -> f c)
+ \end{haskell}
+ 
+ \subsection{Adjunctions and Kan extensions}
+ 
+ We started by describing Kan extensions as a generalization of adjunctions. Thus if we have a pair of adjoint functors $L \dashv R$, we expect the left functor to be the right Kan extension of the identity along the right functor.
+ \[ L \cong Ran_R Id \]
+ 
+ Indeed, the counit of the Kan extension is the same as the counit of the adjunction:
+
+ \[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "Id", "" {name=ID, below} ]
+ \arrow[d, bend right, "R"']
+ && \cat C
+ \\
+ \cat D
+  \arrow[urr, bend right, "L"']
+ \arrow[Rightarrow, "\varepsilon",  to=ID]
+ \end{tikzcd}
+\]
+We also have to show the universality:
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "Id", "" {name=ID, below} ]
+ \arrow[d, bend right, "R"']
+ && \cat C
+ \\
+ \cat D
+  \arrow[urr, bend right, "G"']
+ \arrow[Rightarrow, "\alpha",  to=ID]
+ \end{tikzcd}
+ \qquad %----%
+\begin{tikzcd}[row sep=2cm, column sep=2cm]
+\cat C  \ar[d, "R"', "" {name=P}]
+            \ar[r, "R", ""  {name=F, below, near start, bend right}]
+&
+\cat D
+\\
+\cat D
+    \ar[ur, bend left, "G", "" {name=G, below}]
+    \ar[ur, bend right, "L"', "" {name=Ran}]
+\arrow[Rightarrow, "\sigma", from=G, to=Ran]
+\end{tikzcd}
+\]
+We have at our disposal the unit of the adjunction:
+\[ \eta \colon Id \to R \circ L \]
+We construct $\sigma$ as the composite:
+\[ G \rightarrow G \circ Id \xrightarrow{G \circ \eta} G \circ R \circ L \xrightarrow{\alpha \circ L} Id \circ L \rightarrow L\]
+
+\[ \sigma = (\alpha \circ L) \cdot (G \circ \eta) \]
+
+We could ask the converse question: is $\text{Ran}_R Id$, if it exists, automatically the left adjoint to $R$? It turns out that we need one more condition for that: The Kan extension must be preserved by $R$, that is:
+
+\[ R \circ \text{Ran}_R Id \cong \text{Ran}_R R \]
+The right-hand side of this condition defines a codensity monad.
+
+ \subsection{Codensity monad}
+ 
+ We've seen that every adjunction $L \dashv R$ produces a monad $R \circ L$. It turns out that this monad is the right Kan extension of $R$ along $R$. Interestingly, even if $R$ doesn't have a left adjoint, the Kan extension $\text{Ran}_R R$ is still a monad called the \emph{codensity monad} $T^R$:
+ \[ T^R = \text{Ran}_R R \]
+ 
+If we were serious about the interpretation of Kan extensions as franctions, a codensity monad would correspond to identity, $R/R$.
+
+To see that $T^R$ is a monad, we have to define monad multipliation:
+\[ \mu \colon T^R \circ T^R \to  T^R \]
+\[ \eta \colon Id \to T^R \]
+ Both follow from universality:
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "R", "" {name=ID, below} ]
+ \arrow[d, bend right, "R"']
+ && \cat D
+ \\
+ \cat D
+  \arrow[urr, bend right, "G"']
+ \arrow[Rightarrow, "\alpha",  to=ID]
+ \end{tikzcd}
+ \qquad
+\begin{tikzcd}[row sep=2cm, column sep=2cm]
+\cat C  \ar[d, "R"', "" {name=P}]
+            \ar[r, "R", ""  {name=F, below, near start, bend right}]
+&
+\cat D
+\\
+\cat D
+    \ar[ur, bend left, "G", "" {name=G, below}]
+    \ar[ur, bend right, "T^R = \text{Ran}_R R"', "" {name=Ran}]
+\arrow[Rightarrow, "\sigma", from=G, to=Ran]
+\end{tikzcd}
+\]
+
+To get the unit, we replace $G$ with the identity functor $Id$ and $\alpha$ with the identity natural transformation. 
+
+To get multiplication, we replace $G$ with $T^R \circ T^R$ and note that we have at our disposal the counit of the Kan extension:
+\[ \varepsilon \colon  T^R \circ R \to R \]
+We can define the corresponding $\alpha$:
+\[ \alpha \colon T^R \circ T^R \circ R \to R \]
+as the composite:
+\[ T^R \circ T^R \circ R \xrightarrow{id \circ \varepsilon} T^R \circ R \xrightarrow{\varepsilon} R\]
+or, using whiskering notation:
+\[ \alpha = \varepsilon \cdot (T^R \circ \varepsilon) \]
+
+
+Let's now show that if we do have an adjunction:
+\[ \cat C(L d, c) \cong \cat D (d, R c) \]
+then the codensity monad is $R \circ L$.
+Let's plug the formula into the definition:
+\[ [\cat C, \cat D](G \circ R, R) \cong  [\cat D, \cat D] (G, \text{Ran}_R R)\]
+and rewrite it in terms of ends:
+\[ \int_c \cat D( G (R c), R c) \cong \int_d \cat D (G d, R (L d)) \]
+The trick is to rewrite the right-hand side by inserting the Yoneda lemma. The end over $c$ has the effect of replacing $c$ with $L d$:
+\[ \cong \int_d \int_c \Set\big(\cat C(L d, c), \cat D (G d, R c)\big) \]
+We can now use the adjunction:
+\[ \cong \int_d \int_c \Set\big(\cat C(d, R c), \cat D (G d, R c)\big) \]
+and perform the ninja-Yoneda integration over $d$:
+\[ \cong \int_c \cat D (G (R c), R c) \]
+The result is the left hand side of the identity we set out to prove.
+
+In Haskell, 
+ \begin{haskell}
+type Codensity f a = forall c. (a -> f c) -> f c
+ \end{haskell}
 
  \begin{haskell}
- newtype Ran p f e = Ran (forall c. (e -> p c) -> f c)
+instance Monad (Codensity f) where
+  return x = \k -> k x
+  m >>= kl = \k' -> m (\a -> (kl a) k')
  \end{haskell}
 
 \section{Left Kan extension}
-\[ (\text{Lan}_P F , G) \cong (F, G \circ P) \]
+
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "F", "" {name=ID, below} ]
+ \arrow[d, bend right, "P"']
+ && \cat D
+ \\
+ \cat B
+  \arrow[urr, bend right, "\text{Lan}_P F"']
+ \arrow[Rightarrow, "\eta",  from=ID]
+ \end{tikzcd}
+\]
+
 \[
 \begin{tikzcd}[row sep=2cm, column sep=2cm]
 \cat C  \ar[d, "P"', "" {name=P}]
@@ -238,19 +641,36 @@ Notice that the more information $F$ discards, the easier it is for Kan extensio
 \end{tikzcd}
 \]
 
+\[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
+
+\subsection{Left Kan extension as a coend}
+Yoneda:
+\[ \cat \int^b C(c, b) \cdot b \cong c \]
+
+\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B(P c, b) \cdot F c \]
+
+\[ \int_b \cat D\big((\text{Lan}_P F)\,b, G b\big) \cong \int_c \cat D\big(F c, G(Pc)\big) \]
+
+\[ \int_b \cat D\Big( \int^{c} \cat B (P c, b) \cdot F c, G b \Big) \]
+
+\[ \cong \int_b \int_c \cat D\big( \cat B (P c, b) \cdot F c, G b \big) \]
+
+\[ \cong \int_b \int_c \Set \big( \cat B (P c, b), \cat D (F c, G b) \big) \]
+
+\[ \cong \int_c \cat D \big(F c, G ( P c) \big) \]
 
 
-\[ (\text{Lan}_P F) e \cong \int^{c} \cat B(P c, e) \cdot F c \]
 
-\[ (\text{Lan}_P F) e \cong \int^{c} \Set (P c, e) \times F c \]
+In $\Set$:
+\[ (\text{Lan}_P F)\, b \cong \int^{c} \Set (P c, b) \times F c \]
 
  \begin{haskell}
- Lan p f e = exists c. (p c -> e, f c)
+ Lan p f b = exists c. (p c -> b, f c)
  \end{haskell}
 
  \begin{haskell}
  data Lan p f e where
-   Lan :: (p c -> e) -> f c -> Lan p f e
+   Lan :: (p c -> b) -> f c -> Lan p f b
  \end{haskell}
 \begin{itemize}
 
@@ -277,10 +697,12 @@ Notice that the more information $F$ discards, the easier it is for Kan extensio
 \item Power:
 \[ \cat C (b, A \pitchfork c) \cong \Set  \big(A, \cat C(b, c)\big) \]
 \item Right Kan extension:
+\[ [\cat C, \cat D](G \circ P, F) \cong [\cat B, \cat D](G, \text{Ran}_P F) \]
  \[ (\text{Ran}_P F) e \cong \int_c \cat B (e, P c) \pitchfork F c \]
 \item Right Kan extension in $\Set$:
   \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \Set (e, P c), F c\big) \]
 \item Left Kan extension:
+\[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
 \[ (\text{Lan}_P F) e \cong \int^{c} \cat B(P c, e) \cdot F c \]
 \item Left Kan extension in $\Set$:
 \[ (\text{Lan}_P F) e \cong \int^{c} \Set (P c, e) \times F c \]
