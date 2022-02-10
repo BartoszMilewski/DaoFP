@@ -67,7 +67,7 @@ It's a relationship between three functions acting on two sets:
 The naturality condition tells us that:
 \[ G m \circ \alpha = \alpha \circ F m \]
 
-In other words, if you pick an element $x \in F *$, you can map it to $G *$ using $\alpha$ and then apply the transformation corresponding to $m$; or you can first apply the thansformation $F m$ and then map the result using $\alpha$. The result is the same in both cases.
+In other words, if you pick an element $x \in F *$, you can map it to $G *$ using $\alpha$ and then apply the transformation corresponding to $m$; or you can first apply the transformation $F m$ and then map the result using $\alpha$. The result is the same in both cases.
 
 Such functions are called \index{equivariant function}\emph{equivariant}. We often call $F m$ the \emph{action} of $m$ on the set $F *$. An equivariant function maps an action on one set to its corresponding action on another set. 
 
@@ -75,7 +75,9 @@ Such functions are called \index{equivariant function}\emph{equivariant}. We oft
 
 How much information do we need to reconstruct a monoid from its representations? Just looking at the sets is definitely not enough, since any monoid can be represented on any set. But if we include structure-preserving functions between these sets, we might have a chance. 
 
-Consider a set of all functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid, $F m$. If we look at the ``neighboring'' set $G *$ and its set of functions  $\Set(G *, G *)$ we'll find there the corresponding actions $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will map these actions. It will map other morphisms as well.
+Consider a set of all functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid, $F m$. 
+
+If we look at the ``neighboring'' set $G *$, for some other functor $G$, and its set of functions  $\Set(G *, G *)$ we'll find there the corresponding actions $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will map these actions. It will map other morphisms as well.
 
 Now imagine creating a gigantic tuple by taking one function from each of the sets $\Set (F *, F *)$, for all functors $F\colon \cat M \to \Set$. We are interested only in tuples whose elements are correlated. Here's what I mean: If we pick $g \in  \Set (G*, G *)$ and  $h \in  \Set (H*,  H*)$ and there is a natural transformation (equivariant function) $\alpha$ between the two functors $G$ and $H$, we want the two function to be related:
 \[ \alpha \circ g = h \circ \alpha \]
@@ -123,9 +125,95 @@ The Tannakian reconstruction theorem, in this case, tells us that:
 \[ \int_F \Set(F *, F *) \cong \cat M (*, *) \]
 In other words, we can recover the monoid from its representations.
 
+\subsection{Cayley's theorem}
+
+In group theory, Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element has an inverse. Permutations are just functions that map a set to itself.
+
+In category theory, Cayley's theorem is practically built into the definition of a monoid and its representations in $\Set$. The connection between the single-object interpretation and the more traditional set-of-elements interpretation of a monoid is easy to establish. 
+
+We do this by constructing the functor $F \colon \cat M \to \Set$ that maps $*$ to the set $S$ that is given by the hom-set: $S = \cat M(*, *)$. Elements of this set are morphisms in $\cat M$. We define the action of $F$ on morphisms as post-composition:
+\[ (F m) n = m \circ n \]
+Here $m$ is a morphism in $\cat M$ and $n$ is an element of $S$, which happens to also be a morphism in $\cat M$.
+
+We can take this particular representation as an alternative definition of a monoid in the monoidal category $\Set$. All we need is to implement unit and multiplication:
+\begin{align*}
+\eta &\colon 1 \to S
+\\
+\mu &\colon S \times S \to S
+\end{align*}
+The unit picks the element of $S$ that corresponds to $id_*$ in $\cat M(*, *)$. Multiplication of two elements $m$ and $n$ is given by the element that corresponds to $m \circ n$. 
+
+At the same time we can look at $S$ as an image of $F \colon \cat M \to \Set$, in which case the functions $S \to S$ form a representation of the monoid. This is the essence of the Cayley's theorem.
+
+In programming, the best example of applying the Cayley's theorem is in the efficient implementation of list reversal. Recall the naive recursive implementation of reversal:
+\begin{haskell}
+reverse :: [a] -> [a]
+reverse [] = []
+reverse (a : as) = reverse as ++ [a]
+\end{haskell}
+It splits the list into head and tail, reverses the tail, and appends a singleton made out of the head to the result. The problem is that every append has to traverse the growing list resulting in $O(N^2)$ performance.
+
+Remember, however, that a list is a (free) monoid:
+\begin{haskell}
+instance Monoid [a] where
+  mempty = []
+  mappend as bs = as ++ bs
+\end{haskell}
+We can use Cayley's theorem to represent this monoid as functions on lists:
+\begin{haskell}
+type DList a = [a] -> [a]
+\end{haskell}
+To represent a list, we turn it into a function that prepends this list to its argument:
+\begin{haskell}
+rep :: [a] -> DList a
+rep as = \xs -> as ++ xs
+\end{haskell}
+This representation is called a \index{difference list}\emph{difference list}.
+
+To turn a function back to a list, we act with it on an empty list:
+\begin{haskell}
+unRep :: DList a -> [a]
+unRep f = f []
+\end{haskell}
+It's easy to check that the representation of an empty list is an identity function, and that the representation of a concatenation of two lists is a composition of representations:
+\begin{haskell}
+rep [] = id
+rep (xs ++ ys) = rep xs . rep ys
+\end{haskell}
+So this is exactly the Cayley representation of the list monoid.
+
+We can now translate the reversal algorithm to produce this new representation:
+\begin{haskell}
+rev :: [a] -> DList a
+rev [] = rep []
+rev (a : as) = rev as . rep [a]
+\end{haskell}
+and turn it back to a list:
+\begin{haskell}
+fastReverse :: [a] -> [a]
+fastReverse = unRep . rev
+\end{haskell}
+At first sight it might seem like we haven't done much except to add a layer of conversion on top of our recursive algorithm. Except that the new algorithm has $O(N)$ rather than $O(N^2)$ performance. To see that, consider reversing a simple list \hask{[1, 2, 3]}. The function \hask{rev} turns this list into a composition of functions:
+\begin{haskell}
+ rep [3] . rep [2] . rep [1]
+\end{haskell}
+It does it in linear time. The function \hask{unRep} executes this composite starting with an empty list. But notice that each \hask{rep} \emph{prepends} its argument to the cumulative result. In particular, the final \hask{rep [3]} executes:
+\begin{haskell}
+ [3] ++ [2, 1]
+\end{haskell}
+Unlike appending, prepending is a constant time operation, so the whole algorithm takes $O(N)$ time. 
+
+Another way of looking at it is to realize that \hask{rev} queues up the actions in the order of the elements of the list, starting at the head. But the queue of functions is executed in the first-in-first-out (FIFO) order. 
+
+Because of Haskell's laziness, list reversal using \hask{foldl} has similar performance:
+\begin{haskell}
+reverse = foldl (\as a -> a : as) []
+\end{haskell}
+This is because \hask{foldl}, before returning the result, traverses the list left-to-right accumulating functions (closures). It then executes them as necessary, in the FIFO order.
+
 \subsection{Proof of Tannakian reconstruction}
 
-Monoid reconstruction is a special case of a more general theorem in which instead of the single-object category we use a regular category. As in the monoid case, we'll reconstruct the hom-set, only this time it will be a regular hom-set between two objects. We'll prove the formula:
+Monoid reconstruction is a special case of a more general theorem in which, instead of the single-object category, we use a regular category. As in the monoid case, we'll reconstruct the hom-set, only this time it will be a regular hom-set between two objects. We'll prove the formula:
 \[ \int_{F \colon [\cat C, \Set]} \Set (F a, F b) \cong \cat C(a, b) \]
 The trick is to use the Yoneda lemma to represent the action of $F$:
 \[ F a \cong [\cat C, \Set] ( \cat C (a ,-), F) \]
@@ -142,6 +230,22 @@ In particular, we can replace $\cat A$ with the functor category $[\cat C, \Set]
 We can then apply the Yoneda lemma again to the right hand side to get:
 \[ \cat C (a, b) \]
 which is exactly the sought after result.
+
+It's important to realize how the structure of the functor category enters the end through the wedge condition. It does that through natural transformations. Every time we have a natural transformation between two functors $\alpha \colon G \to H$, the following diagram must commute:
+\[
+ \begin{tikzcd}
+ & \int_F \Set (F a, F b)
+ \arrow[dl, "\pi_G"']
+ \arrow[dr, "\pi_H"]
+ \\
+ \Set(G a, G b)
+ \arrow[dr, "{\Set(id, \alpha)}"']
+ && \Set (H a, H b)
+  \arrow[dl, "{\Set (\alpha, id)}"]
+\\
+ & \Set (G a, H b)
+ \end{tikzcd}
+\]
 
 \subsection{Tannakian reconstruction in Haskell}
 
@@ -282,7 +386,7 @@ Our starting point for Tannakian reconstruction is the end:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \]
 The mapping $\cat T \to \Set$ parameterized by the object $a$, and given by the formula:
 \[ P \mapsto (U P) a \]
-is sometimes called a \index{fiber functor}\emph{fiber functor}, so the end formula can be interpreted as a set of natural transformations between two fiber functors. 
+is sometimes called a \index{fiber functor}\emph{fiber functor}, so the end formula can be interpreted as a set of natural transformations between two fiber functors. Conceptually, a fiber functor describes an infinitesimal neighborhood of an object. It maps functors to sets but, more importantly, it maps natural transformations to functions. These functions probe the environment in which the object lives. In particular, natural transformations in $\cat T$ are involved in wedge conditions that define the end. In calculus, stalks of sheaves play a very similar role.
 
 As we did before, we first apply the Yoneda lemma to get:
 \[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (b ,-), U P\big)\Big) \]
@@ -297,6 +401,10 @@ and the Yoneda lemma again:
 The final observation is that the compostion $U \circ F$ of adjoint functors is a monad in the functor category. Let's call this monad $\Phi$. The result is the following identity that will serve as the foundation for profunctor optics:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \cong \big( \Phi \cat C (a ,-) \big) b \]
 The right-hand side is the action of the monad $\Phi = U \circ F$ on the representable functor $\cat C (a, -)$ evaluated at $b$. 
+
+Compare this with the earlier formula for Tannakian reconstruction, especially if we rewrite it in the following form:
+\[ \int_{F \colon [\cat C, \Set]} \Set (F a, F b) \cong \cat C(a, -) b\]
+
 
 In our toy example, the monad $\Phi$ is given by:
 \[ (\Phi Q) b = b + Q b \]
@@ -445,7 +553,7 @@ Since we want Tambara modules to form a category, we have to define morphisms be
  &  Q \langle c \times a, c \times b \rangle
  \end{tikzcd}
 \]
-
+Keep in mind that the structure of the Tambara category is encoded in these natural transformations. They will determine, through the wedge condition, the shape of the ends that enter the definition of profunctor lenses.
 
 \subsection{Profunctor lenses}
 
@@ -468,7 +576,7 @@ The left adjoint to $\Theta$ is a monad $\Phi$ given by the formula:
 where:
 \[ (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle\big) = \cat C(s, c \times s) \times \cat C(c \times v, t) \]
 
-This adjunction can be easily checked using some end/coend manipulations. The mapping out of $\Phi P$ to some profunctor $Q$ can be written as an end. The coends in $\Phi$ can then be taken out using co-continuity of the hom-functor. Finally, applying the ninja-Yoneda lemma produces the mapping into $\Theta Q$. We get:
+This adjunction can be easily verified using some end/coend manipulations. The mapping out of $\Phi P$ to some profunctor $Q$ can be written as an end. The coends in $\Phi$ can then be taken out using co-continuity of the hom-functor. Finally, applying the ninja-Yoneda lemma produces the mapping into $\Theta Q$. We get:
 \[ [(\cat C^{op} \times \cat C, \Set] (P \Phi, Q) \cong [(\cat C^{op} \times \cat C, \Set] (P, \Theta Q) \]
 
 Replacing $Q$ with $P$ we immediately see that the set of algebras for $\Phi$ is isomorphic to the set of coalgebras for $\Theta$. In fact they are monad algebras for $\Phi$. This means that the Eilenberg-Moore category for the monad $\Phi$ is the same as the Tambara category.
