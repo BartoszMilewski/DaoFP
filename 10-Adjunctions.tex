@@ -553,6 +553,8 @@ It's easy to see that an empty list is mapped to the monoidal unit. It's not too
 
 Following the intuition of a free monoid being a domain-specific program, \hask{foldMap} provides an \emph{interpreter} for this program. It performs all the multiplications that have been postponed. Note that the same program may be interpreted in many ways, depending on the choice of the concrete monoid and the function \hask{f}.
 
+We'll come back to free monoids as lists in the chapter on algebras.
+
 \begin{exercise}
 Write a program that takes a list of integers and interprets it in two ways: once using the additive and once using the multiplicative monoid of integers.
 \end{exercise}
