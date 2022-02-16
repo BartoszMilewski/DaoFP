@@ -809,6 +809,8 @@ mcata (l, r) (Free ffa) =
   r (fmap (mcata (l, r)) ffa)
 \end{haskell}
 
+Many tree-like monads are in fact free monads for simple functors.
+
 \begin{exercise}
 A rose tree is defined as
 \begin{haskell}
@@ -817,6 +819,18 @@ data Rose a = Leaf a | Rose [Rose a]
 \end{haskell}
 Implement conversions back and forth between \hask{Rose a} and  \hask{FreeMonad [] a}.
 \end{exercise}
+
+\begin{exercise}
+Implement conversions between a binary tree and \hask{FreeMonad Bin a}, where:
+\begin{haskell}
+data Bin a = Bin a a
+\end{haskell}
+\end{exercise}
+
+\begin{exercise}
+Find a functor whose free monad is equivalent to the list monad \hask{[a]}.
+\end{exercise}
+
 
 \subsection{Stack calculator example}
 As an example, let's consider a stack calculator implemented as an embedded domain-specific language, EDSL. We'll use the free monad to accumulate simple commands written in this language. 
