@@ -71,7 +71,13 @@ Most programming texts, following Brian Kernighan, start with "Hello World!". It
 
 \subsection{Conventions}
 
-I tried to keep the notation coherent throughout the book. In particular, I decided to use lowercase letters like $a$ or $b$ for objects in a category and uppercase names like $S$ for sets, but sometimes things get mixed up.
+I tried to keep the notation coherent throughout the book. In particular, I decided to use lowercase letters like $a$ or $b$ for objects in a category and uppercase names like $S$ for sets, even though sets are objects in the category of sets and functions. Generic categories have names like $\cat C$ or $\cat D$, whereas specific categories are named like $\Set$ or $\Cat{Cat}$. 
+
+Programming examples are written in Haskell. Although this is not a Haskell manual, the introduction of language constructs is gradual enough to help the reader navigate the code. The fact that Haskell syntax is often based on mathematical notation is an additional advantage. Program fragments are written in the following format:
+\begin{haskell}
+apply :: (a -> b, a) -> b
+apply (f, x) = f x
+\end{haskell}
 
 \mainmatter
 
@@ -93,8 +99,8 @@ I tried to keep the notation coherent throughout the book. In particular, I deci
 \subfile{16-Comonads}
 \subfile{17-Ends}
 \subfile{18-Tambara}
-\subfile{19-Kan}
-\subfile{20-Enrichment}
+%\subfile{19-Kan}
+%\subfile{20-Enrichment}
 
 \printindex
 
