@@ -129,9 +129,9 @@ In other words, we can recover the monoid from its representations.
 
 In group theory, Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element has an inverse. Permutations are just functions that map a set to itself.
 
-In category theory, Cayley's theorem is practically built into the definition of a monoid and its representations in $\Set$. The connection between the single-object interpretation and the more traditional set-of-elements interpretation of a monoid is easy to establish. 
+In category theory, Cayley's theorem is practically built into the definition of a monoid and its representations. 
 
-We do this by constructing the functor $F \colon \cat M \to \Set$ that maps $*$ to the set $S$ that is given by the hom-set: $S = \cat M(*, *)$. Elements of this set are morphisms in $\cat M$. We define the action of $F$ on morphisms as post-composition:
+The connection between the single-object interpretation and the more traditional set-of-elements interpretation of a monoid is easy to establish. We do this by constructing the functor $F \colon \cat M \to \Set$ that maps $*$ to the special set $S$ that is given by the hom-set: $S = \cat M(*, *)$. Elements of this set are morphisms in $\cat M$. We define the action of $F$ on morphisms as post-composition:
 \[ (F m) n = m \circ n \]
 Here $m$ is a morphism in $\cat M$ and $n$ is an element of $S$, which happens to also be a morphism in $\cat M$.
 
@@ -143,7 +143,7 @@ We can take this particular representation as an alternative definition of a mon
 \end{align*}
 The unit picks the element of $S$ that corresponds to $id_*$ in $\cat M(*, *)$. Multiplication of two elements $m$ and $n$ is given by the element that corresponds to $m \circ n$. 
 
-At the same time we can look at $S$ as an image of $F \colon \cat M \to \Set$, in which case the functions $S \to S$ form a representation of the monoid. This is the essence of the Cayley's theorem.
+At the same time we can look at $S$ as an image of $F \colon \cat M \to \Set$, in which case it's the functions $S \to S$ that form a representation of the monoid. This is the essence of the Cayley's theorem.
 
 In programming, the best example of applying the Cayley's theorem is in the efficient implementation of list reversal. Recall the naive recursive implementation of reversal:
 \begin{haskell}
@@ -201,7 +201,7 @@ It does it in linear time. The function \hask{unRep} executes this composite sta
 \begin{haskell}
  [3] ++ [2, 1]
 \end{haskell}
-Unlike appending, prepending is a constant time operation, so the whole algorithm takes $O(N)$ time. 
+Unlike appending, prepending is a constant-time operation, so the whole algorithm takes $O(N)$ time. 
 
 Another way of looking at it is to realize that \hask{rev} queues up the actions in the order of the elements of the list, starting at the head. But the queue of functions is executed in the first-in-first-out (FIFO) order. 
 
