@@ -383,33 +383,34 @@ The trick in generalizing the Tannakian reconstruction is to define the end over
 \[ \cat T (F Q, P) \cong  [\cat C, \Set] ( Q, U P )\]
 
 Our starting point for Tannakian reconstruction is the end:
-\[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \]
+\[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) s\big) \]
 The mapping $\cat T \to \Set$ parameterized by the object $a$, and given by the formula:
 \[ P \mapsto (U P) a \]
 is sometimes called a \index{fiber functor}\emph{fiber functor}, so the end formula can be interpreted as a set of natural transformations between two fiber functors. Conceptually, a fiber functor describes an infinitesimal neighborhood of an object. It maps functors to sets but, more importantly, it maps natural transformations to functions. These functions probe the environment in which the object lives. In particular, natural transformations in $\cat T$ are involved in wedge conditions that define the end. In calculus, stalks of sheaves play a very similar role.
 
 As we did before, we first apply the Yoneda lemma to get:
-\[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (b ,-), U P\big)\Big) \]
+\[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (s ,-), U P\big)\Big) \]
 We can now use the adjunction:
-\[ \int_{P \colon \cat T} \Set \Big(\cat T \big( F \cat C (a ,-), P\big), \cat T \big( F \cat C (b ,-), P\big)\Big) \]
+\[ \int_{P \colon \cat T} \Set \Big(\cat T \big( F \cat C (a ,-), P\big), \cat T \big( F \cat C (s ,-), P\big)\Big) \]
 We end up with a mapping between two natural transformations in the functor category $\cat T$. We can simplify it using the corollary to the Yoneda lemma, resulting in:
-\[ \cat T\big( F \cat C (b ,-), F \cat C (a ,-) \big) \]
+\[ \cat T\big( F \cat C (s ,-), F \cat C (a ,-) \big) \]
 We can apply the adjunction once more:
-\[ \cat T\big( \cat C (b ,-), (U\circ F) \cat C (a ,-) \big) \]
+\[ \cat T\big( \cat C (s ,-), (U\circ F) \cat C (a ,-) \big) \]
 and the Yoneda lemma again:
-\[ \big( (U\circ F) \cat C (a ,-) \big) b \]
+\[ \big( (U\circ F) \cat C (a ,-) \big) s \]
 The final observation is that the compostion $U \circ F$ of adjoint functors is a monad in the functor category. Let's call this monad $\Phi$. The result is the following identity that will serve as the foundation for profunctor optics:
-\[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) b\big) \cong \big( \Phi \cat C (a ,-) \big) b \]
-The right-hand side is the action of the monad $\Phi = U \circ F$ on the representable functor $\cat C (a, -)$ evaluated at $b$. 
+\[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) s\big) \cong \big( \Phi \cat C (a ,-) \big) s \]
+The right-hand side is the action of the monad $\Phi = U \circ F$ on the representable functor $\cat C (a, -)$ evaluated at $s$. 
 
 Compare this with the earlier formula for Tannakian reconstruction, especially if we rewrite it in the following form:
-\[ \int_{F \colon [\cat C, \Set]} \Set (F a, F b) \cong \cat C(a, -) b\]
+\[ \int_{F \colon [\cat C, \Set]} \Set (F a, F s) \cong \cat C(a, -) s\]
 
+Keep in mind that, in the derivation of optics, we'll replace $a$ and $s$ with pairs of objects $\langle a, b \rangle$ and $\langle s, t \rangle$  from $\cat C^{op} \times \cat C$. In that case our functors will become profunctors.
 
-In our toy example, the monad $\Phi$ is given by:
-\[ (\Phi Q) b = b + Q b \]
+Going back to our toy example, the monad $\Phi$ is given by:
+\[ (\Phi Q) s = s + Q s \]
 which is just the action of the free functor $F$ followed by forgetting the $\eta$. Replacing $Q$ with the representable $\cat C (a, -)$ we get:
-\[ b + \cat C (a, b) \]
+\[ s + \cat C (a, s) \]
 In Haskell, this translates directly to our \hask{PtdGetter}.
 
 The bottom line is that we were able to reconstruct a hom-set in a category of simple optics from the category of functors with some additional structure. 
@@ -422,6 +423,9 @@ Notice that the pair of hom-sets in this formula can be seen as a single hom-set
 \[  \mathcal{L}\langle s, t\rangle \langle a, b \rangle =  \int^{c} (\cat C^{op} \times \cat C )(c \bullet \langle a, b \rangle, \langle s, t \rangle)  \]
 where we define the action of $c$ on a pair $\langle a, b \rangle$ as:
 \[ c \bullet \langle a, b \rangle = \langle c \times a, c \times b \rangle \]
+This is a shorthand notation for the diagonal part of a more general action of $\cat C^{op} \times \cat C$ on itself given by:
+ \[ \langle c, c' \rangle \bullet \langle a, b \rangle = \langle c \times a, c' \times b \rangle \]
+
 
 This suggests that, to represent such optics, we should be looking at co-presheaves on the category $\cat C^{op} \times \cat C$, that is, we should be considering profunctor representations. 
 
@@ -465,7 +469,7 @@ Let's try to apply the same logic to lenses. We have to find a class of profunct
 
 Let's start with the existential representation. We have at our disposal an object $c$ and a pair of functions:
 \[  \langle f, g \rangle \colon \cat C(s, c \times a) \times \cat C(c \times b, t) \]
-We want to build a profunctor representation, so we have to be able to map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$. We could get $P \langle s, t \rangle$ by lifting these two functions, but we would have to start from $P \langle c \times a, c \times b \rangle$. Indeed:
+We want to build a profunctor representation, so we have to be able to map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$. We could get $P \langle s, t \rangle$ by lifting these two functions, if start from $P \langle c \times a, c \times b \rangle$. Indeed:
 \[ P \langle f, g \rangle \colon P \langle c \times a, c \times b \rangle \to P \langle s, t \rangle \]
 What we are missing is the mapping:
 \[ P \langle a, b \rangle \to P \langle c \times a, c \times b \rangle \]
@@ -573,7 +577,7 @@ In fact, these coalgebras are comonad coalgebras, that is they are compatible wi
 
 The left adjoint to $\Theta$ is a monad $\Phi$ given by the formula:
 \[(\Phi P)  \langle s, t \rangle = \int^{\langle u, v \rangle, c} (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle\big) \times P \langle u, v \rangle \]
-where:
+where we use the shorthand notation:
 \[ (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle\big) = \cat C(s, c \times s) \times \cat C(c \times v, t) \]
 
 This adjunction can be easily verified using some end/coend manipulations. The mapping out of $\Phi P$ to some profunctor $Q$ can be written as an end. The coends in $\Phi$ can then be taken out using co-continuity of the hom-functor. Finally, applying the ninja-Yoneda lemma produces the mapping into $\Theta Q$. We get:
