@@ -812,7 +812,7 @@ mcata (l, r) (Free ffa) =
 Many tree-like monads are in fact free monads for simple functors.
 
 \begin{exercise}
-A rose tree is defined as
+A (non-empty) rose tree is defined as:
 \begin{haskell}
 data Rose a = Leaf a | Rose [Rose a]
   deriving Functor
