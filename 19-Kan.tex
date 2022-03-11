@@ -492,8 +492,8 @@ and apply the Yoneda lemma:
 \[ \int_c  \cat D \big(G (P c), F c\big) \]
 This result is the left-hand side of the adjunction.
  
-If all three categories are $\Set$, we can replace the power with the exponential/hom-set to get:
-  \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \Set (b, P c), F c\big) \]
+If $F$ is a co-presheaf, that is $\cat D$ is $\Set$, we can replace the power with the exponential/hom-set to get:
+  \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \]
 This can be immediatly translated to Haskell:
  \begin{haskell}
  newtype Ran p f b = Ran (forall c. (b -> p c) -> f c)
@@ -846,8 +846,8 @@ We can now use the Yoneda lemma to integrate over $b$, replacing $b$ with $P c$:
 As long as the coend in question exists, it indeed gives us the left adjoint to functor pre-composition:
 \[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
 
-In $\Set$, the co-power reduces to a cartesian product, so the left Kan extension becomes:
-\[ (\text{Lan}_P F)\, b \cong \int^{c} \Set (P c, b) \times F c \]
+In $\Set$, the co-power reduces to a cartesian product, so the left Kan extension of a co-presheaf becomes:
+\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B (P c, b) \times F c \]
 
 When translating this formula to Haskell, we replace the coend with the existential type. Symbolically:
  \begin{haskell}
@@ -975,19 +975,14 @@ where:
 \[ [\cat C, \cat D](G \circ P, F) \cong [\cat B, \cat D](G, \text{Ran}_P F) \]
  \[ (\text{Ran}_P F) e \cong \int_c \cat B (e, P c) \pitchfork F c \]
 \item Right Kan extension in $\Set$:
-  \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \Set (e, P c), F c\big) \]
+  \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \cat B (e, P c), F c\big) \]
 \item Left Kan extension:
 \[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
 \[ (\text{Lan}_P F) e \cong \int^{c} \cat B(P c, e) \cdot F c \]
 \item Left Kan extension in $\Set$:
-\[ (\text{Lan}_P F) e \cong \int^{c} \Set (P c, e) \times F c \]
+\[ (\text{Lan}_P F) e \cong \int^{c} \cat B (P c, e) \times F c \]
 
 
 \end{itemize}
-
-\[ [\cat D, \cat D] (G \circ R, R) \cong  [\cat D, \cat D](G, \text{Ran}_R R ) = [\cat D, \cat D](G, T^R) \]
-  
-  \[[\cat C, \cat C] (T \circ T, T) \cong [\cat C, \cat C] (T, \text{Ran}_T T) = [\cat C, \cat C] (T, T^T)\]
-
 
 \end{document}
