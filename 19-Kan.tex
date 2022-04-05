@@ -469,13 +469,12 @@ This makes $\text{Lim} D$ the limit of the diagram $D$.
 
 \subsection{Right Kan extension as an end}
 
-Right Kan extensions can be calculated using ends (as long as these ends exist). We could start from the definition of the right Kan extension as the right adjoint to functor pre-composition. The sets of natural transformations in that adjunction can be expressed as ends, and we could cleverly use the Yoneda lemma in reverse to derive the formula. But it's easier to start with the final formula and prove that it works. 
+Recall the ninja Yoneda lemma:
+\[ F b \cong \int_{c} \mathbf{Set} (\mathcal{B}(b, c), F c) \]
+Here, $F$ is a co-presheaf, that is a functor from $\cat B$ to $\Set$. The right Kan extensions of $F$ along $P$ generalizes this formula:
+\[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \]
 
-The hint to the final formula is the pitchfork Yoneda lemma:
-\[ \int_c \cat C (c', c) \pitchfork c \cong c' \]
-We can think of it as the right Kan extension of identity along identity.
- 
-The right Kan extension is given by the following end:
+This works for a co-presheaf. In general we are interested in $F \colon \cat C \to \cat D$, so we need to replace the hom-set by a power. Thus he right Kan extension is given by the following end (if it exists):
  \[ (\text{Ran}_P F) b \cong \int_c \cat B (b, P c) \pitchfork F c \]
  
  The proof essentially writes itself: at every step there is only one thing to do. We start with the adjunction:
@@ -492,9 +491,9 @@ and apply the Yoneda lemma:
 \[ \int_c  \cat D \big(G (P c), F c\big) \]
 This result is the left-hand side of the adjunction.
  
-If $F$ is a co-presheaf, that is $\cat D$ is $\Set$, we can replace the power with the exponential/hom-set to get:
+If $F$ is a co-presheaf, the power in the formula for the right Kan extension decays to the exponential/hom-set:
   \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \]
-This can be immediatly translated to Haskell:
+This can be immediately translated to Haskell:
  \begin{haskell}
  newtype Ran p f b = Ran (forall c. (b -> p c) -> f c)
  \end{haskell}
@@ -827,15 +826,15 @@ The colimit is the universal cocone, which is given by the left Kan extension:
 
 
 \subsection{Left Kan extension as a coend}
-A hint to representing the left Kan extension as a coend comes from the co-Yoneda lemma:
-\[ \cat \int^c C(c, b) \cdot c \cong b \]
-which could be interpreted as an extension of the identity functor along itself.
 
-This is the full formula:
-
+Recall the ninja co-Yoneda lemma. For every co-presheaf $F$, we have:
+\[ F b \cong \int^{c} \mathcal{B}(c, b) \times F c \]
+The left Kan extension generalizes this formula:
+\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B (P c, b) \times F c \]
+For a general functor $F \colon \cat C \to \cat D$, we replace the product with a copower:
 \[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B(P c, b) \cdot F c \]
 
-We prove it by considering a mapping out to some functor $G$. We represent the set of natural transformations as an end:
+We prove this formula by considering a mapping out to some functor $G$. We represent the set of natural transformations as an end:
 \[\int_b \cat D \big(\int^c \cat B(P c, b) \cdot F c, G b\big) \]
 We pull out the coend, which turns to an end:
 \[\int_b \int_c \cat D \big(\cat B(P c, b) \cdot F c, G b\big) \]
@@ -846,7 +845,7 @@ We can now use the Yoneda lemma to integrate over $b$, replacing $b$ with $P c$:
 As long as the coend in question exists, it indeed gives us the left adjoint to functor pre-composition:
 \[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
 
-In $\Set$, the co-power reduces to a cartesian product, so the left Kan extension of a co-presheaf becomes:
+As expected, in $\Set$, the co-power decays to a cartesian product:
 \[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B (P c, b) \times F c \]
 
 When translating this formula to Haskell, we replace the coend with the existential type. Symbolically:
