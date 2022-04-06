@@ -263,26 +263,6 @@ data MoreThanA a b = More a (Maybe b)
 \end{exercise}
 
 
-\subsection{Profunctors}
-
-We've seen that the function type is also functorial. It lifts two functions at a time, just like \hask{Bifunctor}, except that one of the functions goes in the opposite direction. 
-
-In category theory this corresponds to a functor from a product of two categories, one of them being the opposite category: it's a functor from $\mathcal{C}^{op} \times \mathcal{C}$. Functors from $\mathcal{C}^{op} \times \mathcal{C}$ to  to $\mathbf{Set}$ are called \emph{profunctors}.
-
-In Haskell, profunctors form a typeclass:
-\begin{haskell}
-class Profunctor f where
-  dimap :: (a' -> a) -> (b -> b') -> (f a b -> f a' b')
-\end{haskell}
-
-The function type, which can be written as an infix operator \hask{(->)}, is an instance of \hask{Profunctor}
-\begin{haskell}
-instance Profunctor (->) where
-  dimap f g h = g . h . f
-\end{haskell}
-
-In programming, all non-trivial profunctors are variations on the function type. 
-
 \subsection{Contravariant functors}
 
 Functors from the opposite category $\mathcal{C}^{op}$ are called \emph{contravariant}. They have the property of lifting arrows that go in the opposite direction. Regular functors are sometimes called \index{covariant functor}\emph{covariant}.
@@ -293,7 +273,9 @@ class Contravariant f where
   contramap :: (b -> a) -> (f a -> f b)
 \end{haskell}
 
-A predicate is a function returning \hask{True} or \hask{False}:
+It's often convenient to think of functors in terms of producers and consumers. In this picture, a (covariant) functor is a producer. You can turn a producer of \hask{a}'s to a producer of \hask{b}'s by applying (using \hask{fmap}) a function \hask{a->b}. Conversely, to turn a consumer of \hask{a}'s to a consumer of \hask{b}'s you need a function going in the opposite direction, \hask{b->a}. 
+
+Example: A predicate is a function returning \hask{True} or \hask{False}:
 \begin{haskell}
 data Predicate a = Predicate (a -> Bool)
 \end{haskell}
@@ -305,13 +287,13 @@ instance Contravariant Predicate where
 
 The only non-trivial examples of contravariant functors are variations on the theme of function objects. 
 
-One way to recognize them is by assigning polarities to types that define a function type. We say that the return type is in a \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then the polarities get reversed. 
+One way to tell if a given function type is covariant or contravariant in one of the types is by assigning polarities to the types used in its definition. We say that the return type is in a \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then its polarities get reversed. 
 
 Consider this data type:
 \begin{haskell}
 data Tester a = Tester ((a -> Bool) -> Bool)
 \end{haskell}
-It has \hask{a} in a double-negative, therefore a positive position. This is why it's a covariant \hask{Functor}:
+It has \hask{a} in a double-negative, therefore a positive position. This is why it's a covariant \hask{Functor}. It's a producer of \hask{a}'s:
 
 \begin{haskell}
 instance Functor Tester where
@@ -319,7 +301,30 @@ instance Functor Tester where
     where g' h = g (h . f)
 \end{haskell}
 
-Notice that parentheses are important here. A similar function \hask{a -> Bool -> Bool} has \hask{a} in a \emph{negative} position. That's because it's a function of \hask{a} returning a function \hask{(Bool -> Bool)}. Equivalently, you may uncurry it to get a function that takes a pair: \hask{(a, Bool) -> Bool}.
+Notice that parentheses are important here. A similar function \hask{a -> Bool -> Bool} has \hask{a} in a \emph{negative} position. That's because it's a function of \hask{a} returning a function \hask{(Bool -> Bool)}. Equivalently, you may uncurry it to get a function that takes a pair: \hask{(a, Bool) -> Bool}. Either way, \hask{a} ends up in the negative position.
+
+\subsection{Profunctors}
+
+We've seen before that the function type is functorial. It lifts two functions at a time, just like \hask{Bifunctor}, except that one of the functions goes in the opposite direction. 
+
+In category theory this corresponds to a functor from a product of two categories, one of them being the opposite category: it's a functor from $\mathcal{C}^{op} \times \mathcal{C}$. Functors from $\mathcal{C}^{op} \times \mathcal{C}$ to  to $\mathbf{Set}$ are called \emph{profunctors}.
+
+In Haskell, profunctors form a typeclass:
+\begin{haskell}
+class Profunctor f where
+  dimap :: (a' -> a) -> (b -> b') -> (f a b -> f a' b')
+\end{haskell}
+
+You can think of a profunctor as a type that's simultaneously a producer and a consumer. It consumes one type and produces another.
+
+The function type, which can be written as an infix operator \hask{(->)}, is an instance of \hask{Profunctor}
+\begin{haskell}
+instance Profunctor (->) where
+  dimap f g h = g . h . f
+\end{haskell}
+This is in accordance with our intuition that a function \hask{a->b} consumes arguments of the type \hask{a} and produces results of the type \hask{b}.
+
+In programming, all non-trivial profunctors are variations on the function type. 
 
 \section{The Hom-Functor}
 
