@@ -365,14 +365,14 @@ This is somewhat reminiscent of the currying adjunction:
 in which the product is replaced by functor composition. (Of course, composition can be considered a tensor product only in the category of endofunctors.)
 
 \subsection{Limits as Kan extensions}
- We have previously defined limits as universal cones. The definition of a cone involves two categories: the indexing category $\cat I$ that defines the shape of the diagram, and the target category $\cat C$. A diagram is a functor $D \colon \cat I \to \cat C$. 
+ We have previously defined limits as universal cones. The definition of a cone involves two categories: the indexing category $\cat J$ that defines the shape of the diagram, and the target category $\cat C$. A diagram is a functor $D \colon \cat J \to \cat C$. 
  
- We can introduce a third category $\mathbf 1$: the terminal category that contains a single object and a single identity arrow. We can then use a functor $X$ from that category to $\cat C$ to pick the apex $x$ of the cone. Since $\mathbf 1$ is terminal in $\mathbf{Cat}$, we also have the unique functor from $\cat I$ to it, which we'll call $!$.
+ We can introduce a third category $\mathbf 1$: the terminal category that contains a single object and a single identity arrow. We can then use a functor $X$ from that category to $\cat C$ to pick the apex $x$ of the cone. Since $\mathbf 1$ is terminal in $\mathbf{Cat}$, we also have the unique functor from $\cat J$ to it, which we'll call $!$.
  
-It turns out that the limit of $D$ is the right Kan extension of the diagram $D$ along $!$. First, let's observe that the composition $X \circ !$ maps the shape $\cat I$ to a single object $x$, so it does the job of the constant functor $\Delta_x$ picking the apex of a cone. A cone with the apex $x$ is a natural transformation $\gamma$: 
+It turns out that the limit of $D$ is the right Kan extension of the diagram $D$ along $!$. First, let's observe that the composition $X \circ !$ maps the shape $\cat J$ to a single object $x$, so it does the job of the constant functor $\Delta_x$ picking the apex of a cone. A cone with the apex $x$ is a natural transformation $\gamma$: 
 \[
  \begin{tikzcd} [row sep=1cm, column sep=1cm]
- \cat I
+ \cat J
  \arrow[rr, "D", "" {name=ID, below} ]
  \arrow[d, bend right, "!"']
  && \cat C
@@ -383,7 +383,7 @@ It turns out that the limit of $D$ is the right Kan extension of the diagram $D$
  \end{tikzcd}
 \]
 
-The following diagrams illustrate this. On the left we have two categories: $\mathbf 1$ with a single object $*$, and $\cat I$ with three objects forming a shape for the diagram. On the right we have the image of $D$ and the image of $X \circ !$, which is the apex $x$. The three components of $\gamma$ connect the apex $x$ with the diagram. Naturality of $\gamma$ ensures that all the triangles commute.
+The following diagrams illustrate this. On the left we have two categories: $\mathbf 1$ with a single object $*$, and $\cat J$ with three objects forming a shape for the diagram. On the right we have the image of $D$ and the image of $X \circ !$, which is the apex $x$. The three components of $\gamma$ connect the apex $x$ with the diagram. Naturality of $\gamma$ ensures that all the triangles commute.
 
 \[
  \begin{tikzcd}
@@ -423,7 +423,7 @@ The right Kan extension $(\text{Ran}_! D, \varepsilon)$ is the universal such co
 Universality means that for any pair $(X, \gamma)$ there is a natural transformation $\sigma \colon X \to \text{Ran}_! D$ 
 \[
 \begin{tikzcd}[row sep=2cm, column sep=2cm]
-\cat I  \ar[d, "!"', "" {name=P}]
+\cat J  \ar[d, "!"', "" {name=P}]
             \ar[r, "D", ""  {name=F, below, near start, bend right}]
 &
 \cat C
@@ -497,6 +497,12 @@ This can be immediately translated to Haskell:
  \begin{haskell}
  newtype Ran p f b = Ran (forall c. (b -> p c) -> f c)
  \end{haskell}
+ 
+ Notice also that, if $P$ has a left adjoint, let's call it $P^{-1}$:
+ \[ \cat B(b, P c) \cong \cat C(P^{-1} b, c) \]
+ we could use the ninja Yoneda lemma to perform the end and get:
+ \[  (\text{Ran}_P F) b \cong (F \circ P^{-1}) b \]
+ Since the adjunction is a weakening of the idea of an inverse, this result is in agreement with the intuition that the Kan extension \emph{inverts} $P$.
  
  \subsection{Left adjoint as a right Kan extension}
  
@@ -775,10 +781,10 @@ This establishes one-to-one mapping between the sets of natural transformations.
 
 \subsection{Colimits as Kan extensions}
 
-Just like limits can be defined as right Kan extensions, so colimits can be defined as left Kan extension. We start with an indexing category $\cat I$ that defines the shape of the colimit. The functor $D$ selects this shape in the target category $\cat C$. The apex of the cocone is selected by a functor from the terminal single-object category $\Cat 1$. The natural transformation defines a cocone from $D$ to $X$:
+Just like limits can be defined as right Kan extensions, so colimits can be defined as left Kan extension. We start with an indexing category $\cat J$ that defines the shape of the colimit. The functor $D$ selects this shape in the target category $\cat C$. The apex of the cocone is selected by a functor from the terminal single-object category $\Cat 1$. The natural transformation defines a cocone from $D$ to $X$:
 \[
  \begin{tikzcd} [row sep=1cm, column sep=1cm]
- \cat I
+ \cat J
  \arrow[rr, "D", "" {name=ID, below} ]
  \arrow[d, bend right, "!"']
  && \cat C
@@ -857,6 +863,12 @@ Currently, this is how we would encode the existential:
  data Lan p f e where
    Lan :: (p c -> b) -> f c -> Lan p f b
  \end{haskell}
+ 
+ If the functor $P$ has a right adjoint, let's call it $P^{-1}$:
+ \[ \cat B(P c , b) \cong \cat C(c, P^{-1} b) \]
+ then we can use the ninja co-Yoneda lemma to get:
+ \[  (\text{Lan}_P F)\, b \cong (F \circ P^{-1}) b \]
+ thus reinforcing the intuition that a Kan extension inverts $P$.
  
 \subsection{Right adjoint as a left Kan extension}
 
