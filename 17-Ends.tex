@@ -160,15 +160,15 @@ So let's see how we would go about defining the sum of all diagonal entries of a
  \begin{tikzcd}
  P \langle y, y \rangle
  \arrow[dr, "i_y"']
- \arrow[rr, dash, dotted]
+ \arrow[rr, dash, dashed]
  &&P \langle x, x \rangle
  \arrow[dl, "i_x"]
  \\
- &C
+ &S
  \end{tikzcd}
 \]
 
-If we were defining a sum, we'd make it a universal set equipped with such injections. But because we are dealing with profunctors, we want to identify the injections that are related by ``extending'' a common ancestor (here, $P \langle y, x \rangle$). We want the following diagram to commute, whenever there is a connecting morphism $f\colon x \to y$:
+If we were defining a sum, we'd make it a universal set equipped with such injections. But because we are dealing with profunctors, we want to identify the injections that are related by ``extending'' some common ancestor (here, $P \langle y, x \rangle$). We want the following diagram to commute, whenever there is a connecting morphism $f\colon x \to y$:
 
 \[
  \begin{tikzcd}
@@ -181,17 +181,17 @@ If we were defining a sum, we'd make it a universal set equipped with such injec
  &&P \langle x, x \rangle
  \arrow[dl, "i_x"]
  \\
- &C
+ &S
  \end{tikzcd}
 \]
-This diagram is called a \index{co-wedge}co-wedge, and its commuting condition is called the co-wedge condition. For every $f \colon x \to y$, we demand:
+This diagram is called a \index{co-wedge}co-wedge, and its commuting condition is called the co-wedge condition. For every $f \colon x \to y$, we demand that:
 \[ i_x \circ P \langle f, id_y \rangle = i_y \circ P \langle id_x, f \rangle \]
-The universal co-wedge is called a coend.
+The \emph{universal} co-wedge is called a coend.
 
-Since a coend generalizes a sum to a potentially infinite domain, we write it using the integral sign, with the ``integration variable'' at the top:
+Since a coend generalizes the sum to a potentially infinite domain, we write it using the integral sign, with the ``integration variable'' at the top:
 \[ \int^{x\colon \mathcal{C}} P \langle x, x \rangle \]
-Universality means that, whenever there is a set $C$ equipped with a family of functions $g_x \colon P \langle x, x \rangle \to C$ satisfying the co-wedge condition, there is a unique mapping out:
-\[ h \colon \int^{x\colon \mathcal{C}} P \langle x, x \rangle \to C \]
+Universality means that, whenever there is a set $S$ equipped with a family of functions $g_x \colon P \langle x, x \rangle \to S$ satisfying the co-wedge condition, there is a unique mapping out from the coend:
+\[ h \colon \int^{x\colon \mathcal{C}} P \langle x, x \rangle \to S \]
 that factorizes every $g_x$ through the injection $i_x$:
 \[ g_x = h \circ i_x \]
 Pictorially, we have:
@@ -211,7 +211,7 @@ Pictorially, we have:
  &\int^x P \langle x, x \rangle
  \arrow[d, dashed, "h"]
  \\
- &C
+ &S
  \end{tikzcd}
 \]
 
@@ -229,7 +229,7 @@ Compare this with the definition of a sum of two objects:
 &a + b
 \arrow[d, dashed, "h"]
 \\
-& C
+& S
  \end{tikzcd}
 \]
 Just like the sum was defined as a universal cospan, a coend is defined as a universal co-wedge. 
@@ -240,6 +240,88 @@ and
 \[ P \langle f, id \rangle (z) = x\]
 
 Notice that, in a discrete category (which is just a set of objects with no arrows between them) the co-wedge condition is trivial (there are no $f$'s other than identities), so a coend is just a straightforward sum (discriminated union) of the diagonal sets $P \langle x, x \rangle$.
+
+\subsection{Extranatural transformations}
+
+A family of arrows in the target category parameterized by the objects of the source category can often be combined into a single natural transformation between two functors. 
+
+The injections in our definition of a cowedge form a family of functions that is parameterized by objects, but they don't neatly fit into a definition of a natural transformation.
+\[
+ \begin{tikzcd}
+ P \langle y, y \rangle
+ \arrow[dr, "i_y"']
+ \arrow[rr, dash, dashed]
+ &&P \langle x, x \rangle
+ \arrow[dl, "i_x"]
+ \\
+ &S
+ \end{tikzcd}
+\]
+The problem is that the functor $P \colon \cat C^{op} \times \cat C \to \Set$ is contravariant in the first argument and covariant in the second; so its diagonal part, which on objects is defined as $x \mapsto P \langle x, x \rangle$, is neither.
+
+The closest analog of naturality at our disposal is the cowedge condition:
+\[
+ \begin{tikzcd}
+ &P \langle y, x \rangle
+ \arrow[ld, "{P \langle id, f \rangle}"']
+ \arrow[rd, "{P \langle f, id \rangle}"]
+ \\
+ P \langle y, y \rangle
+ \arrow[dr, "i_y"']
+ &&P \langle x, x \rangle
+ \arrow[dl, "i_x"]
+ \\
+ &S
+ \end{tikzcd}
+\]
+Indeed, as is the case with the naturality square, it involves the interaction between the lifting of a morphism $f \colon x \to y$ (here, in two different ways) and the components of the transformation $i$. 
+
+Granted, the standard naturality condition deals with pairs of functors. Here, the target is a single object, the set $S$. But we can always reinterpret it as the output of a constant functor $\Delta_S \colon \cat C^{op} \times \cat C \to \Set$.
+
+The cowedge condition can be interpreted as a special case of the more general \emph{extranatural} transformation. An extranatural transformation is a family of arrows:
+\[ \alpha_{c d} \colon P \langle c, c \rangle \to Q \langle d, d \rangle \]
+between two functors of the form:
+\[ P \colon \cat C^{op} \times \cat C \to \cat E \]
+\[ Q \colon \cat D^{op} \times \cat D \to \cat E \]
+Extranaturality in $c$ means that the following diagram commutes for any morphism $f \colon c \to c'$:
+\[
+ \begin{tikzcd}
+ &P \langle c', c \rangle
+ \arrow[ld, "{P \langle id, f \rangle}"']
+ \arrow[rd, "{P \langle f, id \rangle}"]
+ \\
+      P \langle c', c' \rangle
+ \arrow[dr, "\alpha_{c' d}"']
+ &&P \langle c, c \rangle
+ \arrow[dl, "\alpha_{c d}"]
+ \\
+ & Q \langle d, d \rangle
+ \end{tikzcd}
+\]
+Extranaturality in $d$ means that the following diagram commutes for any morphism $g \colon d \to d'$:
+\[
+ \begin{tikzcd}
+ &P \langle c, c \rangle
+ \arrow[ld, "\alpha_{c d}"']
+ \arrow[rd, "\alpha_{c d'}"]
+ \\
+      Q \langle d, d \rangle
+ \arrow[dr, "{Q \langle id, g\rangle}"']
+ &&Q \langle d', d' \rangle
+ \arrow[dl, "{Q \langle g,  id\rangle}"]
+ \\
+ & Q \langle d, d' \rangle
+ \end{tikzcd}
+\]
+
+Given this definition, we get our cowedge condition as the extranaturality of the mapping between the profunctor $P$ and the constant profunctor $\Delta_S$. 
+
+We can now reformulate the definition of the coend as the set $E$ equipped with the extranatural transformation  $i \colon P \to \Delta_E$ that is universal among such pairs.
+
+Universality means that for any set $S$ equipped with the extranatural transformation $\alpha \colon P \to \Delta_S$ there is a unique function $h \colon E \to S$ that factorizes all the components of $\alpha$ through the components of $i$:
+\[ \alpha_x = h \circ i_x \]
+We call this set $E$ the coend, and write it as:
+\[ E = \int^x P\langle x, x \rangle \]
 
 \subsection{Profunctor composition using coends}
 
@@ -258,10 +340,10 @@ data Coend p where
   Coend ::  p x x -> Coend p
 \end{haskell}
 
-Coends introduce a new level of abstraction in dealing with profunctors. Calculations using coends usually take advantage of their mapping-out property. To define a mapping out of a coend to some set $C$:
-\[ \int^x P \langle x, x \rangle \to C \]
- it's enough to define a family of functions from the diagonal entries of the profunctor to $C$:
- \[ g_x \colon P \langle x, x \rangle \to C \]
+Coends introduce a new level of abstraction in dealing with profunctors. Calculations using coends usually take advantage of their mapping-out property. To define a mapping out of a coend to some set $S$:
+\[ \int^x P \langle x, x \rangle \to S \]
+ it's enough to define a family of functions from the diagonal entries of the profunctor to $S$:
+ \[ g_x \colon P \langle x, x \rangle \to S \]
  You can get a lot of mileage from this trick, especially when combined with the Yoneda lemma. We'll see examples of this in what follows.
 
 \begin{exercise}
@@ -288,12 +370,12 @@ Define a \hask{Profunctor} instance for \hask{CoEndCompose}.
 
 Just like a coend generalizes a sum of the diagonal elements of a profunctor---its dual, an end, generalizes the product. A product is defined by its projections, and so is an end. 
 
-The generalization of a span that we used in the definition of a product would be a set $C$ with a family of projections, one per every object $x$:
-\[ \pi_x \colon C \to P \langle x, x \rangle \]
+The generalization of a span that we used in the definition of a product would be a set $S$ with a family of projections, one per every object $x$:
+\[ \pi_x \colon S \to P \langle x, x \rangle \]
 The dual to a co-wedge is called a \index{wedge}wedge:
 \[
  \begin{tikzcd}
- &C
+ &S
  \arrow[ld, "\pi_x"']
  \arrow[rd, "\pi_y"]
  \\
@@ -308,7 +390,7 @@ The dual to a co-wedge is called a \index{wedge}wedge:
 For every arrow $f \colon x \to y$ we demand that:
 \[ P \langle f, id_y \rangle \circ \pi_y = P \langle id_x, f \rangle \circ \pi_x \]
 
-You may think of constructing a set $C$ by first starting with a bigger set that is equipped with all the projections, and then restricting it to the elements that can be connected by way of lifting a morphism $f$. 
+You may think of constructing a set $S$ by first starting with a bigger set that is equipped with all the projections, and then restricting it to the elements that can be connected to a common descendant by way of lifting a morphism $f$. 
 
 The end is a universal wedge. We use the integral sign for it too, but with the ``integration variable'' at the bottom. 
 \[ \int_x P \langle x, x \rangle \]
@@ -317,12 +399,12 @@ You might be wondering why integrals based on multiplication are rarely used in 
 
 To summarize, an end is a set equipped with a family of functions (projections):
 \[ \pi_a \colon \left( \int_x P \langle x, x \rangle \right) \to P \langle a, a \rangle \]
-satisfying the wedge condition. It is universal among such sets; that is, for any other set $C$ equipped with a family of functions $g_x$ satisfying the wedge condition, there is a unique function $h$ that factorizes the family $g_x$ through the family $\pi_x$:
+satisfying the wedge condition. It is universal among such sets; that is, for any other set $S$ equipped with a family of functions $g_x$ satisfying the wedge condition, there is a unique function $h$ that factorizes the family $g_x$ through the family $\pi_x$:
 \[ g_x = \pi_x \circ h \]
 Pictorially, we have:
 \[
  \begin{tikzcd}
- &C
+ &S
  \arrow[ddl, bend right, "g_x"']
  \arrow[ddr, bend left, "g_y"]
  \arrow[d, dashed, "h"]
@@ -340,9 +422,11 @@ Pictorially, we have:
  \end{tikzcd}
 \]
 
+Equivalently, we can say that the end is a set $E$ equipped with an  extranatural transformation $\pi \colon \Delta_S \to E$ that is universal among such pairs. The wedge condition turns out to be a special case of extranaturality condition.
+
 If you were to construct an end, you'd start with a product of all $P \langle x, x \rangle$ for all objects in the category and then prune the tuples that don't satisfy the wedge condition. 
 
-Imagine for a moment using the singleton set $1$ in place of $C$. The family $g_x$ would select one element from each $P \langle x, x \rangle$. This would give you a giant tuple. You'd weed out most of these tuples, leaving only the ones that satisfy the wedge condition. 
+Imagine for a moment using the singleton set $1$ in place of $S$. The family $g_x$ would select one element from each $P \langle x, x \rangle$. This would give you a giant tuple. You'd weed out most of these tuples, leaving only the ones that satisfy the wedge condition. 
 
 Again, in Haskell, due to parametricity, the wedge condition is automatically satisfied, and the definition of an end for a profunctor \hask{p} simplifies to:
 
