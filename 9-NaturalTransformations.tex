@@ -801,14 +801,14 @@ Nothing prevents us from replacing the category $\mathbf{2}$ with something more
 
 There is a whole vocabulary built around such constructions. 
 
-We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can replace $\mathbf{2}$ with an arbitrary indexing category $\mathbf{I}$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \mathbf{I} \to \mathcal{C}$. It picks objects in $\mathcal{C}$ as well as some arrows between them.
+We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can replace $\mathbf{2}$ with an arbitrary indexing category $\cat J$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \cat J \to \mathcal{C}$. It picks objects in $\mathcal{C}$ as well as some arrows between them.
 
-As the second functor we'll still use the constant functor $\Delta_x \colon \mathbf{I} \to \mathcal{C}$.
+As the second functor we'll still use the constant functor $\Delta_x \colon \cat J \to \mathcal{C}$.
 
 A  natural transformation that's an element of the hom-set
-\[ [\mathbf{I}, \mathcal{C}](\Delta_x, D)  \]
+\[ [\cat J, \mathcal{C}](\Delta_x, D)  \]
 is now called a \emph{cone}. Its dual, an element of
-\[ [\mathbf{I}, \mathcal{C}](D, \Delta_x)  \]
+\[ [\cat J, \mathcal{C}](D, \Delta_x)  \]
 is called a \emph{cocone}. They generalize the span and the cospan, respectively.
 
 Diagramatically, cones and cocones look like this:
@@ -849,9 +849,9 @@ D 1
 Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_x$ shrinks all vertices to one, so naturality squares turn into triangles. Naturality means that all triangles with $X$ in their apex must now commute. 
 
 The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}D$. Universality means that it satisfies the following isomorphism, natural in $x$:
-\[ [\mathbf{I}, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
+\[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
 Dually, the universal cocone is called a \emph{colimit}, and is described by the following natural isomorphism:
-\[ [\mathbf{I}, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}D, x) \]
+\[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}D, x) \]
 
 We can now say that a product is a limit, and a sum is a colimit, of a diagram from the indexing category $\mathbf{2}$.
 
@@ -1040,6 +1040,10 @@ We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded 
 
 Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
 
+\begin{exercise}
+Describe limits and colimits as representing objects. What are the functors they represent?
+\end{exercise}
+
 \subsection{The guessing game}
 
 The idea that objects can be described by the way they interact with other objects is sometimes illustrated by playing imaginary guessing games. One category theorist picks a secret object in a category, and the other has to guess which object it is (up to isomorphism, of course). 
@@ -1113,5 +1117,17 @@ In the language of 2-categories, objects are called 0-cells, arrows between them
 The obvious generalization of that picture would be to have 3-cells that go between 2-cells and so on. An $n$-category has cells going up to the $n$-th level. 
 
 But why not have arrows all the way down? Enter infinity categories. Far from being a curiosity, $\infty$-categories have practical applications. For instance they are used in algebraic topology to describe points, paths between points, surfaces swiped by paths, volumes swiped by surfaces, and so on, ad infinitum. 
+
+\section{Useful Formulas}
+\begin{itemize}
+\item Yoneda lemma for covariant functors:
+\[ [\mathcal{C}, \mathbf{Set}]( \mathcal{C}(a, -), F) \cong F a \]
+\item Yoneda lemma for contravariant functors:
+\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, a), F) \cong F a \]
+\item Corollaries to the Yoneda lemma:
+\[ [\mathcal{C}, \mathbf{Set}]( \mathcal{C}(x, -), \mathcal{C}(y, -)) \cong \mathcal{C}(y, x)\]
+\[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, x), \mathcal{C}(-, y)) \cong \mathcal{C}(x, y)\]
+
+\end{itemize}
 
 \end{document}
