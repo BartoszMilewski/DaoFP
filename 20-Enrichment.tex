@@ -4,11 +4,468 @@
 
 \chapter{Enrichment}
 
-\section{Notes}
+\section{Enriched Categories}
+Lao Tzu says: "To know you have enough is to be rich." 
 
-\begin{itemize}
-\item weithted limits
+This chapter contains some advanced material, which might not be immediately applicable to programming. However, a lot of categorical literature, notably the website nLab, contains description of concepts in most general terms, which often means in terms of enriched categories. In this chapter I'll try to show that, at least conceptually, enrichment is not a huge step from the ordinary category theory. Most of the usual constructs can be translated just by changing the vocabulary, replacing hom-sets with hom-objects and $\Set$ with a monoidal category $\cat V$. 
 
-\item Kan extensions as weighted limits
-\end{itemize}
+Some enriched concepts, like weighted limits and colimits, turn out to be powerful on their own, to the extent that one might be tempted to replace Mac Lane's adge,``All concepts are Kan extensions'' with ``All concepts are weighted (co-)limits.''
+
+
+
+\subsection{Set-theoretical foundations}
+
+Category theory is very frugal at its foundations. But it (reluctantly) draws upon set theory. In particular the idea of the hom-set, defined as a set of arrows between two objects, drags in set theory as the prerequisite to category theory. Granted, arrows form a set only in a \emph{locally small} category, but that's a small consolation, considering that dealing with things that are too big to be sets requires even more theory. 
+
+It would be nice if category theory could bootstrap itself, for instance by replacing hom-sets with more general objects. That's the idea behind enriched categories. These hom-object, though, have to come from some other category that has hom-sets and, at some point we have to fall back to set-theoretical foundations. Nevertheless, having the option of replacing stuctureless hom-sets with something different expands our ability to model more complex systems.
+
+Virtually all that we've learned about categories can be translated into the realm of enriched categories. A lot of categorical reasoning involved commuting diagrams, which were used to express equality of arrows. In the enriched setting we don't have arrows going between objects, so all these constructions will have to be modified.
+
+\subsection{Hom-Objects}
+
+At first sight, replacing hom-sets with objects might seem like a step backward. After all, sets have elements, while objects are formless blobs. However, the richness of hom-objects is encoded in the morphisms of the category they come from. 
+
+Conceptually, the fact that sets are structure-less means that there are lots of morphisms (functions) between them. More structure often means fewer morphisms. 
+
+The guiding principle in defining enriched categories is that we should be able to recover ordinary category theory as a special case. After all hom-sets are objects in the category $\Set$. In fact we worked really hard to express properties of sets in terms of functions rather than elements. However, the very definition of a category in terms of composition and identity talks about morphisms that are \emph{elements} of hom-sets. 
+
+So let's first re-formulate the primitives of a category without recourse to elements. 
+
+Composition of arrows can be defined in bulk as a function between hom-sets:
+\[ \circ \colon \mathcal C (b, c) \times \mathcal C (a, b) \to \mathcal C (a, c) \]
+
+Instead of talking about the identity arrow, we can use a function from the singleton set:
+\[ j_a \colon 1 \to \mathcal C (a, a) \]
+
+This shows us that, if we want to replace hom-sets $\mathcal C (a, b)$ with objects from some category $\mathcal V$, we have to be able to multiply these objects, and we need some kind of unit object. We could ask for $\mathcal V$ to be cartesian but, in fact, a monoidal category works just fine. The unit and associativity laws of a monoidal category translate directly to identity and associativity laws for composition. 
+
+\subsection{Enriched Categories}
+
+Let $\mathcal V$ be a monoidal category with a tensor product $\otimes$, a unit object $I$, and the associator and two unitors:
+\begin{align*}
+\alpha &\colon (a \otimes b) \otimes c \to a \otimes (b \otimes c)
+\\
+ \lambda &\colon I \otimes a \to a
+ \\
+ \rho &\colon a \otimes I \to a
+\end{align*}
+A category $\mathcal C$ enriched over $\mathcal V$ has objects and, for any pair of objects $a$ and $b$, a hom-object $\mathcal C(a, b)$. This hom-object is an object in $\mathcal V$. Composition is defined by arrows in $\mathcal V$:
+\[ \circ \colon \mathcal C (b, c) \otimes \mathcal C (a, b) \to \mathcal C (a, c) \]
+Identity is defined by the arrow:
+\[ j_a \colon I \to \mathcal C (a, a) \]
+Associativity is expressed in terms of the associators in $\mathcal V$:
+\[
+ \begin{tikzcd}
+ \big( \mathcal C (c, d) \otimes \mathcal C (b, c) \big) \otimes \mathcal C(a, b)
+ \arrow[rr, "\alpha"]
+ \arrow[d, "\circ \otimes id"]
+ &&  \mathcal C (c, d) \otimes \big( \mathcal C (b, c) \otimes \mathcal C(a, b) \big) 
+ \arrow[d, "id \otimes \circ"]
+ \\
+ \mathcal C(b, d) \otimes \mathcal C(a, b)
+ \arrow[dr, "\circ"]
+ && \mathcal C(c, d) \otimes \mathcal C(a, c)
+ \arrow[dl, "\circ"']
+ \\
+ & \mathcal C(a, d)
+ \end{tikzcd}
+\]
+Unit laws are expressed in terms of unitors in $\mathcal V$:
+
+\[
+ \begin{tikzcd}
+ I \otimes \mathcal C(a, b)
+ \arrow[r, "\lambda"]
+ \arrow[d, "j_b \otimes id"']
+ & \mathcal C(a, b)
+ \\
+ \mathcal C(b, b) \otimes \mathcal C(a, b)
+ \arrow[ru, "\circ"]
+ \end{tikzcd}
+ \qquad
+\begin{tikzcd}
+\mathcal C(a, b) \otimes I
+\arrow[r, "\rho"]
+\arrow[d, "id \otimes j_a"']
+& \mathcal C(a, b)
+\\
+\mathcal C(a, b) \otimes \mathcal C(a, a)
+\arrow[ru, "\circ"]
+ \end{tikzcd}
+\]
+Notice that these are all diagrams in $\mathcal V$, where arrows are just elements of hom-sets.
+
+A category enriched over $\mathcal V$ is also called a $\mathcal V$-category. In what follows we'll assume that the enriching category is \emph{symmetric} monoidal, so we can form opposite and product categories.
+
+
+The category $\mathcal C^{op}$ opposite to a $\mathcal V$-category $\mathcal C$ is obtained by reversing hom-objects, that is:
+\[ \mathcal C^{op}(a, b) = \mathcal C(b, a) \]
+Composition in the opposite category involves reversing the order of hom-objects, so it only works if the tensor product is symmetric.
+
+We can also define product categories, provided that $\mathcal V$ is symmetric. The product of two $\mathcal V$-categories $\mathcal C \otimes \mathcal D$ has, as objects, pairs of objects, one from each category. The hom-objects are defined to be tensor products:
+\[ \mathcal (C \otimes \mathcal D) (\langle c, d \rangle, \langle c', d' \rangle) = \mathcal C(c, c') \otimes \mathcal D (d, d') \]
+We need symmetry of the tensor product in order to define composition. Indeed, we need to swap the two hom-objects in the middle, before we can apply the two available compositions:
+\[ \circ \colon  \big(\mathcal C(c', c'',) \otimes \mathcal D (d', d'')\big) \otimes \big( \mathcal C(c, c') \otimes \mathcal D (d, d')\big) \to  \mathcal C(c, c'') \otimes \mathcal D (d, d'') \]
+The identity arrow is the product of two identities:
+\[ I_{\mathcal C} \otimes I_{\mathcal D} \xrightarrow{j_c \otimes j_d} \mathcal C(c, c) \otimes \mathcal D (d, d) \]
+
+
+\begin{exercise}
+Define composition and unit in the $\mathcal V$-category $\mathcal C^{op}$.
+\end{exercise}
+
+\begin{exercise}
+Show that every $\mathcal V$-category $\mathcal C$ has an underlying ordinary category $\mathcal C_0$ whose objects are the same, but whose hom-sets are given by (monoidal) global elements of the hom-objects  $\mathcal V(I, \mathcal C(a, b))$.
+\end{exercise}
+
+\subsection{Examples}
+
+Seen from the new perspective, the ordinary categories we've studied so far were trivially enriched over the monoidal category $(\Set, \times, 1)$, with the cartesian product as the tensor product, and the singleton set as the unit. 
+
+A 2-category can be seen as enriched over $\mathbf{Cat}$. Indeed, 1-cells in a 2-category are themselves objects in another category. The 2-cells are just arrows in that category. In particular the 2-category $\mathbf{Cat}$ of small categories is enriched in itself. It's hom-objects are functor categories, which are themselves objects in $\mathbf{Cat}$.
+
+\subsection{Preorders}
+
+Enrichment doesn't always mean adding more stuff. Sometimes it looks more like impoverishment, as is the case of enriching over a walking arrow category. 
+
+This category has just two objects which, for the purpose of this construction, we'll call $\text{False}$ and $\text{True}$. There is a single arrow from $\text{False}$ to $\text{True}$ (not counting identity arrows), which makes $\text{False}$ the initial object and $\text{True}$ the terminal one. 
+\[
+ \begin{tikzcd}
+ \text{False}
+ \arrow[r, "!"]
+ \arrow[loop, "id_{\text{False}}"']
+ & \text{True}
+ \arrow[loop, "id_{\text{True}}"']
+ \end{tikzcd}
+\]
+To make this a monoidal category, we define the tensor product, such that:
+\[ \text{True} \otimes \text{True} = \text{True} \]
+and all other combinations are \text{False}.
+$\text{True}$ is the monoidal unit, since:
+\[ \text{True} \otimes x = x \]
+
+A category enriched over the monoidal walking arrow is called a \emph{preorder}. A hom-object $\mathcal C (a, b)$ between any two objects can either be $\text{False}$ or $\text{True}$. We interpret $\text{True}$ to mean that $a$ precedes $b$ in the preorder, which we write as $a \le b$. $\text{False}$ means that the two objects are unrelated. 
+
+The important property of composition, as defined by:
+\[ \mathcal C (b, c) \otimes \mathcal C (a, b) \to \mathcal C (a, c) \]
+is that, if both hom-objects on the left are $\text{True}$, then the right hand side must also be $\text{True}$. (It can't be $\text{False}$, because there is no arrow going from $\text{True}$ to $\text{False}$.) In the preorder interpretation, it means that $\le$ is transitive:
+\[ b \le c \land a \le b \implies a \le c \]
+
+By the same reasoning, the existence of the identity arrow:
+\[ j_a \colon \text{True} \to \mathcal C(a, a) \]
+means that $\mathcal C(a, a)$ is always $\text{True}$. In the preorder interpretation, this means that $\le$ is reflexive, $a \le a$.
+
+Notice that a preorder doesn't preclude cycles and, in particular, it's possible to have $a \le b$ and $b \le a$ without $a$ being equal to $b$. 
+
+A preorder may also be defined without resorting to enrichment as a \index{thin category}\emph{thin category}---a category in which there is at most one arrow between any two objects.
+
+\subsection{Self-enrichment}
+
+Any cartesian closed category $\mathcal V$ can be viewed as self-enriched. This is because every external hom-set $\mathcal C(a, b)$ can be replaces by the internal hom $[a, b]$ (the object of arrows, a.k.a., the exponential $b^a$). 
+
+In fact every \emph{monoidal closed} category $\mathcal V$ is self-enriched. Recall that, in a monoidal closed category we have the hom-functor adjunction:
+\[ \mathcal V (a \otimes b, c) \cong \mathcal V (a, [b, c]) \]
+The counit of this adjunction works as the evaluation morphism:
+\[ \varepsilon_{b, c} \colon [b, c] \otimes b \to c \]
+
+To define composition in this self-enriched category, we need an arrow:
+\[ \circ \colon [b, c] \otimes [a, b] \to [a, c] \]
+The trick is to consider the whole hom-set at once:
+\[ \mathcal V([b, c] \otimes [a, b], [a, c]) \]
+We can use the adjunction to rewrite it as:
+\[  \mathcal V([b, c] \otimes [a, b], [a, c]) \cong \mathcal V( ([b, c] \otimes [a, b]) \otimes a, c) \]
+All we have to do now is to pick an element of the right hand side. We do it by constructing the following composite:
+\[ ([b, c] \otimes [a, b]) \otimes a \xrightarrow{\alpha}  
+    [b, c] \otimes ([a, b] \otimes a) \xrightarrow{id \otimes \varepsilon_{a, b} }
+    [b, c] \otimes b \xrightarrow{\varepsilon_{b, c}} c \]
+We used the associator and the counit of the adjunction.
+
+We also need an arrow that defines the identity:
+\[ j_a \colon I \to [a, a] \]
+Again, we can pick it as a member of the hom-set $\mathcal V(I, [a, a])$. We use the adjunction:
+\[ \mathcal V(I, [a, a]) \cong \mathcal V (I \otimes a, a) \]
+We know that this hom-set contains the left unitor $\lambda$, so we can use it to define $j_a$.
+
+\section{$\mathcal V$-Functors} 
+
+An ordinary functor maps objects to objects and arrows to arrows. Similarly, an enriched functor $F$ maps object to objects, but instead of acting on individual arrows, it must map hom-objects to hom-objects. This is only possible if the hom-objects in the source category $\mathcal C$ belong to the same category as the hom-objects in the target category $\mathcal D$. In other words, both categories must be enriched over the same $\mathcal V$. The action of $F$ on hom-objects is then defined using arrows in $\mathcal V$:
+\[ F_{a b} \colon \mathcal C (a, b) \to D (F a, F b) \]
+
+A functor must preserve composition and identity. These can be expressed as commuting diagrams in $\mathcal V$:
+
+\[
+ \begin{tikzcd}
+ \mathcal C(b, c) \otimes \mathcal C(a, b) 
+ \arrow[r, "\circ"]
+ \arrow[d, "F_{b c} \otimes F_{a b}"]
+ & \mathcal C(a, c)
+ \arrow[d, "F_{a c}"]
+ \\
+ \mathcal D(F b, F c) \otimes \mathcal D (F a, F b)
+ \arrow[r, "\circ"]
+ & \mathcal D(F a, F b)
+ \end{tikzcd}
+ \qquad
+ \begin{tikzcd}
+ & I
+ \arrow[dl, "j_a"']
+ \arrow[dr, "j_{F a}"]
+ \\
+ \mathcal C(a, a)
+ \arrow[rr, "F_{a a}"]
+ && \mathcal D( F a, F a)
+  \end{tikzcd}
+\]
+Notice that we used the same symbol $\circ$ for two different compositions, ant the same $j$ for two different identity mappings.
+
+As before, all diagrams are in the category $\mathcal V$.
+
+\subsection{The \text{Hom}-functor}
+
+The hom-functor in a category that is enriched over a monoidal \emph{closed} category $\mathcal V$ is an enriched functor:
+\[ \text{Hom} \colon \mathcal C^{op} \otimes \mathcal C \to \mathcal V \]
+Here, in order to define an enriched functor, we have to treat $\mathcal V$ as self-enriched. 
+
+It's clear how this functor works on (pairs of) objects:
+\[ \text{Hom} \langle a, b \rangle = \mathcal C (a, b) \]
+but it's instructive to see how it's defined on hom-objects. We have to define the mapping between hom-object in two categories:
+\[ \text{Hom}_{\langle a, a' \rangle \langle b, b' \rangle} \colon (C^{op} \otimes \mathcal C)(\langle a, a' \rangle, \langle b, b' \rangle) \to \mathcal V (\text{Hom}\langle a, a' \rangle, \text{Hom}\langle b, b' \rangle)\]
+By definition of the product category, the source is a product of two hom-objects. The target is the internal hom in $\mathcal V$. We need an arrow:
+\[ \mathcal C(b, a) \otimes \mathcal C(a', b') \to [\mathcal C(a, a'), \mathcal C(b, b')] \]
+This arrow is related, through the hom-functor adjunction, to the following arrow:
+\[ \Big( \mathcal C(b, a) \otimes \mathcal C(a', b') \Big) \otimes \mathcal C(a, a') \to \mathcal C(b, b') \]
+We can construct this arrow by re-associating the product and applying the composition twice.
+
+The closest we can get to defining an individual morphism from $a$ to $b$ in an enriched category is to use an arrow from the unit object to pick a (monoidal-global) element of a hom-object:
+\[ f \colon I \to \mathcal C(a, b) \]
+We can define what it means to lift such an arrow using the hom-functor. For instance, keeping the first argument constant, we'd can define:
+\[ \mathcal C(c, f) \colon \mathcal C(c, a) \to C(c, b) \] 
+as the composite:
+\[ \mathcal C(c, a) \xrightarrow{\lambda^{-1}} I \otimes \mathcal C(c, a) \xrightarrow{f \otimes id} \mathcal C(a, b) \otimes \mathcal C(c, a) \xrightarrow{\circ} \mathcal C(c, b) \]
+Similarly, the contravariant lift:
+\[ \mathcal C(f, c) \colon \mathcal C(b, c) \to \mathcal C(a, c) \]
+can be defined as:
+\[ \mathcal C(b, c) \xrightarrow{\rho^{-1}} \mathcal C(b, c) \otimes I \xrightarrow{id \otimes f} \mathcal C (b, c) \otimes \mathcal C(a, b) \xrightarrow{\circ} \mathcal C(a, c) \]
+
+A lot of the familiar constructions we've studied in ordinary category theory have their enriched counterparts, with products replaced by tensor products and $\Set$ replaced by $\mathcal V$.
+
+\begin{exercise}
+What is a functor between two preorders?
+\end{exercise}
+
+\subsection{Enriched co-presheaves}
+Co-presheaves, that is $\Set$-valued functors, play an important role in category theory, so it's natural to ask what their counterparts are in the enriched setting. The generalization of a co-preshef is a $\cat V$-funtor $\cat C \to \cat V$. This is only possible if $\cat V$ can be made into a $\cat V$-category, that is, when it's monoidal-closed. 
+
+An enriched co-presheaf maps object of $\cat C$ to objects of $\cat V$ and it maps hom-objects of $\cat C$ to internal homs of $\cat V$:
+\[ F_{a b} \colon \mathcal C (a, b) \to \cat [F a, F b] \]
+
+In particular, the $\text{Hom}$-functor is an example of a $\cat V$-valued $\cat V$-functor:
+\[ \text{Hom} \colon \cat C^{op} \otimes \cat C \to \cat V \]
+
+The hom-functor is a special case of an enriched profunctor, which is defined as:
+\[ \mathcal C^{op} \otimes \mathcal D \to \mathcal V \]
+
+
+
+\begin{exercise}
+The tensor product is a functor in $\cat V$:
+\[ \otimes \colon \cat V \times \cat V \to \cat V \]
+Show that if $\cat V$ is closed, the tensor product defines a $\cat V$-functor. Hint: Define its action on internal homs.
+\end{exercise}
+
+\section{$\mathcal V$-Natural Transformations}
+
+An ordinary natural transformation between two functors $F$ and $G$ from $\mathcal C$ to $\mathcal D$ is a selection of arrows from all the hom-sets $\mathcal D(F a, G a)$. In the enriched setting, we don't have arrows, so the next best thing is to use the unit object $I$ to do the selection:
+\[ \nu_a \colon I \to \mathcal D(F a, G a) \]
+
+Naturality condition is a little tricky. The standard naturality square involves the lifting of an arbitrary arrow $f \colon a \to b$ and the equality of the following compositions:
+\[ \nu_b \circ F f = G f \circ \nu_a \]
+Let's consider the hom-sets that are involved in this equation. Our starting point is $f \in \mathcal C(a, b)$. The composites on both sides of the equation are the elements of $\mathcal D(F a, G b)$. On the left we have a composition $ \nu_b \circ F f$, which is an arrow:
+\[  \mathcal D(F b, G b) \times \mathcal D(F a, F b) \to \mathcal D(F a, G b) \]
+and on the right we have $G f \circ \nu_a$, which is an arrow:
+\[ \mathcal D(G a, G b) \times \mathcal D(F a, G a) \to  \mathcal D(F a, G b) \]
+
+In the enriched setting we work with hom-objects rather than hom-sets, and the selection of the components of the natural transformation is done using the unit $I$. We can always produce the unit out of thin air using the inverse of the left or the right unitor. Altogether, the naturality condition is expressed as the following commuting diagram:
+\[
+ \begin{tikzcd}
+ & I \otimes \mathcal C(a, b)
+ \arrow[r, "\nu_b \otimes F_{a b}"]
+ & \mathcal D(F b, G b) \otimes \mathcal D(F a, F b)
+ \arrow[dr, "\circ"]
+ \\
+ \mathcal C(a, b)
+ \arrow[ur, "\lambda^{-1}"]
+\arrow[dr, "\rho^{-1}"']
+ &&& \mathcal D(F a, G b)
+ \\
+ & \mathcal C(a, b) \otimes I 
+ \arrow[r, "G_{a b} \otimes \nu_a"]
+ & \mathcal D(G a, G b) \otimes \mathcal D(F a, G a)
+ \arrow[ur, "\circ"']
+  \end{tikzcd}
+\]
+
+This diagram can be further simplified if we use our earlier definition of  the hom-functor's action on global elements of hom-objects. We can apply it to the component of the natural transformation:
+\[ \mathcal D(d, \nu_b) \colon \mathcal D(d, F b) \to \mathcal D(d, G b) \]
+and:
+\[ \mathcal D (\nu_a, d) \colon \mathcal D(G a, d) \to \mathcal D(F a, d) \]
+We get something that looks more like the familiar naturality square:
+\[
+ \begin{tikzcd}
+ & \mathcal D(F a, F b)
+  \arrow[dr, "{\mathcal D (F a, \nu_b)}"]
+ \\
+ \mathcal C(a, b) 
+ \arrow[ur, "F"]
+ \arrow[dr, "G"']
+ && \mathcal D(F a, G b)
+ \\
+& \mathcal D (G a, G b)
+\arrow[ur, "{\mathcal D (\nu_a, G b)}"']
+ \end{tikzcd}
+\]
+
+
+$\mathcal V$-natural transformations between two $\mathcal V$-functors $F$ and $G$ form a set $\mathcal V\text{-nat} (F, G)$. We have earlier seen that, in ordinary categories, the set of natural transformations can be written as an end:
+\[ [\mathcal C, \mathcal D](F, G) \cong \int_a \mathcal D(F a, G a) \]
+It turns out that ends and coends can be defined for enriched profunctors, so this formula works for enriched natural transformations as well. The difference is that, instead of a set of natural transformations $\mathcal V\text{-nat} (F, G)$, it defines the \emph{object} of natural transformations $[\mathcal C, \mathcal D](F, G)$ in $\mathcal V$. 
+
+\section{Yoneda Lemma}
+
+The ordinary Yoneda lemma involves a $\Set$-valued functor $F$ and a set of natural transformations:
+\[ [\mathcal C, \Set]( \mathcal C(c, -), F) \cong F c \]
+To generalize it to the enriched setting, we'll consider a $\mathcal V$-valued functor $F$. As before, we'll use the fact that we can treat $\mathcal V$ as self-enriched, as long as it's closed, so we can talk about $\mathcal V$-valued $\mathcal V$-functors. 
+
+The weak version of the Yoneda lemma deals with a \emph{set} of $\mathcal V$-natural transformations. Therefore, we have to turn the right hand side into a set as well. This is done by taking the (monoidal-global) elements of $F c$. We get:
+\[ \mathcal V\text{-nat} ( \mathcal C(c, -), F) \cong \mathcal V(I, F c) \]
+
+The strong version of the Yoneda lemma works with objects of $\mathcal V$ and uses the end over the internal hom in $\mathcal V$ to represent the object of natural transformations:
+\[ \int_x [\mathcal C( c, x), F x] \cong F c \]
+
+\section{Weighted Limits}
+
+Limits (and colimits) are built around commuting triangles, so they are not immediately translatable to the enriched setting. The problem is that cones are constructed from ``wires,'' that is individual morphisms. You may think of a hom-set as a thick bundles of wires, each wire having zero thickness. When constructing a cone, you are selecting a single wire from a hom-set. 
+
+Consider a diagram, that is a functor $D$ from the indexing category $\mathcal J$ to the target category $\mathcal C$. The wires for the cone with the apex $x$ are selected from hom-sets $\mathcal C(x, D j)$, where $j$ is an object of $\mathcal J$. 
+
+\[
+ \begin{tikzcd}
+ \\
+ \\
+j
+\arrow[rr, red]
+\arrow[rd, red]
+&& k
+\arrow[dl, red]
+\\
+& l
+ \end{tikzcd}
+ \qquad
+ \begin{tikzcd}
+  & x
+ \arrow[ddl, ""']
+ \arrow[ddl, bend right, "{\mathcal C(x, D j)}"']
+ \arrow[ddl, bend left, ""]
+ \\
+\\
+D j
+\arrow[rr, red]
+\arrow[rd, red]
+&& D k
+\arrow[dl, red]
+\\
+& D l
+ \end{tikzcd}
+ \]
+This selection of a $j$'th wire can be described as a function from the singleton set $1$:
+\[ \gamma_j \colon 1 \to \mathcal C(x, D j) \]
+We can gather these functions into a natural transformation:
+\[ \gamma \colon \Delta_1 \to \mathcal C(x, D -) \]
+where $\Delta_1$ is a constant functor mapping all objects of $\mathcal J$ to the singleton set. Naturality conditions ensure that the triangles forming the sides of the cone commute. 
+
+The set of all cones  with the apex $x$ is given by the set of natural transformations:
+\[ [\mathcal J, \Set] (\Delta_1, \mathcal C(x, D-)) \]
+
+This reformulation gets us closer to the enriched setting, since it rephrases the problem in terms of hom-sets rather than individual morphisms. We could start by considering both $\mathcal J$ and $\mathcal C$ to be enriched over $\mathcal V$, in which case $D$ would be a $\mathcal V$-functor. 
+
+There is just one problem: how do we define a constant $\mathcal V$-functor? Its action on objects is obvious: it maps all objects to one. But what should it do to hom-objects? The natural thing would be to map them all to the unit object $I$ in $\cat V$. But there's no guarantee that for every hom-object $\mathcal C(a, b)$ we can find an arrow to $I$; and even if there was, it might not be unique. In other words, there is no reason to believe that $I$ is a terminal object.
+
+The solution is to ``blur our vision'': instead of using the constant functor to select a single wire, we use some other ``weighting'' functor $W \colon \mathcal J\to \mathcal V$ to select a thicker ``cylinder''. Such a weighted cone with the apex $x$ is an element of the set of natural transformations:
+\[ [\mathcal J, \Set] \left(W, \mathcal C(x, D-)\right) \]
+
+A \emph{weighted limit}, also known as an \index{indexed limit}\emph{indexed limit}, $\text{lim}^W D$, is then defined as the universal weighted cone. It means that for any weighted cone with the apex $x$ there is a unique morphism from $x$ to $\text{lim}^W D$ that factorizes it. The factorization is guaranteed by the naturality of the isomorphism that defines the weighted limit:
+\[  \mathcal C(x, \text{lim}^W D) \cong [\mathcal J, \Set] (W, \mathcal C(x, D-)) \]
+
+The regular, non-weighted limit is often called a \index{limit, conical}\emph{conical} limit, and it corresponds to using the constant functor as the weight. 
+
+This definition can be translated almost verbatim to the enriched setting by replacing $\Set$ with $\mathcal V$:
+\[  \mathcal C(x, \text{lim}^W D) \cong [\mathcal J, \mathcal V] (W, \mathcal C(x, D-)) \]
+Of course, the meaning of the symbols in this formula is changed. Both sides are now objects in $\mathcal V$. The left-hand side is the hom-object in $\mathcal C$, and the right-hand side is the object of natural transformations between two $\mathcal V$-functors.
+
+Dually, a weighted colimit is defined by the natural isomorphism:
+\[  \mathcal C(\text{colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] (W, \mathcal C(D-, x)) \]
+Here, the colimit is weighed by a functor $W \colon \mathcal J^{op} \to \mathcal V$.
+
+Weighted (co-)limits, both in ordinary and in enriched categories, play a fundamental role: the can be used to re-formulate a lot of familiar constructions, like (co-)ends, Kan extensions, etc. 
+
+\section{Ends as Weighted Limits}
+
+We'd like to calculate a weighted limit of a functor $P \colon \mathcal C^{op} \otimes \mathcal C \to \mathcal D$. What $\mathcal V$-functor should we use as the weight? The canonical candidate is the hom-functor $\text{Hom}$, which has exactly the right signature. It turns out that such a limit is the same as the end of $P$ and, in fact, can be used to define that end:
+\[  \int_c P\langle c, c\rangle = \text{lim}^{\text{Hom}} P\]
+
+
+\[ \Set(S, \text{lim}^{\text{Hom}} P) \cong [\cat C^{op} \times \cat C, \Set](\cat C(-, =), \Set (S, P(-, =))\]
+\[ \int_{\langle c, c' \rangle} \Set(\cat C(c, c'), \Set(S, P\langle c, c' \rangle))  \cong \int_c \int_{c'} \Set(\cat C(c, c'), \Set(S, P\langle c, c' \rangle))\]
+\[ \int_c \Set(S, P\langle c, c \rangle) \cong \Set(S, \int_c P \langle c, c \rangle) \]
+
+
+
+\[ \cat D(x, \text{lim}^{\text{Hom}} P) \cong [\cat C^{op} \times \cat C, \cat V](\cat C(-, =), \cat D (x, P(-, =))\]
+\[ \int_{\langle c, c' \rangle} \cat V(\cat C(c, c'), \cat D(x, P\langle c, c' \rangle))  \cong \int_c \int_{c'} \cat V(\cat C(c, c'), \cat D(x, P\langle c, c' \rangle))\]
+\[ \int_c \cat D(x, P\langle c, c \rangle) \cong \cat D(x, \int_c P \langle c, c \rangle) \]
+
+
+
+
+\[ \mathcal D\left(x, \int_c P\langle c, c\rangle\right) \cong [\mathcal C^{op} \times \mathcal C, \mathcal V]\big(\text{Hom}, \mathcal D(x, P\langle -,= \rangle )\big)\]
+
+
+\[
+ \begin{tikzcd}
+ \\
+ \\
+j
+\arrow[r, red]
+& k
+ \end{tikzcd}
+ \qquad
+ \begin{tikzcd}
+  & x
+ \arrow[ddl, "{\cat C(j, j) \to \mathcal D(x, P\langle j, j \rangle)}"']
+ \\
+\\
+P \langle j, j \rangle
+\arrow[rr, red]
+&& P \langle j, k \rangle
+\\
+P \langle k, j \rangle
+\arrow[rr, red]
+\arrow[u, red]
+&& P \langle k, k\rangle
+\arrow[u, red]
+ \end{tikzcd}
+ \]
+
+
+\section{Kan Extensions}
+
+\[ (\text{Ran}_P F) e = \text{lim}^{\cat B(e, P-)} F  \]
+\[  \mathcal C(x, \text{lim}^{\cat B(e, P-)} F) \cong [\mathcal C, \mathcal V] (\cat B(e, P-), \mathcal C(x, F-)) \cong
+\int_c [\cat B(e, P c), \cat C(x, F c)]  \]
+
+
+\[ (\text{Lan}_P F) e = \text{colim}^{\cat B(P-, e)} F \]
+\[  \mathcal C(\text{colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] (W, \mathcal C(D-, x)) \]
+
+
 \end{document}
