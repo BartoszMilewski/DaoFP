@@ -147,7 +147,7 @@ We can either extend $Q$ on the right, by lifting $Q \langle id, f \rangle$, and
 
 In order to avoid the double-counting, we have to tweak our definition of a sum type when applied to profunctors. The resulting construction is called a coend. 
 
-First, let's re-formulate the problem. We are trying to sum over all objects $x$ in the cartesian product:
+First, let's re-formulate the problem. We are trying to sum over all objects $x$ in the product:
 \[ P \langle a, x \rangle \times Q \langle x, b \rangle \]
 The double-counting happens because we can open up the gap between the two profunctors, as long as there is a morphism that we can fit between them. So we are really looking at a more general product:
 \[ P \langle a, x \rangle \times Q \langle y, b \rangle \]
@@ -155,7 +155,9 @@ The important observation is that, if we fix the endpoints $a$ and $b$, this pro
 \[ Q \langle y, b \rangle \times P \langle a, x \rangle \]
 We are interested in the sum of the diagonal parts of this profunctor, that is when $x$ is equal to $y$. 
 
-So let's see how we would go about defining the sum of all diagonal entries of a general profunctor $P$. The sum is defined by injections; in this case, one per every object in the category. Here we show just two of them:
+So let's see how we would go about defining the sum of all diagonal entries of a general profunctor $P$. In fact, this construction works for any functor $P \colon \cat C^{op} \times \cat C \to D$, not just for $\Set$-valued profunctors. 
+
+The sum of the diagonal objects is defined by injections; in this case, one per every object in $\cat C$. Here we show just two of them and the dashed line representing all the rest:
 \[
  \begin{tikzcd}
  P \langle y, y \rangle
@@ -164,11 +166,11 @@ So let's see how we would go about defining the sum of all diagonal entries of a
  &&P \langle x, x \rangle
  \arrow[dl, "i_x"]
  \\
- &S
+ & d
  \end{tikzcd}
 \]
 
-If we were defining a sum, we'd make it a universal set equipped with such injections. But because we are dealing with profunctors, we want to identify the injections that are related by ``extending'' some common ancestor (here, $P \langle y, x \rangle$). We want the following diagram to commute, whenever there is a connecting morphism $f\colon x \to y$:
+If we were defining a sum, we'd make it a universal object equipped with such injections. But because we are dealing with functors of two variables, we want to identify the injections that are related by ``extending'' some common ancestor (here, $P \langle y, x \rangle$). We want the following diagram to commute, whenever there is a connecting morphism $f\colon x \to y$:
 
 \[
  \begin{tikzcd}
@@ -181,7 +183,7 @@ If we were defining a sum, we'd make it a universal set equipped with such injec
  &&P \langle x, x \rangle
  \arrow[dl, "i_x"]
  \\
- &S
+ &d
  \end{tikzcd}
 \]
 This diagram is called a \index{co-wedge}co-wedge, and its commuting condition is called the co-wedge condition. For every $f \colon x \to y$, we demand that:
@@ -190,8 +192,8 @@ The \emph{universal} co-wedge is called a coend.
 
 Since a coend generalizes the sum to a potentially infinite domain, we write it using the integral sign, with the ``integration variable'' at the top:
 \[ \int^{x\colon \mathcal{C}} P \langle x, x \rangle \]
-Universality means that, whenever there is a set $S$ equipped with a family of functions $g_x \colon P \langle x, x \rangle \to S$ satisfying the co-wedge condition, there is a unique mapping out from the coend:
-\[ h \colon \int^{x\colon \mathcal{C}} P \langle x, x \rangle \to S \]
+Universality means that, whenever there is an object $d$ in $\cat D$ equipped with a family of arrows $g_x \colon P \langle x, x \rangle \to d$ satisfying the co-wedge condition, there is a unique mapping out from the coend:
+\[ h \colon \int^{x\colon \mathcal{C}} P \langle x, x \rangle \to d \]
 that factorizes every $g_x$ through the injection $i_x$:
 \[ g_x = h \circ i_x \]
 Pictorially, we have:
@@ -211,7 +213,7 @@ Pictorially, we have:
  &\int^x P \langle x, x \rangle
  \arrow[d, dashed, "h"]
  \\
- &S
+ &d
  \end{tikzcd}
 \]
 
@@ -229,17 +231,17 @@ Compare this with the definition of a sum of two objects:
 &a + b
 \arrow[d, dashed, "h"]
 \\
-& S
+& d
  \end{tikzcd}
 \]
 Just like the sum was defined as a universal cospan, a coend is defined as a universal co-wedge. 
 
-If you were to construct a coend, you would start with a sum (discriminated union) of all the sets $P \langle x, x \rangle$. Then you would identify all the elements of this sum that satisfy the co-wedge condition. You'd identify the element $x \in P \langle x, x \rangle$ with the element $y \in P \langle y, y \rangle$ whenever there is an element $z  \in P \langle y, x \rangle$ and a morphism $f \colon x \to y$, such that:
-\[ P \langle id, f \rangle (z) = y\]
+In particular, if you were to construct a coend of a $\Set$-valued profunctor, you would start with a sum (a discriminated union) of all the sets $P \langle x, x \rangle$. Then you would identify all the elements of this sum that satisfy the co-wedge condition. You'd identify the element $a \in P \langle x, x \rangle$ with the element $b \in P \langle y, y \rangle$ whenever there is an element $c  \in P \langle y, x \rangle$ and a morphism $f \colon x \to y$, such that:
+\[ P \langle id, f \rangle (c) = b\]
 and
-\[ P \langle f, id \rangle (z) = x\]
+\[ P \langle f, id \rangle (c) = a\]
 
-Notice that, in a discrete category (which is just a set of objects with no arrows between them) the co-wedge condition is trivial (there are no $f$'s other than identities), so a coend is just a straightforward sum (discriminated union) of the diagonal sets $P \langle x, x \rangle$.
+Notice that, in a discrete category (which is just a set of objects with no arrows between them) the co-wedge condition is trivial (there are no $f$'s other than identities), so a coend is just a straightforward sum (coproduct) of the diagonal objects $P \langle x, x \rangle$.
 
 \subsection{Extranatural transformations}
 
@@ -254,10 +256,10 @@ The injections in our definition of a cowedge form a family of functions that is
  &&P \langle x, x \rangle
  \arrow[dl, "i_x"]
  \\
- &S
+ &d
  \end{tikzcd}
 \]
-The problem is that the functor $P \colon \cat C^{op} \times \cat C \to \Set$ is contravariant in the first argument and covariant in the second; so its diagonal part, which on objects is defined as $x \mapsto P \langle x, x \rangle$, is neither.
+The problem is that the functor $P \colon \cat C^{op} \times \cat C \to \cat D$ is contravariant in the first argument and covariant in the second; so its diagonal part, which on objects is defined as $x \mapsto P \langle x, x \rangle$, is neither.
 
 The closest analog of naturality at our disposal is the cowedge condition:
 \[
@@ -271,12 +273,12 @@ The closest analog of naturality at our disposal is the cowedge condition:
  &&P \langle x, x \rangle
  \arrow[dl, "i_x"]
  \\
- &S
+ &d
  \end{tikzcd}
 \]
 Indeed, as is the case with the naturality square, it involves the interaction between the lifting of a morphism $f \colon x \to y$ (here, in two different ways) and the components of the transformation $i$. 
 
-Granted, the standard naturality condition deals with pairs of functors. Here, the target is a single object, the set $S$. But we can always reinterpret it as the output of a constant functor $\Delta_S \colon \cat C^{op} \times \cat C \to \Set$.
+Granted, the standard naturality condition deals with pairs of functors. Here, the target is a single object $d$. But we can always reinterpret it as the output of a constant functor $\Delta_d \colon \cat C^{op} \times \cat C \to \cat D$.
 
 The cowedge condition can be interpreted as a special case of the more general \emph{extranatural} transformation. An extranatural transformation is a family of arrows:
 \[ \alpha_{c d} \colon P \langle c, c \rangle \to Q \langle d, d \rangle \]
@@ -316,12 +318,12 @@ Extranaturality in $d$ means that the following diagram commutes for any morphis
 
 Given this definition, we get our cowedge condition as the extranaturality of the mapping between the profunctor $P$ and the constant profunctor $\Delta_S$. 
 
-We can now reformulate the definition of the coend as the set $E$ equipped with the extranatural transformation  $i \colon P \to \Delta_E$ that is universal among such pairs.
+We can now reformulate the definition of the coend as the object $e$ equipped with the extranatural transformation  $i \colon P \to \Delta_e$ that is universal among such pairs.
 
-Universality means that for any set $S$ equipped with the extranatural transformation $\alpha \colon P \to \Delta_S$ there is a unique function $h \colon E \to S$ that factorizes all the components of $\alpha$ through the components of $i$:
+Universality means that for any object $d$ equipped with the extranatural transformation $\alpha \colon P \to \Delta_d$ there is a unique morphism $h \colon e \to d$ that factorizes all the components of $\alpha$ through the components of $i$:
 \[ \alpha_x = h \circ i_x \]
-We call this set $E$ the coend, and write it as:
-\[ E = \int^x P\langle x, x \rangle \]
+We call this object $e$ the coend, and write it as:
+\[ e = \int^x P\langle x, x \rangle \]
 
 \subsection{Profunctor composition using coends}
 
@@ -334,17 +336,17 @@ data Procompose p q a b where
   Procompose ::  q a x -> p x b -> Procompose p q a b
 \end{haskell}
 
-The reason why, in Haskell, we don't have to worry about the co-wedge condition is analogous to the reason why all parametrically polymorphic functions automatically satisfy naturality condition. A coend is defined using a family of injections; in Haskell all these injections are defined by a single polymorphic function:
+The reason why in Haskell we don't have to worry about the co-wedge condition is analogous to the reason why all parametrically polymorphic functions automatically satisfy naturality condition. A coend is defined using a family of injections; in Haskell all these injections are defined by a single polymorphic function:
 \begin{haskell}
 data Coend p where
   Coend ::  p x x -> Coend p
 \end{haskell}
 
-Coends introduce a new level of abstraction in dealing with profunctors. Calculations using coends usually take advantage of their mapping-out property. To define a mapping out of a coend to some set $S$:
-\[ \int^x P \langle x, x \rangle \to S \]
- it's enough to define a family of functions from the diagonal entries of the profunctor to $S$:
- \[ g_x \colon P \langle x, x \rangle \to S \]
- You can get a lot of mileage from this trick, especially when combined with the Yoneda lemma. We'll see examples of this in what follows.
+Coends introduce a new level of abstraction in dealing with profunctors. Calculations using coends usually take advantage of their mapping-out property. To define a mapping out of a coend to some object $d$:
+\[ \int^x P \langle x, x \rangle \to d \]
+ it's enough to define a family of functions from the diagonal entries of the functor to $d$:
+ \[ g_x \colon P \langle x, x \rangle \to d \]
+ satisfying the cowedge condition. You can get a lot of mileage from this trick, especially when combined with the Yoneda lemma. We'll see examples of this in what follows.
 
 \begin{exercise}
 Define a \hask{Profunctor} instance for the pair of profunctors:
@@ -370,12 +372,12 @@ Define a \hask{Profunctor} instance for \hask{CoEndCompose}.
 
 Just like a coend generalizes a sum of the diagonal elements of a profunctor---its dual, an end, generalizes the product. A product is defined by its projections, and so is an end. 
 
-The generalization of a span that we used in the definition of a product would be a set $S$ with a family of projections, one per every object $x$:
-\[ \pi_x \colon S \to P \langle x, x \rangle \]
+The generalization of a span that we used in the definition of a product would be an object $d$ with a family of projections, one per every object $x$:
+\[ \pi_x \colon d \to P \langle x, x \rangle \]
 The dual to a co-wedge is called a \index{wedge}wedge:
 \[
  \begin{tikzcd}
- &S
+ &d
  \arrow[ld, "\pi_x"']
  \arrow[rd, "\pi_y"]
  \\
@@ -390,21 +392,21 @@ The dual to a co-wedge is called a \index{wedge}wedge:
 For every arrow $f \colon x \to y$ we demand that:
 \[ P \langle f, id_y \rangle \circ \pi_y = P \langle id_x, f \rangle \circ \pi_x \]
 
-You may think of constructing a set $S$ by first starting with a bigger set that is equipped with all the projections, and then restricting it to the elements that can be connected to a common descendant by way of lifting a morphism $f$. 
-
 The end is a universal wedge. We use the integral sign for it too, but with the ``integration variable'' at the bottom. 
-\[ \int_x P \langle x, x \rangle \]
+\[ \int_{x \colon \cat C} P \langle x, x \rangle \]
 
 You might be wondering why integrals based on multiplication are rarely used in calculus. That's because we can use a logarithm to replace multiplication with addition. We don't have this luxury in category theory, so ends and coends are equally important.
 
-To summarize, an end is a set equipped with a family of functions (projections):
+To summarize, an end is an object equipped with a family of morphisms (projections):
 \[ \pi_a \colon \left( \int_x P \langle x, x \rangle \right) \to P \langle a, a \rangle \]
-satisfying the wedge condition. It is universal among such sets; that is, for any other set $S$ equipped with a family of functions $g_x$ satisfying the wedge condition, there is a unique function $h$ that factorizes the family $g_x$ through the family $\pi_x$:
+satisfying the wedge condition. 
+
+It is universal among such objects; that is, for any other object $d$ equipped with a family of arrows $g_x$ satisfying the wedge condition, there is a unique morphism $h$ that factorizes the family $g_x$ through the family $\pi_x$:
 \[ g_x = \pi_x \circ h \]
 Pictorially, we have:
 \[
  \begin{tikzcd}
- &S
+ &d
  \arrow[ddl, bend right, "g_x"']
  \arrow[ddr, bend left, "g_y"]
  \arrow[d, dashed, "h"]
@@ -422,11 +424,11 @@ Pictorially, we have:
  \end{tikzcd}
 \]
 
-Equivalently, we can say that the end is a set $E$ equipped with an  extranatural transformation $\pi \colon \Delta_S \to E$ that is universal among such pairs. The wedge condition turns out to be a special case of extranaturality condition.
+Equivalently, we can say that the end is a pair $(e, \pi)$ consisting of an object $e$ and an  extranatural transformation $\pi \colon \Delta_d \to e$ that is universal among such pairs. The wedge condition turns out to be a special case of extranaturality condition.
 
-If you were to construct an end, you'd start with a product of all $P \langle x, x \rangle$ for all objects in the category and then prune the tuples that don't satisfy the wedge condition. 
+If you were to construct an end of a $\Set$-valued profunctor, you'd start with a product of all $P \langle x, x \rangle$ for all objects in the category and then prune the tuples that don't satisfy the wedge condition. 
 
-Imagine for a moment using the singleton set $1$ in place of $S$. The family $g_x$ would select one element from each $P \langle x, x \rangle$. This would give you a giant tuple. You'd weed out most of these tuples, leaving only the ones that satisfy the wedge condition. 
+In particular, imagine for a moment using the singleton set $1$ in place of $d$. The family $g_x$ would select one element from each set $P \langle x, x \rangle$. This would give you a giant tuple. You'd weed out most of these tuples, leaving only the ones that satisfy the wedge condition. 
 
 Again, in Haskell, due to parametricity, the wedge condition is automatically satisfied, and the definition of an end for a profunctor \hask{p} simplifies to:
 
@@ -462,7 +464,7 @@ The mapping  $\langle a, b \rangle \to \mathcal{C} (F a, G b)$ behaves like a pr
  \[ (G g) \circ - \circ (F f) \]
 
 Indeed, an element of the set $ \mathcal{C} (F a, G b)$ is an arrow $h \colon F a \to G b$. We are trying to lift a pair of arrows $f \colon s \to a$ and $g \colon b \to t$. We can do it with a pair of arrows in $\mathcal{C}$: the first one is $F f \colon F s \to F a$, and the second one is $G g \colon G b \to G t$. The composition $G g \circ h \circ F f$ gives us the desired result $ F s \to G t$, which is an element of $\mathcal{C} (F s, G t)$.
-\[ F s \xrightarrow{F f} F a \xrightarrow{h} G b \xrightarrow{G g} GT \]
+\[ F s \xrightarrow{F f} F a \xrightarrow{h} G b \xrightarrow{G g} G t \]
 
 The diagonal parts of this profunctor are good candidates for the components of a natural transformation. In fact, the end:
 \[  \int_{x \colon  \mathcal{B}} \mathcal{C}(F x, G x) \]
@@ -533,10 +535,18 @@ Continuity of the hom-functor in the first argument is reversed: it maps colimit
 This follows from the universality of the sum: a mapping out of the sum is defined by a pair of mapping out of the two objects.
 
 It can be shown that an end can be expressed as a limit, and a coend as a colimit. Therefore, by continuity of the hom-functor, we can always pull out the integral sign from inside a hom-set. By analogy with the product, we have the mapping-in formula for an end:
-\[ \mathbf{Set}\left(x, \int_a P\langle a, a \rangle \right) \cong \int_a  \mathbf{Set}(x, P\langle a, a \rangle) \]
+\[\cat D\left(d, \int_a P\langle a, a \rangle \right) \cong \int_a \cat D(d, P\langle a, a \rangle) \]
 By analogy with the sum, we have a mapping-out formula for the coend:
-\[ \mathbf{Set}\left( \int^a P\langle a, a \rangle , x\right) \cong \int_a  \mathbf{Set}(P\langle a, a \rangle, x) \]
+\[\cat D\left( \int^a P\langle a, a \rangle , d \right) \cong \int_a \cat D(P\langle a, a \rangle, d) \]
 Notice that, in both cases, the right-hand side is an end.
+
+\section{Fubini Rule}
+
+The Fubini rule in calculus states the conditions under which we can switch the order of integration in double integrals. It turns out that we can similarly switch the order of double ends and coends. The Fubini rule for ends works for functors of the form $P \colon \cat C \times \cat C^{op} \times \cat D \times \cat D^{op} \to \cat E$. The following expressions, as long as they exist, are isomorphic:
+\[ \int_{c \colon \cat C} \int_{d \colon \cat D} P\langle c, c \rangle \langle d, d \rangle \cong  \int_{d \colon \cat D} \int_{c \colon \cat C} P\langle c, c \rangle \langle d, d \rangle \cong  \int_{\langle c, d \rangle \colon \cat C \times \cat D}  P\langle c, c \rangle \langle d, d \rangle \]
+In the last end, the funtor $P$ is reinterpreted as $P \colon (\cat C  \times \cat D)^{op} \times (\cat C \times \cat D)\to \cat E$
+
+The analogous rule works for coends as well.
 
 \section{Ninja Yoneda Lemma}
 
@@ -556,9 +566,9 @@ There is also a dual set of ninja co-Yoneda lemmas that use coends instead. For 
 and for the contravariant one we have:
 \[ \int^{x \colon \mathcal{C}} \mathcal{C}(a, x) \times G x \cong G a \]
 
-Physicists might notice the similarity of these formulas to integrals involving the Dirac delta function (actually, a distribution). This is why profunctors are sometimes called \index{distributors}distributors, following the adage that ``distributors are to functors as distributions are to functions.'' 
+Physicists might notice the similarity of these formulas to integrals involving the Dirac delta function (actually, a distribution). This is why profunctors are sometimes called \index{distributors}distributors, following the adage that ``distributors are to functors as distributions are to functions.'' Engineers might notice the similarity of the hom-functor to the impulse function.
 
-This intuition is often expressed by saying that we can perform the integration over $x$ in this formula by replacing $x$ with $a$ in the integrand $G x$. 
+This intuition is often expressed by saying that we can perform the ``integration over $x$'' in this formula that results in replacing $x$ with $a$ in the integrand $G x$. 
 
 If $\cat C$ is a discrete category, the coend reduces to the sum (coproduct), and the hom-functor reduces to the unit matrix (the Kronecker delta). The co-Yoneda lemma becomes:
 \[ \sum_j \delta_i^j v_j = v_i \]
@@ -566,7 +576,7 @@ In fact, a lot of linear algebra translates directly to the theory of $\Set$-val
 
 Yet another name for profunctors, especially in Australia, is \index{bimodule}``bimodules.'' This is because the lifting of morphisms by a profunctor is somewhat similar to the left and right actions on sets. 
 
-The proof of the co-Yoneda lemma is quite instructive, as it uses a few common tricks. Most importantly, we rely on the corollary of the Yoneda lemma, which says that, if the mappings out from two objects to an arbitrary object are isomorphic, then the two objects themselves are isomorphic. We'll start, therefore, with such a mapping-out to an arbitrary set $S$:
+The proof of the co-Yoneda lemma is quite instructive, as it uses a few common tricks. Most importantly, we rely on the corollary of the Yoneda lemma, which says that, if all the mappings out from two objects to an arbitrary object are isomorphic, then the two objects themselves are isomorphic. We'll start, therefore, with such a mapping-out to an arbitrary set $S$:
 \[ \mathbf{Set} \left(\int^{x \colon \mathcal{C}} \mathcal{C}(x, a) \times F x, S \right) \]
 Using the co-continuity of the hom-functor, we can pull out the integral sign, replacing the coend with an end:
 \[ \int_{x \colon \mathcal{C}} \mathbf{Set} \left( \mathcal{C}(x, a) \times F x, S \right) \]
@@ -607,7 +617,7 @@ coyoneda (Coend (CoY g fa)) = fmap g fa
 \end{haskell}
 You can do it without knowing anything about the existential type \hask{x}.
 
-The second says that if you have a functorful of \hask{a} then you can create a coend by injecting it (together with the identity function) into the existential type:
+The second says that if you have a functorful of \hask{a}, you can create a coend by injecting it (together with the identity function) into the existential type:
 \begin{haskell}
 coyoneda_1 :: Functor f => f a -> Coend (CoY f a)
 coyoneda_1 fa = Coend (CoY id fa)
@@ -630,7 +640,7 @@ There is nothing special about coproduct so, in general, Day convolution is defi
 In fact, Day convolution for a monoidal category $(\cat C, \otimes, I)$ endows the category of co-presheaves $[\cat C, \Set]$ with a monoidal structure. It's easy to check that Day convolution is associative (up to isomorphism) and that $\cat C(I, -)$ serves as the unit object. For instance, we have:
 \[ (\cat C(I, -) \star G) x =  \int^{a, b} \cat C (a \otimes b, x) \times \cat C(I, a) \times G b \cong 
   \int^{b} \cat C (I \otimes b, x) \times  G b \cong G x\]
-So the unit of Day convolution is the Yoneda functor taken at monoidal unit, which lends itself to the slogan, ``ONE of DAY is a YONEDA of ONE.''
+So the unit of Day convolution is the Yoneda functor taken at monoidal unit, which lends itself to the anagrammatic slogan, ``ONE of DAY is a YONEDA of ONE.''
 
 If the tensor product is symmetric, then the corresponding Day convolution is also symmetric (up to isomorphism).
 
@@ -643,7 +653,7 @@ data Day f g x where
   Day :: ((a, b) -> x) -> f a -> g b -> Day f g x
 \end{haskell}
 
-If we think of functors as containers of values, Day convolution tells us how to combine two different containers into one, given a way of combining two different values into one. 
+If we think of functors as containers of values, Day convolution tells us how to combine two different containers into one, given a function that combines two different values into one. 
 
 \begin{exercise}
 Define the \hask{Functor} instance for \hask{Day}.
@@ -664,15 +674,11 @@ assoc :: Day f (Day g h) x -> Day (Day f g) h x
 Recall that a monoid is an object in a monoidal category. The category we're interested in is the co-presheaf category $[\cat C, \Set]$. If $\cat C$ is cartesian, then the co-presheaf category is monoidal with respect to Day convolution, with the unit object $\cat C(I, -)$. A monoid in this category is a functor $F$ equipped with two natural transformations that serve as unit and multiplication:
 \[ \eta \colon \cat C(I, -) \to F \]
 \[ \mu \colon F \star F \to F \]
-Since $\cat C(1, a)$ is isomorphic to $a$, the component of unit at $a$ is:
+In particular, in a cartesian closed category where the unit is the terminal object, $\cat C(1, a)$ is isomorphic to $a$, and the component of unit at $a$ is:
 \[ \eta_a \colon a \to F a \] 
 You may recognize this function as \hask{pure} in the definition of \hask{Applicative}.
 \begin{haskell}
 pure :: a -> f a
-\end{haskell}
-or, eqivalently, as \hask{unit} in the definition of \hask{Monoidal}
-\begin{haskell}
-unit :: f a
 \end{haskell}
 
 Let's consider the set of natural transformations from which $\mu$ is taken. We'll write it as an end:
@@ -696,7 +702,9 @@ We have just learned that applicative functors are monoids in the monoidal categ
 \[ ([\cat C, \Set], \cat C(I, -), \star) \]
 It's only natural to ask what a free monoid in that category is. 
 
-Just like we did with free monads, we'll construct a free applicative as the initial algebra, or the least fixed point of the generalized list functor, which in this case is:
+Just like we did with free monads, we'll construct a free applicative as the initial algebra, or the least fixed point of the list functor. Recall that the list functor was defined as:
+\[ \Phi_a x = 1 + a \otimes x \]
+In our case it becomes:
 \[ \Phi_F G = \cat C(I, -) + F \star G \]
 Its fixed point is given by the recursive formula:
 \[ A_F \cong C(I, -) + F \star A_F\]
@@ -722,9 +730,9 @@ class Monoidal f where
   (>*<) :: f a -> f b -> f (a, b)
 \end{haskell}
 
-The \hask{Monoidal} instance for free applicative generalizes the idea of list concatenation. We pattern match on the first list. 
+The \hask{Monoidal} instance for free applicative generalizes the idea of list concatenation. We do the pattern matching on the first list, resulting in two cases.
 
-Instead of an empty list we have \hask{DoneA x}. Prepending it to the second argument doesn't change the length of the list, but it modifies the type of the values stored in it. It pairs them with \hask{x}.
+In the first case, instead of an empty list we have \hask{DoneA x}. Prepending it to the second argument doesn't change the length of the list, but it modifies the type of the values stored in it. It pairs them with \hask{x}.
 \begin{haskell}
   (DoneA x) >*< fry = fmap (x,) fry
 \end{haskell}
@@ -770,13 +778,13 @@ For instance, we can try to show associativity of profunctor composition. We sta
 \[ ((P \diamond Q) \diamond R) \langle s, t \rangle = \int^b \left( \int^a P \langle s, a \rangle \times Q \langle a, b \rangle \right) \times R \langle b,  t \rangle \]
 and, after a few transformations, arrive at:
 \[ (P \diamond (Q \diamond R)) \langle s, t \rangle =  \int^a P \langle s, a \rangle \times \left( \int^b Q \langle a, b \rangle \times R \langle b,  t \rangle \right) \]
-We use the associativity of the product and the fact that we can switch the order of coends (it's called the \index{Fubini theorem} Fubini theorem). Both are true only up to isomorphism. We don't get associativity ``on the nose.''
+We use the associativity of the product and the fact that we can switch the order of coends using the Fubini theorem. Both are true only up to isomorphism. We don't get associativity ``on the nose.''
 
 The identity profunctor turns out to be the hom-functor, which can be written symbolically as $\mathcal{C}(-, =)$, with placeholders for both arguments. For instance:
 \[ \left( \mathcal{C}(-, =) \diamond P \right) \langle s, t \rangle = \int^a  \mathcal{C}(s, a) \times P \langle a, t \rangle \cong P \langle s, t \rangle \]
 This is the consequence of the (contravariant) ninja co-Yoneda lemma, which is also an isomorphism---not an equality.
 
-A category in which categorical laws are satisfied up to isomorphism is called a bicategory. Notice that such a category must be equipped with 2-cells---morphisms between morphisms, which we've already seen in the definition of a 2-category. We need those in order to be able to define isomorphisms between 1-cells. 
+A category in which categorical laws are satisfied up to isomorphism is called a \index{bicategory}bicategory. Notice that such a category must be equipped with 2-cells---morphisms between morphisms, which we've already seen in the definition of a 2-category. We need those in order to be able to define isomorphisms between 1-cells. 
 
 A bicategory $\mathbf{Prof}$ has (small) categories as objects, profunctors as 1-cells, and natural transformations as 2-cells. 
 
@@ -802,11 +810,11 @@ for every pair of arrows:
 
 \subsection{Monads in a bicategory}
 
-We've seen before that categories, functors, and natural transformations form a 2-category $\Cat{Cat}$. Let's focus on one object $\cat C$, that is a 0-cell in $\Cat{Cat}$. The 1-cells of this object form a regular category, in this case the functor category $[\cat C, \cat C]$. The objects in this category are endo-1-cells of the outer 2-category. The arrows between them are the 2-cells of the outer 2-category.
+We've seen before that categories, functors, and natural transformations form a 2-category $\Cat{Cat}$. Let's focus on one object, a category $\cat C$, that is a 0-cell in $\Cat{Cat}$. The 1-cells that start and end at this object form a regular category, in this case it's the functor category $[\cat C, \cat C]$. The objects in this category are endo-1-cells of the outer 2-category $\Cat{Cat}$. The arrows between them are the 2-cells of the outer 2-category.
 
-This category is automatically equipped with a monoidal structure. The tensor product is the composition of 1-cells, and the unit object is the identity 1-cell, $I$. In $[\cat C, \cat C]$ this product is the composition of endofunctors and the unit is the identity functor. 
+This endo-one-cell category is automatically equipped with a monoidal structure. We define the tensor product as the composition of 1-cells---all 1-cells with the same source and target compose. The monoidal unit object is the identity 1-cell, $I$. In $[\cat C, \cat C]$ this product is the composition of endofunctors and the unit is the identity functor. 
 
-If we now focus our attention on just one endo-1-cell $F$, we can ``square'' it, that is use the monoidal product to multiply it by itself. In other words, use the 1-cell composition to create $F \circ F$. We say that $F$ is a monad if we have 2-cells:
+If we now focus our attention on just one endo-1-cell $F$, we can ``square'' it, that is use the monoidal product to multiply it by itself. In other words, use the 1-cell composition to create $F \circ F$. We say that $F$ is a monad if we can find 2-cells:
 \[ \mu \colon F \circ F \to F \]
 \[ \eta \colon I \to F \]
 that behave like multiplication and unit, that is make the associativity and unit diagrams commute. 
@@ -829,12 +837,12 @@ equipped with two natural transformations (2-cells):
 \[ \eta \colon \cat C(-, =) \to P \]
 that satisfy the associativity and unit conditions.
 
-Let's rewrite the sets of natural transformations as ends. We get:
-\[ \mu = \int_{\langle a, b \rangle} \Set \big( \int^x P \langle a, x \rangle \times P \langle x, b \rangle,  P\langle a, b \rangle \big) \]
+These natural transformations are elements of ends. For instance:
+\[ \mu \in \int_{\langle a, b \rangle} \Set \big( \int^x P \langle a, x \rangle \times P \langle x, b \rangle,  P\langle a, b \rangle \big) \]
 By co-continuity, this is equivalent to:
-\[ \mu \cong \int_{\langle a, b \rangle, x} \Set \big(P \langle a, x \rangle \times P \langle x, b \rangle,  P\langle a, b \rangle \big) \]
+\[ \int_{\langle a, b \rangle, x} \Set \big(P \langle a, x \rangle \times P \langle x, b \rangle,  P\langle a, b \rangle \big) \]
 The unit is:
-\[ \eta = \int_{\langle a, b \rangle} \Set (\cat C(a, b), P\langle a, b \rangle) \]
+\[ \eta \in \int_{\langle a, b \rangle} \Set (\cat C(a, b), P\langle a, b \rangle) \]
 
 In Haskell, such profunctor monads are called pre-arrows:
 \begin{haskell}
@@ -957,7 +965,7 @@ Here, the type of the whole is a product \hask{(c, a)}. When we replace \hask{a}
 
 The main advantage of using lenses is that they compose. A composition of two lenses lets us zoom in on a subcomponent of a component. 
 
-Suppose that we start with a lens that lets us access and modify the focus described by the pair \hask{a} and \hask{b}. This focus is part of a whole described by the pair \hask{s} and \hask{t}. We also have a lens that can access the focus of \hask{a'} and \hask{b'} inside the whole of \hask{a} and \hask{b}. We can now construct a new lens that can access \hask{a'} and \hask{b'} inside of \hask{s} and \hask{t}. The trick is to realize that we can take, as the new residue, a product of the two residues:
+Suppose that we start with a lens that lets us access the focus \hask{a}  and change it to \hask{b}. This focus is part of a whole described by the source \hask{s} and the target \hask{t}. We also have a lens that can access the focus of \hask{a'} and \hask{b'} inside the whole of \hask{a} and \hask{b}. We can now construct a new lens that can access \hask{a'} and \hask{b'} inside of \hask{s} and \hask{t}. The trick is to realize that we can take, as the new residue, a product of the two residues:
 \[
 \begin{tikzpicture}
 \filldraw[fill=gray!50, draw=white] (0, 0) circle (1.4);
@@ -1056,7 +1064,7 @@ Since lenses can be composed, you might be wondering if there is a category in w
 
 Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle s, t\rangle$ to $ \langle a, b \rangle$ are elements of  $\mathcal{L} \langle s, t\rangle \langle a, b \rangle$.
 
-The formula for the composition of existential lenses is too complicated to be useful in practice. In the next chapter we'll see an alternative representation of lenses using Tambara modules, in which composition of lenses is just a composition of functions.
+The formula for the composition of existential lenses is too complicated to be useful in practice. In the next chapter we'll see an alternative representation of lenses using Tambara modules, in which composition is just a composition of functions.
 
 \section{Lenses and Fibrations}
 
@@ -1068,9 +1076,10 @@ The base $B$ represents the type of the focus.
 
 The other part of the lens, \hask{set}, is a mapping: 
 \[ q \colon E \times B \to E \]
+Let's see how we can interpret it using fibrations.
 \subsection{Transport law}
 
-We interpret $q$ as ``transporting'' an element of the bundle to a new fiber because of the get/set lens law, or the \emph{transport} law:
+We interpret $q$ as ``transporting'' an element of the bundle to a new fiber. This is in accordance with the get/set lens law, or the \emph{transport} law, that says that ``you get what you set'':
 \begin{haskell}
 get (set s a) = a
 \end{haskell}
@@ -1117,7 +1126,9 @@ We say that $q(s, a)$ transports $s$ to a new fiber over $a$:
 \]
 
 We can rewrite this law in terms of $p$ and $q$:
-\[ p \circ q = \pi_1 \]
+\[ p \circ q = \pi_2 \]
+where $\pi_2$ is the second projection from the product.
+
 Equivalently, we can represent it as a commuting diagram:
 \[
  \begin{tikzcd}
@@ -1136,7 +1147,7 @@ Here, instead of using the projection $\pi_2$, I used a comonoidal counit $\vare
 and the unit law for the product. Using a comonoid makes it easier to generalize this construction to a tensor product in a monoidal category. 
 
 \subsection{Identity law}
-Here's the set/get law or the \emph{identity} law:
+Here's the set/get law or the \emph{identity} law. It says that ``nothing changes if you set what you get'':
 \begin{haskell}
 set s (get  s) = s
 \end{haskell}
@@ -1186,7 +1197,7 @@ Here's the illustration of this law in a bundle:
 
 \subsection{Composition law}
 
-Finally, here's the set/set law, or the \emph{composition} law:
+Finally, here's the set/set law, or the \emph{composition} law. It says that ``the last set wins'':
 \begin{haskell}
 set (set s a) a' = set s a'
 \end{haskell}
@@ -1271,7 +1282,7 @@ A type-changing lens generalizes transport to act between bundles. We have to de
 
 We use a set $B$ as the combined set of all elements of all types. $B$ is fibrated over $\cat A$---the projection $\pi$ sending an element of $B$ to its corresponding type. You may think of it as the set of objects of the coslice category $1/ \cat A$.
 
-The bundle of bundles $E$ is a set that's fibrated over $B$ with the projection $p$. Since $B$ itself is fibrated over $\cat A$, $E$ is transitively fibrated over $\cat A$, with the composite projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. Each of these bundles represents a different Haskell type. A type-changing lens will move between these bundles.
+The bundle of bundles $E$ is a set that's fibered over $B$ with the projection $p$. Since $B$ itself is fiberdd over $\cat A$, $E$ is transitively fibered over $\cat A$, with the composite projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. Each of these bundles represents a different Haskell type. A type-changing lens will move between these bundles.
 
 \[
 \begin{tikzpicture}
@@ -1377,14 +1388,14 @@ The two mappings $p$ and $q$ can be combined into one mapping between categories
 This is a handy (co-)end calculus cheat-sheet.
 \begin{itemize}
 \item Continuity of the hom-functor:
-\[ \mathbf{Set}\left(S, \int_a P\langle a, a \rangle \right) \cong \int_a  \mathbf{Set}(S, P\langle a, a \rangle) \]
+\[\cat D\left(d, \int_a P\langle a, a \rangle \right) \cong \int_a \cat D \left(d, P\langle a, a \rangle \right) \]
 \item Co-continuity of the hom-functor:
-\[ \mathbf{Set}\left( \int^a P\langle a, a \rangle , S\right) \cong \int_a  \mathbf{Set}(P\langle a, a \rangle, S) \]
+\[\cat D\left( \int^a P\langle a, a \rangle , d \right) \cong \int_a \cat D \left( P\langle a, a \rangle, d \right) \]
 \item Ninja Yoneda:
 \[ \int_{x} \mathbf{Set} (\mathcal{C}(a, x), F x) \cong F a \]
 \item Ninja co-Yoneda:
 \[ \int^{x} \mathcal{C}(x, a) \times F x \cong F a \]
-\item Ninja Yoneda for contravariant functors (pre-sheaves):
+\item Ninja Yoneda for contravariant functors (presheaves):
 \[ \int_{x} \mathbf{Set} (\mathcal{C}(x, a), G x) \cong G a \]
 \item Ninja co-Yoneda for contravariant functors:
 \[ \int^{x} \mathcal{C}(a, x) \times G x \cong G a \]
