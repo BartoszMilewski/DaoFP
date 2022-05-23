@@ -1,0 +1,131 @@
+\documentclass[DaoFP]{subfiles}
+\begin{document}
+\setcounter{chapter}{19}
+
+\chapter{Enrichment}
+
+\section{Notes}
+
+\[ \int_{p \colon \cat{T}} \Set\left(P\langle a, b \rangle, P'\langle s, t \rangle\right) \]
+
+\[F_{ \langle a, b\rangle} \colon \cat{T} \to \Set \]
+\[ F_{ \langle a, b\rangle} P = P \langle a, b\rangle \]
+
+\[ (\mathbb F p) \langle a, b \rangle \to  (\mathbb F p') \langle m \bullet a, m \bullet b \rangle \]
+
+\[
+\begin{tikzcd} [row sep=1cm, column sep=1cm]
+i 
+\arrow[d, "{m}"']
+\arrow[r, "p"]
+& j
+\arrow[d, "{m'}"']
+&& \cat C
+ \arrow[rr, "P", "" {name=ID, below} ]
+ \arrow[d,  "{m \bullet}"']
+ && \cat D
+  \arrow[d, "{m' \bullet}"']
+\\
+ i'
+\arrow[r, "p'"]
+ & j'
+ && \cat{C'}
+  \arrow[rr, "P'", "" ]
+&& \cat{D'}
+  \end{tikzcd}
+\]
+
+
+\[
+\begin{tikzcd} [row sep=1cm, column sep=1cm]
+i 
+\arrow[d, "{m}"']
+\arrow[r, "p"]
+& j
+\arrow[d, "{m}"']
+&& \cat C
+ \arrow[rr, "P", "" {name=ID, below} ]
+ \arrow[d,  "{m \bullet}"']
+ && \cat D
+  \arrow[d, "{m \bullet}"']
+\\
+ i
+\arrow[r, "p"]
+ & j
+ && \cat{C}
+  \arrow[rr, "P", "" ]
+&& \cat{D}
+  \end{tikzcd}
+\]
+
+\[
+\begin{tikzcd} [row sep=1cm, column sep=1cm]
+i 
+\arrow[d, "{m}"']
+\arrow[r, "p"]
+& j
+\arrow[d, "{m}"']
+&& \cat C
+ \arrow[rr, "P", "" {name=ID, below} ]
+ \arrow[d,  "{m \bullet}"']
+ && \cat D
+  \arrow[d, "{m \bullet}"']
+\\
+ i'
+\arrow[r, "p'"]
+ & j'
+ && \cat{C'}
+  \arrow[rr, "P'", "" ]
+&& \cat{D'}
+  \end{tikzcd}
+\]
+
+
+\[
+\begin{tikzcd} [row sep=1cm, column sep=1cm]
+i 
+\arrow[r, "p"]
+& j
+&& \cat C
+ \arrow[rr, "P", "" {name=ID, below} ]
+ && \cat D
+\\
+ i'
+\arrow[r, "p'"]
+ & j'
+ && \cat{C'}
+  \arrow[rr, "P'", "" ]
+&& \cat{D'}
+  \end{tikzcd}
+\]
+
+\[ \int_{} \int_{}(\mathbb F p) \langle a, b \rangle \to  (\mathbb F p') \langle m \bullet a, m \bullet b \rangle \]
+
+\[ \cat C (s, m \bullet a) \times \cat D (m \bullet b, t) \]
+
+
+\[
+ \begin{tikzcd}
+ s
+ \arrow[r, bend right, dashed, blue]
+ & m \actL a
+  \arrow[r, bend left, dashed, red]
+  & a
+ \arrow[r, bend right, "p"]
+ & b
+  \arrow[r, bend left, dashed, red]
+ & m \actR b
+ \arrow[r, bend right, dashed, blue]
+ & t
+ \end{tikzcd}
+\]
+
+
+
+
+\begin{itemize}
+\item weighted limits
+
+\item Kan extensions as weighted limits
+\end{itemize}
+\end{document}
