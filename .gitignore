@@ -10,4 +10,6 @@
 DaoFP.ilg
 *.ind
 *.idx
-.DS_Store
+*.fls
+*.out
+*.pyg

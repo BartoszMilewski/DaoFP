@@ -27,9 +27,16 @@
 \newtheorem{exercise}{Exercise}[section]
 \newcommand{\exinline}[1]{(\refstepcounter{exercise}Exercise~\theexercise\label{#1})}
 
-
 \usepackage{minted}
 \usepackage{etoolbox}
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks,
+  linkcolor={red!40!black},
+  citecolor={red!40!black},
+  urlcolor={blue!40!black}
+}
 
 \newcommand{\cat}[1]{\mathcal{#1}}%a generic category
 \newcommand{\Cat}[1]{\mathbf{#1}}%a named category
