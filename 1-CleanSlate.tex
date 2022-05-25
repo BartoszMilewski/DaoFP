@@ -119,15 +119,21 @@ Note: In category theory there is no prohibition against the initial object havi
 
 \section{The Object of Arrows}
 
-We describe an object by looking at its arrows. Can we describe an arrow in a similar way? Could an arrow from $a$ to $b$ be represented as an element of some special \emph{object of arrows}? After all, in programming we talk about the \emph{type} of functions from \hask{a} to \hask{b}. In Haskell we write:
+Arrows between any two objects form a set\footnote{Strictly speaking, this is true only in a \emph{locally small} category.}. This is why some knowledge of set theory is a prerequisite to the study of category theory. 
+
+In programming we talk about the \emph{type} of functions from \hask{a} to \hask{b}. In Haskell we write:
 \begin{haskell}
 f :: a -> b
 \end{haskell}
-meaning that \hask{f} is of the type ``function from \hask{a} to \hask{b}''. Here, \hask{a->b} is just the name we are giving to this type. To fully define this type, we would have to describe its relation to other objects, in particular to \hask{a} and \hask{b}. We don't have the tools to do that yet, but we'll get there. 
+meaning that \hask{f} is of the type ``function from \hask{a} to \hask{b}''. Here, \hask{a->b} is just the name we are giving to this type. 
 
-For now, let's keep in mind the following distinction: On the one hand we have an arrow which connects two objects \hask{a} and \hask{b}. On the other hand we have an element of the \emph{object of arrows} from  \hask{a} to \hask{b}. This element is itself defined as an arrow from the terminal object \hask{()} to the object we call \hask{a->b}. 
+If we want function types to be treated the same way as other types, we need an \emph{object} that would represent a set of arrows from \hask{a} to \hask{b}.
 
-The notation we use in programming tends to blur this distinction. This is why in category theory we call the object of arrows an \emph{exponential} and write it as $ b^a$ (the source is in the exponent). So the statement:
+To fully define this object, we would have to describe its relation to other objects, in particular to \hask{a} and \hask{b}. We don't have the tools to do that yet, but we'll get there. 
+
+For now, let's keep in mind the following distinction: On the one hand we have arrows which connect two objects \hask{a} and \hask{b}. These arrows form a set. On the other hand we have an \emph{object of arrows} from  \hask{a} to \hask{b}. An ``element'' of this object is defined as an arrow from the terminal object \hask{()} to the object we call \hask{a->b}. 
+
+The notation we use in programming tends to blur this distinction. This is why in category theory we call the object of arrows an \emph{exponential} and write it as $ b^a$ (the source object is in the exponent). So the statement:
 \begin{haskell}
 f :: a -> b
 \end{haskell}
