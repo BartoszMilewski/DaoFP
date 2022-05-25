@@ -98,6 +98,8 @@ Dually, you can pre-compose $f$, or apply $(- \circ f)$ to arrows originating in
 
 Pre-composition let us shift the perspective from one observer to another. Notice that the outgoing arrows are mapped in the direction opposite to the shifting arrow $f$.
 
+Pre- and post-composition are mappings of arrows. Since arrows form sets, these are \emph{functions} between sets. 
+
 Another way of looking at pre- and post-composition is that they are the result of partial application of the two-hole composition operator $(- \circ -)$, in which we pre-fill one hole or the other with an arrow.
 
 In programming, an outgoing arrow is interpreted as extracting data from the source. An incoming arrow is interpreted as producing or constructing the target. Outgoing arrows define the interface, incoming arrows define the constructors.
@@ -107,7 +109,7 @@ Do the following exercises to convince yourself that shifts in focus and perspec
 Suppose that you have two arrows, $f \colon a \to b$ and $g \colon b \to c$. Their composition $g \circ f$ induces a mapping of arrows $((g \circ f) \circ -)$. Show that the result is the same if you first apply $(f \circ -)$ and follow it by $(g \circ -)$. Symbolically:
 \[((g \circ f) \circ -) = (g \circ -) \circ (f \circ -)\]
 
-Hint: Pick an arbitrary object $x$ and an arrow $h \colon x \to a$ and see if you get the same result. 
+Hint: Pick an arbitrary object $x$ and an arrow $h \colon x \to a$ and see if you get the same result. Note that $\circ$ is overloaded here. It means regular function composition when put between two post-compositions.
 \end{exercise}
 
 \begin{exercise}
