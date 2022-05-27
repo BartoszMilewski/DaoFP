@@ -187,10 +187,10 @@ Here are some other isomorphisms written in Haskell (without proofs of having th
 assoc :: ((a, b), c) -> (a, (b, c))
 assoc ((a, b), c) = (a, (b, c))
 \end{haskell}
-And this is the left unit
+And this is the right unit
 \begin{haskell}
-lunit :: ((), a) -> a
-lunit (_, a) = a
+runit :: (a, ()) -> a
+runit (a, _) = a
 \end{haskell}
 
 These two functions correspond to the \index{associator}\emph{associator}
