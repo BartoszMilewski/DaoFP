@@ -4,14 +4,15 @@
 
 \chapter{Enrichment}
 
-\section{Enriched Categories}
 Lao Tzu says: "To know you have enough is to be rich." 
 
-This chapter contains some advanced material, which might not be immediately applicable to programming. However, a lot of categorical literature, notably the website nLab, contains description of concepts in most general terms, which often means in terms of enriched categories. In this chapter I'll try to show that, at least conceptually, enrichment is not a huge step from the ordinary category theory. Most of the usual constructs can be translated just by changing the vocabulary, replacing hom-sets with hom-objects and $\Set$ with a monoidal category $\cat V$. 
+\section{Enriched Categories}
+
+This might come as a surprise, but the Haskell definition of a \hask{Functor} cannot be fully explained without some background in enriched categories. In this chapter I'll try to show that, at least conceptually, enrichment is not a huge step from the ordinary category theory. 
+
+Additional motivation for studying enriched categories comes from the fact that a lot of literature, notably the website nLab, contains description of concepts in most general terms, which often means in terms of enriched categories. Most of the usual constructs can be translated just by changing the vocabulary, replacing hom-sets with hom-objects and $\Set$ with a monoidal category $\cat V$. 
 
 Some enriched concepts, like weighted limits and colimits, turn out to be powerful on their own, to the extent that one might be tempted to replace Mac Lane's adge,``All concepts are Kan extensions'' with ``All concepts are weighted (co-)limits.''
-
-
 
 \subsection{Set-theoretical foundations}
 
@@ -187,7 +188,7 @@ We know that this hom-set contains the left unitor $\lambda$, so we can use it t
 \section{$\mathcal V$-Functors} 
 
 An ordinary functor maps objects to objects and arrows to arrows. Similarly, an enriched functor $F$ maps object to objects, but instead of acting on individual arrows, it must map hom-objects to hom-objects. This is only possible if the hom-objects in the source category $\mathcal C$ belong to the same category as the hom-objects in the target category $\mathcal D$. In other words, both categories must be enriched over the same $\mathcal V$. The action of $F$ on hom-objects is then defined using arrows in $\mathcal V$:
-\[ F_{a b} \colon \mathcal C (a, b) \to D (F a, F b) \]
+\[ F_{a b} \colon \mathcal C (a, b) \to \cat D (F a, F b) \]
 
 A functor must preserve composition and identity. These can be expressed as commuting diagrams in $\mathcal V$:
 
@@ -265,13 +266,100 @@ In particular, the $\text{Hom}$-functor is an example of a $\cat V$-valued $\cat
 The hom-functor is a special case of an enriched profunctor, which is defined as:
 \[ \mathcal C^{op} \otimes \mathcal D \to \mathcal V \]
 
-
-
 \begin{exercise}
 The tensor product is a functor in $\cat V$:
 \[ \otimes \colon \cat V \times \cat V \to \cat V \]
 Show that if $\cat V$ is monoidal closed, the tensor product defines a $\cat V$-functor. Hint: Define its action on internal homs.
 \end{exercise}
+
+\subsection{Functorial strength and enrichment}
+
+When we were discussing monads, I mentioned an important property that made them work in programming. The endofunctors that define monads must be strong, so that we can access external contexts inside monadic code. 
+
+It turns out that the way we have defined endofunctors in Haskell makes them automatically strong. The reason is that strength is related to enrichment and, as we've seen, a cartesian closed category is self-enriched. Let's start with some definitions.
+
+Functorial strength for an endofunctor $F$ in a monoidal category is defined as a natural transformation with components:
+\[ \sigma_{a b} \colon a \otimes F(b) \to F (a \otimes b) \]
+There are some pretty obvious coherence conditions that make strength respect the properties of the tensor product. This is the associativity condition:
+\[
+ \begin{tikzcd}
+ (a \otimes b) \otimes F (c) 
+ \arrow[rr, "\sigma_{(a \otimes b) c}"]
+ \arrow[d, "\alpha"]
+ && F((a \otimes b) \otimes c)
+ \arrow[d, "F(\alpha)"]
+ \\
+ a \otimes (b \otimes F(c))
+ \arrow[r, "a \otimes \sigma_{b c}"]
+ & a \otimes F(b \otimes c)
+ \arrow[r, "\sigma_{a (b \otimes c)}"]
+ & F(a \otimes (b \otimes c))
+ \\
+ \end{tikzcd}
+\]
+and this is the unit condition:
+\[
+ \begin{tikzcd}
+ I \otimes F(a)
+ \arrow[r, "\sigma_{I a}"]
+ \arrow[rd, "\lambda"]
+ & F(I \otimes a)
+ \arrow[d, "F (\lambda)"]
+ \\
+ & F(a)
+ \end{tikzcd}
+\]
+
+In a general monoidal category this is called the \emph{left strength}, and there is a corresponding definition of the right strength. In a symmetric monoidal category, the two are equivalent.
+
+An enriched endofunctor maps hom-objects to hom-objects:
+\[ F_{a b} \colon \cat C (a, b) \to \cat C (F a, F b) \]
+In a monoidal closed category $\cat V$ enriched over itself, the hom-objects are internal homs, so an enriched endofunctor is equipped with the mapping:
+\[ F_{a b} \colon [a, b] \to [F a, F b] \]
+Compare this with our definition of a Haskell \hask{Functor}:
+\begin{haskell}
+class Functor f where
+  fmap :: (a -> b) -> (f a -> f b)
+\end{haskell}
+The function types involved in this definition, \hask{(a -> b)} and \hask{(f a -> f b)}, are the \emph{internal} homs. A Haskell \hask{Functor} is indeed an enriched functor. 
+
+We don't normally distinguish between external and internal homs in Haskell, since their sets of elements are isomorphic. It's a simple consequence of the currying adjunction:
+\[ \cat C(1 \times b, c) \cong \cat C(1, [b, c]) \]
+and the fact that the terminal object is the unit of the cartesian product.
+
+It turns out that in a self-enriched category $\cat V$ every strong endofunctor is automatically enriched. Indeed, to show that a functor $F$ is enriched we need to define the mapping between internal homs, that is an element of the hom-set:
+\[ F_{a b} \in \cat V([a, b], [F a, F b]) \]
+Using the hom adjunction, this is isomorphic to:
+\[ \cat V([a, b] \otimes F a, F b) \]
+We can construct this mapping by composing the strength and the counit of the adjunction (the evaluation morphism):
+\[ [a, b] \otimes F a \xrightarrow{\sigma_{[a, b] a}} F ([a, b] \otimes a) \xrightarrow{\epsilon_{a b}} F b \]
+
+Conversely, every enriched endofunctor in $\cat V$ is strong. To show that, we need to define strength, which is a natural transformation with components that are elements of the following hom-sets:
+\[ \sigma_{a b} \in \cat V(a \otimes F b, F (a \otimes b)) \]
+Recall the definition of the unit of the hom adjunction, the coevaluation morphism:
+\[ \eta_{a b} \colon a \to [b, a \otimes b] \]
+Using the unit and the counit, together with the action of the enriched functor on an internal hom, we construct the composite:
+\[ a \otimes F b \xrightarrow{\eta_{a b} \otimes Fb} [b, a \otimes b] \otimes F b \xrightarrow{F_{b, a \otimes b} \otimes F b} [F b, F (a \otimes b)] \otimes F b \xrightarrow{\epsilon} F (a \otimes b)\]
+
+This can be translated directly to Haskell:
+\begin{haskell}
+strength :: Functor f => (a, f b) -> f (a, b)
+strength = eval . bimap fmap id . bimap coeval id
+\end{haskell}
+with the following definitions of \hask{eval} and \hask{coeval}:
+\begin{haskell}
+eval :: (a -> b, a) -> b
+eval (f, a) = f a
+\end{haskell}
+\begin{haskell}
+coeval :: a -> (b -> (a, b))
+coeval a = \b -> (a, b)
+\end{haskell}
+Since currying and evaluation are built into Haskell, we can further simplify this formula:
+\begin{haskell}
+strength :: Functor f => (a, f b) -> f (a, b)
+strength (a, bs) = fmap (a, ) bs
+\end{haskell}
 
 \section{$\mathcal V$-Natural Transformations}
 
