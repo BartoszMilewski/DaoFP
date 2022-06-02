@@ -23,7 +23,7 @@ A $2$ is an object with two elements: two arrows coming from $1$. Let's call one
  \end{tikzcd}
 \]
 
-This simple idea can be immediately expressed in Haskell as the definition of a type, traditionally called \hask{Bool}, after its inventor George Boole (1815-1864).
+This simple idea can be immediately expressed in Haskell\footnote{This style of definition is called the Generalized Algebraic Data Types or \hask{GADTs} in Haskell} as the definition of a type, traditionally called \hask{Bool}, after its inventor George Boole (1815-1864).
 
 \begin{haskell}
 data Bool where
@@ -57,7 +57,7 @@ x = True
 \end{haskell}
 The first line declares \hask{x} to be an element of \hask{Bool} (secretly a function \hask{()->Bool}), and the second line tells us which one of the two.
 
-The functions \hask{True} and \hask{False} that we used in the definition of \hask{Bool} are called \emph{data constructors}. They can be used to construct specific terms, like in the example above. As a side note, in Haskell, function names start with lower-case letters, except when they are data constructors. 
+The functions \hask{True} and \hask{False} that we used in the definition of \hask{Bool} are called \index{data constructor}\emph{data constructors}. They can be used to construct specific terms, like in the example above. As a side note, in Haskell, function names start with lower-case letters, except when they are data constructors. 
 
 Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it. We have to be able to define arrows that go out of \hask{Bool}---the \index{mapping out}\emph{mappings ou}t of \hask{Bool}. 
 
@@ -103,7 +103,7 @@ We are now ready to complete our definition of \hask{Bool} by adding the conditi
 
 What this means is that we can interpret the diagram above in two ways: Given \hask{h}, we can easily get \hask{x} and \hask{y}. But the converse is also true: a pair of elements \hask{x} and \hask{y} uniquely \emph{defines} \hask{h}.
 
-We have a ``buddy system,'' or a bijection, at work here. This time it's a one-to-one mapping between a pair of elements $(x, y)$ and an arrow $h$. 
+We have a bijection at work here. This time it's a one-to-one mapping between a pair of elements $(x, y)$ and an arrow $h$. 
 
 In Haskell, this definition of \hask{h} is encapsulated in the \index{\hask{if} statement}\hask{if}, \hask{then}, \hask{else} construct. Given
 \begin{haskell}
@@ -119,19 +119,35 @@ Here, \hask{b} is a term of type \hask{Bool}.
 
 In general, a data type is created using \index{introduction rule}\emph{introduction} rules and deconstructed using \index{elimination rule}\emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and another using \hask{False}. The \hask{if}, \hask{then}, \hask{else} construct defines the elimination rule. 
 
-The fact that, given \hask{h}, we can reconstruct the two terms used to define it, is called the \index{computation rule}\emph{computation} rule. It tells us how to compute the result of \hask{h}. If we call \hask{h} with \hask{True}, the result is \hask{x}; if we call it with \hask{False}, the result is \hask{y}.
+The fact that, given the above definition of \hask{h}, we can retrieve the two terms that were used to define it, is called the \index{computation rule}\emph{computation} rule. It tells us how to compute the result of \hask{h}. If we call \hask{h} with \hask{True}, the result is \hask{x}; if we call it with \hask{False}, the result is \hask{y}.
 
 We should never lose sight of the purpose of programming: to decompose complex problems into a series of simpler ones. The definition of \hask{Bool} illustrates this idea. Whenever we have to construct a mapping out of \hask{Bool}, we decompose it into two smaller tasks of constructing a pair of elements of the target type. We traded one larger problem for two simpler ones.
 
 \subsection{Examples}
 
-Let's do a few examples. We haven't defined many types yet, so we'll be limited to mappings out from \hask{Bool} to either \hask{Void}, \hask{()}, or \hask{Bool}. Such edge cases, however, may offer new insights into well known results.
+Let's do a few examples. We haven't defined many types yet, so we'll be limited to mappings out of \hask{Bool} to either \hask{Void}, \hask{()}, or \hask{Bool}. Such edge cases, however, may offer new insights into well known results.
 
 We have decided that there can be no functions (other than identity) with \hask{Void} as a target, so we don't expect any functions from \hask{Bool} to \hask{Void}. And indeed, we have zero pairs of elements of \hask{Void}. 
 
 What about functions from \hask{Bool} to \hask{()}? Since \hask{()} is terminal, there can be only one function from \hask{Bool} to it. And, indeed, this function corresponds to the single possible pair of functions from \hask{()} to \hask{()}---both being identities. So far so good.
+\[
+ \begin{tikzcd}
+ \hask{()}
+ \arrow[dd, bend right, "\text{True}"']
+ \arrow[dd, bend left, "\text{False}"]
+  \arrow[ddd, bend right =90, "\hask{id}"']
+ \arrow[ddd, bend left=90, "\hask{id}"]
+\\
+ \\
+\text{Bool}
+\arrow[d, dashed, "h"]
+\\
+\hask{()}
+ \end{tikzcd}
+\]
 
-The interesting case is functions from \hask{Bool} to \hask{Bool}. Let's plug \hask{Bool} in place of \hask{A} in our diagram:
+
+The interesting case is functions from \hask{Bool} to \hask{Bool}. Let's plug \hask{Bool} in place of \hask{A}:
 \[
  \begin{tikzcd}
  \hask{()}
@@ -155,7 +171,7 @@ not :: Bool -> Bool
 not b = if b then False else True
 \end{haskell}
 
-We can also look at functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential $A^2$, where $2$ is the \hask{Bool} object. Accoording to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra, where numbers actually mean numbers.
+We can also look at functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential object $A^2$, where $2$ is the \hask{Bool} object. Accoording to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra, where numbers actually mean numbers.
 
 \begin{exercise}
 Write the implementations of the three other functions \hask{Bool->Bool}.
@@ -180,7 +196,7 @@ This introduction rule allows us to construct terms of the type \hask{RGB}, for 
 c :: RGB
 c = Blue
 \end{haskell}
-To define mappings out of \hask{RGB}, we need a more general elimination pattern. Just like a function from \hask{Bool} was determined by two elements, a function from \hask{RGB} to \hask{A} is determined by a triple of elements of \hask{A}: \hask{x}, \hask{y}, and \hask{z}. We can write such function using \emph{pattern matching}:
+To define mappings out of \hask{RGB}, we need a more general elimination pattern. Just like a function from \hask{Bool} was determined by two elements, a function from \hask{RGB} to \hask{A} is determined by a triple of elements of \hask{A}: \hask{x}, \hask{y}, and \hask{z}. We write such a function using \emph{pattern matching} syntax:
 \begin{haskell}
 h :: RGB -> A
 h Red   = x
@@ -195,7 +211,7 @@ h :: Bool -> A
 h True  = x
 h False = y
 \end{haskell}
-In fact, there is a third way of writing the same thing using the \index{\hask{case} statement}\hask{case} pattern:
+In fact, there is a third way of writing the same thing using the \index{\hask{case} statement}\hask{case} statement:
 \begin{haskell}
 h c = case c of
   Red   -> x
@@ -221,9 +237,10 @@ There is a giant enumeration of Unicode characters called \hask{Char}. Their con
 c :: Char
 c = 'a'
 \end{haskell}
+
 As Lao Tzu would say, a pattern of ten thousand things would take many years to complete, therefore people came up with the wildcard pattern, the underscore, which matches everything. 
 
-Because the patterns are matched in order, you should make the wildcard pattern the last:
+Because the patterns are matched in order, you should use the wildcard pattern as the last one in a series:
 \begin{haskell}
 yesno :: Char -> Bool
 yesno c = case c of
@@ -335,7 +352,7 @@ When we want to translate this diagram to Haskell, we need to select elements of
 & c
  \end{tikzcd}
 \]
-Follow the arrows in this diagram to get
+Follow the arrows in this diagram to get:
 \[h \circ \text{Left} \circ a = f \circ a\]
 \[h \circ \text{Right} \circ b = g \circ b\]
 
@@ -348,7 +365,7 @@ h (Right b) = g b
 \end{haskell}
 (Again, notice the use of lower-case letters for type variables and the same letters for terms of that type. Unlike humans, the compilers don't get confused by this.)
 
-You can also read these equations right to left, and you will see the computation rules for sum types. The two functions that were used to define \hask{h} can be recovered by applying \hask{h} to terms constructed using \hask{Left} and \hask{Right}. 
+You can also read these equations right to left, and you will see the computation rules for sum types: The two functions that were used to define \hask{h} can be recovered by applying \hask{h} to \hask{(Left a)} and \hask{(Right b)}. 
 
 You can also use the \hask{case} syntax to define \hask{h}:
 \begin{haskell}
@@ -372,7 +389,7 @@ The data constructor \hask{Nothing} is an arrow from the unit type, and \hask{Ju
 data Maybe a = Nothing | Just a
 \end{haskell}
 
-\hask{Maybe} is mostly used to encode the return type of partial functions: ones that are undefined for some values of their arguments. In that case, instead of failing, such functions return \hask{Nothing}. In other programming languages partial functions are often implemented using exceptions.
+\hask{Maybe} is mostly used to encode the return type of partial functions: ones that are undefined for some values of their arguments. In that case, instead of failing, such functions return \hask{Nothing}. In other programming languages partial functions are often implemented using exceptions (or core dumps).
 
 \subsection{Logic}
 
@@ -388,8 +405,10 @@ In Haskell, we can define a sum of any two types using \hask{Either}. A category
 
 \subsection{One Plus Zero}
 Let's first show that $1 + 0 \cong 1$, meaning the sum of the terminal object and the initial object is isomorphic to the terminal object. The standard procedure for this kind of proofs is to use the Yoneda trick. Since sum types are defined by mapping out, we should compare arrows coming \emph{out} of either side. 
+
+The Yoneda argument says that two objects are isomorphic if there is a bijection $\beta_a$ between the sets of arrows coming out of them to an arbitrary object $a$, and this bijection is natural.  
  
-Look at the definition of $1 + 0$ and it's mapping out to any object $a$. It's defined by a pair $(x, \mbox{!`})$, where $x$ is an element of $a$ and $\mbox{!`}$ is the unique arrow from the initial object to $a$ (the \hask{absurd} function in Haskell). 
+Let's look at the definition of $1 + 0$ and it's mapping out to any object $a$. This mapping is defined by a pair $(x, \mbox{!`})$, where $x$ is an element of $a$ and $\mbox{!`}$ is the unique arrow from the initial object to $a$ (the \hask{absurd} function in Haskell). 
 
 \[
  \begin{tikzcd}
@@ -414,9 +433,9 @@ Look at the definition of $1 + 0$ and it's mapping out to any object $a$. It's d
  a
  \end{tikzcd}
 \]
-We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \mbox{!`})$, we can simply map it to the arrow $x$ originating in $1$. Since there is only one $\mbox{!`}$, the mapping is a bijection. 
+We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \mbox{!`})$, we can simply assign it to the arrow $x$ originating in $1$. Since there is only one $\mbox{!`}$, the mapping is a bijection. 
 
-So our $\beta_a$ maps any pair $(x, \mbox{!`})$ to $x$. Conversely, $\beta^{-1}_a$ maps $x$ to the pair $(x, \mbox{!`})$. But is it a natural transformation? 
+We define $\beta_a$ to map any $h$ defined by a pair $(x, \mbox{!`})$ to $x$. Conversely, $\beta^{-1}_a$ maps $x$ to the pair $(x, \mbox{!`})$. But is it a natural transformation? 
 
 To answer that, we need to consider what happens when we change focus from $a$ to some $b$ that is connected to it through an arrow $g \colon a \to b$. We have two options now:
 \begin{itemize}
@@ -558,9 +577,10 @@ This code can also be displayed in diagrammatical form. Here's the diagram for t
 Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the foci of the arrows that define the product. But what happens when we move the sources of those arrows? 
 
 Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
-\[f \colon a \to a' \]
-\[g \colon b \to b'\]
-The composition of these arrows with the constructors $\text{Left}$ and $\text{Right}$, respectively, can be used to define the mapping of the sums:
+\begin{align*}f &\colon a \to a' \\
+g &\colon b \to b' 
+\end{align*}
+The composition of these arrows with the constructors $\text{Left}$ and $\text{Right}$, respectively, can be used to define the mapping between the sums:
 \[
  \begin{tikzcd}
  a
@@ -582,7 +602,7 @@ The composition of these arrows with the constructors $\text{Left}$ and $\text{R
 \]
 The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon a + b \to a' + b'$.
 
-This property of the sum is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the sum. 
+This property of the sum is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the sum and get a new sum. We also say that functoriality lets us \index{lifting}\emph{lift} a pair of arrows in order to operate on sums.
 
 \begin{exercise}
 Show that functoriality preserves composition. Hint: take two composable arrows, $g \colon b \to b'$ and $g' \colon b' \to b''$ and show that applying $g' \circ g$ gives the same result as first applying $g$ to transform $a + b$ to $a + b'$ and then applying $g'$ to transform $a + b'$ to $a + b''$.
@@ -600,9 +620,11 @@ Whether we are adding numbers, composing arrows, or constructing sums of objects
 As Lao Tzu would say, when things come together to form a new thing, and the operation is associative, and it has a neutral element, we know how to deal with ten thousand things.
 
 The sum type we have defined satisfies these properties:
-\[a + 0 \cong a\]
-\[a + b \cong b + a \]
-\[(a + b) + c \cong a + (b + c) \]
+\begin{align*}
+a + 0 &\cong a \\
+a + b &\cong b + a \\
+(a + b) + c &\cong a + (b + c)
+\end{align*}
 and it's functorial. A category with this type of operation is called \emph{symmetric monoidal}. When the operation is the sum (coproduct), it's called \emph{cocartesian}. In the next chapter we'll see another monoidal structure that's called \emph{cartesian} without the ``co.''
 
 

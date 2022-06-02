@@ -78,7 +78,7 @@ In logic, a product type corresponds to logical conjunction. In order to prove $
 
 As Lao Tzu would say, a product of ten thousand objects is just an object with ten thousand projections. 
 
-We can form such products in Haskell using the tuple notation. For instance, a product of three types is written as \hask{(A, B, C)}. A term of this type can be constructed from three elements: \hask{(a, b, c)}. 
+We can form arbitrary products in Haskell using the tuple notation. For instance, a product of three types is written as \hask{(A, B, C)}. A term of this type can be constructed from three elements: \hask{(a, b, c)}. 
 
 In what mathematicians call ``abuse of notation'', a product of zero types is written as \hask{()}, an empty tuple, which happens to be the same as the terminal object, or unit type. This is because the product behaves very much like multiplication of numbers, with the terminal object playing the role of one.
 
@@ -223,9 +223,11 @@ Implement a Haskell function \hask{maybeAB :: Either b (a, b) -> (Maybe a, b)}. 
 \subsection{Functoriality}
 
 Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
-\[f \colon a \to a' \]
-\[g \colon b \to b'\]
-The composition of these arrows with the projections $\text{fst}$ and $\text{snd}$, respectively, can be used to define the mapping of the products:
+\begin{align*}
+f &\colon a \to a' \\
+g &\colon b \to b'
+\end{align*}
+The composition of these arrows with the projections $\text{fst}$ and $\text{snd}$, respectively, can be used to define the mapping between the products:
 
 \[
  \begin{tikzcd}
@@ -248,7 +250,7 @@ a' && b'
 The shorthand notation for this diagram is:
 \[ a \times b \xrightarrow{f \times g} a' \times b' \]
 
-This property of the product is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the product. 
+This property of the product is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the product to get the new product. We also say that functoriality lets us \index{lifting}\emph{lift} a pair of arrows in order to operate on products.
 
 \section{Duality}
 
@@ -308,7 +310,7 @@ a \times b &\cong b \times a
 \end{align*}
 and is functorial. 
 
-A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen a similar structure before when working with sums and the initial object. 
+A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen a similar structure before, when working with sums and the initial object. 
 
 A category can have multiple monoidal structures at the same time. When you don't want to name your monoidal structure, you replace the plus sign or the product sign with a tensor sign, and the neutral element with the letter $I$. The rules of a symmetric monoidal category can then be written as:
 \begin{align*}
@@ -329,6 +331,13 @@ These isomorphisms are often written as families of invertible arrows called \in
 \end{align*}
 The symmetry is witnessed by:
 \[ \gamma \colon a \otimes b \to b \otimes a \]
+Functoriality lets us \emph{lift} a pair of arrows:
+\begin{align*} 
+f &\colon a \to a' \\
+g &\colon b \to b'
+\end{align*}
+ to operate on tensor products:
+\[ a \otimes b \xrightarrow{f \otimes g} a' \otimes b' \]
 
 You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, but it requires both objects $a$ and $b$; and it has no elimination rule---no projections. Some interesting examples of tensor products are not even symmetric. 
 
@@ -336,7 +345,7 @@ You may think of a tensor product as the lowest common denominator of product an
 
 Monoids are very simple structures equipped with a binary operation and a unit. Natural numbers with addition and zero form a monoid. So do natural numbers with multiplication and one. 
 
-The intuition is that a monoid lets you combine two things to get one thing. There is also one special thing, such that combining it with anything else gives back the same thing. And the combining must be associative. 
+The intuition is that a monoid lets you combine two things to get one thing. There is also one special thing, such that combining it with anything else gives back the same thing. That's the unit. And the combining must be associative. 
 
 What's not assumed is that the combining is symmetric, or that there is an inverse element.
 
@@ -346,7 +355,7 @@ A category with a single object is called a monoid. The combining operation is t
 
 This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
 
-In a category, we are forced to define operations in bulk, rather than looking at individual elements. We start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
+In a category, we are forced to define operations in bulk, rather than looking at individual elements. So we start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
 \[ \mu \colon m \times m \to m \]
 The unit element can be defined as an arrow from the terminal object $1$:
 \[ \eta \colon 1 \to m \]
@@ -360,7 +369,7 @@ class Monoid m where
 
 The two arrows $\mu$ and $\eta$ have to satisfy monoid laws but, again, we have to formulate them in bulk, without any recourse to elements.
 
-To formulate the left unit law, we first create the product $1 \times m$. We then use $\eta$ to ``pick the unit element in $m$'' or, in terms of arrows, turn $1$ into $m$. Since we are operating on a product $1 \times m$, we have to lift the pair $\langle \eta, id_m \rangle$, which ensures that we ``do not touch'' the $m$. We then perform the ``multiplication'' using $\mu$. 
+To formulate the left unit law, we first create the product $1 \times m$. We then use $\eta$ to ``pick the unit element in $m$'' or, in terms of arrows, turn $1$ into $m$. Since we are operating on a product $1 \times m$, we have to lift the pair $\langle \eta, id_m \rangle$, which ensures that we ``do not touch'' the $m$. Finally we perform the ``multiplication'' using $\mu$. 
 
 We want the result to be the same as the original element of $m$, but without mentioning elements. So we just use the left unitor $\lambda$ to go from $1 \times m$ to $m$ without ``stirring things up.''
 \[
@@ -405,7 +414,7 @@ To formulate the law of associativity, we have to start with a triple product an
  \end{tikzcd}
 \]
 
-Notice that we didn't have to assume a lot about the categorical product that we used with the objects $m$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in a monoidal category. It doesn't even have to be symmetric. All we have to assume is that there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
+Notice that we didn't have to assume a lot about the categorical product that we used with the objects $m$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in an arbitrary monoidal category. It doesn't even have to be symmetric. All we have to assume is that: there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
 
 Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category. 
 
@@ -445,6 +454,6 @@ satisfying the unit and associativity laws:
 &  m
  \end{tikzcd}
 \]
-We used the functoriality of $\otimes$ in lifting pairs of arrows, as in $\eta \otimes id_m$, $\mu \otimes id_m$, etc.
+We used the functoriality of $\otimes$ to lift pairs of arrows, as in $\eta \otimes id_m$, $\mu \otimes id_m$, etc.
 
 \end{document}
