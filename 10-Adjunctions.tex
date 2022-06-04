@@ -31,12 +31,13 @@ The shorthand notation for the adjunction is $L \dashv R$. Substituting the prod
 
 \[ (- \times b) \dashv (-)^b \]
 
-The exponential object $b^a$ is sometimes called the \index{internal hom}\emph{internal hom} and is written as $[a, b]$. This is in contrast to the \emph{external hom}, which is the set $\cat C (a, b)$. The external hom is not an object in $\cat C$ (except when $\cat C$ itself is $\Set$). The currying adjunction can then be written as:
+The exponential object $b^a$ is sometimes called the \index{internal hom}\emph{internal hom} and is written as $[a, b]$. This is in contrast to the \emph{external hom}, which is the set $\cat C (a, b)$. The external hom is not an object in $\cat C$ (except when $\cat C$ itself is $\Set$). With this notation, the currying adjunction can be written as:
 \[  \mathcal{C}(a \times b, c ) \cong  \mathcal{C} (a, [b, c])  \]
+A category in which this adjunction holds is called cartesian closed.
 
-The category of (small) categories $\mathbf{Cat}$ is cartesian closed, as reflected in this adjunction between product categories and functor categories that uses the same internal-hom notation:
-
+Incidentally, the category of (small) categories $\mathbf{Cat}$ is cartesian closed, as reflected in this adjunction between product categories and functor categories that uses the same internal-hom notation:
 \[ \mathbf{Cat} (\cat A \times \cat B, \cat C) \cong \mathbf{Cat} (\cat A, [\cat B, \cat C]) \]
+Here, both sides are sets of natural transformations.
 
 
 \section{The Sum and the Product Adjunctions}
@@ -224,51 +225,57 @@ What is the presheaf for which $R y$, in the adjunction formula, is the represen
 \section{Limits and Colimits}
 
 The definition of a limit also involves a natural isomorphism between hom-sets:
-\[ [\mathbf{I}, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}_D) \]
+\[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim} D) \]
 The hom-set on the left is in the functor category. Its elements are cones, or natural transformations between the constant functor and the diagram functor. The one on the right is a hom-set in $\mathcal{C}$. 
 
 In a category where all limits exist, we have the adjunction between these two functors:
-\[ \Delta_{(-)} \colon \mathcal{C} \to  [\mathbf{I}, \mathcal{C}] \]
-\[ Lim_{(-)} \colon  [\mathbf{I}, \mathcal{C}] \to \mathcal{C} \]
+\[ \Delta_{(-)} \colon \mathcal{C} \to  [\cat J, \mathcal{C}] \]
+\[ \text{Lim}{(-)} \colon  [\cat J, \mathcal{C}] \to \mathcal{C} \]
 
 Dually, the colimit is described by the following natural isomorphism:
-\[ [\mathbf{I}, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}_D, x) \]
+\[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim} D, x) \]
 We can write both adjunctions using one terse formula:
-\[ Colim \dashv \Delta \dashv Lim\]
+\[ \text{Colim} \dashv \Delta \dashv \text{Lim}\]
 
 \section{Unit and Counit of Adjunction}
 
 We compare arrows for equality, but we prefer to use isomorphisms for comparing objects. 
 
-We have a problem with functors, though. On the one hand, they are objects in the functor category, so isomorphisms are the way to go; on the other hand, they are arrows in $\mathbf{Cat}$ so maybe it's okay to compare them for equality?
+We have a problem when it comes to functors, though. On the one hand, they are objects in the functor category, so isomorphisms are the way to go; on the other hand, they are arrows in $\mathbf{Cat}$ so maybe it's okay to compare them for equality?
 
-To shed some light on this dilemma, we should ask ourselves \emph{why} we use equality for arrows. It's not because we like equality, but because there's nothing else for us to do in a set but to compare its elements for equality. Two elements of a set are either equal or not, period. 
+To shed some light on this dilemma, we should ask ourselves \emph{why} we use equality for arrows. It's not because we like equality, but because there's nothing else for us to do in a set but to compare elements for equality. Two elements of a hom-set are either equal or not, period. 
 
 That's not the case in  $\mathbf{Cat}$ which, as we know, is a $2$-category. Here, hom-sets themselves have the structure of a category---the functor category. In a $2$-category we have arrows between arrows so, in particular, we can define isomorphisms between arrows. In $\mathbf{Cat}$ these would be natural isomorphisms between functors.
 
-However, even though we have the option of replacing arrow equalities with isomorphisms, categorical laws in $\mathbf{Cat}$ are still expressed as equalities. So, for instance, the composition of a functor $F$ with the identity functor is \emph{equal} to $F$, and the same for associativity. A $2$-category in which the laws are satisfied ``on the nose'' is called \emph{strict}, and $\mathbf{Cat}$ is an example of a strict $2$-category. 
+However, even though we have the option of replacing arrow equalities with isomorphisms, categorical laws in $\mathbf{Cat}$ are still expressed as equalities. For instance, the composition of a functor $F$ with the identity functor is \emph{equal} to $F$, and the same for associativity. A $2$-category in which the laws are satisfied ``on the nose'' is called \emph{strict}, and $\mathbf{Cat}$ is an example of a strict $2$-category. 
 
 But as far as comparing categories goes, we have more options. Categories are objects in $\mathbf{Cat}$, so it's possible to define an isomorphism of categories as a pair of functors $L$ and $R$:
 \[
  \begin{tikzcd}
   \mathcal{C}
   \arrow[rr, bend right, "R"']
-  \arrow[loop, "Id_{ \mathcal{C}} "']
+  \arrow[loop, "\text{Id}_{ \mathcal{C}} "']
   &&
   \mathcal{D}
   \arrow[ll, bend right, "L"']
-  \arrow[loop, "Id_{ \mathcal{D}} "']
+  \arrow[loop, "\text{Id}_{ \mathcal{D}} "']
   \end{tikzcd}
 \]
-such that
-\[ L \circ R = Id_{ \mathcal{C}} \]
-\[ Id_{ \mathcal{D}} = R \circ L  \]
+such that:
+\begin{align*}
+L \circ R = \text{Id}_{ \mathcal{C}} \\
+\text{Id}_{ \mathcal{D}} = R \circ L 
+\end{align*}
 This definition involves equality of functors, though. What's worse, acting on objects, it involves equality of objects:
-\[ L (R x) = x \]
-\[ y = R (L y) \]
+\begin{align*}
+ L (R x) = x \\
+ y = R (L y)
+\end{align*}
 This is why it's more proper to talk about a weaker notion of \emph{equivalence} of categories, where equalities are replaced by isomorphisms:
-\[ L \circ R \cong Id_{ \mathcal{C}} \]
-\[ Id_{ \mathcal{D}} \cong R \circ L \]
+\begin{align*}
+L \circ R \cong \text{Id}_{ \mathcal{C}} \\
+ \text{Id}_{ \mathcal{D}} \cong R \circ L 
+\end{align*}
 On objects, an equivalence of categories means that a round trip produces an object that is isomorphic, rather than equal, to the original one. In most cases, this is exactly what we want.
 
 An adjunction is also defined as a pair of functors going in opposite directions, so it makes sense to ask what the result of a round trip is. The isomorphism that defines an adjunction works for any pair of objects $x$ and $y$
@@ -278,22 +285,24 @@ so, in particular, we can replace $y$ with $L x$
 We can now use the Yoneda trick and pick the identity arrow $id_{L x}$ on the left. The isomorphism maps it to a unique arrow on the right, which we'll call $\eta_x$:
 \[ \eta_x \colon x \to R ( L x) \]
 Not only is this mapping defined for every $x$, but it's also natural in $x$. The natural transformation $\eta$ is called the \emph{unit} of the adjunction. If we observe that the $x$ on the left is the action of the identity functor on $x$, we can write:
-\[ \eta \colon Id_{\mathcal{D}} \to R \circ L \]
+\[ \eta \colon \text{Id}_{\mathcal{D}} \to R \circ L \]
 
 We can do a similar trick by replacing $x$ with $R y$:
 \[  \mathcal{C} (L (R y), y) \cong \mathcal{D}( R y , R y)\]
-We get a family of arrows:
+Corresponding to $id_{R y}$ on the right, we get a family of arrows on the left:
 \[ \varepsilon_y \colon L (R y) \to y \]
 which form another natural transformation called the \emph{counit} of the adjunction:
-\[ \varepsilon \colon L \circ R \to Id_{\mathcal{C}}  \]
+\[ \varepsilon \colon L \circ R \to \text{Id}_{\mathcal{C}}  \]
 
 Notice that, if those two natural transformations were invertible, they would witness the equivalence of categories. But this kind of ``half-equivalence'' is even more interesting in the context of category theory. 
 
 \subsection{Triangle identities}
 
-We can use the unit/counit pair to formulate an equivalent  definition of an adjunction. To do that, we'll start with two natural transformations:
-\[ \eta \colon Id_{\mathcal{D}} \to R \circ L \]
-\[ \varepsilon \colon L \circ R \to Id_{\mathcal{C}}  \]
+We can use the unit/counit pair to formulate an equivalent  definition of an adjunction. To do that, we start with a pair of natural transformations:
+\begin{align*}
+\eta \colon \text{Id}_{\mathcal{D}} \to R \circ L \\
+\varepsilon \colon L \circ R \to \text{Id}_{\mathcal{C}} 
+\end{align*}
 and impose additional \emph{triangle identities}. 
 
 These identities are derived by noticing that $\eta$ can be used to replace an identity functor with the composite $R \circ L$, effectively letting us insert $R \circ L$ anywhere an identity functor would work.
@@ -301,7 +310,7 @@ These identities are derived by noticing that $\eta$ can be used to replace an i
 Similarly, $\varepsilon$ can be used to eliminate the composite $L \circ R$ (i.e., replace it with identity). 
 
 So, for instance, starting with $L$:
-\[ L = L \circ Id_{\mathcal{D}} \xrightarrow{L \circ \eta} L \circ R \circ L \xrightarrow{\varepsilon \circ L} Id_{\mathcal{C}} \circ L = L \]
+\[ L = L \circ \text{Id}_{\mathcal{D}} \xrightarrow{L \circ \eta} L \circ R \circ L \xrightarrow{\varepsilon \circ L} \text{Id}_{\mathcal{C}} \circ L = L \]
 Here, we used the horizontal composition of natural transformation, with one of them being the identity transformation (a.k.a., whiskering).
 
 The first triangle identity is the condition that this chain of transformations result in the identity natural transformation. Pictorially:
@@ -318,8 +327,8 @@ The first triangle identity is the condition that this chain of transformations 
   \end{tikzcd}
 \]
 
-Similarly, the following chain of natural transformations should also compose to identity:
-\[ R = Id_{\mathcal{D}} \circ R \xrightarrow{\eta \circ R} R \circ L \circ R \xrightarrow{R \circ \varepsilon} R \circ Id_{\mathcal{C}} = R \]
+Similarly, we want the following chain of natural transformations to also compose to identity:
+\[ R = \text{Id}_{\mathcal{D}} \circ R \xrightarrow{\eta \circ R} R \circ L \circ R \xrightarrow{R \circ \varepsilon} R \circ \text{Id}_{\mathcal{C}} = R \]
 or, pictorially:
 \[
  \begin{tikzcd}
@@ -333,17 +342,18 @@ or, pictorially:
   \end{tikzcd}
 \]
 
-It turns out that an adjunction can be alternatively defined in terms of the two natural transformations, $\eta$ and $\varepsilon$, as long as the  triangle identities are satisfied:
+It turns out that an adjunction can be alternatively defined in terms of the two natural transformations, $\eta$ and $\varepsilon$ satisfying the  triangle identities:
+\begin{align*}
+(\varepsilon \circ L) \cdot (L \circ \eta) = id_L \\
+(R \circ \varepsilon) \cdot (\eta \circ R) = id_R
+\end{align*}
 
-\[ (\varepsilon \circ L) \cdot (L \circ \eta) = id_L \]
-\[ (R \circ \varepsilon) \cdot (\eta \circ R) = id_R \]
-
-The mapping of hom-sets can be easily recovered. For instance, let's start with an arrow $f \colon x \to R y$, which is an element of $\mathcal{D}( x , R y)$. We can lift it to 
+From those, the mapping of hom-sets can be easily recovered. For instance, let's start with an arrow $f \colon x \to R y$, which is an element of $\mathcal{D}( x , R y)$. We can lift it to 
 \[L f \colon L x \to L (R y)\]
-We can then use $\eta$ to collapse the composite $L \circ R$ to identity. The result is a mapping $L x \to y$, which is an element of $ \mathcal{C} (L x, y)$.
+We can then use $\eta$ to collapse the composite $L \circ R$ to identity. The result is an arrow $L x \to y$, which is an element of $ \mathcal{C} (L x, y)$.
 
 
-The definition of the adjunction using unit and counit is more general in the sense that it can be translated to a 2-category setting. 
+The definition of the adjunction using unit and counit is more general in the sense that it can be translated to an arbitrary 2-category setting. 
 
 \begin{exercise}
 Given an arrow $g \colon L x \to y$ implement an arrow $x \to R y$ using $\varepsilon$ and the fact that $R$ is a functor. Hint: Start with the object $x$ and see how you can get from there to $R y$ with one stopover.
@@ -355,7 +365,7 @@ Let's calculate the unit and the counit of the currying adjunction:
 \[  \mathcal{C}(a \times b, c ) \cong  \mathcal{C} (a, c^b)  \]
 If we replace $c$ with $a \times b$, we get
 \[  \mathcal{C}(a \times b, a \times b ) \cong  \mathcal{C} (a, (a \times b)^b)  \]
-Corresponding to the identity arrow on the left, we get the unit of the adjunction:
+Corresponding to the identity arrow on the left, we get the unit of the adjunction on the right:
 \[ \eta \colon a \to (a \times b)^b \]
 This is a curried version of the product constructor. In Haskell, we write it as:
 \begin{haskell}
@@ -398,12 +408,12 @@ Using the inverse of the sum adjunction, we arrive at the final result:
 
 Every step in this proof was a natural isomorphism, so their composition is also a natural isomorphism. By Yoneda lemma, the two objects that form the left- and the right-hand side of distributivity law are therefore isomorphic.
 
-\section{Free-Forgetful Adjunctions}
+\section{Free/Forgetful Adjunctions}
 The two functors in the adjunction play different roles: the picture of the adjunction is not symmetric. Nowhere is this illustrated better than in the case of the free/forgetful adjunctions. 
 
-A forgetful functor is a functor that ``forgets'' some of the structure of its source category. This is not a rigorous definition but, in most cases, it's pretty obvious what structure is being forgotten. Very often the target category is just the category of sets, which is considered the epitome of structurelessness. The result of the forgetful functor, in that case, is called the ``underlying'' set, and the functor itself is often called $U$. 
+A forgetful functor is a functor that ``forgets'' some of the structure of its source category. This is not a rigorous definition but, in most cases, it's pretty obvious what structure is being forgotten. Very often the target category is just the category of sets, which is considered the epitome of structurelessness. The result of the forgetful functor in that case is called the ``underlying'' set, and the functor itself is often called $U$. 
 
-More precisely, we say that a functor forgets \emph{structure} if the mapping of hom-sets is not surjective, that is, there are arrows in the target hom-set that have no corresponding arrows in the source hom-set. Intuitively, it means that the arrows in the source have to preserve some structure, and that structure is absent in the target. 
+More precisely, we say that a functor forgets \emph{structure} if the mapping of hom-sets is not surjective, that is, there are arrows in the target hom-set that have no corresponding arrows in the source hom-set. Intuitively, it means that the arrows in the source have some structure to preserve, so there are fewer of them; and that structure is absent in the target. 
 
 The left adjoint to a forgetful functor is called a \emph{free functor}.
 
@@ -433,7 +443,7 @@ A classic example of a free/forgetful adjunction is the construction of the free
 \subsection{The category of monoids}
 Monoids in a monoidal category $\mathcal{C}$ form their own category $\mathbf{Mon}(\mathcal{C})$. Its objects are monoids, and its arrows are the arrows in $\mathcal{C}$ that preserve the monoidal structure. 
 
-The following diagram explains what it means for $f$ to be a monoid morphism, going from a monoid $M_1$ to a monoid $M_2$:
+The following diagram explains what it means for $f$ to be a monoid morphism, going from a monoid $(M_1, \eta_1, \mu_1)$ to a monoid $(M_2, \eta_2, \mu_2)$:
 \[
  \begin{tikzcd}
  & M_1
@@ -465,11 +475,11 @@ Monoids in $\mathbf{Set}$ are sets with additional structure. They form their ow
 
 We want to construct the free functor 
 \[ F \colon \mathbf{Set} \to \mathbf{Mon}(\mathbf{Set})\]
-that is adjoint to the forgetful functor $U$. We start with an arbitrary set $X$ and an arbitrary monoid $m$. 
+that is adjoint to the forgetful functor $U$. 
 
-On the right-hand side of the adjunction we have the set of functions between two sets, $X$ and $U m$. On the left-hand side, we have a set of highly constrained structure-preserving monoid morphisms from $F X$ to $m$. How can these two sets be isomorphic?
+We start with an arbitrary set $X$ and an arbitrary monoid $m$. On the right-hand side of the adjunction we have the set of functions between two sets, $X$ and $U m$. On the left-hand side, we have a set of highly constrained structure-preserving monoid morphisms from $F X$ to $m$. How can these two sets be isomorphic?
 
-In  $\mathbf{Mon}(\mathbf{Set})$, monoids are just sets of elements, and a monoid morphism is a function between such sets, satisfying additional constraints: it has to preserve unit and multiplication. 
+In  $\mathbf{Mon}(\mathbf{Set})$, monoids are just sets of elements, and a monoid morphism is a function between such sets, satisfying additional constraints: preserving unit and multiplication. 
 
 Arrows in $\mathbf{Set}$, on the other hand, are just functions with no additional constraints. So, in general, there are fewer arrows between monoids than there are between their underlying sets. 
 
@@ -495,23 +505,22 @@ m
 
 Here's the idea: if we want to have a one to one matching between arrows, we want $F X$ to be much larger than $X$. This way, there will be many more functions from it to $m$---so many that, even after rejecting the ones that don't preserve the structure, we'll still have enough to match every function $f \colon X \to U m$.
 
-We'll construct the monoid $F X$ starting from the set $X$, adding more elements as necessary. We'll call $X$ the set of \index{generators of a monoid}\emph{generators} of $F X$.
+We'll construct the monoid $F X$ starting from the set $X$, adding more and more elements as we go. We'll call the initial set $X$ the \index{generators of a monoid}\emph{generators} of $F X$. We'll construct a monoid morphism $g \colon F X \to m$ starting from the original function $f$ and extending it to more and more elements.
 
-We'll construct a monoid morphism $g \colon F X \to m$ starting from the function $f$. On generators, $x \in X$, $g$ works the same as $f$:
+On generators, $x \in X$, $g$ works the same as $f$:
 \[ g x = f x \]
-Every time we add new element to $F X$, we'll extend the definition of $g$.
 
-Since $F X$ is supposed to be a monoid, it has to have a unit. We can't pick one of the generators for the unit, because it would impose a constraint of $f$---it would have to map it to the unit of $m$. So we'll just add an extra element $e$ to $F X$ and call it a unit. We'll define the action of $g$ on it by saying that it is mapped to the unit $e'$ of $m$:
+Since $F X$ is supposed to be a monoid, it has to have a unit. We can't pick one of the generators for the unit, because it would impose a constraint on the part of $g$ that is already fixed by $f$---it would have to map it to the unit $e'$ of $m$. So we'll just add an extra element $e$ to $F X$ and call it the unit. We'll define the action of $g$ on it by saying that it is mapped to the unit $e'$ of $m$:
 \[ g e = e' \]
 
-We also have to define monoidal multiplication in $F X$. Let's start with a product of two generators $a$ and $b$. The result of the multiplication cannot be another generator because, again, that would constrain $f$---products must be mapped to products. So we have to make all products of generators new elements of $F X$. Again, the action of $g$ on those products is fixed:
+We also have to define monoidal multiplication in $F X$. Let's start with a product of two generators $a$ and $b$. The result of the multiplication cannot be another generator because, again, that would constrain the part of $g$ that's fixed by $f$---products must be mapped to products. So we have to make all products of generators new elements of $F X$. Again, the action of $g$ on those products is fixed:
 \[ g (a \cdot b)  = g a \cdot g b\]
 
 Continuing with this construction, any new multiplication produces a new element of $F X$, except when it can be reduced to an existing element by applying monoid laws. For instance, the new unit $e$ times a generator $a$ must be equal to $a$. But we have made sure that $e$ is mapped to the unit of $m$, so the product $g e \cdot g a$ is automatically equal to $g a$.
 
 Another way of looking at this construction is to think of the set $X$ as an alphabet. The elements of $F X$ are then strings of characters from this alphabet. The generators are single-letter strings, $``a"$, $``b"$, and so on. The unit is an empty string , $``"$. Multiplication is string concatenation, so  $``a"$ times $``b"$ is a new string  $``ab"$. Concatenation is automatically associative and unital, with the empty string as the unit.
 
-The intuition behind free functors is that they generate structure ``freely,'' as in ``with no additional constraints.'' They do it lazily: instead of performing operations, they just record them. 
+The intuition behind free functors is that they generate structure ``freely,'' as in ``with no additional constraints.'' They also do it lazily: instead of performing operations, they just record them. 
 
 The free monoid ``remembers to do the multiplication'' at a later time. It stores the arguments to multiplication in a string, but doesn't perform the multiplication. It's only allowed to simplify its records based on generic monoidal laws. For instance, it doesn't have to store the command to multiply by the unit. It can also ``skip the parentheses'' because of associativity. 
 
@@ -527,7 +536,7 @@ class Monoid m where
   mappend :: m -> m -> m
   mempty  :: m
 \end{haskell}
-Here, \hask{mappend} is the curried form of the mapping from the product \hask{(m, m)} to \hask{m}. The \hask{mempty} element corresponds to the arrow from the terminal object (unit of the monoidal category) to \hask{m}. 
+Here, \hask{mappend} is the curried form of the mapping from the product: \hask{(m, m) -> m}. The \hask{mempty} element corresponds to the arrow from the terminal object (unit of the monoidal category) to \hask{m}. 
 
 A free monoid generated by some type \hask{a} that is treated as a set of generators, is represented by a list type \hask{[a]}. An empty list serves as the unit; and monoid multiplication is implemented as list concatenation, traditionally written in infix form:
 \begin{haskell}
@@ -551,7 +560,7 @@ This function transforms the elements of the list to monoidal values using \hask
 
 It's easy to see that an empty list is mapped to the monoidal unit. It's not too hard to see that a concatenation of two lists is mapped to the monoidal product of the results. So, indeed, \hask{foldMap} produces a monoid morphism. 
 
-Following the intuition of a free monoid being a domain-specific program, \hask{foldMap} provides an \emph{interpreter} for this program. It performs all the multiplications that have been postponed. Note that the same program may be interpreted in many ways, depending on the choice of the concrete monoid and the function \hask{f}.
+Following the intuition of a free monoid being a domain-specific program for multiplying stuff, \hask{foldMap} provides an \emph{interpreter} for this program. It performs all the multiplications that have been postponed. Note that the same program may be interpreted in many different ways, depending on the choice of the concrete monoid and the function \hask{f}.
 
 We'll come back to free monoids as lists in the chapter on algebras.
 
@@ -590,7 +599,7 @@ Adjunctions can be defined purely in terms of functors and natural transformatio
 
 \section{Levels of Abstraction}
 
-Category theory is about structuring knowledge. In particular, it can be applied to the knowledge of category theory itself. Hence we see a lot of mixing of abstraction levels in category theory. The structures that we see at one level can be grouped into higher-level structures which exhibit even higher levels of structure, and so on. 
+Category theory is about structuring our knowledge. In particular, it can be applied to the knowledge of category theory itself. Hence we see a lot of mixing of abstraction levels in category theory. The structures that we see at one level can be grouped into higher-level structures which exhibit even higher levels of structure, and so on. 
 
 In programming we are used to building hierarchies of abstractions. Values are grouped into types, types into kinds. Functions that operate on values are treated differently than functions that operate on types. We often use different syntax to separate levels of abstractions. Not so in category theory.
 

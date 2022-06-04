@@ -30,11 +30,11 @@ We can also strip a category of all arrows (except for the identity arrows). Suc
 
 Sets form their own category called $\mathbf{Set}$\footnote{Again, ignoring ``size'' issues, in particular the non-existence of the set of all sets.}. The objects in that category are sets, and the arrows are functions between sets. Such functions are defined as special kind of relations, which themselves are defined as sets of pairs.
 
-To lowest approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. There's nothing wrong with that. In fact all of categorical construction we've described so far have their set-theoretical roots. The categorical product is a generalization of the cartesian product of sets, the sum is the disjoint union, and so on. 
+To the lowest approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. There's nothing wrong with that. In fact all of categorical construction we've described so far have their set-theoretical roots. The categorical product is a generalization of the cartesian product of sets, the sum is the disjoint union, and so on. 
 
 What category theory offers is more precision: the fine distinction between the structure that is absolutely necessary, and the superfluous details. 
 
-A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Functions must have underlying algorithms because they have to be computable by some physical systems, be it computers or a human brains. 
+A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Our functions must have underlying algorithms because they have to be computable by some physical systems, be it computers or a human brains. 
 
 \subsection{Opposite and product categories}
 In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
@@ -154,7 +154,7 @@ Also, not all object or arrows in the target category must be covered by a funct
 
 A \index{constant functor}\emph{constant functor} $\Delta_c$ is an example of a functor that maps all objects from the source category to a single object $c$ in the target category, and all arrows from the source category to a single identity arrow $id_c$.
 
-In category theory, functors are often used for creating models of one category inside another. The fact that they can merge multiple objects and arrows into one means that they produce simplified views of the source category. They ``abstract'' some aspects of the source category.
+In category theory, functors are often used to create models of one category inside another. The fact that they can merge multiple objects and arrows into one means that they produce simplified views of the source category. They ``abstract'' some aspects of the source category.
 
 The fact that they may only cover parts of the target category means that the models are embedded in a larger environment.
 
@@ -189,7 +189,7 @@ The \hask{Maybe} type constructor maps \hask{a} to \hask{Maybe a}.
 
 The second part of an endofunctor is the mapping of arrows. Given a function \hask{a -> b}, we want to be able to define a function \hask{List a -> List b}, or \hask{Maybe a -> Maybe b}. This is the ``functoriality'' property of these data types that we have discussed before. Functoriality lets us \index{lifting}\emph{lift} an arbitrary function to a function between transformed types.
 
-Functoriality can be expressed in Haskell using a \index{\hask{class}}\emph{typeclass}. In this case, the typeclass is parameterized by a type constructor \hask{f}. We say that \hask{f} is a \hask{Functor} if there is a corresponding mapping of functions called \hask{fmap}:
+Functoriality can be expressed in Haskell using a \index{\hask{class}}\emph{typeclass}. In this case, the typeclass is parameterized by a type constructor \hask{f} (in Haskell we use lower case names for type-constructor variables). We say that \hask{f} is a \hask{Functor} if there is a corresponding mapping of functions called \hask{fmap}:
 \begin{haskell}
 class Functor f where
   fmap :: (a -> b) -> (f a -> f b)
@@ -241,7 +241,7 @@ We have also seen data constructors that take two types as arguments: the produc
 
 Such functors map a pair of objects to an object, and a pair of arrows to an arrow. 
 
-In Haskell, we treat such functors as members of a separate class called a \hask{Bifunctor}.
+In Haskell, we treat such functors as members of a separate class called \hask{Bifunctor}.
 
 \begin{haskell}
 class Bifunctor f where
@@ -287,7 +287,7 @@ instance Contravariant Predicate where
 
 The only non-trivial examples of contravariant functors are variations on the theme of function objects. 
 
-One way to tell if a given function type is covariant or contravariant in one of the types is by assigning polarities to the types used in its definition. We say that the return type is in a \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then its polarities get reversed. 
+One way to tell if a given function type is covariant or contravariant in one of the type arguments is by assigning polarities to the types used in its definition. We say that the return type of a function is in a \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then its polarities get reversed. 
 
 Consider this data type:
 \begin{haskell}
@@ -358,7 +358,7 @@ whose action on an arrow $g' \colon a' \to a$ is written as:
 and is given by pre-composition:
 \[\mathcal{C}(g', b) = (- \circ g') \]
 
-The functor $\mathcal{C}(-, b)$ organizes all the arrows pointing at $b$ into one coherent view. It is the picture of $b$ ``as seen by the world.''
+The functor $\mathcal{C}(-, b)$ organizes all the arrows pointing at $b$ into one coherent view. It is the picture of $b$ ``as it's seen by the world.''
 
 We can now reformulate the results from the chapter on isomorphisms. If two objects $a$ and $b$ are isomorphic, than their hom-sets are also isomorphic. In particular:
 \[\mathcal{C}(a, x) \cong \mathcal{C}(b, x)\]

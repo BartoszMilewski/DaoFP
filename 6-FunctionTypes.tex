@@ -8,7 +8,7 @@ There is another kind of composition that is at the heart of functional programm
 
 If we model functions as arrows between objects, then what does it mean to have a function as an argument? 
 
-We need a way to objectify functions in order to define arrows that have an ``object of arrows'' as a source or as a target. A function that takes a function as an argument or returns a function is called a \emph{higher-order} function.
+We need a way to objectify functions in order to define arrows that have an ``object of arrows'' as a source or as a target. A function that takes a function as an argument or returns a function is called a \emph{higher-order} function. Higher-order functions are the work-horses of functional programming.
 
 \subsection{Elimination rule}
 
@@ -27,16 +27,18 @@ The defining quality of a function is that it can be applied to an argument to p
 \]
 Here $f$ is represented as an arrow from $a$ to $b$, but we would like to be able to replace $f$ with an element of the object of arrows or, as mathematicians call it, the exponential object $b^a$; or as we call it in programming, a function type \hask{a->b}. 
 
-Given an element of $b^a$ and an element of $a$, function application should produce an element of $b$. In other words, given a pair of elements
-\[f \colon 1 \to b^a\]
-\[x \colon 1 \to a\]
-it should produce an element
+Given an element of $b^a$ and an element of $a$, function application should produce an element of $b$. In other words, given a pair of elements:
+\begin{align*}
+f &\colon 1 \to b^a \\
+x &\colon 1 \to a
+\end{align*}
+it should produce an element:
 \[y \colon 1 \to b \]
 
 Keep in mind that, here, $f$ denotes an element of $b^a$. Previously, it was an arrow from $a$ to $b$.
 
 We know that a pair of elements $(f, x)$ is equivalent to an element of the product $b^a \times a$. We can therefore define function application as a single arrow:
-\[\varepsilon_{a, b} \colon b^a \times a \to b\]
+\[\varepsilon_{a b} \colon b^a \times a \to b\]
 This way $y$, the result of the application, is defined by this commuting diagram:
 \[
  \begin{tikzcd}
@@ -45,7 +47,7 @@ This way $y$, the result of the application, is defined by this commuting diagra
  \arrow[rd, "y"]
  \\
  b^a \times a
- \arrow[r, "\varepsilon_{a, b}"']
+ \arrow[r, "\varepsilon_{a b}"']
 & b
  \end{tikzcd}
 \]
@@ -58,12 +60,12 @@ To complete the definition of the function object, we also need the introduction
 
 First, suppose that there is a way of constructing a function object $b^a$ from some other object $c$. It means that there is an arrow
 \[h \colon c \to b^a\]
-We know that we can eliminate the result of $h$ using $\varepsilon_{a, b}$, but we have to first multiply it by $a$. So let's first multiply $c$ by $a$ and the use functoriality to map it to $b^a \times a$. 
+We know that we can eliminate the result of $h$ using $\varepsilon_{a b}$, but we have to first multiply it by $a$. So let's first multiply $c$ by $a$ and the use functoriality to map it to $b^a \times a$. 
 
 Functoriality lets us apply a pair of arrows to a product to get another product. Here, the pair of arrows is $(h, id_a)$ (we want to turn $c$ into $b^a$, but we're not interested in modifying $a$)
 \[ c \times a \xrightarrow{h \times id_a} b^a \times a \]
 We can now follow this with function application to get to $b$
-\[ c \times a \xrightarrow{h \times id_a} b^a \times a \xrightarrow{\varepsilon_{a, b}} b\]
+\[ c \times a \xrightarrow{h \times id_a} b^a \times a \xrightarrow{\varepsilon_{a b}} b\]
 This composite arrow defines a mapping we'll call $f$:
 \[f \colon c \times a \to b\]
 Here's the corresponding diagram
@@ -83,7 +85,7 @@ This commuting diagram tells us that, given an $h$, we can construct an $f$; but
 
 We can use this property, this one-to-one correspondence between two sets of arrows, to define the exponential object. This is the \emph{introduction rule} for the function object. 
 
-We've seen that product was defined using its mapping-in property. Function application, on the other hand, is defined as a \emph{mapping out} of a product. 
+We've seen that product was defined using its mapping-in property. Function application, on the other hand, is defined as a \emph{mapping out} from a product. 
 
 \subsection{Currying}
 
@@ -119,7 +121,7 @@ Of course, written this way, the types of \hask{curry} and \hask{uncurry} corres
  \arrow[rd, "f"]
  \\
  b^a \times a
- \arrow[r, "\varepsilon_{a, b}"']
+ \arrow[r, "\varepsilon_{a b}"']
 & b
  \end{tikzcd}
 \]
@@ -127,7 +129,7 @@ In this case, $h$ is an element of the object $b^a$, and $f$ is an arrow from $1
 
 Therefore, from now on, we'll call an arrow \hask{->} an arrow $\to$, without making much fuss about it. The correct incantation for this kind of phenomenon is to say that the category is self-enriched.
 
-We can write $\varepsilon_{a, b}$ as a Haskell function \hask{apply}:
+We can write $\varepsilon_{a b}$ as a Haskell function \hask{apply}:
 \begin{haskell}
 apply :: (a -> b, a) -> b
 apply (f, x) = f x
@@ -139,7 +141,11 @@ Even though defining function application as a separate function may seem redund
 ($) :: (a -> b) -> a -> b
 f $ x = f x
 \end{haskell}
-The trick, though, is that regular function application binds to the left, e.g., \hask{f x y} is the same as \hask{(f x) y}; but the dollar sign binds to the right, so that \hask{f  $ g x} is the same as \hask{f (g x)}. In the first example, \hask{f} must be a function of (at least) two arguments; in the second, it could be a function of one argument.
+The trick, though, is that regular function application binds to the left, e.g., \hask{f x y} is the same as \hask{(f x) y}; but the dollar sign binds to the right, so that 
+\begin{haskell}
+f  $ g x
+\end{haskell}
+is the same as \hask{f (g x)}. In the first example, \hask{f} must be a function of (at least) two arguments; in the second, it could be a function of one argument.
 
 In Haskell, currying is ubiquitous. A function of two arguments is almost always written as a function returning a function. Because the function arrow \hask{->} binds to the right, there is no need to parenthesize such types. For instance, the pair constructor has the signature:
 \begin{haskell}
@@ -186,7 +192,7 @@ h = \x -> a * x^2 + b * x + c
 
 This is just notation for the result of the one-to-one mapping between arrows: Given an arrow $e$ that represents an expression in the context $\Gamma$, this mapping produces an arrow that we call $\lambda x . e$. In typed lambda calculus, we also specify the type of $x$:
 \[h = \lambda\;  (x \colon a) . \, e\]
-The defining diagram for the function object becomes
+The defining diagram for the function object becomes:
 \[
  \begin{tikzcd}
  \Gamma \times a
@@ -201,7 +207,7 @@ The defining diagram for the function object becomes
 
 The environment $\Gamma$ that provides free parameters for the expression $e$ is a product of multiple objects representing the types of the parameters (in our example, it was $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$). An empty environment is represented by the terminal object, the unit of the product. In the latter case, $h$ simply picks an element from the function object. 
 
-It's important to keep in mind that, in general, a function object represents functions that depend on external parameters. Such functions are called \index{closure}\emph{closures}. Closures are functions that capture values from their environment.
+It's important to keep in mind that in general a function object represents functions that depend on external parameters. Such functions are called \index{closure}\emph{closures}. Closures are functions that capture values from their environment.
 
 Here's an example of a function returning a closure (for simplicity, we use \hask{Double} for all types)
 \begin{haskell}
@@ -217,7 +223,7 @@ quadratic a b c x = a * x^2 + b * x + c
 
 \subsection{Modus ponens}
 
-In logic, the function object corresponds to an implication. An arrow from the terminal object to the function object is the proof of an implication. Function application $\varepsilon$ corresponds to what logicians call \emph{modus ponens}: if you have a proof of the implication $A \Rightarrow B$ and a proof of $A$ then this constitutes the proof of $B$.
+In logic, the function object corresponds to an implication. An arrow from the terminal object to the function object is the proof of that implication. Function application $\varepsilon$ corresponds to what logicians call \emph{modus ponens}: if you have a proof of the implication $A \Rightarrow B$ and a proof of $A$ then this constitutes the proof of $B$.
 
 \section{Sum and Product Revisited}
 
@@ -398,9 +404,11 @@ If we find such a $g$, it will uniquely define our $k$.
 
 The way to think about this problem is to consider how we would implement $g$. It takes the product $b^a \times a'$ as its argument. Think of it as a pair: an element of the function object from $a$ to $b$ and an element of $a'$. The only thing we can do with the function object is to apply it to something. But $b^a$ requires an argument of type $a$, and all we have at our disposal is $a'$. We can't do anything unless somebody gives us an arrow $a' \to a$. This arrow applied to $a'$ will generate the argument for $b^a$. However, the result of the application is of type $b$, and $g$ is supposed to produce a $b'$. Again, we'll request an arrow $b \to b'$ to complete our assignment. 
 
-This may sound complicated, but the bottom line is that we require two arrows between the primed and non-primed objects. The twist is that the first arrow goes from $a'$ to $a$, which feels backward from the usual. In order to map $b^a$ to $b'^{a'}$ we are asking for a pair of arrows
-\[f \colon a' \to a\]
-\[g \colon b \to b' \]
+This may sound complicated, but the bottom line is that we require two arrows between the primed and non-primed objects. The twist is that the first arrow goes from $a'$ to $a$, which feels backward from the usual. In order to map $b^a$ to $b'^{a'}$ we need a pair of arrows:
+\begin{align*}
+f &\colon a' \to a \\
+g &\colon b \to b' 
+\end{align*}
 
 This is somewhat easier to explain in Haskell. Our goal is to implement a function \hask{a' -> b'}, given a function \hask{h :: a -> b}. 
 
@@ -433,8 +441,10 @@ The left to right mapping is easy to construct, since it's simultaneously a mapp
 dist :: Either (b, a) (c, a) -> (Either b c, a)
 \end{haskell}
 A mapping out of the sum on the left is given by a pair of arrows:
-\[f \colon b\times a \to (b + c) \times a \]
-\[g \colon c\times a \to (b + c) \times a \]
+\begin{align*}
+f &\colon b\times a \to (b + c) \times a \\
+g &\colon c\times a \to (b + c) \times a 
+\end{align*}
 We write it in Haskell as:
 \begin{haskell}
 dist = either f g
@@ -445,17 +455,21 @@ dist = either f g
 The \index{\hask{where}}\hask{where} clause is used to introduce the definitions of sub-functions.
 
 Now we need to implement $f$ and $g$. They are mappings into the product, so each of them is equivalent to a pair of arrows. For instance, the first one is given by the pair:
-\[f' \colon b \times a \to (b + c)\]
-\[f'' \colon b \times a \to  a\]
+\begin{align*}
+f' &\colon b \times a \to (b + c) \\
+f'' &\colon b \times a \to  a
+\end{align*}
 In Haskell:
 \begin{haskell}
     f = f' &&& f''
     f'  :: (b, a) -> Either b c
     f'' :: (b, a) -> a
 \end{haskell}
-The first arrow can be implemented by projecting the first component $b$ and then using $\text{Left}$ to construct the sum. The second is just the projection $\text{snd}$.
-\[ f' = \text{Left} \circ \text{fst} \]
-\[ f'' = \text{snd} \]
+The first arrow can be implemented by projecting the first component $b$ and then using $\text{Left}$ to construct the sum. The second is just the projection $\text{snd}$:
+\begin{align*}
+ f' &= \text{Left} \circ \text{fst} \\
+ f'' &= \text{snd}
+\end{align*}
 Combining all these together, we get:
 \begin{haskell}
 dist = either f g
@@ -480,13 +494,14 @@ They can also be inlined to produce this terse form:
 \begin{haskell}
 dist = either ((Left . fst) &&& snd) ((Right . fst) &&& snd)
 \end{haskell}
+
 This style of programming is called \emph{point free} because it omits the arguments (points). For readability reasons, Haskell programmers prefer a more explicit style. The above function would normally be implemented as:
 \begin{haskell}
-dist (Left  (b, a)) = (Left b, a)
+dist (Left  (b, a)) = (Left  b, a)
 dist (Right (c, a)) = (Right c, a)
 \end{haskell}
 
-Notice that we have only used the definitions of sum and product. The other direction of the isomorphism requires the use of the exponential, so it's only valid in a bicartesian \emph{closed} category. This is not immediately clear from the straightforward Haskell implementation:
+Notice that we have only used the definitions of sums and products. The other direction of the isomorphism requires the use of the exponential, so it's only valid in a bicartesian \emph{closed} category. This is not immediately clear from the straightforward Haskell implementation:
 \begin{haskell}
 undist :: (Either b c, a) -> Either (b, a) (c, a)
 undist (Left b, a)  = Left (b, a)
@@ -500,7 +515,7 @@ undist = uncurry (either (curry Left) (curry Right))
 \end{haskell}
 This may not be the most readable implementation, but it underscores the fact that we need the exponential: we use both \hask{curry} and \hask{uncurry} to implement the mapping.
 
-We'll come back to this identity when we are equipped with more powerful tools: adjunctions.
+We'll come back to this identity later, when we are equipped with more powerful tools: adjunctions.
 
 \begin{exercise}
 Show that:
