@@ -28,7 +28,7 @@ From type-theory point of view, we've been able to define recursive types, such 
 
 There are two orthogonal concerns when it comes to recursive data structures. One is the machinery of recursion. The other is the pluggable components to be used by recursion. 
 
-We know how to work recursion: We assume that we know how to construct small trees. Then we use the recursive step to plant those trees into nodes to make bigger trees. 
+We know how to work recursion: We assume that we know how to construct small trees. We then use the recursive step to plant those trees into nodes to make bigger trees. 
 
 Category theory tells us how to formalize this imprecise description.
 
@@ -110,7 +110,7 @@ Given an endofunctor $F$, an \emph{algebra morphism} between two algebras $(a, \
 In other words, the following equation must hold:
 \[f \circ \alpha = \beta \circ F f \]
 
-The composition of two algebra morphisms is again an algebra morphism, which can be seen by pasting together two such diagrams. The identity arrow is also an algebra morphism, because 
+The composition of two algebra morphisms is again an algebra morphism, which can be seen by pasting together two such diagrams (a functor maps composition to composition). The identity arrow is also an algebra morphism, because 
 \[ id_a \circ \alpha = \alpha \circ F (id_a) \]
 (a functor maps identity to identity).
 
@@ -122,7 +122,7 @@ Show that \hask{show} is not an algebra morphism. Hint: Consider what happens to
 
 \subsection{Initial algebra}
 
-The initial object in the category of algebras is called the \emph{initial algebra} and, as we'll see, it plays a very important role.
+The initial object in the category of algebras for a given functor $F$ is called the \emph{initial algebra} and, as we'll see, it plays a very important role.
 
 By definition, the initial algebra $(i, \iota)$ has a unique algebra morphism $f$ from it to any other algebra $(a, \alpha)$. Diagrammatically:
 
@@ -169,7 +169,7 @@ Lambek's lemma says that the structure map $\iota$ of the initial algebra is an 
 
 The reason for it is the self-similarity of algebras. You can lift any algebra $(a, \alpha)$ using $F$, and the result $(F a, F \alpha)$ is also an algebra with the structure map $F \alpha \colon F (F a) \to F a$. 
 
-In particular, if you lift the initial algebra $(i, \iota)$, you get an algebra with the carrier $F i$ and the structure map $F \iota \colon F (F i) \to F i$. It follows then that there must be a unique algebra morphism from the initial algebra to it:
+In particular, if you lift the initial algebra $(i, \iota)$, you get a new algebra with the carrier $F i$ and the structure map $F \iota \colon F (F i) \to F i$. It follows then that there must be a unique algebra morphism from the initial algebra to it:
 \[
  \begin{tikzcd}
  F i 
@@ -217,11 +217,11 @@ We interpret this identity as stating that $i$ is a fixed point of $F$ (up to is
 There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. The least fixed point of an endofunctor $F$ is denoted $\mu F$, so we have:
 \[ i = \mu F \]
 \subsection{Fixed point in Haskell}
-Let's consider how the definition of the fixed point works with our original example:
+Let's consider how the definition of the fixed point works with our original example given by the endofunctor:
 \begin{haskell}
 data ExprF x = ValF Int | PlusF x x
 \end{haskell}
-Its fixed point is a data structure defined by the property that \hask{ExprF} acting on it reproduces it. If we call this data structure \hask{Expr}, the fixed point equation becomes  (in pseudo-Haskell):
+Its fixed point is a data structure defined by the property that \hask{ExprF} acting on it reproduces it. If we call this fixed point \hask{Expr}, the fixed point equation becomes  (in pseudo-Haskell):
 \begin{haskell}
 Expr = ExprF Expr
 \end{haskell}
@@ -313,13 +313,22 @@ cata :: Functor f => Algebra f a -> Fix f -> a
 cata alg = alg . fmap (cata alg) . out
 \end{haskell}
 
-Here's what's happening: \hask{cata alg} is applied to some \hask{Fix f}. Every \hask{Fix f} is obtained by applying \hask{In} to a functorful of \hask{Fix f}. The function \hask{out} ``strips'' this data constructor. 
+Here's what's happening: We apply this definition to some \hask{Fix f}. Every \hask{Fix f} is obtained by applying \hask{In} to a functorful of \hask{Fix f}:
+\begin{haskell}
+data Fix f where
+  In :: f (Fix f) -> Fix f
+\end{haskell}
+The function \hask{out} ``strips'' the data constructor \hask{In}:
+\begin{haskell}
+out :: Fix f -> f (Fix f)
+out (In x) = x
+\end{haskell}
 
-We can evaluate the functorful of \hask{Fix f} by \hask{fmap}'ing \hask{cata alg} over it. This is a recursive application. The idea is that the trees inside the functor are smaller than the original tree, so the recursion eventually terminates. It terminates when it hits the leaves. 
+We can now evaluate the functorful of \hask{Fix f} by \hask{fmap}'ing \hask{cata alg} over it. This is a recursive application. The idea is that the trees inside the functor are smaller than the original tree, so the recursion eventually terminates. It terminates when it hits the leaves. 
 
 After this step, we are left with a functorful of values, and we apply the evaluator \hask{alg} to it, to get the final result.
 
-The power of this approach is that all the recursion is encapsulated in one data type and one library function: We have the definition of \hask{Fix} and the catamorphism. The client of the library has only to provide the \emph{non-recursive} pieces: the functor and the algebra. These are much easier to deal with.
+The power of this approach is that all the recursion is encapsulated in one data type and one library function: We have the definition of \hask{Fix} and the catamorphism \hask{cata}. The client of the library provides only the \emph{non-recursive} pieces: the functor and the algebra. These are much easier to deal with. We have decomposed a complex problem into simpler components.
 
 \subsection{Examples}
 
@@ -375,7 +384,7 @@ The mapping out of \hask{Maybe} is determined by two things: the value correspon
 
 \subsection{Lists as initial algebras}
 
-The list type that we've seen previously is equivalent to a fixed point of the following functor:
+The list type that we've seen previously is equivalent to a fixed point of the following functor, which is parameterized by the type of the list contents \hask{a}:
 \begin{haskell}
 data ListF a x = NilF | ConsF a x
 \end{haskell}
@@ -406,7 +415,9 @@ revAlg :: Algebra (ListF a) ([a]->[a])
 revAlg NilF = id
 revAlg (ConsF a f) = \as -> f (a : as)
 \end{haskell}
-At each step, this algebra creates a function that will apply the previous function \hask{f} to the result of prepending the current element \hask{a} to its argument. It's this element that's remembered by the closure. The catamorphism for this algebra accumulates a queue of such closures. To reverse a list, we apply the result of the catamorphism for this algebra to an empty list:
+At each step, this algebra creates a new function. This function, when executed, will apply the previous function \hask{f} to a list. The list is the result of prepending the current element \hask{a} to the function's argument \hask{as}. The resulting closure remembers the current element \hask{a} and the previous function \hask{f}.
+
+The catamorphism for this algebra accumulates a queue of such closures. To reverse a list, we apply the result of the catamorphism for this algebra to the empty list:
 \begin{haskell}
 reverse :: Fix (ListF a) -> [a]
 reverse as = (cata revAlg as) []
@@ -435,7 +446,7 @@ L_a &\cong I / (I - a)
 \\
 L_a &\cong I + a + a \otimes a + a \otimes a \otimes a + ...
 \end{align*}
-where the last step uses the formula for the sum of geometric series. Admittedly, the intermediate steps make no sense, since there is no subtraction or division defined on objects, yet the final result make sense, and it may be made rigorous by considering a colimit of a chain of objects.
+where the last step uses the formula for the sum of the geometric series. Admittedly, the intermediate steps make no sense, since there is no subtraction or division defined on objects, yet the final result make sense and, as we'll see later, it may be made rigorous by considering a colimit of a chain of objects.
 
 \section{Initial Algebra from Universality}
 
@@ -473,6 +484,8 @@ In fact, these two functions, \hask{cata'} and \hask{uncata}, are the inverse of
 \begin{haskell}
 data Mu f = Mu (forall a. Algebra f a -> a)
 \end{haskell}
+We can now substitute \hask{Mu f} everywhere we used  \hask{Fix f}.
+
 Folding over \hask{Mu f} is easy, since \hask{Mu} carries in itself its own set of catamorphisms:
 \begin{haskell}
 cataMu :: Algebra f a -> (Mu f -> a)
@@ -502,9 +515,9 @@ Write a test that takes a list of integers, converts it to the \hask{Mu} form, a
 
 \section{Initial Algebra as a Colimit}
 
-In general, there is no guarantee that the initial object in the category of algebras exists. But if it exists, Lambek's lemma tells us that it's a fixed point of the endofunctor for these algebras.  The construction of this fixed point is a little mysterious, since it involves tying the recursive knot. 
+In general, there is no guarantee that the initial object in the category of algebras exists. But if it exists, Lambek's lemma tells us that it's a fixed point of the endofunctor for those algebras.  The construction of this fixed point is a little mysterious, since it involves tying the recursive knot. 
 
-Loosely speaking, the fixed point is reached after we apply the functor infinitely many times. Then, applying it once more wouldn't change anything. This idea can be made precise, if we take it one step at a time. For simplicity, let's consider algebras in the category of sets, which has all the nice properties.
+Loosely speaking, the fixed point is reached after we apply the functor infinitely many times. Then, applying it once more wouldn't change anything. Infinity plus one is still infinity. This idea can be made precise, if we take it one step at a time. For simplicity, let's consider algebras in the category of sets, which has all the nice properties.
 
 We've seen, in our examples, that building instances of recursive data structures always starts with the leaves. The leaves are the parts in the definition of the functor that don't depend on the type parameter: the \hask{NilF} of the list, the \hask{ValF} of the tree, the \hask{Nothing} of the \hask{Maybe}, etc. 
 
@@ -529,7 +542,7 @@ m2' = Just Nothing
 
 We can continue this process, adding deeper and deeper trees at each step. In the $n$-th iteration, the type $F^n 0$ ($n$-fold application of $F$ to the initial object) describes all trees of depth up to $n$. However, for every $n$, there are still infinitely many trees of depth greater than $n$ that are not covered. 
 
-If we knew how to define $F^{\infty} 0$, it would cover all possible trees. The next best thing we could try is to gather all these partial trees into one infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. 
+If we knew how to define $F^{\infty} 0$, we would cover all possible trees. The next best thing we could try is to add up all these partial trees and construct an infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. 
 
 An infinite sum (a coproduct):
 $$ \coprod_{n = 0}^{\infty} F^n 0$$
@@ -555,7 +568,7 @@ It has the universal mapping-out property, just like the sum of two types, only 
 
 To construct a tree of depth $n$, we would first select it from $F^n 0$ and use the $n$-th constructor $i_n$ to inject it into the sum. 
 
-There is only one problem: the same tree shape can also be constructed using any of the $F^m 0$, with $m > n$. 
+There is just one problem: the same tree shape can also be constructed using any of the $F^m 0$, for $m > n$. 
 
 Indeed, we've seen the leaf \hask{Nothing} appear in \hask{Maybe Void} and \hask{Maybe(Maybe Void)}. In fact it shows up in any nonzero power of \hask{Maybe} acting on \hask{Void}. 
 
@@ -563,7 +576,8 @@ Similarly, \hask{Just Nothing} shows up in all powers starting with two.
 
 \hask{Just(Just(Nothing))} shows up in all powers starting with three, and so on...
 
-But there is a way to get rid of all these duplicates. The trick is to replace the sum by the colimit. Instead of a diagram consisting of discrete objects, we can construct a chain. Let's call this chain $\Gamma$, and its colimit $i = Colim \, \Gamma$.
+But there is a way to get rid of all these duplicates. The trick is to replace the sum by a colimit. Instead of a diagram consisting of discrete objects, we can construct a chain. Let's call this chain $\Gamma$, and its colimit $i$:
+\[i = \text{Colim} \, \Gamma \]
 
 \[
  \begin{tikzcd}
@@ -613,19 +627,19 @@ The same shape of a tree is also found in $F^{n+1} 0$, as the composite $t' = F^
 
 This time, however, we have the commuting triangle as the face of the cocone:
 \[i_{n+1} \circ F^n (\mbox{!`}) = i_n \]
-which means that 
+which means that:
 \[ i_{n+1} \circ t' =  i_{n+1} \circ F^n (\mbox{!`}) \circ t =  i_n \circ t\]
 The two copies of the tree have been identified in the colimit. You can convince yourself that this procedure removes all duplicates.
 
-We can  prove directly that $i = Colim\, \Gamma$ is the initial algebra. There is however one assumption that we have to make: the functor $F$ must preserve the colimit. The colimit of $F \Gamma$ must be equal to $F i$.
+We can  prove directly that $i = \text{Colim}\, \Gamma$ is the initial algebra. There is however one assumption that we have to make: the functor $F$ must preserve the colimit. The colimit of $F \Gamma$ must be equal to $F i$.
 \[ \text{Colim} (F \Gamma) \cong F i \]
 Fortunately, this assumption holds in $\mathbf{Set}$. 
 
 Here's the sketch of the proof: First we'll construct an arrow $i \to F i$ and then an arrow in the opposite direction. We'll skip the proof that they are the inverse of each other.
 
-We start with the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $Colim (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $Colim F \Gamma$. And the latter, by our assumption, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
+We start with the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $\text{Colim} (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $\text{Colim} (F \Gamma)$. And the latter, by our assumption, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
 
-To construct this cocone, notice that $Colim (F \Gamma$) is, by definition, the apex of a cocone $F \Gamma$. 
+To construct this cocone, notice that $\text{Colim} (F \Gamma$) is, by definition, the apex of a cocone $F \Gamma$. 
 
 \[
  \begin{tikzcd}
@@ -646,7 +660,7 @@ To construct this cocone, notice that $Colim (F \Gamma$) is, by definition, the 
  & ...
  \\
  \\
- &&Colim (F \Gamma)
+ &&\text{Colim} (F \Gamma)
   \end{tikzcd}
 \]
 The diagram $F \Gamma$ is the same as $\Gamma$, except that it's missing the naked initial object at the start of the chain.
@@ -687,10 +701,10 @@ The spokes of the cocone we are looking for are marked in red in the diagram bel
  & ...
  \\
  \\
- &&Colim (F \Gamma)
+ &&\text{Colim} (F \Gamma)
   \end{tikzcd}
 \]
-And since $i = Colim \Gamma$ is the apex of the universal cocone based on $\Gamma$, there must be a unique mapping out of it to $Colim (F \Gamma)$ which, as we said, was equal to $F i$:
+Since $i = \text{Colim} \Gamma$ is the apex of the universal cocone based on $\Gamma$, there must be a unique mapping out of it to $\text{Colim} (F \Gamma)$ which, as we said, was equal to $F i$:
 \[ i \to F i \]
 
 Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be embedded in it. It means that we can construct a cocone from $F \Gamma$ to the apex $i$ by going through (a sub-chain of) $\Gamma$. 
@@ -732,8 +746,8 @@ Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be 
 \]
 
 
-From the universality of $Colim (F \Gamma)$ it follows that there is a mapping out 
-\[Colim (F \Gamma) \cong F i \to i \]
+From the universality of $\text{Colim} (F \Gamma)$ it follows that there is a mapping out 
+\[\text{Colim} (F \Gamma) \cong F i \to i \]
 This shows that $i$ is a carrier of an algebra. In fact, it can be shown that the two mappings are the inverse of each other, as we would expect from the Lambek's lemma.
 
 To show that this is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(a, \alpha \colon F a \to a)$. Again, we can use universality, if we can construct a cocone from $\Gamma$ to $a$. 
@@ -762,14 +776,14 @@ To show that this is indeed the initial algebra, we have to construct a mapping 
 \]
 
 
-The zero'th spoke of this cocone goes from $0$ to $a$, so it's just $f_0 = \mbox{!`}$.
+The zeroth spoke of this cocone goes from $0$ to $a$, so it's just $f_0 = \mbox{!`}$.
 
-The first one, $F 0 \to a$, is $f_1 = \alpha \circ F f_0$, because $F f_0 \colon F 0 \to F a$.
+The first spoke, $F 0 \to a$, is $f_1 = \alpha \circ F f_0$, because $F f_0 \colon F 0 \to F a$ and $\alpha \colon F a \to a$.
 
-The third one, $F (F 0) \to a$ is  $f_2 = \alpha \circ F f_1$.  And so on...
+The third spoke, $F (F 0) \to a$ is  $f_2 = \alpha \circ F f_1$.  And so on...
 
 The unique mapping from $i$ to $a$ is then our catamorphism. With some more diagram chasing, it can be shown that it's indeed an algebra morphism. 
 
-Notice that this construction only works if we can ``prime'' the process by creating the leaves of the functor. If, on the other hand, $F 0 \cong 0$, then there are no leaves, and all further iterations will just reproduce the $0$. 
+Notice that this construction only works if we can ``prime'' the process by creating the leaves of the functor. If, on the other hand, $F 0 \cong 0$, then there are no leaves, and all further iterations will keep reproducing $0$. 
 
 \end{document}

@@ -10,6 +10,8 @@ Categorically, such types are modeled as functors \footnote{A type constructor t
 
 A natural generalization of this idea is to have types that are parameterized by values. For instance, it's often advantageous to encode the length of a list in its type. A list of length zero would have a different type than a list of length one, and so on. 
 
+Obviously, you cannot change the length of such a list, since it would change its type. This is not a problem in functional programming, where all data types are immutable anyway. When you prepend an element to a list, you create a new list, at least conceptually. With a length-encoded list, this new list is of a different type, that's all!
+
 Types parameterized by values are called \emph{dependent types}. There are languages like Idris or Agda that have full support for dependent types. It's also possible to implement dependent types in Haskell, but support for them is still rather patchy. 
 
 The reason for using dependent types in programming is to make programs provably correct. In order to do that, the compiler must be able to check the assumptions made by the programmer. 
@@ -96,7 +98,7 @@ The easiest way to visualize dependent types is to think of them as families of 
 The zeroth type would be the unit type \hask{()} representing an empty vector. The type corresponding to \hask{(S Z)} would be \hask{a}; then we'd have a pair \hask{(a, a)}, a triple \hask{(a, a, a)} and so on, with higher and higher powers of \hask{a}.
 
 If we want to talk about the whole family as one big set, we can take the sum of all these types. For instance, the sum of all powers of $a$ is the familiar list type, a.k.a, a free monoid:
-\[ \mathit{List} (a) = \coprod_{n:\mathbb{N}} a^n \]
+\[ \mathit{List} (a) = 1 + a + a \times a + a \times a \times a + ... =  \coprod_{n:\mathbb{N}} a^n \]
 
 \subsection{Fibrations}
 
@@ -223,9 +225,11 @@ a
 
 In particular, if the category $\mathcal{C}$ has a terminal object $1$, then the coslice $1 / \mathcal{C}$ has, as objects, global elements of all objects of $\mathcal{C}$. 
 
-There is a forgetful functor $U \colon 1 / \mathcal{C} \to \mathcal{C}$ that maps $\langle a, i \rangle$ to $a$. This functor defines a fibration of $1 / \mathcal{C}$. Objects in the fiber over some $a$ are in one-to-one correspondence with global elements of $a$. 
+There is a forgetful functor $U \colon 1 / \mathcal{C} \to \mathcal{C}$ that maps $\langle a, i \rangle$ to $a$. This functor defines a fibration of $1 / \mathcal{C}$ with the base $\cat C$. Objects in the fiber over some $a$ are in one-to-one correspondence with global elements of $a$. 
 
-\[
+Morphisms of $1/  \mathcal{C}$ that correspond to arrows $f \colon a \to b$ map the set of global elements of $a$ to the set of global elements of $b$.
+
+ \[
  \begin{tikzcd}
 & 1
  \arrow[rd, "y"]
@@ -236,7 +240,7 @@ a
 && b
   \end{tikzcd}
 \]
-Morphisms of $1/  \mathcal{C}$ that correspond to arrows $f \colon a \to b$ map the set of global elements of $a$ to the set of global elements of $b$. Thus this fibration justifies our intuition of types as sets of values, with values represented by global elements of types. 
+Thus this fibration justifies our intuition of types as sets of values, with values represented by global elements of types. 
 
 \subsection{Pullbacks}
 
@@ -246,7 +250,7 @@ Like with every equality we may want to replace one or more of its components wi
 
  Let's start with a particular fibration $p \colon E \to B$ and ask ourselves the question: what happens when we change the base from $B$ to some $A$ that is related to it through a mapping $f \colon A \to B$. Can we ``pull the fibers back'' along $f$? 
  
- Again, let's think about sets first. Imagine picking a fiber in $E$ over some point $y \in B$ that is in the image of $f$. We can plant this fiber over all points in $A$ that are in the inverse image $f^{-1} y$. If multiple points in $A$ are mapped to the same point in $B$, we just duplicate the corresponding fiber. This way, every point in $A$ will have a fiber sticking out of it. The sum of all these fibers will form a new bundle $E'$.
+ Again, let's think about sets first. Imagine picking a fiber in $E$ over some point $y \in B$ that is in the image of $f$. If $f$ were invertible, there would be an element $x = f^{-1} y$. We'd plant our fiber over it. In general, though, $f$ is not invertible. It means that there could be more elements of $A$ that are mapped to our $y$. In the picture below you see two such elements, $x_1$ and $x_2$. We'll just duplicate the fiber above $y$ and plant it over all elements that map to $y$. This way, every point in $A$ will have a fiber sticking out of it. The sum of all these fibers will form a new bundle $E'$.
  
 
 \[
@@ -331,7 +335,12 @@ A \index{pullback}pullback of $p \colon e \to b$ along $f \colon a \to b$ is an 
 and that satisfies the universal condition. 
 
 
-The universal condition says that, for any other candidate object $x$ with two arrows $q' \colon x \to e$ and $q \colon x \to a$ such that $p \circ q' = f \circ q$, there is a unique arrow $h \colon x \to e'$ that makes the two triangles commute:
+The universal condition says that, for any other candidate object $x$ with two arrows $q' \colon x \to e$ and $q \colon x \to a$ such that $p \circ q' = f \circ q$ (making the bigger ``square'' commute), there is a unique arrow $h \colon x \to e'$ that makes the two triangles commute, that is:
+\begin{align*}
+q &= p' \circ h \\
+q' &= g \circ h
+\end{align*}
+Pictorially:
 \[
  \begin{tikzcd}
  x
@@ -351,50 +360,50 @@ The universal condition says that, for any other candidate object $x$ with two a
  &b
   \end{tikzcd}
 \]
-The angle symbol in the corner of the square is used to mark pullbacks.
+The angle symbol in the upper corner of the square is used to mark pullbacks.
 
-If we look at the pullback through the prism of sets and fibrations, $E$ is a bundle over $B$, and we are constructing a new bundle $E'$ out of the fibers taken from $E$. Where we plant these fibers over $A$ is determined by (the inverse image of) $f$. This procedure makes $E'$ a bundle over both $A$ and $B$, the latter with the projection $p \circ g = f \circ p'$. 
+If we look at the pullback through the prism of sets and fibrations, $e$ is a bundle over $b$, and we are constructing a new bundle $e'$ out of the fibers taken from $e$. Where we plant these fibers over $a$ is determined by (the inverse image of) $f$. This procedure makes $e'$ a bundle over both $a$ and $b$, the latter with the projection $p \circ g = f \circ p'$. 
 
-$X$ in this picture is some other bundle over $A$ with the projection $q$. It is simultaneously a bundle over $B$ with the projection $f \circ q = p \circ q'$. The unique mapping $h$ maps the fibers of $X$ given by $q^{-1}$ to fibers of $E'$ given by $p'$. 
+The $x$ in this picture is some other bundle over $a$ with the projection $q$. It is simultaneously a bundle over $b$ with the projection $f \circ q = p \circ q'$. The unique mapping $h$ maps the fibers of $x$ given by $q^{-1}$ to fibers of $e'$ given by $p'$. 
 
-All mappings in this picture work on fibers. Some of them rearrange fibers over new bases---that's what a pullback does. This is analogous to what natural transformations do to containers. Others modify individual fibers---the mapping $h \colon X \to E'$ works like this. This is analogous to what \hask{fmap} does to containers. The universal condition then tells us that $q'$ can be factored into a transformation of fibers $h$, followed by the rearrangement of fibers $g$.
+All mappings in this picture work on fibers. Some of them rearrange fibers over new bases---that's what a pullback does. (This is analogous to what natural transformations do to containers.) Others modify individual fibers---the mapping $h \colon X \to E'$ works like this. (This is analogous to what \hask{fmap} does to containers.) The universal condition then tells us that $q'$ can be factored into a transformation of fibers $h$, followed by the rearrangement of fibers $g$.
 
-It's worth noting that picking the singleton set as the pullback target gives us automatically the definition of the cartesian product:
+It's worth noting that picking the terminal object or the singleton set as the pullback target gives us automatically the definition of the cartesian product:
 \[
  \begin{tikzcd}
- B \times F
+ b \times e
  \arrow[d, "\pi_1"']
  \arrow[r, "\pi_2"]
 \arrow[dr, phantom,  , very near start, "\lrcorner"]
- & F
+ & e
  \arrow[d, "!"]
  \\
- B
+ b
  \arrow[r, "!"]
  &
  1
   \end{tikzcd}
 \]
 
-Alternatively, we can think of this picture as planting as many copies of $F$ as there are elements in $B$. We'll use this analogy when we talk about the dependent sum and product.
+Alternatively, we can think of this picture as planting as many copies of $e$ as there are elements in $b$. We'll use this analogy when we talk about the dependent sum and product.
 
-Conversely, a single fiber can be extracted from a fibration by pulling it back to the terminal object. In this case the mapping $x \colon 1 \to B$ picks an element of the base, and the pullback along it extracts a single fiber $F$:
+Conversely, a single fiber can be extracted from a fibration by pulling it back to the terminal object. In this case the mapping $x \colon 1 \to b$ picks an element of the base, and the pullback along it extracts a single fiber $\varphi$:
 \[
  \begin{tikzcd}
- F
+ \varphi
  \arrow[d, "!"']
  \arrow[r, "g"]
 \arrow[dr, phantom,  , very near start, "\lrcorner"]
- & E
+ & e
  \arrow[d, "p"]
  \\
  1
  \arrow[r, "x"]
  &
- B
+ b
   \end{tikzcd}
 \]
-The arrow $g$ injects this fiber back into $E$. By varying $x$ we can pick different fibers in $E$.
+The arrow $g$ injects this fiber back into $e$. By varying $x$ we can pick different fibers in $e$.
 
 \begin{exercise}
 Show that the pullback with the terminal object as the target is the product.
@@ -434,7 +443,7 @@ Notice that the functor $f^*$ goes in the opposite direction to the arrow $f$.
 
 To visualize the base-change functor let's consider how it works on sets. We have the intuition that the fibration $p$ decomposes the set $E$ into fibers over each point of $A$. 
 
-But here we have another fibration $f$ that similarly decomposes $B$. Let's call these fibers in $B$ ``patches.'' For instance, if $A$ is just a two-element set, then the fibration given by $f$ splits $B$ into two patches. The pullback takes a fiber from $E$ and plants it over the whole patch in $B$. The resulting set $f^*E$ looks like a patchwork, where each patch is planted with clones of a fiber from $E$.
+We can think of $f$ as another fibration that similarly decomposes $B$. Let's call these fibers in $B$ ``patches.'' For instance, if $A$ is just a two-element set, then the fibration given by $f$ splits $B$ into two patches. The pullback takes a fiber from $E$ and plants it over the whole patch in $B$. The resulting set $f^*E$ looks like a patchwork, where each patch is planted with clones of a single fiber from $E$.
 
 
 \[
@@ -486,11 +495,11 @@ In particular, if $A$ is a singleton set (the terminal object), then we have onl
 
 A non-trivial bundle is not a product, but it can be \emph{locally} decomposed into products. Just as $B$ is a sum of patches, so $f^*E$ is a sum of products of these patches and the corresponding fibers of $E$.
 
-As we'll see soon, in a locally cartesian closed category, the base change functor has both the left and the right adjoints. The left adjoint is called the dependent sum, and the right adjoint is called the dependent product (or dependent function).
+As we'll see soon, in a locally cartesian closed category, the base change functor has both the left and the right adjoints. The left adjoint is called the dependent sum, and the right adjoint is called the dependent product or dependent function.
 
 \section{Dependent Sum}
 
-In type theory, the dependent sum, or the sigma type $\Sigma_{x : B} T(x)$, is defined as a type of pairs in which the type of the second component depends on the value of the first component. Our counted vector type can be thought of as a dependent sum. An element of this type is a natural number \hask{n} paired with an n-tuple of values \hask{(x_1, x_2, ... x_n)} of the type \hask{(a, a, ... a)}.
+In type theory, the dependent sum, or the sigma type $\Sigma_{x : B} T(x)$, is defined as a type of pairs in which the \emph{type} of the second component depends on the \emph{value} of the first component. Our counted vector type can be thought of as a dependent sum. An element of this type is a natural number \hask{n} paired with an n-tuple of values \hask{(x_1, x_2, ... x_n)} of the type \hask{(a, a, ... a)}.
 
 The introduction rule for the dependent sum assumes that there is a family of types $T(x)$ indexed by elements of the base type $B$. Then an element of $\Sigma_{x : B} T(x)$ is constructed from a pair of elements $x \colon B$ and $y \colon T(x)$. 
 
@@ -597,7 +606,7 @@ For comparison, this is the definition of a coproduct of two fibers, with $S = F
 
 Seen in this light, a dependent sum is just a sum of many fibers. In $\mathbf{Set}$ it's a tagged union. Each individual set is a fiber of $S$ under $q$. 
 
-We can generalize our diagram by replacing the terminal object with an arbitrary base $A$. We now have a fibration $\langle F, p \rangle$, and we get the pullback square that defines the base-change functor $f^*$:
+We can generalize our diagram by replacing the terminal object with an arbitrary base $A$ (an atlas). We now have a fibration $\langle F, p \rangle$, and we get the pullback square that defines the base-change functor $f^*$:
 \[
  \begin{tikzcd}
  S
@@ -645,7 +654,7 @@ In type theory, the dependent product, or dependent function, or pi-type $\Pi_{x
 It's called a function, because you can evaluate it. Given a dependent function  $f \colon \Pi_{x:B} T(x)$, you may apply it to an argument $x\colon B$ to get a value $f(x) \colon T(x)$.
 
 \subsection{Dependent product in Haskell}
-A simple example is a function that constructs a vector of a given size and fills it with copies of a given value:
+A simple example of a dependent product is a function that constructs a vector of a given size and fills it with copies of a given value:
 \begin{haskell}
 replicateV :: a -> SNat n -> Vec n a
 replicateV _ SZ  = VNil
@@ -662,9 +671,9 @@ data SNat n where
 \subsection{Dependent product of sets}
 Before we describe the categorical model of dependent functions, it's instructive to consider how they work on sets. A dependent function selects one element from each set $T(x)$. 
 
-You may visualize the totality of this selection as a giant tuple, with one component per every value of $x$---or as an element of the cartesian product that you get by multiplying together all the sets in the family. This is the meaning of the product notation, $\Pi_{x:B} T(x)$. For instance, in the trivial case of $B$ a two-element set $\{1, 2\}$, a dependent function is just a cartesian product $T(1) \times T(2)$. 
+You may visualize the totality of this selection as a giant tuple---an element of a cartesian product. For instance, in the trivial case of $B$ a two-element set $\{1, 2\}$, a dependent function is just a cartesian product $T(1) \times T(2)$. In general, you get one component per every value of $x$, that is an element of the cartesian product that you get by multiplying together all the sets in the family $T(x)$. This is the meaning of the product notation, $\Pi_{x:B} T(x)$. 
 
-In our example, \hask{replicateV} picks a particular counted vector for each value of \hask{n}. Counted vectors are equivalent to tuples so, for \hask{n} equal zero, \hask{replicateV} returns an empty tuple \hask{()}; for \hask{n} equal one it returns a single value \hask{x}; for \hask{n} equal two, it duplicates \hask{x} returning \hask{(x, x)}; etc. 
+In our example, \hask{replicateV} picks a particular counted vector for each value of \hask{n}. Counted vectors are equivalent to tuples so, for \hask{n} equal zero, \hask{replicateV} returns an empty tuple \hask{()}; for \hask{n = 1} it returns a single value \hask{x}; for \hask{n} equal two, it duplicates \hask{x} returning \hask{(x, x)}; etc. 
 
 The function \hask{replicateV}, evaluated at some \hask{x :: a},  is equivalent to an infinite tuple of tuples:
 \[ ((), x, (x, x), (x, x, x), ...) \]
@@ -679,12 +688,12 @@ If you visualize the bundle as a bunch of fibers sticking out from the base $B$,
 Just like we talked about a function object representing a set of functions, we can talk about an object $S(E)$ that represents a set of sections of a given bundle $E$. 
 
 Just like we defined function application as a mapping out of the product:
-\[\varepsilon_{B, C} \colon C^B \times B \to C\]
+\[\varepsilon_{B C} \colon C^B \times B \to C\]
 we can define the dependent function application as a mapping:
 \[\varepsilon \colon S(E) \times B \to E\]
 We can visualize it as picking a section $s$ in $S(E)$ and an element $x$ of the base $B$ and producing a value in the bundle $E$. (In physics, this would correspond to measuring a field at a particular point in spacetime.)
 
-But this time we have to insist that this value be in the correct fiber. If we project the result of applying $\varepsilon$ to $(s, x)$, we should recover the $x$. 
+But this time we have to insist that this value be in the correct fiber. If we project the result of applying $\varepsilon$ to $(s, x)$, it should fall back to the $x$. 
 
 \[
 \begin{tikzpicture}
@@ -737,7 +746,7 @@ In other words, this diagram must commute:
 \]
 This makes $\varepsilon$ a morphism in the slice category $\mathcal{C}/B$.
 
-And just like the exponential object was universal, so is the object of sections. The universality condition has the same form: for any other object $G$ with an arrow $\phi \colon G \times B \to E$ there is a unique arrow $\phi^T \colon G \to S(E)$ that makes the following diagram commute:
+And just like the exponential object was universal, so is the object of sections. The universality condition has the same form: For any other object $G$ with an arrow $\phi \colon G \times B \to E$ there is a unique arrow $\phi^T \colon G \to S(E)$ that makes the following diagram commute:
 \[
  \begin{tikzcd}
  G \times B
@@ -749,7 +758,7 @@ And just like the exponential object was universal, so is the object of sections
  &E
   \end{tikzcd}
 \]
-The difference is that now both $\varepsilon$ and $\phi$ are now morphisms in the slice category $\mathcal{C}/B$. 
+The difference is that both $\varepsilon$ and $\phi$ are now morphisms in the slice category $\mathcal{C}/B$. 
 
 The one-to-one correspondence between $\phi$ and $\phi^T$ forms the adjunction:
 \[(\mathcal{C}/B) \left( \left \langle {G\times B \atop \pi_2} \right \rangle , \left \langle {E \atop p } \right \rangle \right) \cong \mathcal{C} \left(G, S(E)\right) \]
@@ -757,7 +766,7 @@ which we can use as the definition of the object of sections $S(E)$.
 
 Recall that we can interpret the product $G \times B$ as planting copies of $G$ as identical fibers over each element of $B$. 
 
-In $\mathbf{Set}$, the left-hand side defines a family of functions, one per fiber. Any given $y \in G$ cuts a horizontal slice of $G \times B$. The family of functions maps this slice to the corresponding fibers of $E$ thus creating a section of $E$.
+In $\mathbf{Set}$, a single element of the left-hand side of the adjunction is a family of functions, one per fiber. Any given $y \in G$ cuts a horizontal slice of $G \times B$. The family of functions maps this slice to the corresponding fibers of $E$ thus creating a section of $E$.
 
 \[
 \begin{tikzpicture}
@@ -818,11 +827,11 @@ These are all set-theoretical intuitions. We can generalize them by first notici
 Indeed, there is one-to-one correspondence between objects $X$ in $\mathcal{C}$ and objects $\langle X, ! \rangle$ in  $\mathcal{C}/1$. Arrows in $\mathcal{C}/1$ are arrows of $\mathcal{C}$ with no additional constraints. We therefore have:
 \[(\mathcal{C}/B) \left( \left \langle {G\times B \atop \pi_2} \right \rangle , \left \langle {E \atop p } \right \rangle \right) \cong (\mathcal{C}/1)  \left( \left \langle {G \atop !} \right \rangle , \left \langle {S(E) \atop ! } \right \rangle \right)  \]
 
-The next step is to ``blur the focus'' by replacing the terminal object with a more general base $A$.
+The next step is to ``blur the focus'' by replacing the terminal object with a more general base $A$, serving as the atlas.
 
 The right-hand side becomes a hom-set in the slice category $\mathcal{C}/A$. $G$ itself gets coarsely fibrated by some $q \colon G \to A$. 
 
-Remember that $G \times B$ can be understood as a pullback along the mapping $! \colon B \to 1$, or a change of base from $1$ to $B$. If we want to replace $1$ with $A$, we should replace the product $G \times B$ with a more general pullback of $q$. Such a change of base can be parameterized by a new morphism $f \colon B \to A$.
+Remember that $G \times B$ can be understood as a pullback along the mapping $! \colon B \to 1$, or a change of base from $1$ to $B$. If we want to replace $1$ with $A$, we should replace the product $G \times B$ with a more general pullback of $q$. Such a change of base is parameterized by a new morphism $f \colon B \to A$.
 
 \[
  \begin{tikzcd}
@@ -859,7 +868,7 @@ Remember that $G \times B$ can be understood as a pullback along the mapping $! 
 
 The result is that, instead of a bunch of $G$ fibers over $B$, we get a pullback $f^* G$ that is populated by groups of fibers from the fibration $q \colon G \to A$. This way $A$ serves as an atlas that enumerates all the patches populated by uniform fibers. 
 
-Imagine, for instance, that $A$ is a two-element set. The fibration $q$ will split $G$ into two fibers. These will serve as our generic fibers. These fibers are now replanted over the two patches in $B$ to form $f^* G$. The replanting is guided by $f^{-1}$. 
+Imagine, for instance, that $A$ is a two-element set. The fibration $q$ will split $G$ into two fibers. They will serve as our generic fibers. These fibers are now replanted over the two patches in $B$ to form $f^* G$. The replanting is guided by $f^{-1}$. 
 
 \[
 \begin{tikzpicture}
@@ -1146,7 +1155,7 @@ We arrive at:
 \begin{haskell}
 add (S Z) (S Z) = S (S Z)
 \end{haskell}
-We can clearly see that the right-hand side is the encoding of $2$. But we haven't shown that our definition of equality is reflexive so, in principle, we don't know if:
+We can clearly see that the right-hand side is the encoding of $2$. But we haven't shown that our definition of equality is reflexive so, in principle, we don't know if
 \begin{haskell}
 eq (S (S Z)) (S (S Z))
 \end{haskell}
@@ -1218,9 +1227,11 @@ This is the only introduction rule for equality, so you might think that all pro
 
 In type theory we have this interplay of introduction and elimination rules that essentially makes them the inverse of each other. 
 
-Consider the definition of a product. We introduce it by providing two values, $x \colon A$ and $y \colon B$ and we get a value $p \colon A \times B$. We can then eliminate it by extracting two values using two projections. But how do we know if these are the same values that we used to construct it? This is something that we have to postulate (in the categorical model this follows from the universal construction). We call it the computation rule or the $\beta$-reduction rule.
+Consider the definition of a product. We introduce it by providing two values, $x \colon A$ and $y \colon B$ and we get a value $p \colon A \times B$. We can then eliminate it by extracting two values using two projections. But how do we know if these are the same values that we used to construct it? This is something that we have to postulate. We call it the computation rule or the $\beta$-reduction rule.
 
 Conversely, if we are given a value $p \colon A \times B$, we can extract the two components using projections, and then use the introduction rule to recompose it. But how do we know that we'll get the same $p$? This too has to be postulated. This is sometimes called the uniqueness condition, or the $\eta$-conversion rule.
+
+In the categorical model of type theory these two rules follow from the universal construction. 
 
 The equality type also has the elimination rule, which we'll discuss shortly, but we don't impose the uniqueness condition. It means that it's possible that there are some equality proofs that were not obtained using $\mathit{refl}$. 
 
@@ -1246,7 +1257,7 @@ or, equivalently, the proof of the zeroth proposition; and a dependent function:
 \[\mathit{step} \colon \Pi_{n:\mathbb{N}}\,\left(T(n) \to T(S n)\right) \]
 This function is interpreted as generating a proof of the $(n + 1)$st proposition from the proof of the $n$th proposition.
 
-The \emph{dependent elimination rule} for natural numbers tells us that, given such $\mathit{init}$ and $\mathit{step}$, there exists a dependent function:
+The \emph{dependent elimination rule} for natural numbers postulates that, given such $\mathit{init}$ and $\mathit{step}$, there exists a dependent function:
 \[f \colon \Pi_{n:\mathbb{N}} \, T(n) \]
 This function is interpreted as providing the proof that $T(n)$ is true for all $n$.
 
@@ -1266,7 +1277,7 @@ The elimination rule for equality type is somewhat analogous to the induction pr
 
 The idea is that we want to construct a mapping \emph{out} of the equality type. But since equality type is itself a two-parameter family of types, the mapping out should be a dependent function. The target of this function is another family of types:
 \[T(x, y, p)\]
- that depends on the pair of values that are being compared $x, y \colon A$ and the proof of equality $p \colon \mathit{Id}(x, y)$.
+ that depends on the pair of values that are being compared $x, y \colon A$, and the proof of equality $p \colon \mathit{Id}(x, y)$.
  
  The function we are trying to construct is:
  \[ f \colon \Pi_{x, y : A} \Pi_{p : \mathit{Id}(x, y)} \, T(x, y, p) \]
@@ -1331,6 +1342,6 @@ This is a very strong postulate. One way to understand it is to argue that, with
 
 The closest analogy that we've seen so far is the result of parametricity, which states that, in Haskell, all polymorphic functions between endofunctors are automatically natural transformations. Another example, this time from calculus, is that any analytic function defined on the real axis has a unique extension to the whole complex plane. 
 
-The use of dependent types blurs the boundary between programming and mathematics. There is a whole spectrum of languages,  with Haskell barely dipping its toes in dependent types while still firmly established in commercial usage; all the way to theorem provers, which are helping mathematicians formalize mathematical proofs.
+The use of dependent types blurs the boundary between programming and mathematics. There is a whole spectrum of languages,  starting with Haskell barely dipping its toes in dependent types while still firmly established in commercial usage, all the way to theorem provers, which are helping mathematicians formalize mathematical proofs.
 
 \end{document}
