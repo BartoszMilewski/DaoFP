@@ -105,13 +105,13 @@ smooth = extend avg
 \end{haskell}
 
 
-Comonads are useful for structuring computations in spatially or temporally extended data structures. Such computations are local enough to define the ``current location,'' but require gathering information from neighboring locations. Signal processing or image processing are good examples. So are simulations, in which differential equations have to be iteratively solved inside volumes: climate simulations, cosmological models, or nuclear reactions come to mind. Conway's Game of Life is also a good testing ground for comonadic methods.
+Comonads are useful for structuring computations in spatially or temporally extended data structures. Such computations are local enough to define the ``current location,'' but require gathering information from neighboring locations. Signal processing or image processing are good examples. So are simulations, in which differential equations have to be iteratively solved inside volumes: climate simulations, cosmological models, or nuclear reactions, to name a few. Conway's Game of Life is also a good testing ground for comonadic methods.
 
 Sometimes it's convenient to perform calculation on continuous streams of data, postponing the sampling until the very last step. Here's an example of a signal that is a function of time (represented by \hask{Double})
 \begin{haskell}
 data Signal a = Sig (Double -> a) Double
 \end{haskell}
-The second component, the \hask{Double}, is the current time.
+The first component is a continuous stream of \hask{a}'s implemented as a function of time. The second component is the current time.
 
 This is the \hask{Comonad} instance:
 \begin{haskell}
@@ -146,7 +146,7 @@ We can get the definition of a comonad by reversing the arrows in the definition
 A comonad is thus an endofunctor $W$ equipped with two natural transformations:
 \begin{align*}
 \delta &\colon W \to W \circ W \\
-\varepsilon &\colon W \to \mathit{Id} 
+\varepsilon &\colon W \to \text{Id} 
 \end{align*}
 
 These transformations (corresponding to \hask{duplicate} and \hask{extract}, respectively) must satisfy the same identities as the monad, except with the arrows reversed. 
@@ -348,7 +348,7 @@ The counit of this adjunction, which becomes the comonadic \hask{extract}, is fu
 extract :: Store s c -> c
 extract (St f s) = f s
 \end{haskell}
-The unit of this adjunction is a natural transformation $\eta \colon \mathit{Id} \to R_s \circ L_s$. We've used it as the \hask{return} of the state monad. This is its component at \hask{c}:
+The unit of this adjunction is a natural transformation $\eta \colon \text{Id} \to R_s \circ L_s$. We've used it as the \hask{return} of the state monad. This is its component at \hask{c}:
 \begin{haskell}
 eta :: c -> (s -> (c, s))
 eta c = \s -> (c, s)
@@ -453,7 +453,11 @@ Given a comonad $W$, we can construct an adjunction using either $\mathcal{C}^W$
 
 \subsection{Lenses}
 
-The coalgebra for the \hask{Store} comonad is of particular interest. We'll do some renaming first: we'll call the carrier \hask{s} and the state \hask{a}. The coalgebra is given by a function:
+The coalgebra for the \hask{Store} comonad is of particular interest. We'll do some renaming first. Let's call the carrier \hask{s} and the state \hask{a}. 
+\begin{haskell}
+data Store a s = St (a -> s) a
+\end{haskell}
+The coalgebra is given by a function:
 \begin{haskell}
 phi :: s -> Store a s
 \end{haskell}
@@ -474,6 +478,31 @@ phi s = (set s, get s)
 epsilon (f, a) = f a
 delta (f, a) = (\x -> (f, x), a)
 \end{haskell}
+
+\[
+ \begin{tikzcd}
+ s
+ & W s
+ \arrow[l, "\varepsilon_s"']
+ \\
+ & a
+ \arrow[ul, "id_s"]
+\arrow[u, red, "\phi"']
+ \end{tikzcd}
+  \hspace{30pt}
+ \begin{tikzcd}
+W(W s) 
+&W s
+\arrow[l, red, "W \phi "']
+\\
+W s
+\arrow[u, "\delta_s"']
+& s
+\arrow[l, red, "\phi"']
+\arrow[u, red, "\phi"']
+ \end{tikzcd}
+\]
+
 
 The first law  tells us that applying the result of \hask{set} to the result of \hask{get} results in identity:
 \begin{haskell}
