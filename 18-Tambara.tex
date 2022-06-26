@@ -31,9 +31,9 @@ For instance, a monoid of whole numbers with addition can be thought of as a cat
 \]
 The morphism corresponding to zero is automatically the identity morphism. 
 
-We can represent a monoid on a set. Such a representation is a functor $F$ from $\cat M$ to $\Set$. Such a functor maps the single object $*$ to some set $S$, and it maps the hom-set $\cat M(*, *)$ to a set of functions $S \to S$. By functor laws, it maps identity to identity and composition to composition, so it preserves the structure of the monoid. 
+We can represent a monoid as transformations of a set. Such a representation is given by a functor $F \colon M \to \Set$. It maps the single object $*$ to some set $S$, and it maps the hom-set $\cat M(*, *)$ to a set of functions $S \to S$. By functor laws, it maps identity to identity and composition to composition, so it preserves the structure of the monoid. 
 
-If the functor is fully faithful, its image contains exactly the same information as the monoid and nothing more. But, in general, functors cheat. The hom-set $\Set (S, S)$ may contain some other functions that are not in the image of $\cat M(*, *)$; and multiple morphisms can be mapped to a single function. 
+If the functor is fully faithful, its image contains exactly the same information as the monoid and nothing more. But, in general, functors cheat. The hom-set $\Set (S, S)$ may contain some other functions that are not in the image of $\cat M(*, *)$; and multiple morphisms in $\cat M$ can be mapped to a single function. 
 
 In the extreme, the whole hom-set $\cat M(*, *)$ may be mapped to the identity morphism $id_S$. So, just by looking at the set $S$---the image of $*$ under the functor $F$---we cannot dream of reconstructing the original monoid.
 
@@ -75,9 +75,9 @@ Such functions are called \index{equivariant function}\emph{equivariant}. We oft
 
 How much information do we need to reconstruct a monoid from its representations? Just looking at the sets is definitely not enough, since any monoid can be represented on any set. But if we include structure-preserving functions between these sets, we might have a chance. 
 
-Consider a set of all functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid, $F m$. 
+Consider a set of \emph{all} functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid. These are the functions of the form $F m$, where $m$ is an arrow in $\cat M$. Keep in mind, though, that there may be many more functions in that hom-set.
 
-If we look at the ``neighboring'' set $G *$, for some other functor $G$, and its set of functions  $\Set(G *, G *)$ we'll find there the corresponding actions $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will map these actions. It will map other morphisms as well.
+Now let's look at the ``neighboring'' set $G *$, the image of some other functor $G$. In its hm-set  $\Set(G *, G *)$ we'll find, among others, the corresponding actions of the form $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will preserve these actions.
 
 Now imagine creating a gigantic tuple by taking one function from each of the sets $\Set (F *, F *)$, for all functors $F\colon \cat M \to \Set$. We are interested only in tuples whose elements are correlated. Here's what I mean: If we pick $g \in  \Set (G*, G *)$ and  $h \in  \Set (H*,  H*)$ and there is a natural transformation (equivariant function) $\alpha$ between the two functors $G$ and $H$, we want the two function to be related:
 \[ \alpha \circ g = h \circ \alpha \]
@@ -104,30 +104,42 @@ whose wedge condition provides the constraints we are looking for.
  \arrow[dr, "\pi_H"]
  \\
  \Set(G *, G *)
- \arrow[dr, "{\Set(id, \alpha)}"']
+ \arrow[dr, "\alpha \circ -"']
  && \Set (H *, H *)
-  \arrow[dl, "{\Set (\alpha, id)}"]
+  \arrow[dl, "- \circ \alpha"]
 \\
  & \Set (G *, H *)
  \end{tikzcd}
 \]
 
-Notice that this is the end over the whole functor category $[\cat M, \Set ]$, so the wedge condition relates the entries that are connected by natural transformations. In this case, natural transformations are equivariant functions. The profunctor under the end is given by:
+Notice that this is the end over the whole functor category $[\cat M, \Set ]$, so the wedge condition relates the entries that are connected by natural transformations. In this case, natural transformations are equivariant functions. 
+
+Here are some details. The profunctor under the end is given by:
 \[ P \langle G, H \rangle = \Set (G *, H *) \]
-It is a functor:
+It's a functor:
 \[ P \colon [\cat M, \Set]^{op} \times [\cat M, \Set] \to \Set \]
-Its action on morphisms (natural transformations) is:
+Consider its action on pairs of morphisms in $[\cat M, \Set]$. Given a pair of natural transformations:
+\begin{align*}
+\alpha &\colon G' \to G \\ 
+\beta &\colon H \to H'
+\end{align*}
+their lifting is a function:
+\[ P\langle \alpha, \beta \rangle \colon  P\langle G, H \rangle \to P\langle G', H' \rangle\]
+Substituting our definition of $P$, we have:
+\[ P\langle \alpha, \beta \rangle \colon  \Set ( G*, H*)  \to \Set (G'*, H'*)\]
+We get this function by pre-composing with $\alpha$ and post-composing with $\beta$:
 \[ P \langle \alpha, \beta \rangle = \beta \circ - \circ \alpha \]
-If we pick $f$ to be the element of $\Set (G*, G*)$ and $g$ to be the element of $\Set (H*, H*)$, the wedge condition indeed becomes:
+
+In the wedge condition, if we pick $g$ to be the element of $\Set (G*, G*)$ and $h$ to be the element of $\Set (H*, H*)$, we reproduce our condition:
 \[ \alpha \circ g = h \circ \alpha \]
 
 The Tannakian reconstruction theorem, in this case, tells us that:
 \[ \int_F \Set(F *, F *) \cong \cat M (*, *) \]
-In other words, we can recover the monoid from its representations.
+In other words, we can recover the monoid from its representations. We'll see the proof of this theorem in the context of a more general statement.
 
 \subsection{Cayley's theorem}
 
-In group theory, Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element has an inverse. Permutations are just functions that map a set to itself.
+In group theory, Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element has an inverse. Permutations are just bijective functions that map a set to itself. They \emph{permute} the elements of a set.
 
 In category theory, Cayley's theorem is practically built into the definition of a monoid and its representations. 
 
@@ -143,7 +155,7 @@ We can take this particular representation as an alternative definition of a mon
 \end{align*}
 The unit picks the element of $S$ that corresponds to $id_*$ in $\cat M(*, *)$. Multiplication of two elements $m$ and $n$ is given by the element that corresponds to $m \circ n$. 
 
-At the same time we can look at $S$ as an image of $F \colon \cat M \to \Set$, in which case it's the functions $S \to S$ that form a representation of the monoid. This is the essence of the Cayley's theorem.
+At the same time we can look at $S$ as an image of $F \colon \cat M \to \Set$, in which case it's the functions $S \to S$ that form a representation of the monoid. This is the essence of the Cayley's theorem: Every monoid can be represented by a set of endo-functions.
 
 In programming, the best example of applying the Cayley's theorem is in the efficient implementation of list reversal. Recall the naive recursive implementation of reversal:
 \begin{haskell}
@@ -163,14 +175,14 @@ We can use Cayley's theorem to represent this monoid as functions on lists:
 \begin{haskell}
 type DList a = [a] -> [a]
 \end{haskell}
-To represent a list, we turn it into a function that prepends this list to its argument:
+To represent a list, we turn it into a function. It's a function (a closure) that prepends this list \hask{as} to its argument \hask{xs}:
 \begin{haskell}
 rep :: [a] -> DList a
 rep as = \xs -> as ++ xs
 \end{haskell}
 This representation is called a \index{difference list}\emph{difference list}.
 
-To turn a function back to a list, we act with it on an empty list:
+To turn a function back to a list, it's enough to apply it to an empty list:
 \begin{haskell}
 unRep :: DList a -> [a]
 unRep f = f []
@@ -381,18 +393,20 @@ together with the natural transformation:
 The trick in generalizing the Tannakian reconstruction is to define the end over a specialized functor category $\cat T$, 
  but applying the forgetful functor to its functors. We assume that we have the free/forgetful adjunction $F \dashv U$ between $\cat T$ and $[\cat C, \Set]$:
 \[ \cat T (F Q, P) \cong  [\cat C, \Set] ( Q, U P )\]
+where $Q$ is a functor in $[\cat C, \Set]$ and $P$ a functor in $\cat T$.
 
-Our starting point for Tannakian reconstruction is the end:
+Our starting point for Tannakian reconstruction is the following end:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) s\big) \]
+
 The mapping $\cat T \to \Set$ parameterized by the object $a$, and given by the formula:
 \[ P \mapsto (U P) a \]
-is sometimes called a \index{fiber functor}\emph{fiber functor}, so the end formula can be interpreted as a set of natural transformations between two fiber functors. Conceptually, a fiber functor describes an infinitesimal neighborhood of an object. It maps functors to sets but, more importantly, it maps natural transformations to functions. These functions probe the environment in which the object lives. In particular, natural transformations in $\cat T$ are involved in wedge conditions that define the end. In calculus, stalks of sheaves play a very similar role.
+is sometimes called a \index{fiber functor}\emph{fiber functor}, so the end formula can be interpreted as a set of natural transformations between two fiber functors. Conceptually, a fiber functor describes an ``infinitesimal neighborhood'' of an object. It maps functors to sets but, more importantly, it maps natural transformations to functions. These functions probe the environment in which the object lives. In particular, natural transformations in $\cat T$ are involved in wedge conditions that define the end. In calculus, stalks of sheaves play a very similar role.
 
 As we did before, we first apply the Yoneda lemma to get:
 \[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (s ,-), U P\big)\Big) \]
 We can now use the adjunction:
 \[ \int_{P \colon \cat T} \Set \Big(\cat T \big( F \cat C (a ,-), P\big), \cat T \big( F \cat C (s ,-), P\big)\Big) \]
-We end up with a mapping between two natural transformations in the functor category $\cat T$. We can simplify it using the corollary to the Yoneda lemma, resulting in:
+We end up with a mapping between two natural transformations in the functor category $\cat T$. We can perform the integration using the corollary to the Yoneda lemma, resulting in:
 \[ \cat T\big( F \cat C (s ,-), F \cat C (a ,-) \big) \]
 We can apply the adjunction once more:
 \[ \cat T\big( \cat C (s ,-), (U\circ F) \cat C (a ,-) \big) \]
@@ -417,7 +431,7 @@ The bottom line is that we were able to reconstruct a hom-set in a category of s
 
 \section{Profunctor Lenses}
 
-Our goal is to find a functor representation for other optics. We've seen before that, for instance, type-changing lenses can be seen as hom-sets in the $\mathbf{Lens}$ category. The objects in $\mathbf{Lens}$ are pairs of objects from some category $\cat C$, and a hom-set from one such pair $\langle s, t \rangle$ to another  $\langle a, b \rangle$ is given by the coend formula:
+Our goal is to find a functor representation for optics. We've seen before that, for instance, type-changing lenses can be seen as hom-sets in the $\mathbf{Lens}$ category. The objects in $\mathbf{Lens}$ are pairs of objects from some category $\cat C$, and a hom-set from one such pair $\langle s, t \rangle$ to another  $\langle a, b \rangle$ is given by the coend formula:
 \[ \mathcal{L}\langle s, t\rangle \langle a, b \rangle = \int^{c} \mathcal{C}(s, c \times a) \times  \mathcal{C}(c \times b, t) \]
 Notice that the pair of hom-sets in this formula can be seen as a single hom-set in the product category $\cat C^{op} \times \cat C$:
 \[  \mathcal{L}\langle s, t\rangle \langle a, b \rangle =  \int^{c} (\cat C^{op} \times \cat C )(c \bullet \langle a, b \rangle, \langle s, t \rangle)  \]
@@ -430,19 +444,20 @@ This is a shorthand notation for the diagonal part of a more general action of $
 This suggests that, to represent such optics, we should be looking at co-presheaves on the category $\cat C^{op} \times \cat C$, that is, we should be considering profunctor representations. 
 
 \subsection{Iso}
-As a quick check of this idea, let's apply our reconstruction formula to the simple case of $\cat T = \cat C^{op} \times \cat C$. In that case we don't need to use the forgetful functors, or the monad $\Phi$, and we get:
+As a quick check of this idea, let's apply our reconstruction formula to the simple case of $\cat T = \cat C^{op} \times \cat C$ with no additional structure. In that case we don't need to use the forgetful functors, or the monad $\Phi$, and we get:
 \[  \mathcal{O}\langle s, t\rangle \langle a, b \rangle =\int_{P \colon \cat C^{op} \times \cat C} \Set \big(P \langle a, b\rangle, P \langle s, t\rangle \big) \cong \big( (\cat C^{op} \times \cat C) (\langle a, b\rangle ,-) \big) \langle s, t\rangle \]
-The right hans side evaluates to:
+The right hand side evaluates to:
 \[ (\cat C^{op} \times \cat C) (\langle a, b\rangle , \langle s, t\rangle) = \cat C (s, a) \times \cat C (b, t) \]
 
 This optic is known in Haskell as \hask{Iso}:
 \begin{haskell}
 type Iso s t a b = (s -> a, b -> t)
 \end{haskell}
-and it, indeed, has a profunctor representation:
+and it, indeed, has a profunctor representation corresponding to the coend:
 \begin{haskell}
 type Iso s t a b = forall p. Profunctor p => p a b -> p s t
 \end{haskell}
+
 Given a pair of functions it's easy to construct this profunctor-polymorphic function:
 \begin{haskell}
 toIsoP :: (s -> a, b -> t) -> Iso s t a b
@@ -450,7 +465,7 @@ toIsoP (f, g) = dimap f g
 \end{haskell}
 This is simply saying that any profunctor can be used to lift a pair of functions. 
 
-Conversely, we may ask the question: How can a function map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$ for \emph{every} profunctor imaginable? The only thing this function knows about the profunctor is that it can lift a pair of functions. Therefore it must either contain or be able to produce a pair of functions. 
+Conversely, we may ask the question: How can a single polymorphic function map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$ for \emph{every} profunctor imaginable? The only thing this function knows about the profunctor is that it can lift a pair of functions. Therefore it must be a closure that either contains or is able to produce a pair of functions. 
 
 \begin{exercise}
 Implement the function:
@@ -469,7 +484,7 @@ Let's try to apply the same logic to lenses. We have to find a class of profunct
 
 Let's start with the existential representation. We have at our disposal an object $c$ and a pair of functions:
 \[  \langle f, g \rangle \colon \cat C(s, c \times a) \times \cat C(c \times b, t) \]
-We want to build a profunctor representation, so we have to be able to map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$. We could get $P \langle s, t \rangle$ by lifting these two functions, if start from $P \langle c \times a, c \times b \rangle$. Indeed:
+We want to build a profunctor representation, so we have to be able to map the set $P \langle a, b \rangle$ to the set $P \langle s, t \rangle$. We could get $P \langle s, t \rangle$ by lifting these two functions, but only if start from $P \langle c \times a, c \times b \rangle$. Indeed:
 \[ P \langle f, g \rangle \colon P \langle c \times a, c \times b \rangle \to P \langle s, t \rangle \]
 What we are missing is the mapping:
 \[ P \langle a, b \rangle \to P \langle c \times a, c \times b \rangle \]
@@ -569,11 +584,11 @@ It turns out that, instead of guessing the monad, it's easier to guess the comon
 \[(\Theta P) \langle a, b \rangle = \int_c P \langle c \times a, c \times b \rangle \]
 You can check that this is indeed a comonad by implementing $\varepsilon$ and $\delta$ (\hask{extract} and \hask{duplicate}). For instance, $\varepsilon$ maps $\Theta P \to P$ using the projection $\pi_1$ for the terminal object (the unit of cartesian product).
 
-What's interesting about this comonad is that its coalgebras are Tambara modules. Again, these are coalgebras that map profunctors to profunctors. They are natural transformations $P \to \Theta P$. We can write such a natural transformation as an end:
+What's interesting about this comonad is that its coalgebras are Tambara modules. Again, these are coalgebras that map profunctors to profunctors. They are natural transformations $P \to \Theta P$. We can write such a natural transformation as an element of the end:
 \[\int_{a, b} \Set \big (P \langle a, b \rangle, (\Theta P) \langle a, b \rangle \big) = \int_{a, b} \int_c \Set \big( P\langle a, b \rangle , P \langle c \times a, c \times b \rangle \big) \]
 I used the continuity of the hom-functor to pull out the end over $c$. The resulting end encodes a set of natural (dinatural in $c$) transformations that define a Tambara module:
 \[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \times a, c \times b \rangle \]
-In fact, these coalgebras are comonad coalgebras, that is they are compatible with the comonad $\Theta$. In other words, Tambara modules form the Eilenberg-Moore category of coalgebras for the comonad $\Theta$.
+In fact, these coalgebras are \emph{comonad} coalgebras, that is they are compatible with the comonad $\Theta$. In other words, Tambara modules form the Eilenberg-Moore category of coalgebras for the comonad $\Theta$.
 
 The left adjoint to $\Theta$ is a monad $\Phi$ given by the formula:
 \[(\Phi P)  \langle s, t \rangle = \int^{u, v, c} (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle\big) \times P \langle u, v \rangle \]
@@ -585,7 +600,9 @@ This adjunction can be easily verified using some end/coend manipulations. The m
 
 Replacing $Q$ with $P$ we immediately see that the set of algebras for $\Phi$ is isomorphic to the set of coalgebras for $\Theta$. In fact they are monad algebras for $\Phi$. This means that the Eilenberg-Moore category for the monad $\Phi$ is the same as the Tambara category.
 
-Recall that the Eilenberg-Moore construction factorizes a monad into a free/forgetful adjunction. This is exactly the adjunction we were looking for when deriving the formula for profunctor optics. What remains is to evaluate the action of $\Phi$ on the representable functor:
+Recall that the Eilenberg-Moore construction factorizes a monad into a free/forgetful adjunction. This is exactly the adjunction we were looking for when deriving the formula for profunctor optics. 
+
+What remains is to evaluate the action of $\Phi$ on the representable functor:
 \[ \big( \Phi (\cat C^{op} \times \cat C) (\langle a, b\rangle ,-) \big) \langle s, t\rangle = \int^{u, v, c} (\cat C^{op} \times \cat C) \big(c \bullet \langle u, v\rangle , \langle s, t \rangle \big) \times  (\cat C^{op} \times \cat C) \big(\langle a, b\rangle , \langle u, v\rangle \big)\]
 Applying the co-Yoneda lemma, we get:
 \[ \int^c (\cat C^{op} \times \cat C) \big(c \bullet \langle a, b\rangle , \langle s, t \rangle\big) = \int^c \cat C(s, c \times a) \times \cat C (c \times b, t)\]
@@ -696,7 +713,7 @@ Again, profunctor prisms compose using function composition.
 \subsection{Traversals}
 A traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list that delivers the replacements must match the number of nodes, otherwise bad things happen. 
 
-A type-safe implementation of a traversals would require us to keep track of the sizes of lists. In other words, it would require dependent types.
+A type-safe implementation of a traversal would require us to keep track of the sizes of lists. In other words, it would require dependent types.
 
 In Haskell, a (non-type-safe) traversal is often written as:
 \begin{haskell}
@@ -708,7 +725,7 @@ When translating traversals to categorical language, we'll express this conditio
 \[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \Set \big( s, \sum_n (\Set (b^n, t) \times a^n) \big) \]
 We interpret a traversal as a function that, given a source $s$ produces an existential type that is hiding an $n$. It says that there exists an $n$ and a pair consisting of a function $b^n \to t$ and a tuple $a^n$. 
 
-The existential form of a traversal must take into account the fact that the residues for different $n$'s should have, in principle, different types. For instance, you can decompose a tree into an n-tuple of leaves $a^n$ and the residue $c_n$ with $n$ holes. So the correct existential representation for a traversal must involve a coend over all sequences $c_n$ that are indexed by natural numbers:
+The existential form of a traversal must take into account the fact that the residues for different $n$'s will have, in principle, different types. For instance, you can decompose a tree into an n-tuple of leaves $a^n$ and the residue $c_n$ with $n$ holes. So the correct existential representation for a traversal must involve a coend over all sequences $c_n$ that are indexed by natural numbers:
 \[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \int^{c_n} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
 The sums here are coproducts in $\cat C$.
 
@@ -718,7 +735,7 @@ Or we can look at $c_n$'s as mappings from the set of natural numbers to $\cat C
 
 \[ \mathcal{TR} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \cat C (\sum_k c_k \times b^k, t) \]
 
-To show the equivalence of the two representations, we first write the mapping out of a sum as a product of mappings:
+To show the equivalence of the two representations, we first rewrite the mapping out of a sum as a product of mappings:
 \[\int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \prod_k \cat C (c_k \times b^k, t) \]
 and use the currying adjunction:
 \[\int^{c \colon [\cat N, \cat C]} \cat C (s, \sum_m c_m \times a^m) \times \prod_k \cat C (c_k,  [b^k, t]) \]
