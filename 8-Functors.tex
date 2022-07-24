@@ -63,7 +63,7 @@ Even though it's not practical to memoize functions that take, say, natural numb
 
 If you can think of a data type as a container of values, it makes sense to apply a function to transform all these values, and create a transformed container. When this is possible, we say that the data type is \emph{functorial}. 
 
-Again, function types require some more suspension of disbelief. You visualize a function object as a lookup table, keyed by some type. If you want to use another, ralated type as your key, you need a function that translates the new key to the original key. This is why functoriality of the function object has one of the arrows reversed:
+Again, function types require some more suspension of disbelief. You visualize a function object as a lookup table, keyed by some type. If you want to use another, related type as your key, you need a function that translates the new key to the original key. This is why functoriality of the function object has one of the arrows reversed:
 \begin{haskell}
 dimap :: (a' -> a) -> (b -> b') -> (a -> b) -> (a' -> b')
 dimap f g h = g . h . f
