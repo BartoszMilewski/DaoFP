@@ -905,22 +905,166 @@ Since the indexing category may now contain arrows, the naturality conditions fo
 
 The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}D$. Universality means that it satisfies the following isomorphism, natural in $x$:
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
+
+A limit of a $\Set$-valued functor has a particularly simple characterization. It's a set of cones with the singleton set at the apex. Indeed, elements of the limit, that is functions from the singleton set to it, are in one-to-one correspondence with such cones:
+\[ [\cat J, \mathcal{C}](\Delta_1, D)  \cong \mathcal{C}(1, \text{Lim}D) \]
+
+
 Dually, the universal cocone is called a \emph{colimit}, and is described by the following natural isomorphism:
 \[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}D, x) \]
 
-We can now say that a product is a limit, and a sum is a colimit, of a diagram from the indexing category $\mathbf{2}$.
+
+We can now say that a product is a limit (and a sum is a colimit) of a diagram from the indexing category $\mathbf{2}$.
 
 Limits and colimits distill the essence of a pattern. 
 
-A limit, like a product, is defined by its mapping-in property. 
-
-A colimit, like a sum, is defined by its mapping-out property.
+A limit, like a product, is defined by its mapping-in property. A colimit, like a sum, is defined by its mapping-out property.
 
 There are many interesting limits and colimits, and we'll see some when we discuss algebras and coalgebras.
 
 \begin{exercise}
 Show that the limit of a ``walking arrow'' category, that is a two-object category with an arrow connecting the two objects, has the same elements as the first object in the diagram (``elements'' are the arrows from the terminal object).
 \end{exercise}
+
+\subsection{Equalizers}
+
+A lot of high-school math involves learning how to solve equations or systems of equations. An equation equates the outcomes of two different ways of producing something. If we are allowed to subtract things, we usually shove everything to one side and simplify the problem to calculating the zeros of some expression. In geometry, the same idea is expressed as the intersection of two geometric objects.
+
+In category theory all these patterns are embodied in a single construction called an equalizer. An equalizer is a limit of a diagram whose pattern is given by a stick-figure category with two parallel arrows:
+\[
+\begin{tikzcd}
+i \arrow[r, shift left=0.75ex]
+  \arrow[r, shift right=0.75ex]
+&
+j
+\end{tikzcd}
+\]
+The two arrows represent two ways of producing something. 
+
+A functor from this category picks a pair of objects and a pair of morphisms in the target category. The limit of this diagram embodies an intersection of the two outcomes. It is an object $e$ with two arrows $p \colon e \to a$ and $p' \colon e \to b$.
+\[
+\begin{tikzcd}
+& e
+\arrow[dl, "p"']
+\arrow[dr, gray, "p'"]
+\\
+a 
+\arrow[rr, red, shift left=.75ex, "f"]
+\arrow[rr, red, shift right=.75ex, "g"']
+&&
+b
+\end{tikzcd}
+\]
+We have two commuting conditions:
+\begin{align*}
+p' &= f \circ h \\
+p' &= g \circ h
+\end{align*}
+It means that $p'$ is fully determined by one of the equations, while the other turns into the constraints:
+\[ f \circ p = g \circ p \]
+Since the equalizer is the limit, it is the universal such pair, as illustrated in this diagram:
+\[
+\begin{tikzcd}
+x
+\arrow[d, dashed, "h"']
+\arrow[dr, ""]
+\\
+e
+\arrow[r, "p"']
+&
+a \arrow[r, red, shift left=0.75ex, "f"]
+  \arrow[r, red, shift right=0.75ex, "g"']
+&
+b
+\end{tikzcd}
+\]
+
+To develop the intuition for equalizers it's instructive to consider how it works for sets. As usual, the trick is to replace $x$ with the singleton set $1$:
+\[
+\begin{tikzcd}
+1
+\arrow[d, dashed, "e"']
+\arrow[dr, "a"]
+\\
+E
+\arrow[r, "p"']
+&
+A \arrow[r, red, shift left=0.75ex, "f"]
+  \arrow[r, red, shift right=0.75ex, "g"']
+&
+B
+\end{tikzcd}
+\]
+In this case $a$ is an element of $A$ such that $f a = g a$. That's just a way of saying that $a$ is the solution of a pair of equations. Universality means that there is a unique element $e$ of $E$ such that $p \circ e = a$. In other words, elements of $E$ are in one-to-one correspondence with the solutions of the system of equations. 
+
+\subsection{Coequalizers}
+
+What's dual to equating or intersecting? It's the process of discovering commonalities and organizing things into buckets. For instance, we can distribute integers into even and odd buckets. In category theory, this process of bucketizing is described by coequalizers.
+
+A coequalizer is the colimit of the same diagram that we used to define the equalizer:
+\[
+\begin{tikzcd}
+a 
+\arrow[rr, red, shift left=.75ex, "f"]
+\arrow[rr, red, shift right=.75ex, "g"']
+\arrow[rd, gray, "q'"']
+&&
+b
+\arrow[ld, "q"]
+\\
+& c
+\end{tikzcd}
+\]
+This time, the arrow $q'$ is fully determined by $q$; and $q$ must satisfy the equation:
+\[ q \circ f = q \circ g \]
+
+Again, we can gain some intuition by considering a coequalizer of two functions acting on sets. 
+\[
+\begin{tikzcd}
+A
+\arrow[r, red, shift left=.75ex, "f"]
+\arrow[r, red, shift right=.75ex, "g"']
+&
+B
+\arrow[r, "q"]
+& C
+\end{tikzcd}
+\]
+An $x \in A$ is mapped to two elements $f x$ and $g x$ in $B$, but then $q$ maps them back to a single element of $C$. This element represents the bucket. Universality means that $C$ is a copy of $B$ in which the elements that were produced from the same $x$ have been identified.
+
+Consider an example where $A$ is a set of pairs of integers \hask{(m, n)}, such that either both are even or both are odd.  We want to coequalize two functions that are the two projections \hask{(fst, snd)}. The equalizer set $C$ will have two elements corresponding to two buckets. We'll represent it as \hask{Bool}. The equalizing function \hask{q} selects the bucket:
+\begin{haskell}
+q :: Int -> Bool
+q n = n `mod` 2 == 0 
+\end{haskell}
+Any function \hask{q'} that cannot distinguish between the components of our pairs can be uniquely factorized through the function \hask{h}:
+\begin{haskell}
+h :: (Int -> a) -> Bool -> a
+h q' True  = g' 0
+h q' False = g' 1
+\end{haskell}
+
+\begin{exercise}
+Run a few tests that show that, in the example above, the factorization \hask{(h g') . q} gives the same result as \hask{g'} given by the following definition:
+\begin{haskell}
+import Data.Bits
+
+q' :: Int -> Bool
+q' x = testBit x 0
+\end{haskell}
+
+\end{exercise}
+\begin{exercise}
+What is the coequalizer of the pair \hask{(id, reverse)}, both of the type \hask{String->String}? Test its universality by factorizing the following function:
+\begin{haskell}
+q' :: String -> Maybe Char
+q' s = if even len
+       then Nothing
+       else Just (s !! (len `div` 2))
+  where len = length s
+\end{haskell}
+\end{exercise}
+
 
 \section{The Yoneda Lemma}
 
