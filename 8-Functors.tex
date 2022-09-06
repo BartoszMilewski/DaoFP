@@ -307,7 +307,7 @@ Notice that parentheses are important here. A similar function \hask{a -> Bool -
 
 We've seen before that the function type is functorial. It lifts two functions at a time, just like \hask{Bifunctor}, except that one of the functions goes in the opposite direction. 
 
-In category theory this corresponds to a functor from a product of two categories, one of them being the opposite category: it's a functor from $\mathcal{C}^{op} \times \mathcal{C}$. Functors from $\mathcal{C}^{op} \times \mathcal{C}$ to  to $\mathbf{Set}$ are called \emph{profunctors}.
+In category theory this corresponds to a functor from a product of two categories, one of them being the opposite category: it's a functor from $\mathcal{C}^{op} \times \mathcal{C}$. Functors from $\mathcal{C}^{op} \times \mathcal{C}$ to $\mathbf{Set}$ are called \emph{profunctors}.
 
 In Haskell, profunctors form a typeclass:
 \begin{haskell}
