@@ -161,20 +161,20 @@ pairWithTen = pair 10 -- partial application of pair
 
 \subsection{Relation to lambda calculus}
 
-Another way of looking at the definition of the function object is to interpret $c$ as the type of the environment in which $f$ is defined. In that case it's customary to call it $\Gamma$. The arrow is interpreted as an expression that can be defined in the environment $\Gamma$. 
+Another way of looking at the definition of the function object is to interpret $c$ as the type of the environment in which $f$ is defined. In that case it's customary to call the environment $\Gamma$. The arrow is interpreted as an expression that uses the variables defined in $\Gamma$. 
 
 Consider a simple example, the expression:
 \[a x^2 + b x + c\]
 You may think of it as being parameterized by a triple of real numbers $(a, b, c)$ and a variable $x$, taken to be, let's say, a complex number. The triple is an element of a product $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$. This product is the environment $\Gamma$ for our expression. 
 
 The variable $x$ is an element of $\mathbb{C}$. The expression is an arrow from the product $\Gamma \times \mathbb{C}$ to the result type (here, also $\mathbb{C}$)
-\[e \colon \Gamma \times \mathbb{C} \to \mathbb{C} \]
+\[f \colon \Gamma \times \mathbb{C} \to \mathbb{C} \]
 This is a mapping-out from a product, so we can use it to construct a function object  $\mathbb{C}^{\mathbb{C}}$ and define a mapping $h \colon \Gamma \to \mathbb{C}^{\mathbb{C}}$
 \[
  \begin{tikzcd}
  \Gamma \times \mathbb{C}
  \arrow[d, dashed, "h \times id_{\mathbb{C}}"']
- \arrow[rd, "e"]
+ \arrow[rd, "f"]
  \\
  \mathbb{C}^{\mathbb{C}} \times \mathbb{C}
  \arrow[r, "\varepsilon"']
@@ -183,21 +183,21 @@ This is a mapping-out from a product, so we can use it to construct a function o
 \]
 This new mapping $h$ can be seen as a constructor of the function object. The resulting function object represents all functions from $\mathbb{C}$ to $\mathbb{C}$ that have access to the environment $\Gamma$; that is, to the triple of parameters $(a, b, c)$. 
 
-Corresponding to our original expression $a x^2 + b x + c$ there is a particular arrow $h$ that we write as:
-\[ \lambda x . \,a x^2 + b x + c \]
+Corresponding to our original expression $a x^2 + b x + c$ there is a particular function in $\mathbb{C}^{\mathbb{C}}$ that we write as:
+\[  \lambda x . \,a x^2 + b x + c \]
 or, in Haskell, with the backslash replacing $\lambda$,
 \begin{haskell}
-h = \x -> a * x^2 + b * x + c
+\x -> a * x^2 + b * x + c
 \end{haskell}
 
-This is just notation for the result of the one-to-one mapping between arrows: Given an arrow $e$ that represents an expression in the context $\Gamma$, this mapping produces an arrow that we call $\lambda x . e$. In typed lambda calculus, we also specify the type of $x$:
-\[h = \lambda\;  (x \colon a) . \, e\]
-The defining diagram for the function object becomes:
+The arrow $h \colon \Gamma \to \mathbb{C}^{\mathbb{C}}$ is uniquely determined by the arrow $f$. This mapping produces a function that we call $\lambda x . f$.
+
+In general, the defining diagram for the function object becomes:
 \[
  \begin{tikzcd}
  \Gamma \times a
- \arrow[d, dashed, "{(\lambda x  . e) \times id_a}"']
- \arrow[rd, "e"]
+ \arrow[d, dashed, "{h \times id_a}"']
+ \arrow[rd, "f"]
  \\
  b^a \times a
  \arrow[r, "\varepsilon"']
@@ -205,21 +205,27 @@ The defining diagram for the function object becomes:
  \end{tikzcd}
 \]
 
-The environment $\Gamma$ that provides free parameters for the expression $e$ is a product of multiple objects representing the types of the parameters (in our example, it was $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$). An empty environment is represented by the terminal object, the unit of the product. In the latter case, $h$ simply picks an element from the function object. 
+The environment $\Gamma$ that provides free parameters for the expression $f$ is a product of multiple objects representing the types of the parameters (in our example, it was $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$). 
 
-It's important to keep in mind that in general a function object represents functions that depend on external parameters. Such functions are called \index{closure}\emph{closures}. Closures are functions that capture values from their environment.
+An empty environment is represented by the terminal object $1$, the unit of the product. In that case, $f$ is just an arrow $a \to b$, and $h$ simply picks an element from the function object $b^a$ that corresponds to $f$. 
 
-Here's an example of a function returning a closure (for simplicity, we use \hask{Double} for all types)
+It's important to keep in mind that, in general, a function object represents functions that depend on external parameters. Such functions are called \index{closure}\emph{closures}. Closures are functions that capture values from their environment.
+
+Here's our example translated to Haskell. Corresponding to $f$ we have an expression:
 \begin{haskell}
-quadratic :: Double -> Double -> Double -> (Double -> Double)
-quadratic a b c = \x -> a * x^2 + b * x + c
+(a :+ 0) * x * x + (b :+ 0) * x + (c :+ 0)
 \end{haskell}
-The same function can be written as a function of four variables:
+If we use \hask{Double} to approximate $\mathbb{R}$, our environment is a product \hask{(Double, Double, Double)}. The type \hask{Complex} is parameterized by another type---here we used \hask{Double} again:
 \begin{haskell}
-quadratic :: Double -> Double -> Double -> Double -> Double
-quadratic a b c x = a * x^2 + b * x + c
+type C = Complex Double
 \end{haskell}
+The conversion from \hask{Double} to \hask{C} is done by setting the imaginary part to zero, as in \hask{(a :+ 0)}. 
 
+The corresponding arrow $h$ takes the environment and produces a closure of the type \hask{C -> C}:
+\begin{haskell}
+h :: (Double, Double, Double) -> (C -> C)
+h (a, b, c) = \x -> (a :+ 0) * x * x + (b :+ 0) * x + (c :+ 0)
+\end{haskell}
 
 \subsection{Modus ponens}
 
