@@ -506,6 +506,8 @@ The interchange law states that the order of composition doesn't matter: we can 
 
 \section{Universal Constructions Revisited}
 
+Lao Tzu says, the simplest pattern is the clearest.
+
 We've seen definitions of sums, products, exponentials, natural numbers, and lists. 
 
 The old-school approach to defining such data types is to explore their internals. It's the set-theory way: we look at how the elements of new sets are constructed from the elements of old sets. An element of a sum is either an element of the first set, or the second set. An element of a product is a pair of elements. And so on. We are looking at objects from the engineering point of view.
@@ -1065,6 +1067,51 @@ q' s = if even len
 \end{haskell}
 \end{exercise}
 
+\subsection{The existence of the terminal object}
+
+Lao Tzu says: great acts are made up of small deeds.
+
+So far we've been studying limits of tiny diagrams, that is functors from simple stick-figure categories. Nothing, however, prevents us from defining limits and colimits where the patterns are taken to be infinite categories. But there is a gradation of infinities. When the objects in a category form a proper set, we call such a category  \index{small category}\emph{small}. Unfortunately, the very basic example, the category $\Set$ of sets, is not small. We know that there is no set of all sets. $\Set$ is a \index{large category}\emph{large} category. But at least all the hom-sets in $\Set$ are sets. We say that $\Set$ is \index{locally small category}\emph{locally small}. In what follows we'll be always working with locally small categories.
+
+A small limit is a limit of a small diagram, that is a functor from a category whose objects and morphisms form sets. A category in which all small limits exist is called small complete, or just \emph{complete}. In particular, in such a category, a product of an arbitrary \emph{set} of objects exists. You can also equalize an arbitrary set of arrows between two objects. If such category is locally small, that means all equalizers exist.
+
+Conversely, a (small) cocomplete category has all small colimits. In particular, such a category has all small coproducts and coequalizers.
+
+The category $\Set$ is both complete and cocomplete. 
+
+
+In a cocomplete locally small category there is a simple criterion for the existence of the terminal object: It's enough that a weakly terminal set exists. 
+
+A \index{weakly terminal object}\emph{weakly terminal} object, just like the terminal object, has an arrow coming from any object; except that such an arrow is not necessarily unique. 
+
+A \index{weakly terminal set}\emph{weakly terminal set} is a family of objects $t_i$ indexed by a set $I$ such that, for any object $c$ in $\cat C$ there exists an $i$ and an arrow $c \to t_i$. Such a set is also called a \index{solution set}\emph{solution set}.
+
+\[
+\begin{tikzpicture}
+        \filldraw (0, 1.5) circle (1pt);
+        \node at (0, 1.8) {$c$};
+        
+\filldraw[fill=gray!50, draw=white] (0, -0.2) ellipse (1.3 and 0.8);
+        \filldraw (-0.7, 0) circle (1pt);
+        \node at (-0.7, -0.3) {$t_1$};
+        \filldraw (0.7, 0) circle (1pt);
+        \node at (0.7, -0.3) {$t_2$};
+        \filldraw (0, -0.2) circle (1pt);
+        \node at (0, -0.5) {$t_3$};
+        
+    	\draw[->] (0, 1.5) -- (0, 0);
+\end{tikzpicture}
+\]
+
+In a cocomplete category we can always construct a coproduct $\coprod_{i \in I} t_i$. This coproduct is a weakly terminal object, because there is an arrow to it from every $c$. This arrow is the composite of the arrow to some $t_i$ followed by the injection $\iota_i \colon t_i \to \coprod_{j \in I} t_j$.
+
+Given a weakly terminal object, we can construct the (strongly) terminal object. We first define a subcategory $\cat T$ of $\cat C$ whose objects are $t_i$. Morphisms in $\cat T$ are all the morphisms in $\cat C$ that go between the objects of $\cat T$. This is called a \index{full subcategory}\emph{full} subcategory of $\cat C$. By our construction, $\cat T$ is small.
+
+There is an obvious inclusion functor $F$ that embeds $\cat T$ in $\cat C$. This functor defines a small diagram in $\cat C$. It turns out that the colimit of this diagram is the terminal object in $\cat C$.
+
+Dually, a similar construction can be used to define an initial object as a limit of a weakly initial set.
+
+This property of solution sets will come handy in the proof of the Freyd's adjoint functor theorem.
 
 \section{The Yoneda Lemma}
 
