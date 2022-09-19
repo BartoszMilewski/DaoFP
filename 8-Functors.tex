@@ -23,7 +23,7 @@ id x = x
 \end{haskell}
 You can easily convince yourself that such composition is associative, and composing with \hask{id} does nothing to a function.
 
-Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call stick-figure categories.
+Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call \index{stick-figure category}stick-figure categories---categories with a small handful of objects and arrows.
 \subsection{Category of sets}
 
 We can also strip a category of all arrows (except for the identity arrows). Such a bare-object category is called a \index{discrete category}\emph{discrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
@@ -50,6 +50,61 @@ If we have an arrow $f \colon c \to c'$ in $\mathcal{C}$ and an arrow $g \colon 
 The two product categories we're most interested in are $\mathcal{C} \times \mathcal{C}$ and $\mathcal{C}^{op} \times \mathcal{C}$, where $\mathcal{C}$ is our familiar category of types and functions.
 
 In both of these categories, objects are pairs of objects from $\mathcal{C}$. In the first category, $\mathcal{C} \times \mathcal{C}$, a morphism from $\langle a, b \rangle $ to $\langle a', b' \rangle $ is a pair $\langle f \colon a \to a', g \colon b \to b' \rangle $. In the second category, $\mathcal{C}^{op} \times \mathcal{C}$, a morphism is a pair $\langle f \colon a' \to a, g \colon b \to b' \rangle $, in which the first arrow goes in the opposite direction.
+
+\subsection{Slice categories}
+
+In a neatly organized universe, objects are always objects and arrows are always arrows. Except that sometimes sets of arrows can be thought of as objects. Slice categories go even further: they turn individual arrows into objects. 
+
+A slice category describes how a particular object $c$ is seen from the perspective of its category $\cat C$. It's the totality of arrows pointing at $c$. But to specify an arrow we need to specify both its ends. One of these ends is $c$, so we only need to specify the other.
+
+An object in the  \index{slice category}\emph{slice category} $\mathcal{C}/c$ (also known as an \index{over category}over-category) is a pair $\langle e, p \rangle$, with $p \colon e \to c$.  
+
+An arrow between two objects $\langle e, p \rangle$ and $\langle e', p' \rangle$ is an arrow $f \colon e \to e'$ of $\cat C$ which makes the following triangle commute:
+
+\[
+ \begin{tikzcd}
+ e
+ \arrow[rd, "p"']
+ \arrow[rr, "f"]
+ && e'
+ \arrow[ld, "p'"]
+ \\
+ &c
+  \end{tikzcd}
+\]
+
+\subsection{Coslice categories}
+
+There is a dual notion of a \index{coslice category}coslice category $c / \mathcal{C}$, also known as an \index{under-category}under-category. It's a category of arrows emanating from a fixed object $c$. Objects in this category are pairs $\langle a, i \colon c \to a \rangle$. Morphisms in $c / \mathcal{C}$ are arrows that make the relevant  triangles commute.
+\[
+ \begin{tikzcd}
+& c
+ \arrow[rd, "j"]
+ \arrow[ld, "i"']
+ \\
+a
+\arrow[rr, "f"']
+&& b
+  \end{tikzcd}
+\]
+
+In particular, if the category $\mathcal{C}$ has a terminal object $1$, then the coslice $1 / \mathcal{C}$ has, as objects, global elements of all the objects of $\mathcal{C}$. 
+
+
+Morphisms of $1/  \mathcal{C}$ that correspond to arrows $f \colon a \to b$ map the set of global elements of $a$ to the set of global elements of $b$.
+
+ \[
+ \begin{tikzcd}
+& 1
+ \arrow[rd, "y"]
+ \arrow[ld, "x"']
+ \\
+a
+\arrow[rr, "f"']
+&& b
+  \end{tikzcd}
+\]
+In particular, the construction of a coslice category from the category of types and functions justifies our intuition of types as sets of values, with values represented by global elements of types. 
 
 \section{Functors}
 
