@@ -1076,14 +1076,16 @@ There is an alternative view of lenses using the language of fiber bundles. A pr
 
 In this view, $p$ plays the role of \hask{get}:
 \[ p \colon E \to B \]
-The base $B$ represents the type of the focus. 
+The base $B$ represents the type of the focus and $E$ represents the type of the composite from which that focus can be extracted.
 
 The other part of the lens, \hask{set}, is a mapping: 
 \[ q \colon E \times B \to E \]
 Let's see how we can interpret it using fibrations.
 \subsection{Transport law}
 
-We interpret $q$ as ``transporting'' an element of the bundle to a new fiber. This is in accordance with the get/set lens law, or the \emph{transport} law, that says that ``you get what you set'':
+We interpret $q$ as ``transporting'' an element of the bundle $E$ to a new fiber. The new fiber is specified by an element of $B$.
+
+This property of the transport is expressed by the get/set lens law, or the \emph{transport} law, that says that ``you get what you set'':
 \begin{haskell}
 get (set s a) = a
 \end{haskell}
@@ -1148,7 +1150,7 @@ Equivalently, we can represent it as a commuting diagram:
 \]
 Here, instead of using the projection $\pi_2$, I used a comonoidal counit $\varepsilon$:
 \[ \varepsilon \colon E \to 1 \]
-and the unit law for the product. Using a comonoid makes it easier to generalize this construction to a tensor product in a monoidal category. 
+followed by the unit law for the product. Using a comonoid makes it easier to generalize this construction to a tensor product in a monoidal category. 
 
 \subsection{Identity law}
 Here's the set/get law or the \emph{identity} law. It says that ``nothing changes if you set what you get'':
@@ -1220,7 +1222,7 @@ and the corresponding commuting diagram:
  E
   \end{tikzcd}
 \]
-Again, we use the counit rather than a projection from a product.
+Again, to get rid of the middle $B$, I used the counit rather than a projection from the product.
 
 This is what the set/set law looks like in a bundle:
 \[
@@ -1238,7 +1240,7 @@ This is what the set/set law looks like in a bundle:
 \def\xbm{\xbl + \dx};
 \def\xbmr{\xbl + 2.5*\dx};
 \def\xbmrr{\xbl + 4*\dx};
-\def\xbr{\xbl + 6*\dx};
+\def\xbr{\xbl + 7.2*\dx};
 
 
 \filldraw[fill=orange!30, draw=white] (\xbl, \yfb) rectangle (\xbr, \yft);
@@ -1261,7 +1263,7 @@ This is what the set/set law looks like in a bundle:
 \draw[blue] (\xbmr, \yfs) edge[->, bend left] (\xbmrr, \yfss);
 
 \filldraw[black] (\xbmrr, \yfss) circle (1 pt);
-\node[right] at (\xbmrr, \yfss) {$q(a', s')$};
+\node[right] at (\xbmrr, \yfss) {$q(a', s') = q(a', s)$};
 
 \draw (\xbm, \yfss) edge[->, bend left] (\xbmrr, \yfss);
 
@@ -1282,11 +1284,11 @@ This is what the set/set law looks like in a bundle:
 
 \subsection{Type-changing lens}
 
-A type-changing lens generalizes transport to act between bundles. We have to define a whole family of bundles. We start with a category $\cat A$ whose objects define the types that we will use for the foci of our lens. In Haskell, this is the full category of Haskell types. 
+A type-changing lens generalizes transport to act between bundles. We have to define a whole family of bundles. We start with a category $\cat A$ whose objects define the types that we will use for the foci of our lens. 
 
-We use a set $B$ as the combined set of all elements of all types. $B$ is fibrated over $\cat A$---the projection $\pi$ sending an element of $B$ to its corresponding type. You may think of it as the set of objects of the coslice category $1/ \cat A$.
+We construct the set $B$ as the combined set of all elements of all focus types. $B$ is fibrated over $\cat A$---the projection $\pi$ sending an element of $B$ to its corresponding type. You may think of $B$ as the set of objects of the coslice category $1/ \cat A$.
 
-The bundle of bundles $E$ is a set that's fibered over $B$ with the projection $p$. Since $B$ itself is fibered over $\cat A$, $E$ is transitively fibered over $\cat A$, with the composite projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. Each of these bundles represents a different Haskell type. A type-changing lens will move between these bundles.
+The bundle of bundles $E$ is a set that's fibered over $B$ with the projection $p$. Since $B$ itself is fibered over $\cat A$, $E$ is transitively fibered over $\cat A$, with the composite projection $\pi \circ p$. It's this coarser fibration that splits $E$ into a family of bundles. Each of these bundles corresponds to a different type of of the composite for a given focus type. A type-changing lens will move between these bundles. 
 
 \[
 \begin{tikzpicture}
@@ -1318,7 +1320,6 @@ The bundle of bundles $E$ is a set that's fibered over $B$ with the projection $
 % shifted walls
 \def\yshift{-1.5};
 \def\xshift{1.5};
-
 
 % E
 \draw \a rectangle \d;
@@ -1363,14 +1364,18 @@ The bundle of bundles $E$ is a set that's fibered over $B$ with the projection $
 
 \draw[red, shorten <=0.2cm, shorten >=0.2cm, ->] (0 + \dx, \yshift + \dy) -- node[above]{$\pi$} (\xshift +\dx, \yshift + \dy);
 
-\draw[draw=black!40!green, shorten <=0.2cm, shorten >=0.2cm, ->] (0 - \dx, 0 + \dy) -- node[right]{$p$} (0 - \dx, \yshift + \dy);
+\draw[draw=black!40!green, shorten >=0.1cm, ->] (0 - \dx, 0 + 3 * \dy) -- node[below right]{$p$} (0 - \dx, \yshift + \dy);
+
+\node[right] at (0 - \dx, 0 + 3 * \dy) {$s$};
+\filldraw[black] (0 - \dx, 0 + 3 * \dy) circle (1 pt);
+
 
 \end{tikzpicture}
 \]
 
 The projection $p$ takes an element $s \in E$ and produces an element $b \in B$ whose type is given by $\pi b$. This is the generalization of \hask{get}. 
 
-The transport $q$, which corresponds to \hask{set}, takes an element $s \in E$ and an element $b \in B$ and produces a new element $t \in E$. 
+The transport $q$, which corresponds to \hask{set}, takes an element $s \in E$ and an element $b \in B$ and produces a new element $t \in E$. The important observation is that $s$ and $t$ may belong to different sub-bundles of $E$.
 
 
 The transport satisfies the following laws:
@@ -1387,7 +1392,6 @@ The set/set law (composition):
 
 \[ q (c, q (b, s)) = q (c, s) \]
 
-The two mappings $p$ and $q$ can be combined into one mapping between categories called a \index{cofunctor}\emph{cofunctor}. 
 \section{Important Formulas}
 This is a handy (co-)end calculus cheat-sheet.
 \begin{itemize}
