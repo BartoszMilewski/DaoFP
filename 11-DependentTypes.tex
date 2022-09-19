@@ -147,7 +147,7 @@ We can go even further: since (small) categories form a category $\mathbf{Cat}$ 
 
 We will therefore model type families as fibrations. For instance, our counted-vector family can be represented as a fibration whose base is the type of natural numbers. The whole family is a sum (coproduct) of consecutive powers (products) of $a$:
 \[ \mathit{List}(a) = a^0 + a^1 + a^2 + ... = \coprod_{n\colon \mathbb{N}} a^n \]
-with the zeroth power---the initial object---representing a vector of size zero.
+with the zeroth power---the initial object---representing the vector of size zero.
 \[
 \begin{tikzpicture}
 \def\dx{0.5};
@@ -183,16 +183,11 @@ with the zeroth power---the initial object---representing a vector of size zero.
 
 The projection $p \colon \mathit{List}(a) \to \mathbb{N}$ is the familiar $\mathit{length}$ function. 
 
-\subsection{Slice categories}
+In category theory we like to describe things in bulk---defining internal structure of things by structure-preserving maps between them. Such is the case with fibrations. If we fix the base object $b$ and consider all possible source objects in the category $\mathcal{C}$, and all possible projections down to $b$, we get a \emph{slice category} $\mathcal{C}/b$. This category represents all the ways we can slice the objects of $\cat C$ over the base $b$.
 
-In category theory we like to describe things in bulk---defining internal structure of things by structure-preserving maps between them. Such is the case with fibrations. 
-
-If we fix the base object $b$ and consider all possible source objects in the category $\mathcal{C}$, and all possible projections down to $b$, we get a \emph{slice category} $\mathcal{C}/b$ (also known as an \index{over category}over-category). 
-
-An object in the slice category is a pair $\langle e, p \rangle$, with $p \colon e \to b$.  An arrow between two objects $\langle e, p \rangle$ and $\langle e', p' \rangle$ is an arrow $f \colon e \to e'$ that commutes with the projections, that is:
+Recall that the objects in the slice category are pairs $\langle e, p \colon e \to b \rangle$, and a morphism between two objects $\langle e, p \rangle$ and $\langle e', p' \rangle$ is an arrow $f \colon e \to e'$ that commutes with the projections, that is:
 \[p' \circ f = p \]
-
-Again, the best way to visualize this is to notice that such an arrow maps fibers of $p$ to fibers of $p'$. It's a ``fiber-preserving'' mapping between bundles.
+The best way to visualize this is to notice that such a morphism maps fibers of $p$ to fibers of $p'$. It's a ``fiber-preserving'' mapping between bundles.
 
 \[
  \begin{tikzcd}
@@ -207,40 +202,6 @@ Again, the best way to visualize this is to notice that such an arrow maps fiber
 \]
 
 Our counted vectors can be seen as objects in the slice category $\mathcal{C}/\mathbb{N}$ given by pairs $\langle \mathit{List}(a), \mathit{length} \rangle$.
-
-\subsection{Coslice categories}
-
-There is also a dual notion of a coslice category $c / \mathcal{C}$, also known as an \index{under-category}under-category. It's a category of arrows emanating from a fixed object $c$. Objects in this category are pairs $\langle a, i \colon c \to a \rangle$. Morphisms in $c / \mathcal{C}$ are arrows that make the relevant  triangles commute.
-\[
- \begin{tikzcd}
-& c
- \arrow[rd, "j"]
- \arrow[ld, "i"']
- \\
-a
-\arrow[rr, "f"']
-&& b
-  \end{tikzcd}
-\]
-
-In particular, if the category $\mathcal{C}$ has a terminal object $1$, then the coslice $1 / \mathcal{C}$ has, as objects, global elements of all objects of $\mathcal{C}$. 
-
-There is a forgetful functor $U \colon 1 / \mathcal{C} \to \mathcal{C}$ that maps $\langle a, i \rangle$ to $a$. This functor defines a fibration of $1 / \mathcal{C}$ with the base $\cat C$. Objects in the fiber over some $a$ are in one-to-one correspondence with global elements of $a$. 
-
-Morphisms of $1/  \mathcal{C}$ that correspond to arrows $f \colon a \to b$ map the set of global elements of $a$ to the set of global elements of $b$.
-
- \[
- \begin{tikzcd}
-& 1
- \arrow[rd, "y"]
- \arrow[ld, "x"']
- \\
-a
-\arrow[rr, "f"']
-&& b
-  \end{tikzcd}
-\]
-Thus this fibration justifies our intuition of types as sets of values, with values represented by global elements of types. 
 
 \subsection{Pullbacks}
 
