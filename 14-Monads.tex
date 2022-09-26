@@ -527,9 +527,6 @@ pairs as bs = do
 \end{haskell}
 Notice that the last line in a \hask{do} block must produce a monadic value---here this is accomplished using \hask{return}.
 
-
-As mentioned before, the \hask{do} notation makes an easy task of otherwise very cumbersome composition of continuations.
-
 Most imperative languages lack the abstraction power to generically define a monad and instead they attempt to hard-code some of the more common monads. For instance, they implement exceptions as an alternative to the \hask{Either} monad, or concurrent tasks as an alternative to the continuation monad. Some, like C++, introduce coroutines that mimic Haskell's \hask{do} notation. 
 
 \begin{exercise}
@@ -543,6 +540,156 @@ Hint: Use \hask{do} notation to extract the function and the argument. Use \hask
 \begin{exercise}
 Rewrite the \hask{pairs} function using the bind operators and lambdas.
 \end{exercise}
+
+\section{Continuation Passing Style}
+
+I mentioned before that \hask{do} notation provides the syntactic sugar that makes working with continuations more natural. One of the most important applications of continuations is in transforming programs to use the continuation passing style, or CPS. The use  of CPS is common in compiler construction. Another very important application of CPS is in converting recursion to iteration. 
+
+The common problem with deeply recursive programs is that they may blow the runtime stack. A function call usually starts with pushing function arguments, local variables, and the return address on the stack. Thus deeply nested recursive calls may quickly exhaust the (usually fixed-size) runtime stack resulting in a runtime error. This is the main reason why imperative languages prefer looping to recursion, and why most programmers learn about loops before they study recursion. However, even in imperative languages, when it comes to traversing recursive data structure, such as linked lists or trees, recursive algorithms are more natural.
+
+The problem with using loops, though, is that they require mutation. There is usually some kind of a counter or a pointer that is modified and checked with each turn of the loop. This is why purely functional languages that shun mutation must use recursion in place of loops. But since looping is more efficient and it doesn't consume the runtime stack, the compiler tries to covert recursive calls to loops. In Haskell all tail-recursive functions are turned into loops. 
+
+\subsection{Tail recursion and CPS}
+
+\index{tail recursion}Tail recursion means that the recursive call happens at the very end of the function. The function doesn't perform any additional operations on the result of the tail call. For instance this program is not tail recursive, because it has to add \hask{i} to the result of the recursive call:
+\begin{haskell}
+sum1 :: [Int] -> Int
+sum1 [] = 0
+sum1 (i : is) = i + sum1 is
+\end{haskell}
+In contrast, the following implementation is tail recursive because the result of the recursive call to \hask{go} is returned without further modification:
+\begin{haskell}
+sum2 = go 0 
+  where go n [] = n
+        go n (i : is) = go (n + i) is
+\end{haskell}
+The compiler can easily turn the latter into a loop. Instead of making the recursive call, it will overwrite the value of the first argument \hask{n} with \hask{n + i}, overwrite the pointer to the head of the list with the pointer to its tail, and then jump to the beginning of the function. 
+
+Note however that it doesn't mean that the Haskell compiler won't be able to cleverly optimize the first implementation. It just means that the second implementation, which is tail recursive, is \emph{guaranteed} to be turned into a loop.
+
+In fact, it's always possible to turn recursion into tail recursion by performing the CPS transformation. This is because a continuation encapsulates \emph{the rest of the computation}, so it's always the last call in a function. 
+
+To see how it works in practice, consider a simple tree traversal. Let's define a tree that stores strings in both nodes and leaves:
+\begin{haskell}
+data Tree = Leaf String 
+          | Node Tree String Tree
+\end{haskell}
+To concatenate these strings we use the traversal that first recurses into the left subtree, and then into the right subtree:
+\begin{haskell}
+show :: Tree -> String
+show (Node lft s rgt) =
+  let ls = show lft
+      rs = show rgt
+  in ls ++ s ++ rs
+\end{haskell}
+This is definitely not a tail recursive function, and it's not obvious how to turn it into one. However, we can almost mechanically rewrite it using the continuation monad:
+\begin{haskell}
+showk :: Tree -> Cont r String
+showk (Leaf s) = return s
+showk (Node lft s rgt) = do
+  ls <- showk lft
+  rs <- showk rgt
+  return (ls ++ s ++ rs)
+ \end{haskell}
+We can run the result with the trivial continuation \hask{id}:
+\begin{haskell}
+show :: Tree -> String
+show t = runCont (showk t) id
+\end{haskell}
+
+This implementation is automatically tail recursive. We can see it clearly by desugaring the do notation:
+\begin{haskell}
+showk :: Tree -> (String -> r) -> r
+showk (Leaf s) k = k s
+showk (Node lft s rgt) k =
+  showk lft (\ls -> 
+    showk rgt (\rs -> 
+      k (ls ++ s ++ rs)))
+\end{haskell}
+Let's analyze this code. The function calls itself, passing the left subtree \hask{lft} and the following continuation:
+\begin{haskell}
+\ls -> 
+    showk rgt (\rs -> 
+      k (ls ++ s ++ rs))
+\end{haskell}
+This lambda in turn calls \hask{showk} with the right subtree \hask{rgt} and another continuation:
+\begin{haskell}
+\rs -> k (ls ++ s ++ rs)
+\end{haskell}
+It's this innermost lambda that has access to all three strings. It concatenates them and calls the outermost continuation \hask{k} with the result.
+
+In each case, the recursive call to \hask{showk} is the last call, and its result is immediately returned. The type of the result is the generic type \hask{r}, which in itself guarantees that we can't perform any operations on it. When we finally run the result of \hask{showk}, we pass it the identity (instantiated for the \hask{String} type):
+\begin{haskell}
+show :: Tree -> String
+show t = runCont (showk t) id
+\end{haskell}
+
+\subsection{Using named functions}
+
+But suppose that our programming language doesn't support anonymous functions. Is it possible to replace the lambdas with named functions? We've seen this technique when we discussed the adjoint functor theorem. As before, we notice that the lambdas generated by the continuation monad are closures---they capture some values from their environment. If we want to use named functions instead, we'll have to pass the environment explicitly. 
+
+We replace the first lambda with the call to the function named \hask{next}, and pass it the necessary environment in the form or a tuple of three values:
+\begin{haskell}
+showk :: Tree -> (String -> r) -> r
+showk (Leaf s) k = k s
+showk (Node lft s rgt) k =
+  showk lft (next (s, rgt, k))
+\end{haskell}
+The three values are the string from the current node of the tree, the right subtree, and the outer continuation. 
+
+The function \hask{next} makes the recursive call to \hask{showk} passing it the right subtree and a continuation named \hask{conc}:
+\begin{haskell}
+next :: (String, Tree, String -> r) -> String -> r
+next (s, rgt, k) ls = showk rgt (conc (ls, s, k))
+\end{haskell}
+Again, \hask{conc} explicitly captures the environment containing two strings and the outer continuation. It performs the concatenation and calls the outer continuation with the result:
+\begin{haskell}
+conc :: (String, String, String -> r) -> String -> r
+conc (ls, s, k) rs = k (ls ++ s ++ rs)
+\end{haskell}
+Finally, we define the trivial continuation:
+\begin{haskell}
+done :: String -> String
+done s = s
+\end{haskell}
+that we use to extract the final result:
+\begin{haskell}
+show t = showk t done
+\end{haskell}
+
+\subsection{Defunctionalization}
+
+Continuation passing style requires the use of higher order functions. If this is a problem, e.g., when implementing distributed systems, we can always use the adjoint functor theorem to defunctionalize our program. 
+
+The first step is to create the sum of all relevant environments, including the empty one we used in \hask{done}:
+\begin{haskell}
+data Kont = Done 
+          | Next String Tree Kont 
+          | Conc String String Kont
+\end{haskell}
+This data structure can be reinterpreted as a list of elements of the sum type:
+\begin{haskell}
+data Sum = Next' String Tree  | Conc' String String 
+\end{haskell}
+This list serves as the runtime stack necessary to implement a recursive algorithm. 
+
+Since we are only interested in producing a string as the final result, we'll approximate the \hask{String -> String} function type. This is the approximate counit of the adjunction that defines it:
+\begin{haskell}
+apply :: (Kont, String) -> String
+apply (Done, s) = s
+apply (Next s rgt k, ls) = showk rgt (Conc ls s k)
+apply (Conc ls s k, rs) = apply (k, ls ++ s ++ rs)
+\end{haskell}
+The \hask{showk} function can be now implemented without recourse to higher order functions:
+\begin{haskell}
+showk :: Tree -> Kont -> String
+showk (Leaf s) k = apply (k, s)
+showk (Node lft s rgt) k = showk lft (Next s rgt k)
+\end{haskell}
+To extract the result, we call it with \hask{Done}:
+\begin{haskell}
+showTree t = showk t Done
+\end{haskell}
 
 \section{Monads Categorically}
 
