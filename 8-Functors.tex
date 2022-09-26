@@ -36,12 +36,20 @@ What category theory offers is more precision: the fine distinction between the 
 
 A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Our functions must have underlying algorithms because they have to be computable by some physical systems, be it computers or a human brains. 
 
-\subsection{Opposite and product categories}
+\subsection{Opposite categories}
 In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
  
 One such category is called the \emph{opposite} category. This is the category in which all the original arrows are inverted: what is called the source of an arrow in the original category is now called its target, and vice versa. 
 
-The opposite of a category $\mathcal{C}$ is called $\mathcal{C}^{op}$. We've had a glimpse of this category when we discussed duality. The terminal object in  $\mathcal{C}$ is the initial object in $\mathcal{C}^{op}$, the product in  $\mathcal{C}$ is the sum in $\mathcal{C}^{op}$, and so on. 
+The opposite of a category $\mathcal{C}$ is called $\mathcal{C}^{op}$. We've had a glimpse of this category when we discussed duality. The objects of $\mathcal{C}^{op}$ are the same as those of $\mathcal{C}$. 
+
+Whenever there is an arrow $f \colon a \to b$ in $\mathcal{C}$, there is a corresponding arrow $f^{op} \colon b \to a$ in $\mathcal{C}^{op}$. 
+
+The composition $g^{op} \circ f^{op}$ of two such arrows $f^{op} \colon a \to b$ and $g^{op} \colon b \to c$ is given by the arrow $f \circ g$ (notice the reversed order).
+
+The terminal object in  $\mathcal{C}$ is the initial object in $\mathcal{C}^{op}$, the product in  $\mathcal{C}$ is the sum in $\mathcal{C}^{op}$, and so on. 
+
+\subsection{Product categories}
 
 Given two categories $\mathcal{C}$ and $\mathcal{D}$, we can construct a product category $\mathcal{C} \times \mathcal{D}$. The objects in this category are pairs of objects $\langle c, d \rangle $, and the arrows are pairs of arrows. 
 
@@ -53,9 +61,9 @@ In both of these categories, objects are pairs of objects from $\mathcal{C}$. In
 
 \subsection{Slice categories}
 
-In a neatly organized universe, objects are always objects and arrows are always arrows. Except that sometimes sets of arrows can be thought of as objects. Slice categories go even further: they turn individual arrows into objects. 
+In a neatly organized universe, objects are always objects and arrows are always arrows. Except that sometimes sets of arrows can be thought of as objects. But slice categories break this neat separation: they turn individual arrows into objects. 
 
-A slice category describes how a particular object $c$ is seen from the perspective of its category $\cat C$. It's the totality of arrows pointing at $c$. But to specify an arrow we need to specify both its ends. One of these ends is $c$, so we only need to specify the other.
+A slice category $\cat C/c$ describes how a particular object $c$ is seen from the perspective of its category $\cat C$. It's the totality of arrows pointing at $c$. But to specify an arrow we need to specify both of its ends. Since one of these ends is fixed to be $c$, we only have to specify the other.
 
 An object in the  \index{slice category}\emph{slice category} $\mathcal{C}/c$ (also known as an \index{over category}over-category) is a pair $\langle e, p \rangle$, with $p \colon e \to c$.  
 
