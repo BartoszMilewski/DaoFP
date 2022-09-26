@@ -11,31 +11,33 @@ We were able to define a lot of constructions using their mapping-in and mapping
 \section{The Currying Adjunction}
 
 The definition of the exponential is the classic example of an adjunction that relates mappings-out and mappings-in. Every mapping out of a product corresponds to a unique mapping into the exponential:
-\[  \mathcal{C}(a \times b, c ) \cong  \mathcal{C} (a, c^b)  \]
-The object $c$ takes the role of the focus on the left hand side; the object $a$ becomes the observer on the right hand side. 
+\[  \mathcal{C}(e \times a, b ) \cong  \mathcal{C} (e, b^a)  \]
+The object $b$ takes the role of the focus on the left hand side; the object $e$ becomes the observer on the right hand side. 
 
-On the left, $a$ is mapped to a product $a \times b$, and on the right, $c$ is exponentiated. 
-
-We can spot two functors at play. They are both parameterized by $b$. On the left we have the functor $(- \times b)$ applied to $a$. On the right we have the functor $(-)^b$ applied to $c$. 
+We can spot two functors at play. They are both parameterized by $a$. On the left we have the functor $(- \times a)$ applied to $e$. On the right we have the functor $(-)^a$ applied to $b$. 
 
 If we write these functors as:
-\[ L_b a = a \times b \]
-\[ R_b c = c^b \]
+\[ L_a e = e \times a \]
+\[ R_a b = b^a \]
 then the natural isomorphism
-\[ \mathcal{C}(L_b a, c) \cong \mathcal{C}(a, R_b c) \]
+\[ \mathcal{C}(L_a e, b) \cong \mathcal{C}(e, R_a b) \]
 is called the adjunction between them. 
 
-In components, this isomorphism tells us that, given a mapping $\phi \in \mathcal{C}(L_b a, c)$, there is a unique mapping $\phi^T \in \mathcal{C}(a, R_b c)$ and vice versa. These mappings are sometimes called the \emph{transpose} of each other---the nomenclature taken from matrix algebra.
+In components, this isomorphism tells us that, given a mapping $\phi \in \mathcal{C}(L_a e, b)$, there is a unique mapping $\phi^T \in \mathcal{C}(e, R_a b)$ and vice versa. These mappings are sometimes called the \emph{transpose} of each other---the nomenclature taken from matrix algebra.
 
 The shorthand notation for the adjunction is $L \dashv R$. Substituting the product functor for $L$ and the exponential functor for $R$, we can write the currying adjunction concisely as:
 
-\[ (- \times b) \dashv (-)^b \]
+\[ (- \times a) \dashv (-)^a \]
 
-The exponential object $b^a$ is sometimes called the \index{internal hom}\emph{internal hom} and is written as $[a, b]$. This is in contrast to the \emph{external hom}, which is the set $\cat C (a, b)$. The external hom is not an object in $\cat C$ (except when $\cat C$ itself is $\Set$). With this notation, the currying adjunction can be written as:
-\[  \mathcal{C}(a \times b, c ) \cong  \mathcal{C} (a, [b, c])  \]
+The exponential object $b^a$ is sometimes called the \index{internal hom}\emph{internal hom} and is written as $[a, b]$. This is in contrast to the \emph{external hom}, which is the set $\cat C (a, b)$. The external hom is \emph{not} an object in $\cat C$ (except when $\cat C$ itself is $\Set$). With this notation, the currying adjunction can be written as:
+\[  \mathcal{C}(e \times a, b) \cong  \mathcal{C} (e, [a, b])  \]
 A category in which this adjunction holds is called cartesian closed.
 
-Incidentally, the category of (small) categories $\mathbf{Cat}$ is cartesian closed, as reflected in this adjunction between product categories and functor categories that uses the same internal-hom notation:
+Since functions play central role in every programming language, cartesian closed categories form the basis of all models of programming. We interpret the exponential $b^a$ as the function type $a \to b$. 
+
+Here $e$ plays the role of the external environment---the $\Gamma$ of the lambda calculus. The morphism in $\cat C(e \times a, b)$ is interpreted as an expression of type $b$ in the environment $\Gamma$ extended by a variable of type $a$. The function type $a \to b$ therefore represents a closure that may capture a value of type $e$ from its environment.
+
+Incidentally, the category of (small) categories $\mathbf{Cat}$ is also cartesian closed, as reflected in this adjunction between product categories and functor categories that uses the same internal-hom notation:
 \[ \mathbf{Cat} (\cat A \times \cat B, \cat C) \cong \mathbf{Cat} (\cat A, [\cat B, \cat C]) \]
 Here, both sides are sets of natural transformations.
 
@@ -163,8 +165,42 @@ and the right functor:
 \[ R \colon \mathcal{C} \to  \mathcal{D} \]
 The adjunction $L \dashv R$ is defined as a natural isomorphism between two hom-sets.
 \[  \mathcal{C} (L x, y) \cong \mathcal{D}( x , R y)\]
+In other words, we have a family of invertible functions:
+\[ \phi_{x y} \colon  \mathcal{C} (L x, y) \to \mathcal{D}( x , R y) \]
+natural in both $x$ and $y$. For instance, naturality in $y$ means that, for any $f \colon y \to y'$ the following diagram commutes:
+\[
+ \begin{tikzcd}
+ \mathcal{C}(L x, y)
+ \arrow[d, leftrightarrow, "\phi_{x y}"]
+ \arrow[r, "{\mathcal{C}(L x, f)}"]
+ &
+ \mathcal{C}(L x, y')
+  \arrow[d, leftrightarrow, "\phi_{x y'}"]
+ \\
+ \mathcal{D}(x, R y)
+ \arrow[r, "{\mathcal{D}(x, R f)}"]
+& \mathcal{D}(x, R y')
+ \end{tikzcd}
+\]
+or, considering that a lifting of arrows by hom-functors is the same as post-composition:
+\[
+ \begin{tikzcd}
+ \mathcal{C}(L x, y)
+ \arrow[d, leftrightarrow, "\phi_{x y}"]
+ \arrow[r, "f \circ -"]
+ &
+ \mathcal{C}(L x, y')
+  \arrow[d, leftrightarrow, "\phi_{x y'}"]
+ \\
+ \mathcal{D}(x, R y)
+ \arrow[r, "R f \circ -"]
+& \mathcal{D}(x, R y')
+ \end{tikzcd}
+\]
+The double-headed arrows can be traversed in either direction (using $\phi^{-1}_{x y}$ when going up), since they are the components of an isomorphism.
 
-Pictorially, these are the two functors:
+
+Pictorially, we have two functors:
 \[
  \begin{tikzcd}
   \mathcal{C}
@@ -174,7 +210,7 @@ Pictorially, these are the two functors:
   \arrow[ll, bend right, "L"']
   \end{tikzcd}
 \]
-and this is the isomorphism of hom-sets:
+and, for any pair $x$ and $y$, two isomorphic hom-sets:
 \[
  \begin{tikzcd}
 L x
@@ -213,7 +249,11 @@ Therefore, in a bicartesian category, the sum is the left adjoint to the diagona
 \[ (+) \dashv \Delta \dashv (\times) \]
 
 \begin{exercise}
-The hom-set $\mathcal{C} (L x, y)$ on the left-hand side of the adjunction formula suggests that $L x$ could be seen as a representing object for some functor (a co-presheaf). What is this functor? Hint: It maps a $y$ to a set. What set is it?
+Draw the commuting square witnessing the naturality of the adjunction function $\phi_{x y}$ in $x$.
+\end{exercise}
+
+\begin{exercise}
+The hom-set $\mathcal{C} (L x, y)$ on the left-hand side of the adjunction formula suggests that $L x$ could be seen as a representing object for some functor (a co-presheaf). What is this functor? Hint: It maps $y$ to a set. What set is it?
 \end{exercise}
 
 \begin{exercise}
@@ -222,7 +262,7 @@ Conversely, a representing object $a$ for a presheaf $P$ is defined by:
 What is the presheaf for which $R y$, in the adjunction formula, is the representing object.
 \end{exercise}
 
-\section{Limits and Colimits}
+\section{Limits and Colimits as Adjunctions}
 
 The definition of a limit also involves a natural isomorphism between hom-sets:
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim} D) \]
@@ -237,7 +277,7 @@ Dually, the colimit is described by the following natural isomorphism:
 We can write both adjunctions using one terse formula:
 \[ \text{Colim} \dashv \Delta \dashv \text{Lim}\]
 
-\section{Unit and Counit of Adjunction}
+\section{Unit and Counit of an Adjunction}
 
 We compare arrows for equality, but we prefer to use isomorphisms for comparing objects. 
 
@@ -362,32 +402,219 @@ Given an arrow $g \colon L x \to y$ implement an arrow $x \to R y$ using $\varep
 \subsection{The unit and counit of the currying adjunction}
 
 Let's calculate the unit and the counit of the currying adjunction:
-\[  \mathcal{C}(a \times b, c ) \cong  \mathcal{C} (a, c^b)  \]
-If we replace $c$ with $a \times b$, we get
-\[  \mathcal{C}(a \times b, a \times b ) \cong  \mathcal{C} (a, (a \times b)^b)  \]
+\[  \mathcal{C}(e \times a, b ) \cong  \mathcal{C} (e, b^a)  \]
+If we replace $b$ with $e \times a$, we get
+\[  \mathcal{C}(e \times a, e \times a ) \cong  \mathcal{C} (e, (e \times a)^a)  \]
 Corresponding to the identity arrow on the left, we get the unit of the adjunction on the right:
-\[ \eta \colon a \to (a \times b)^b \]
+\[ \eta \colon e \to (e \times a)^a \]
 This is a curried version of the product constructor. In Haskell, we write it as:
 \begin{haskell}
-mkpair :: a -> (b -> (a, b))
+mkpair :: e -> (a -> (e, a))
 mkpair = curry id
 \end{haskell}
 
-The counit is more interesting. Replacing $a$ with $c^b$ we get:
-\[  \mathcal{C}(c^b \times b, c ) \cong  \mathcal{C} (c^b, c^b)  \]
+The counit is more interesting. Replacing $e$ with $b^a$ we get:
+\[  \mathcal{C}(b^a \times a, b ) \cong  \mathcal{C} (b^a, b^a)  \]
 Corresponding to the identity arrow on the right, we get:
-\[ \varepsilon \colon c^b \times b \to c \]
+\[ \varepsilon \colon b^a \times a \to b \]
 which is the function application arrow. 
 
 In Haskell:
 \begin{haskell}
-apply :: (b -> c, b) -> c
+apply :: (a -> b, a) -> b
 apply = uncurry id
 \end{haskell}
 
 \begin{exercise}
 Derive the unit and counit for the sum and product adjunctions.
 \end{exercise}
+
+\section{Adjunction Using Universal Arrows}
+
+We've seen the definition of an adjunction using the isomorphism of hom-sets, and another one using the pair of unit/counit. It turns out that we can define an adjunction using just one element of this pair, as long as it satisfies a certain universality condition. To see that, we will construct a new category whose objects are arrows. 
+
+We've seen before an example of such a category---the slice category $\cat C/ c$ that collects all the arrows that converge on $c$. Such a category describes the view of the object $c$ from every possible angle in $\cat C$. 
+
+\subsection{Comma category}
+When dealing with an adjunction:
+\[  \mathcal{C} (L d, c) \cong \mathcal{D}( d , R c)\]
+we are observing the object $c$ from a narrower perspective defined by the functor $L$. Think of $L$ as defining a model of the category $\cat D$ inside $\cat C$. We are interested in the view of $c$ from the perspective of this model. The arrows that describe this view form the comma category $L/c$.
+
+
+\[
+\begin{tikzpicture}
+  \def\Xa{2.0};
+  \def\Xb{-2.0};
+  
+  \def\Ytip{-0.9};
+  \def\Yo{0.5}; % oval
+  \def\Yb{-2.0}; % labels
+         \draw (\Xa, 0)[fill=blue!50!green!20]  ellipse (1.6 and 1.6);
+         \draw (\Xb , 0) ellipse (1.6 and 1.6);
+         % oval
+         \draw (\Xb , \Yo)[fill=blue!50!green!20] ellipse (1 and 0.5);
+         
+        % apex
+        \filldraw (\Xb, \Ytip) circle (1pt);
+        \node at ( \Xb, \Ytip - 0.3) { $c$ };
+        
+        % image
+        \filldraw (\Xa, \Yo) circle (1pt);
+        \node at ( \Xa, \Yo + 0.3) { $d$ };
+        
+	% middle of the cone
+	\draw[->] (\Xb, \Yo) -- (\Xb, \Ytip + 0.15);
+	\node at (\Xb - 0.2, \Ytip + 0.5) {$f$};
+        	% sides of the cone
+	%\draw (\Xb, \Ytip) -- (\Xb + 0.95, \Yo - 0.15);
+	%\draw (\Xb, \Ytip) -- (\Xb - 0.95, \Yo - 0.15);
+
+        % categories
+        \node at (\Xa, \Yb) { $\mathcal D$ };
+        \node at (\Xb, \Yb) { $\mathcal C$ };
+        \node[blue] at (0, \Yb + 0.6) { $L$ };
+
+        % functor middle
+        \filldraw (\Xb, \Yo) circle (1pt);
+        \node[blue] at ( \Xb, \Yo + 0.25) { $L d$ };
+	\draw[->, blue, dashed] (\Xa, \Yo) -- (\Xb + 0.1, \Yo);
+	% functor 
+	\draw [<-, blue, dashed] (\Xb + 0.1, \Yo + 0.6)   --   (\Xa - 0.3, \Yo + 1.1);
+	\draw [<-,blue, dashed] (\Xb + 0.1, \Yo - 0.6) -- (\Xa - 0.6, \Ytip - 0.6);
+\end{tikzpicture}
+\]
+
+
+
+An object in the \index{comma category}\emph{comma category} $L/c$ is a pair $\langle d, f \rangle$, where $d$ is an object of $\cat D$ and $f \colon L d \to c$ is an arrow in $\cat C$. 
+
+A morphism from $\langle d, f \rangle$ to $\langle d', f' \rangle$ is an arrow $h \colon d \to d'$ that makes the diagram on the left commute:
+\[
+ \begin{tikzcd}
+ L d
+ \arrow[rd, "f"']
+ \arrow[rr, "L h"]
+ && L d'
+ \arrow[ld, "f'"]
+ \\
+ &c
+  \end{tikzcd}
+ \hspace{30pt}
+\begin{tikzcd}
+ d
+ \arrow[rr, "h"]
+ && d'
+  \end{tikzcd}
+\]
+
+In Haskell, we could implement the objects of the comma category for the functor \hask{f} over \hask{c} as the type of functions:
+\begin{haskell}
+type Comma f c d = f d -> c
+\end{haskell}
+We can't, however, express the commuting conditions that constrain morphisms in that category.
+
+As an example, let's use the product functor:
+\begin{haskell}
+data L e d = P d e
+\end{haskell}
+to construct an element of an object in its comma category over \hask{Int}:
+\begin{haskell}
+x :: Comma (L Bool) Int Int 
+x (P i b) = if b then i else (-i)
+\end{haskell}
+
+\subsection{Universal arrow}
+
+The universal arrow from $L$ to $c$ is defined as the terminal object in the comma category $L / c$. Let's unpack this definition. The terminal object is a pair $\langle t, \tau \rangle$ with a unique morphism from any object $\langle d, f \rangle$. Such a morphism is an arrow $h \colon d \to t$ that satisfies the commuting condition:
+\[
+ \begin{tikzcd}
+ L d
+ \arrow[rd, "f"']
+ \arrow[rr, "L h"]
+ && L t
+ \arrow[ld, "\tau"]
+ \\
+ &c
+  \end{tikzcd}
+\]
+In other words, for any $f$ in the hom-set $\cat C (L d, c)$ there is a unique element $h$ in the hom-set $\cat D (d, t)$ such that:
+\[ f = \tau \circ L h \]
+
+\subsection{Universal arrows from adjunction}
+
+Let's first convince ourselves that, when the functor $L$ has a right adjoint $R$, then for every $c$ there exists a universal arrow from $L$ to $c$. This arrow is given by the pair $\langle R c, \varepsilon_c \rangle$, where $\varepsilon$ is the counit of the adjunction. Indeed, the component of the counit has the right signature for the object in the comma category $L/c$:
+\[ \varepsilon_c \colon L (R c) \to c \]
+
+We'd like to show that $\langle R c, \varepsilon_c \rangle$ is the terminal object in $L/c$. That is, for any object $\langle d, f \colon L d \to c \rangle$ there is a unique $h \colon d \to R c$ such that $f = \varepsilon_c \circ L h$:
+\[
+ \begin{tikzcd}
+ L d
+ \arrow[rd, "f"']
+ \arrow[rr, "L h"]
+ && L (R c)
+ \arrow[ld, "\varepsilon_c"]
+ \\
+ &c
+  \end{tikzcd}
+\]
+
+
+To prove this, let's write the naturality condition for $\phi_{d c}$. For any arrow $h \colon d \to d'$ the following diagram must commute:
+\[
+ \begin{tikzcd}
+ \mathcal{C}(L d', c)
+ \arrow[d, leftrightarrow, "\phi_{d', c}"]
+ \arrow[r, "- \circ L h"]
+ &
+ \mathcal{C}(L d, c)
+  \arrow[d, leftrightarrow, "\phi_{d, c}"]
+ \\
+ \mathcal{D}(d', R c)
+ \arrow[r, "- \circ h"]
+& \mathcal{D}(d, R c)
+ \end{tikzcd}
+\]
+We can now use the Yoneda trick by setting $d'$ to $R c$.
+
+\[
+ \begin{tikzcd}
+ \mathcal{C}(L (R c), c)
+ \arrow[d, leftrightarrow, "\phi_{R c, c}"]
+ \arrow[r, "- \circ L h"]
+ &
+ \mathcal{C}(L d, c)
+  \arrow[d, leftrightarrow, "\phi_{d, c}"]
+ \\
+ \mathcal{D}(R c, R c)
+ \arrow[r, "- \circ h"]
+& \mathcal{D}(d, R c)
+ \end{tikzcd}
+\]
+We can pick the special element of the hom-set $\cat D(R c, R c)$, namely the identity arrow $id_{R c}$ and propagate it through the rest of the diagram. The upper left corner becomes $\varepsilon_c$, the lower right corner becomes $h$, and the upper right corner becomes the adjoint to $h$, which we called $f$:
+
+\[
+ \begin{tikzcd}
+\varepsilon_c
+ \arrow[d, leftrightarrow, "\phi_{R c, c}"]
+ \arrow[r, maps to, "- \circ L h"]
+ &
+f
+  \arrow[d, leftrightarrow, "\phi_{d, c}"]
+ \\
+id_{R c}
+ \arrow[r, maps to, "- \circ h"]
+& h
+ \end{tikzcd}
+\]
+The upper arrow then gives us the sought after equality $f = \varepsilon_c \circ L h$.
+
+\subsection{Adjunction from universal arrows}
+
+The converse result is even more interesting. If, for every $c$, we have a universal arrow from $L$ to $c$, that is a terminal object $\langle t_c, \varepsilon_c \rangle$ in the comma category $L/c$, then we can construct a functor $R$ that is the right adjoint to $L$. The action of this functor on objects is given by $R c = t_c$, and the family $\varepsilon_c$ is natural in $c$ and forms the counit of the adjunction.
+
+Dually, an adjunction can be constructed starting from a family of universal arrows $\eta_d$, which form initial objects in the comma category $d/R$. 
+
+These results will help us prove the Freyd's adjoint functor theorem. 
 
 \section{Distributivity}
 
@@ -567,6 +794,444 @@ We'll come back to free monoids as lists in the chapter on algebras.
 \begin{exercise}
 Write a program that takes a list of integers and interprets it in two ways: once using the additive and once using the multiplicative monoid of integers.
 \end{exercise}
+
+\section{Properties of Adjunctions}
+
+\subsection{Left adjoints preserve colimits}
+
+Colimits were defined as universal cocones. For every cocone---that is a natural transformation from the diagram $D \colon \cat J \to \cat C$ to the constant functor $\Delta_x$---there is a unique factorizing morphism from the colimit $\text{Colim}\, D$ to $x$. This condition can be written as a one-to-one correspondence between the set of cocones and a hom-set:
+\[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim} \, D, x) \]
+The factorizing condition is reflected in the naturality of this isomorphism.
+
+It turns out that the set of cocones is a limit of the following $\Set$-valued functor $F \colon \cat J \to \Set$:
+\[ F j = \cat C(D j, x) \]
+Indeed, we have seen earlier that a limit of a $\Set$-valued functor is equal to a set of cones with the apex $1$ (the singleton set). In our case, each such cone describes a selection of morphisms from the corresponding hom-set $\cat C(D j, x)$:
+\[
+ \begin{tikzcd}
+  & 1
+\arrow[ddr, ""]
+ \arrow[ddl, ""']
+ \arrow[ddd, ""]
+ \\
+\\
+\cat C( D j_1, x)
+\arrow[rr, red]
+\arrow[rd, red]
+&& \cat C( D j_2, x)
+\arrow[dl, red]
+\\
+& \cat C( D j_3, x)
+ \end{tikzcd}
+\]
+Unfolding the hom-sets, we see that these morphism form a cocone with the apex $x$. 
+\[
+\begin{tikzcd}
+ D j_1
+ \arrow[rr, red]
+ \arrow[dr, red]
+ \arrow[dddr, ""']
+ && D j_2
+\arrow[dl, red]
+ \arrow[dddl, ""]
+ \\
+ & D j_3
+ \arrow[dd, ""]
+ \\
+ \\
+ & x
+ \end{tikzcd}
+ \]
+The commuting conditions for the cone are simultaneously the commuting condition for the cocone.
+
+Replacing the set of cocones with the corresponding limit of the hom-functor, we get:
+\[ \text{Lim}\; \cat C (D-, x) \cong \cat C( \text{Colim}\,  D, x) \]
+This identity can be interpreted as the statement that the (contravariant) hom-functor preserves (co-) limits. A functor that preserves colimits is called \index{co-continuous functor}co-continuous.
+
+Now suppose that we have the adjunction $L \dashv R$, where $L \colon \cat C \to \cat D$ and $R$ goes in the opposite direction. We want to show that the left functor $L$ preserves colimits, that is:
+\[ L (\text{Colim} \, D) \cong \text{Colim} (L \circ D) \]
+for any diagram $D \colon \cat J \to \cat C$ for which the colimit exists.
+
+We'll use the Yoneda lemma to show that the mappings out from both sides to an arbitrary $x$ are isomorphic:
+\[ \cat D( L (\text{Colim} \, D), x) \cong \cat D (\text{Colim} (L \circ D), x) \]
+We apply the adjunction to the left hand side to get:
+\[ \cat D( L (\text{Colim} \, D), x) \cong \cat C (\text{Colim}\, D, R x) \]
+Preservation of colimits by the hom-functor gives us:
+\[ \cong \text{Lim}\; \cat C(D -, R x) \]
+Using the adjunction again, we get:
+\[ \cong \text{Lim}\; \cat D((L \circ D) -, x) \]
+And the second application of preservation of colimits gives us the desired result:
+\[ \cong  \cat D((\text{Colim}\;(L \circ D), x) \]
+
+We can use this result to reformulate our earlier proof of distributivity in a cartesian closed category. We use the fact that the product is the left adjoint of the exponential. Left adjoints preserve colimits. A coproduct is a colimit, therefore:
+\[(b + c) \times a \cong b \times a + c \times a \]
+Here, the left functor is $L x = x \times a$, and the diagram $D$ selects a pair of objects $b$ and $c$. 
+
+\subsection{Right adjoints preserve limits}
+Using a dual argument, we can show that right adjoints preserve limits, that is:
+\[ R (\text{Lim}\, D) \cong \text{Lim}\, (R \circ D) \]
+
+We start by showing that the (covariant) hom-functor preserves limits. 
+\[ \text{Lim}\; \cat C( x, D-) \cong \mathcal{C}(x, \text{Lim}\,D) \]
+This follows from the argument that a set of cones that defines the limit is isomorphic to the limit of the $\Set$-valued functor:
+\[ F j = \cat C(x, D j) \]
+A functor that preserves limits is called \index{continuous functor}continuous.
+
+To show that, given the adjunction $L \dashv R$, the right functor $R \colon \cat D \to \cat C$ preserves limits, we use the Yoneda argument:
+\[ \cat C(x, R (\text{Lim}\, D)) \cong \cat C (x, \text{Lim}\, (R \circ D)) \]
+Indeed, we have:
+\[ \cat C(x, R (\text{Lim}\, D)) \cong \cat D(L x, \text{Lim}\, D) \cong \text{Lim}\; \cat D(L x, D-) \cong \cat C(x, \text{Lim}\, (R \circ D))\]
+
+
+\section{Freyd's adjoint functor theorem}
+
+In general functors are lossy---the are not invertible. In some cases we can make up for the lost information and replace it with the ``best guess.'' If we do it in an organized manner, we end up with an adjunction. The question is: given a functor between two categories, what are the conditions under which we can construct its adjoint. 
+
+The answer to this question is given by the Freyd's adjoint functor theorem. At first it might seem like this is a technical theorem involving a very abstract construction called the solution set condition. We'll see later that this condition translates directly to a programming technique called defunctionalization. 
+
+In what follows, we'll focus our attention on constructing the right adjoint to a functor $L \colon \cat D \to \cat C$. A dual reasoning can be used to solve the converse problem of finding the left adjoint to a functor $R \colon \cat C \to \cat D$.
+
+The first observation is that, since the left functor in an adjunction preserves colimits, we have to assume that our functor $L$  preserves colimits. This gives us a hint that the construction of the right adjoint relies on the ability to construct colimits in $\cat D$, and being able to somehow transport them back to $\cat C$ using $L$. 
+
+We could demand that all colimits, large and small, exist in $\cat D$ but this condition is too strong. Even a small category with all colimits is automatically a preorder---that is, it can't have more than one morphism between any two objects. 
+
+But let's ignore size problems for a moment, and see how one would construct the right adjoint to a colimit-preserving functor $L$, whose source category $\cat D$ is small and and has all colimits, large and small (thus it is a preorder).
+
+\subsection{Freyd's theorem in a preorder}
+
+The easiest way to define the right adjoint to $L$ is to construct, for every object $c$, a universal arrow from $L$ to $c$. Such an arrow is the terminal object in the comma category $L/c$---the category of arrows that converge on the object $c$, and which originate of the image of $L$.
+
+\[
+\begin{tikzpicture}
+  \def\Xa{2.0};
+  \def\Xb{-2.0};
+  
+  \def\Ytip{-0.9};
+  \def\Yo{0.5}; % oval
+  \def\Yb{-2.0}; % labels
+         \draw (\Xa, 0)[fill=blue!50!green!20]  ellipse (1.6 and 1.6);
+         \draw (\Xb , 0) ellipse (1.6 and 1.6);
+         % oval
+         \draw (\Xb , \Yo)[fill=blue!50!green!20] ellipse (1 and 0.5);
+         
+        % apex
+        \filldraw (\Xb, \Ytip) circle (1pt);
+        \node at ( \Xb, \Ytip - 0.3) { $c$ };
+        
+        % image
+        \filldraw (\Xa, \Yo) circle (1pt);
+        \node at ( \Xa, \Yo + 0.3) { $d$ };
+        
+	% middle of the cone
+	\draw[->] (\Xb, \Yo) -- (\Xb, \Ytip + 0.15);
+        	% sides of the cone
+	\draw (\Xb, \Ytip) -- (\Xb + 0.95, \Yo - 0.15);
+	\draw (\Xb, \Ytip) -- (\Xb - 0.95, \Yo - 0.15);
+
+        % categories
+        \node at (\Xa, \Yb) { $\mathcal D$ };
+        \node at (\Xb, \Yb) { $\mathcal C$ };
+        \node[blue] at (0, \Yb + 0.6) { $L$ };
+
+        % functor middle
+        \filldraw (\Xb, \Yo) circle (1pt);
+        \node[blue] at ( \Xb, \Yo + 0.25) { $L d$ };
+	\draw[->, blue, dashed] (\Xa, \Yo) -- (\Xb + 0.1, \Yo);
+	% functor 
+	\draw [blue, dashed] (\Xb - 0.1, \Yo + 0.5    )   --   (\Xa - 0.3, \Yo + 1.1);
+	\draw [blue, dashed] (\Xb - 0.3, \Yo - 0.5) -- (\Xa - 0.6, \Ytip - 0.6);
+\end{tikzpicture}
+\]
+
+The important observation is that this comma category describes a cocone in $\cat C$. The base of this cocone is formed by those objects in the image of $L$ that have an unobstructed view of $c$. The arrows in the base of the cocone are the morphisms in $L/c$. These are exactly the arrows that make the sides of the cocone commute.
+\[
+ \begin{tikzcd}
+ L d
+ \arrow[rd, "f"']
+ \arrow[rr, "L h"]
+ && L d'
+ \arrow[ld, "f'"]
+ \\
+ &c
+  \end{tikzcd}
+ \hspace{30pt}
+\begin{tikzcd}
+ d
+ \arrow[rr, "h"]
+ && d'
+  \end{tikzcd}
+\]
+The base of this cocone can be projected back to $\cat D$. There is a projection $\pi_c$ which maps every pair $(d, f)$ in  $L/c$ back to $d$, thus forgetting the arrow $f$. It also maps every morphism in $L/c$ to an arrow in $\cat D$ that gave rise to it. This way $\pi_c$ defines a diagram in $\cat D$. The colimit of this diagram exists, because we assumed that all colimits exist in $\cat D$. Let's call this colimit $t_c$:
+\[ t_c = \text{colim}\; \pi_c \]
+
+\[
+\begin{tikzpicture}
+  \def\Xa{2.0};
+  \def\Xb{-2.0};
+  
+  \def\Ytip{-0.9};
+  \def\Yo{0.5}; % oval
+  \def\Yb{-2.0}; % labels
+         \draw (\Xa, 0)[fill=blue!50!green!20]   ellipse (1.6 and 1.6);
+         \draw (\Xb , 0) ellipse (1.6 and 1.6);
+         % oval
+         \draw (\Xb , \Yo)[fill=blue!50!green!20]  ellipse (1 and 0.5);
+
+        % apex
+        \filldraw (\Xb, \Ytip) circle (1pt);
+        \node at ( \Xb, \Ytip - 0.3) { $c$ };
+                
+        	% sides of the cone
+	\draw (\Xb, \Ytip) -- (\Xb + 0.95, \Yo - 0.15);
+	\draw (\Xb, \Ytip) -- (\Xb - 0.95, \Yo - 0.15);
+
+         % second oval
+         \draw (\Xa , \Yo) [fill=orange!30]  ellipse (1 and 0.5);
+          
+        % apex
+        \filldraw (\Xa, \Ytip) circle (1pt);
+        \node at ( \Xa, \Ytip - 0.3) { $t_c$ };
+
+        	% sides of the cone
+	\draw (\Xa, \Ytip) -- (\Xa + 0.95, \Yo - 0.15);
+	\draw (\Xa, \Ytip) -- (\Xa - 0.95, \Yo - 0.15);
+
+        % categories
+        \node at (\Xa, \Yb) { $\mathcal D$ };
+        \node at (\Xb, \Yb) { $\mathcal C$ };
+        \node[blue] at (0, \Yo) { $\pi_c$ };
+
+	% functor 
+	\draw [->, blue, dashed] (\Xb, \Yo + 0.5) --  (\Xb + 2.2, \Yo + 0.5);
+	\draw [->, blue, dashed] (\Xb, \Yo - 0.5)  -- (\Xb + 2.2, \Yo - 0.5);
+\end{tikzpicture}
+\]
+
+Let's see if we can turn $t_c$ into a terminal object in $L/c$. We have to find an arrow, let's call it $\varepsilon_c \colon L t_c \to c$, such that the pair $\langle t_c, \varepsilon_c \rangle$ is terminal in $L/c$. We already have all the ingredients. We have a diagram and its colimit in $\cat D$, and we have a colimit preserving functor $L$. 
+
+Notice that $L$ maps the diagram generated by $\pi_c$ back to the original diagram corresponding to $L/c$. The projection $\pi_c$ did nothing more than to ignore the sides of the cocone, leaving its base intact. We now have two cocones with the same base: the original one with the apex $c$ and the new one obtained by applying $L$ to the colimit cocone in $\cat D$. Since $L$ preserves colimits, the colimit of the new cocone is $L t_c$---the image of the colimit $t_c$:
+
+\[ \text{colim} \; (L \circ \pi_c) = L ( \text{colim} \; \pi_c) = L t_c\]
+
+By universal construction, we deduce that there must be a unique cocone morphism from the colimit $L t_c$ to $c$, that is a morphism $\varepsilon_c$ that makes the relevant triangles commute. 
+
+What remains to be shown is that $\langle t_c, \varepsilon_c \rangle$ is terminal in $L/c$, that is, for any  $\langle d, f \colon L d \to c \rangle$ there is a unique comma-category morphism $h \colon d \to t_c$ that makes the following triangle commute:
+
+\[
+ \begin{tikzcd}
+ L d
+ \arrow[rd, "f"']
+ \arrow[rr, "L h"]
+ && L t_c
+ \arrow[ld, "\varepsilon_c"]
+ \\
+ &c
+  \end{tikzcd}
+\]
+
+Notice that $d$ is automatically part of the diagram produced by $\pi_c$ (it's the result of $\pi_c$ acting on $\langle d, f \rangle$). Since $t_c$ is defined as the limit of this diagram, we can pick $h$ as the injection into the colimit---the wire in the limiting cocone with the apex $t_c$. 
+
+\[
+\begin{tikzpicture}
+  \def\Xa{2.1};
+  \def\Xb{-2.1};
+  
+  \def\Ytip{0};
+  \def\Ybot{-2};
+  \def\Yo{0}; % oval
+  \def\Yf{-1.2}; % label
+         % first oval
+         \draw (\Xb , \Yo)[fill=blue!50!green!20]  ellipse (1.8 and 0.8);
+
+         % second oval
+         \draw (\Xa , \Yo) [fill=orange!30]  ellipse (1.8 and 0.8);
+          
+        % apex L tc
+        \filldraw (\Xb, \Ytip) circle (1pt);
+        \node at ( \Xb - 0.5, \Ytip) { $L t_c$ };
+        
+        % apex c
+        \filldraw (\Xb, \Ybot) circle (1pt);
+        \node at ( \Xb, \Ybot - 0.3) { $c$ };
+                
+        	% sides of the cone L h
+	\draw[red, ->]  (\Xb + 0.95, \Yo) -- (\Xb + 0.1, \Ytip);
+	\node[red] at (\Xb + 0.5, \Ytip + 0.3) {$L h$};
+
+        % apex tc
+        \filldraw (\Xa, \Ytip) circle (1pt);
+        \node at ( \Xa, \Ytip - 0.3) { $t_c$ };
+
+        	% sides of the cone h
+	\draw [->, red] (\Xa + 0.95, \Yo) -- (\Xa + 0.1, \Ytip);
+	\node[red] at ( \Xa + 0.6, \Ytip + 0.3) { $h$ };
+	
+	% d
+        \filldraw (\Xa + 1, \Yo) circle (1pt);
+        \node at ( \Xa + 1.3, \Yo) { $d$ };
+
+	% L d
+        \filldraw (\Xb + 1, \Yo) circle (1pt);
+        \node at ( \Xb + 1.3, \Yo) { $L d$ };
+        
+        % f
+        \draw[->] (\Xb + 1, \Yo) to (\Xb + 0.05, \Ybot + 0.1);
+        \node at (\Xb + 0.7, \Yf) {$f$};
+        
+        % epsilon
+        \draw[->, dashed] (\Xb, \Ytip) -- (\Xb, \Ybot);
+        \node at (\Xb - 0.3, \Yf) {$\varepsilon_c$};
+
+\end{tikzpicture}
+\]
+The commuting condition then follows from $\varepsilon_c$ being a cocone morphism. It is unique such morphism simply because $\cat D$ is a preorder.
+
+This proves that there is a universal arrow $\langle t_c, \varepsilon_c \rangle$ for every $c$, therefore we have a functor $R$ defined on objects as $R c = t_c$ that is the right adjoint to $L$.
+
+\subsection{Solution set condition}
+
+The problem with the previous proof is that comma categories in most practical cases are large: their objects don't form a set. But maybe we can approximate the comma category by selecting a representative set of objects and arrows. 
+
+To select the objects we'd use a mapping from some indexing set $I$. We define a set of objects $d_i$ where $i \in I$. Since we are trying to approximate the comma category $L/c$, we select objects together with arrows $f_i \colon L d_i \to c$. 
+
+The relevant part of the comma category was encoded in morphism between objects satisfying the commuting condition. We could try to specialize this condition  to apply only to our family of objects, but that would not be enough. We have to find a way to probe other objects of the comma category. 
+
+To do this, we reinterpret the commuting condition as a recipe for factorizing an arbitrary $f \colon L d \to c$ through some pair $\langle d_i, f_i \rangle$:
+\[
+ \begin{tikzcd}
+ L d
+ \arrow[rd, "f"']
+ \arrow[rr, "L h"]
+ && \textcolor{red}{L d_i}
+ \arrow[ld, red, "f_i"]
+ \\
+ &c
+  \end{tikzcd}
+\]
+
+A \index{solution set}\emph{solution set} is a family of pairs $\langle d_i, f_i \colon L d_i \to c \rangle $ indexed by a set $I$ that can be used to factor any pair $\langle d, f \colon L d \to c \rangle $. It means that there exists an index $i \in I$ and an arrow $h \colon d \to d_i$ that factorizes $f$:
+\[ f = f_i \circ L h \]
+
+Another way of expressing this property is to say that there exists a \index{weakly terminal set}\emph{weakly terminal} set of object in the comma category $L/c$. A weakly terminal set has the property that for any object in the category there is a morphism to at least one object in the set.
+
+Previously we've seen that having the terminal object in the comma category $L/c$ for every $c$ is enough to define the adjunction. It turns out that we can achieve the same goal using the solution set. 
+
+The assumptions of the Freyd's adjoint functor theorem state that we have a colimit-preserving functor $L \colon \cat D \to \cat C$ from a small co-complete category. Both these conditions relate to \emph{small} diagrams. If we can pick a solution set $\langle d_i, f_i \colon L d_i \to c \rangle $ for every $c$, then the right adjoint $R$ exists. Solution sets for different $c$'s may be different.
+
+We've seen before that in a cocomplete category the existence of a weakly terminal set is enough to define a terminal object. In our case it means that, for any $c$, we can construct the universal arrow from $L$ to $c$, which is enough to define the adjunction.
+
+A dual version of the adjoint functor theorem can be used to construct the left adjoint.
+
+\subsection{Defunctionalization}
+
+Every programming language lets us define functions, but not all languages support higher level functions (functions taking functions as arguments, or returning functions) or anonymous functions (a.k.a., lambdas). It turns out that, even in such languages, higher order functions can be implemented using the process called defunctionalization. This technique is based on the adjoint functor theorem. Moreover, defunctionalization can be used whenever passing functions around is impractical, for instance in distributed systems.
+
+The idea behind defunctionalization is that a function type is defined as the right adjoint to product. 
+\[ \cat C(e \times a, b) \cong \cat C(e, b^a) \]
+The adjoint functor theorem can be used to approximate this adjoint. 
+
+In general, any finite program can only have a finite number of function definitions. These functions (together with the environments they capture) form the solution set that we can use to construct the function type. In practice, we do it only for a small subset of functions which occur as arguments to, or are returned from, other functions.
+
+A typical example of the usage of higher order functions is the use of continuations. Here's a function that calculates the sum of the elements of a list. But instead of returning the sum it calls a continuation \hask{k}:
+\begin{haskell}
+sumK :: [Int] -> (Int -> r) -> r
+sumK [] k = k 0
+sumK (i : is) k =
+  sumK is (\s -> k (i + s))
+\end{haskell}
+If the list is empty, our function calls the continuation with zero. Otherwise it calls itself recursively, with two arguments, the tail of the list \hask{is} and a new continuation:
+\begin{haskell}
+\s -> k (i + s)
+\end{haskell}
+This new continuation calls the previous continuation \hask{k}, passing it the sum of the head of the list and its argument \hask{s} (which is the accumulated sum). 
+
+Notice that this lambda is a closure: It's a function of one variable \hask{s}, but it also has access to \hask{k} and \hask{i} from its environment.
+
+To extract the final sum, we call our recursive function with the trivial continuation, the identity:
+\begin{haskell}
+sumList :: [Int] -> Int
+sumList as = sumK as (\i -> i)
+\end{haskell}
+
+Anonymous functions are convenient, but nothing prevents us from using named functions. However, if we want to factor out the continuation, we have to be explicit about passing the environment. For instance, we can replace the first lambda with a function \hask{more}---but we have to pass it the environment of the type \hask{(Int, Int -> r)}:
+\begin{haskell}
+more :: (Int, Int -> r) -> Int -> r
+more (i, k) s = k (i + s)
+\end{haskell}
+The other lambda, the identity, uses an empty environment:
+\begin{haskell}
+done :: Int -> Int
+done i = i
+\end{haskell}
+Here's the implementation of our algorithm using named functions:
+\begin{haskell}
+sumK' :: [Int] -> (Int -> r) -> r
+sumK' [] k = k 0
+sumK' (i : is) k =
+  sumK' is (more (i, k))
+\end{haskell}
+
+\begin{haskell}
+sumList :: [Int] -> Int
+sumList is = sumK' is done
+\end{haskell}
+
+In fact, if all we are interested in is calculating the sum, we can replace the polymorphic type \hask{r} with \hask{Int} with no other changes.
+
+This implementation still uses higher order functions. In order to eliminate them, we have to analyze what it means to pass a function as an argument. Such a function can only be used in one way: it can be applied to its arguments. This property of a function type is expressed as the counit of the currying adjunction:
+\[ \varepsilon \colon b^a \times a \to b \]
+or, in Haskell, as a higher-order function:
+\begin{haskell}
+apply :: (a -> b, a) -> b
+\end{haskell}
+This time we are interested in constructing the counit from first principles. We've seen that this can be accomplished using the comma category. In our case, an object of the comma category for the functor $L_a = (-) \times a$ is a pair 
+\[(e, f \colon (e \times a) \to b) \]
+or, in Haskell:
+\begin{haskell}
+data Comma a b e = Comma e ((e, a) -> b)
+\end{haskell}
+A morphism in this category between $(e, f)$ and $(e', f')$ is an arrow $h \colon e \to e'$, which satisfies the commuting condition:
+\[ f' \circ h = f \]
+We interpret this morphism as ``reducing'' the environment. The arrow $f'$ is able to produce the same output $b$ using a potentially smaller environment given by $h (e)$. For instance $e$ may contain variables that are irrelevant for computing $b$ from $a$, and $h$ projects them out. 
+
+In fact, we performed this kind of reduction when defining \hask{more} and \hask{done}. In principle, we could have passed \hask{is} to both functions, since it's accessible at the point of call. But we know that they don't need it.
+
+Formally, we could define the function object $a \to b$ as the colimit of the diagram defined by the comma category. Such a colimit is essentially a giant coproduct of all environments modulo identifications given by comma-category morphisms. These identification do the job of reducing the environment needed by $a \to b$ to the bare minimum. 
+
+In our example, the continuations we're interested in are functions \hask{Int -> Int}. In fact we are not interested in generating the generic function type \hask{Int -> Int}; just the minimal one that would accommodate our two functions \hask{more} and \hask{done}. We can do it by creating a very small solution set. 
+
+In our case the solution set consists of pairs $(e_i, f_i \colon L_a e_i \to b)$ such that any pair $(e, f \colon L_a e \to b)$ can be factorized through one of the $f_i$'s. More precisely, the only two environments we're interested in are \hask{(Int, Int ->Int)} for \hask{more}, and the empty environment \hask{()} for \hask{done}. 
+
+In principle, our solution set should allow for the factorization of every object of the comma category, that is a pair of the type:
+\begin{haskell}
+(e, (e, Int) -> Int)
+\end{haskell}
+but here we are only interested in two specific functions. Also, we are not concerned about uniqueness of representation so, instead of using a colimit (as we did for the adjoint functor theorem), we'll just use a coproduct of all the environments of interest. We end up with the following data type that is the sum of the two environments we're interested in:
+\begin{haskell}
+data Kont = Done | More Int Kont
+\end{haskell}
+Notice that we have recursively encoded the \hask{Int -> Int} part of the environment (the one we used for \hask{more}) as \hask{Kont}. 
+
+If you look at this definition carefully, you will discover that it's the definition of a list of \hask{Int}, modulo some renamings. Every call to \hask{More} pushes another integer on the \hask{Kont} stack. This interpretation agrees with our intuition that recursive algorithms require some kind of a runtime stack. 
+
+We are now ready to implement our approximation to the counit of the adjunction. It's composed from the bodies of the two functions, with the understanding that recursive calls also go through \hask{apply}:
+\begin{haskell}
+apply :: (Kont, Int) -> Int
+apply (Done, i) = i
+apply (More i k, s) = apply (k, i + s)
+\end{haskell}
+The main algorithm can now be rewritten without any higher order functions or lambdas:
+\begin{haskell}
+sumK'' :: [Int] -> Kont -> Int
+sumK'' [] k = apply (k, 0)
+sumK'' (i : is) k = sumK'' is (More i k)
+\end{haskell}
+
+\begin{haskell}
+sumList'' is = sumK'' is Done
+\end{haskell}
+
+The main advantage of defunctionalization is that it can be used in distributed environments. Arguments to remote functions, as long as they are data structures and not functions, can be serialized and send along the wire. All that's needed is for the receiver have access to \hask{apply}. 
+
 \section{The Category of Adjunctions}
 We can define composition of adjunctions by taking advantage of the composition of functors that define them. Two adjunctions, $L \dashv R$ and $L' \dashv R'$, are composable if they share the category in the middle:
 \[
