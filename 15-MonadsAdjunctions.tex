@@ -188,7 +188,7 @@ The bottom of the string diagram corresponds to the composition of functors $G \
 
 \end{tikzpicture}
 \]
-Drawing two parallel vertical lines, in this new system, corresponds to functor composition. You can think of the horizontal composition of natural transformations as happening along the imaginary horizontal line in the middle of the diagram. But what if somebody was sloppy in drawing the diagram, and one of the dots was a little higher than the other? As it turns out, the exact positioning of the dots doesn't matter, due to the interchange law.
+Drawing two parallel vertical lines, in this new system, corresponds to functor composition. You may think of the horizontal composition of natural transformations as happening along the imaginary horizontal line in the middle of the diagram. But what if somebody was sloppy in drawing the diagram, and one of the dots was a little higher than the other? As it turns out, the exact positioning of the dots doesn't matter, due to the interchange law.
 
 But first, let's illustrate whiskering: horizontal composition in which one of the natural transformation is the identity. We can draw it like this:
 
@@ -297,12 +297,12 @@ Here's the string diagram that corresponds to the interchange law:
 
 \node[below] (a) at (\xa, \ya) {$F$};
 \node(b) at (\xa, \yb) {};
-\node [above] (c) at (\xa, \yc) {$H$};
-\node [right] (ml) at (\xa, \ymid) {$G$};
+\node [above] (c) at (\xa, \yc) {$F''$};
+\node [right] (ml) at (\xa, \ymid) {$F'$};
 
-\node[below] (d) at (\xb, \ya) {$F'$};
+\node[below] (d) at (\xb, \ya) {$G$};
 \node(e) at (\xb, \yb) {};
-\node [above] (f) at (\xb, \yc) {$H'$};
+\node [above] (f) at (\xb, \yc) {$G''$};
 \node [right] (ml) at (\xb, \ymid) {$G'$};
 
 \node(l)[right] at (\xl, \yt) {$\mathcal{C}$};
@@ -330,7 +330,56 @@ Here's the string diagram that corresponds to the interchange law:
 \]
 This diagram is purposefully ambiguous. Are we supposed to first do vertical composition of natural transformations and then the horizontal one? Or should we compose $\beta \circ \alpha$ and $\beta' \circ \alpha'$ horizontally, and then compose the results vertically? The interchange law says that it doesn't matter: the result is the same. 
 
-Now try to replace a pair of natural transformations in this diagram with identities. If you replace $\alpha'$ and $\beta'$, you get the horizontal composition of $\beta \circ \alpha$. If you replace $\alpha'$ and $\beta$, and rename $\beta'$ to $\beta$, you get the diagram in which $\alpha$ is shifted down with respect to $\beta$, and so on. The interchange law tells us that all these diagrams are equal. We are free to slide natural transformations like beads on a string.
+Now try to replace a pair of natural transformations in this diagram with identities. If you replace $\alpha'$ and $\beta'$, you get the horizontal composition of $\beta \circ \alpha$. If you replace $\alpha'$ and $\beta$ with identity natural transformations, and rename $\beta'$ to $\beta$, you get the diagram in which $\alpha$ is shifted down with respect to $\beta$, and so on. 
+
+\[
+\begin{tikzpicture}
+\def\xl{-2.75};
+\def\xa{-1};
+\def\xc{0}
+\def\xb{1};
+\def\xr{2.75};
+
+
+\def \ya{0.2};
+\def \yb{1};
+\def \ybb{2}
+\def \yc{2.8};
+\def \yt {\yc -0.3};
+\def \ymid {1.5}
+
+\filldraw[fill=blue!50!green!20, draw=white] (\xl, \ya) rectangle (\xa, \yc);
+\filldraw[fill=black!10!white, draw=white] (\xa, \ya) rectangle (\xb, \yc);
+\filldraw[fill=orange!30, draw=white] (\xb, \ya) rectangle (\xr, \yc);
+
+\node[below] (a) at (\xa, \ya) {$F$};
+\node(b) at (\xa, \yb) {};
+\node [above] (c) at (\xa, \yc) {$F'$};
+
+\node[below] (d) at (\xb, \ya) {$G$};
+\node(e) at (\xb, \yb) {};
+\node [above] (f) at (\xb, \yc) {$G'$};
+
+\node(l)[right] at (\xl, \yt) {$\mathcal{C}$};
+\node(r) at (\xc, \yt) {$\mathcal{D}$};
+\node(r)[left] at (\xr, \yt) {$\mathcal{E}$};
+
+
+\filldraw[black] (b) circle (1 pt);
+\node [left] at (b) {$\alpha$};
+
+\node(bb) at (\xa, \ybb) {};
+\node(ee) at (\xb, \ybb) {};
+
+\filldraw[black] (ee) circle (1 pt);
+\node [left] at (ee) {$\beta$};
+
+\draw (a)  -- (c);
+\draw (d)  -- (f);
+
+\end{tikzpicture}
+\]
+The interchange law tells us that all these diagrams are equal. We are free to slide natural transformations like beads on a string.
 
 \subsection{String diagrams for the monad}
 
@@ -356,7 +405,7 @@ A monad is defined as an endofunctor equipped with two natural transformations, 
 \end{tikzcd}
 \]
 
-Since we are dealing with just one category, when translating these diagrams to string diagrams, we can dispose of the naming (and shading) of categories, and just draw the strings alone.
+Since we are dealing with just one category, when translating these diagrams to string diagrams, we can dispose of the naming (and the shading) of categories, and just draw the strings alone.
 \[
 \begin{tikzpicture}
 
@@ -397,7 +446,7 @@ Since we are dealing with just one category, when translating these diagrams to 
 
 \end{tikzpicture}
 \]
-In the first diagram, it's customary to skip the dashed line corresponding to the identity functor. The $\eta$ dot can be used to freely inject a $T$ line into a diagram. Two $T$ lines can be joined by the $\mu$ dot. 
+In the first diagram it's customary to skip the dashed line corresponding to the identity functor. The $\eta$ dot can be used to freely inject a $T$ line into a diagram. Two $T$ lines can be joined by the $\mu$ dot. 
 
 String diagrams are especially useful in expressing monad laws. For instance, we have the left identity law:
 \[ \mu \circ (\eta \circ T) = id \]
@@ -444,7 +493,7 @@ The corresponding string diagrams representat the equality of the two paths thro
 \draw (e) -- node[right] {$T$} (f);
 \end{tikzpicture}
 \]
-You can think of this equality as the result of pulling on the top and bottom strings resulting in the $\eta$ appendage being retracted into the straight line.
+You may think of this equality as the result of pulling on the top and bottom strings resulting in the $\eta$ appendage being retracted into the straight line.
 
 There is a symmetric right identity law:
 \[
@@ -684,7 +733,7 @@ Draw the string diagrams for the second triangle identity.
 
 You might have noticed that the same symbol $\eta$ is used for the unit of the adjunction and for the unit of the monad. This is \emph{not} a coincidence. 
 
-At first sight it might seem like we are comparing apples to oranges: an adjunction is defined with two functors between two categories and a monad is defined by one endofunctor operating on a single category. However, the composition of the two functors going in opposite directions is an endofunctor, and the unit of the adjunction maps the identity endofunctor to the endofunctor $R \circ L$. 
+At first sight it might seem like we are comparing apples to oranges: an adjunction is defined with two functors between two categories and a monad is defined by one endofunctor operating on a single category. However, the composition of two functors going in opposite directions is an endofunctor, and the unit of the adjunction maps the identity endofunctor to the endofunctor $R \circ L$. 
 
 Compare this diagram:
 \[
@@ -741,7 +790,7 @@ with the one defining the monadic unit:
 \end{tikzpicture}
 \]
 
-It turns out that $T = R \circ L$ is in fact a monad, with the multiplication $\mu$ defined by the following diagram:
+It turns out that, for any andjuncion $L \dashv R$, the endofunctor $T = R \circ L$ is a monad, with the multiplication $\mu$ defined by the following diagram:
 
 \[
 \begin{tikzpicture}
@@ -794,7 +843,7 @@ It turns out that $T = R \circ L$ is in fact a monad, with the multiplication $\
 \]
 Reading this diagram bottom-to-top, we get the following transformation (imagine slicing it horizontally at the dot):
 \[  R \circ L \circ R \circ L \xrightarrow{R \circ \varepsilon \circ L} R \circ L  \]
-Compare this with the definition of monadic $\mu$:
+Compare this with the definition of the monadic $\mu$:
 
 \[
 \begin{tikzpicture}
@@ -825,7 +874,7 @@ Compare this with the definition of monadic $\mu$:
 
 \end{tikzpicture}
 \]
-This gives us the definition of $\mu$ for the monad $R \circ L$ as the double-whiskering of $\varepsilon$:
+We get the definition of $\mu$ for the monad $R \circ L$ as the double-whiskering of $\varepsilon$:
 \[ \mu = R \circ \varepsilon \circ L \]
 
 To complete the picture, we can use string diagrams to derive monadic laws using triangle identities. The trick is to replace all strings in monadic laws by pairs of parallel strings and then rearrange them according to the rules.
@@ -840,36 +889,39 @@ Draw string diagrams to illustrate monadic laws (unit and associativity) for the
 
 \section{Examples of Monads from Adjunctions}
 
-We'll go through several examples of adjunctions that generate some of the monads that we use in programming. Most examples involve functors that leave the category of Haskell types and functions, even though the round trip that generates the monad ends up being an endofunctor. This is why it's often impossible to express such adjunctions in Haskell. 
+We'll go through several examples of adjunctions that generate some of the monads that we use in programming. We'll expand on these examples later, when we talk about monad transformers.
+
+Most examples involve functors that leave the category of Haskell types and functions, even though the round trip that generates the monad ends up being an endofunctor. This is why it's often impossible to express such adjunctions in Haskell. 
 
 To additionally complicate things, there is a lot of bookkeeping related to explicit naming of data constructors, which is necessary for type inference to work. This may sometimes obscure the simplicity on the underlying formulas.
 
 \subsection{Free monoid and the list monad}
-The list monad corresponds to the free monoid adjunction we've seen before. The unit of this adjunction, $\eta_X \colon X \to U (F X)$, injects the elements of the set $X$ as the generators of the free monoid $F X$, and $U$ extracts the underlying set. 
+The list monad is generated by the free monoid adjunction we've seen before. The unit of this adjunction, $\eta_X \colon X \to U (F X)$, injects the elements of the set $X$ as the generators of the free monoid $F X$, after which $U$ extracts the underlying set. 
 
-We represent the free monoid as a list, and its generators are singleton lists. The unit $\eta_X$ maps elements of $X$ to such singletons:
+In Haskell, we represent the free monoid as a list, and its generators are singleton lists. The unit $\eta_X$ maps elements of $X$ to such singletons:
 \begin{haskell}
 return x = [x]
 \end{haskell}
-To implement the counit, $\varepsilon_M \colon F (U M) \to M$, we take a monoid $M$, forget its multiplication, and use its set of elements as generators for the free monoid. The counit is a monoid morphism from that free monoid back to $M$. It turns out to be a special case of a catamorphism. 
+To implement the counit, $\varepsilon_M \colon F (U M) \to M$, we take a monoid $M$, forget its multiplication, and use its set of elements as generators for a new free monoid. A component of the counit is a monoid morphism from that free monoid back to $M$. It turns out that this monoid morphism is a special case of a catamorphism. 
 
-Recall the Haskell implementation of a list catamorphism:
+First, recall the Haskell implementation of a general list catamorphism:
 \begin{haskell}
 foldMap :: Monoid m => (a -> m) -> ([a] -> m)
 foldMap f = foldr mappend mempty . fmap f
 \end{haskell}
-We can interpret it as taking a function from \hask{a} to the underlying set of a monoid \hask{m} and producing a monoid morphism from the free monoid generated by \hask{a} to \hask{m}. 
+We can interpret it as taking a function from \hask{a} to the underlying set of a monoid \hask{m} and producing a monoid morphism from the free monoid generated by \hask{a} (a list of \hask{a}'s) to \hask{m}. 
 
-The counit is a monoid morphism \hask{[m] -> m}. We get it by applying \hask{foldMap} to identity. The result is \hask{foldMap id }, or 
+The counit is a monoid morphism \hask{[m] -> m}. We get it by applying \hask{foldMap} to identity. The result is \hask{foldMap id } or, in terms of \hask{foldr}:
 \begin{haskell}
 epsilon = foldr mappend mempty
 \end{haskell}
+It is a monoid morphism since it maps an empty list to the monoidal unit, and concatenation to monoidal product.
 
-Monad multiplication is given by the whiskering of the counit:
+Monadic multiplication is given by the whiskering of the counit:
 \[ \mu = U \circ \varepsilon \circ F \]
-You can easily convince yourself that left whiskering doesn't do much here, since it's just a lifting of a monoid morphism by the forgetful functor. It keeps the function while forgetting about its special property of preserving structure. 
+You can easily convince yourself that whiskering on the left doesn't do much here, since it's just a lifting of a monoid morphism by the forgetful functor. It keeps the function while forgetting about its special property of preserving structure. 
 
-The right whiskering by $F$ is more interesting. It means taking the component of $\varepsilon$ at a free monoid generated from the set $X$, that is $\varepsilon_{F X}$. This  free monoid is defined by:
+The right whiskering by $F$ is more interesting. It means that the component $\mu_X$ corresponds to the component of $\varepsilon$ at $F X$, which is the free monoid generated from the set $X$. This  free monoid is defined by:
 \begin{haskell}
 mempty = []
 mappend = (++)
@@ -878,7 +930,7 @@ which gives us the definition of $\mu$ or \hask{join}:
 \begin{haskell}
 join = foldr (++) []
 \end{haskell}
-As expected, this is the same as \hask{concat}.
+As expected, this is the same as \hask{concat}. In the list monad, multiplication is concatenation.
 
 \subsection{The currying adjunction and the state monad}
 
@@ -906,7 +958,7 @@ If you expand this definition, it's easy to recognize in it the \hask{State} fun
 newtype State s a = State (s -> (a, s))
 \end{haskell}
 
-The unit of the adjunction $L_s \dashv R_s$ is:
+The unit of the adjunction $L_s \dashv R_s$ is a mapping:
 \[ \eta_a \colon a \to (a \times s)^s \]
 which can be implemented in Haskell as:
 \begin{haskell}
@@ -937,7 +989,7 @@ mu = fmap epsilon
 \end{haskell}
 Here, whiskering on the right doesn't do anything other than select a component of the natural transformation. This is done automatically by Haskell's type inference engine. 
 
-Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap} (here, it's equivalent to precomposition) to perform that.
+Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap} (here, it's equivalent to precomposition)t.
 
 Compare this with the implementation of \hask{join}:
 \begin{haskell}
@@ -953,7 +1005,9 @@ When it's uncurried, its type signature becomes:
 \begin{haskell}
 uncurry runState :: (State s a , s) -> (a, s)
 \end{haskell}
-which is equivalent to that of \hask{epsilon}. When partially applied, it just strips the data constructor exposing the underlying function type:
+which is equivalent to that of \hask{epsilon}. 
+
+When partially applied, \hask{runState} just strips the data constructor exposing the underlying function type:
 \begin{haskell}
 runState st ::  s -> (a, s)
 \end{haskell}
@@ -999,13 +1053,34 @@ In other words, it doesn't matter if we first do the action $a_m$, and then map 
 
 There is a forgetful functor $U$ from $\mathbf{MSet}$ to $\mathbf{Set}$, which assigns the set $S$ to to the pair $(S, a)$, thus forgetting the action.  
 
-Corresponding to it there is a free functor $F$. Its action on a set $S$ produces an M-set that is a cartesian product of $S$ and $M$ (where $M$ is treated as a set of elements). An element of this M-set is a pair $(x \in S, m \in M)$ and the free action is defined by:
+Corresponding to it there is a free functor $F$. Its action on a set $S$ produces an M-set. It's a set that is a cartesian product of $S$ and $M$, where $M$ is treated as a set of elements (in other words, the result of the action of a forgetful functor on a monoid). An element of this M-set is a pair $(x \in S, m \in M)$ and the free action is defined by:
 \[ \phi_n \colon (x, m) \mapsto (x, n \cdot m) \]
 leaving the element $x$ unchanged, and only multiplying the $m$-component.
 
-To show that $F$ is left adjoint to $U$ we have to construct the following natural isomorphism, for any set $S$ and any M-set $Q$:
+To show that $F$ is left adjoint to $U$ we have to construct the following natural isomorphism:
 \[ \mathbf{MSet}( F S, Q) \cong \mathbf{Set}(S, U Q) \]
-The trick here is to notice that an equivariant mapping on the left is fully determined by its action on the elements of the form $(x, 1) \in F S$.
+for any set $S$ and any M-set $Q$. If we represent $Q$ as a pair $(R, b)$, the element of the right hand side of the adjunction is a function $g \colon S \to R$. 
+
+The trick here is to notice that an equivariant mapping $f$ on the left is fully determined by its action on the elements of the form $(x, 1) \in F S$, which in turn is fully determined by $g \colon x \mapsto r$. 
+
+Indeed, from the equivariance condition it follows that:
+\[
+ \begin{tikzcd}
+ (x, 1)
+ \arrow[r, mapsto, "f"]
+ \arrow[d, mapsto, "\phi_m"]
+ & r
+\arrow[d, mapsto, "b_m"]
+ \\
+(x, m \cdot 1)
+ \arrow[r, mapsto, "f"]
+ & r'
+  \end{tikzcd}
+\]
+or:
+\[ f (x, m) = b_m ( f (x, 1)) \]
+Thus every function $g \colon S \to R$ uniquely defines an equivariant mapping $f \colon F S \to Q$:
+\[ f (x, m) = b_m (g x) \]
 
 The unit of this adjunction $\eta_S \colon S \to U (F S)$ maps an element $x$ to a pair $(x, 1)$. Compare this with the definition of \hask{return} for the writer monad:
 \begin{haskell}
@@ -1015,7 +1090,7 @@ return a = Writer (a, mempty)
 The counit is given by an equivariant map:
 \[ \varepsilon_Q \colon F (U Q) \to Q \]
 
-The left hand side is an M-set constructed by taking the underlying set of $Q$ and pairing it with $M$. The original action of $Q$ is forgotten and replaced by the free action. The obvious choice for counit is:
+The left hand side is an M-set constructed by taking the underlying set of $Q$ and taking its product with the underlying set of $M$. The original action of $Q$ is forgotten and replaced by the free action. The obvious choice for counit is:
 \[ \varepsilon_Q \colon (x, m) \mapsto a_m x \]
 where $x$ is an element of (the underlying set of) $Q$ and $a$ is the action defined in $Q$.
 
@@ -1031,29 +1106,29 @@ join (Writer ( Writer (x, m), m')) = Writer (x, mappend m' m)
 
 \subsection{Pointed objects and the \hask{Maybe} monad}
 
-Pointed objects are objects with a designated element. Since picking an element is done using the arrow from the terminal object, the category of pointed objects is defined using pairs $(a, p \colon 1 \to a)$, where $a$ is an object in $\mathcal{C}$. 
+Pointed objects are objects with a designated element. Since picking an element is done using an arrow from the terminal object, the category of pointed objects is defined using pairs $(a, p \colon 1 \to a)$, where $a$ is an object in $\mathcal{C}$. 
 
-The arrows between these pairs are the arrows in $\mathcal{C}$ that preserve the points. Thus an arrow from $(a, p \colon 1 \to a)$ to $(b, q \colon 1 \to b)$ is an arrow $f \colon a \to b$ such that $q = f \circ p$. This category is also called a \emph{coslice category} and is written as $1/\mathcal{C}$.
+The morphisms between these pairs are the arrows in $\mathcal{C}$ that preserve the points. Thus an arrow from $(a, p \colon 1 \to a)$ to $(b, q \colon 1 \to b)$ is an arrow $f \colon a \to b$ such that $q = f \circ p$. This category is also called a \emph{coslice category} and is written as $1/\mathcal{C}$.
 
 There is an obvious forgetful functor $U \colon 1/\mathcal{C} \to \mathcal{C}$ that forgets the point. Its left adjoint is a free functor $F$ that maps an object $a$ to a pair $(1 + a, \text{Left})$. In other words, $F$ freely ads a point to an object. 
+
+The \hask{Either} monad is similarly constructed by replacing $1$ with a fixed object $e$.
 
 \begin{exercise}
 Show that $U \circ F$ is the \hask{Maybe} monad.
 \end{exercise}
 
-The \hask{Either} monad is similarly constructed by replacing $1$ with a fixed object $e$.
-
 \subsection{The continuation monad}
 
-The continuation monad is defined in terms of a pair of contravariant functors in the category of sets. We don't have to modify the definition of an adjunction to work with contravariant functors. It's enough to select the opposite category for one of the endpoints. 
+The continuation monad is defined in terms of a pair of contravariant functors in the category of sets. We don't have to modify the definition of the adjunction to work with contravariant functors. It's enough to select the opposite category for one of the endpoints. 
 
 We'll define the left functor as:
-\[ L_R \colon \mathbf{Set}^{op} \to \mathbf{Set} \] 
+\[ L_Z \colon \mathbf{Set}^{op} \to \mathbf{Set} \] 
 It maps a set $X$ to the hom-set in $\mathbf{Set}$:
-\[ L_R X = \mathbf{Set}(X, R) \] 
-This functor is parameterized by another set $R$. The right functor is defined by essentially the same formula:
-\[ L_R \colon \mathbf{Set} \to \mathbf{Set}^{op} \] 
-\[ L_R X = \mathbf{Set^{op}}(R, X)  = \mathbf{Set}(X, R) \] 
+\[ L_Z X = \mathbf{Set}(X, Z) \] 
+This functor is parameterized by another set $Z$. The right functor is defined by essentially the same formula:
+\[ R_Z \colon \mathbf{Set} \to \mathbf{Set}^{op} \] 
+\[ R_Z X = \mathbf{Set^{op}}(Z, X)  = \mathbf{Set}(X, Z) \] 
 
 
 The composition $R \circ L$ can be written in Haskell as \hask{((x -> r) -> r)}, which is the same as the (covariant) endofunctor that defines the continuation monad.
@@ -1080,7 +1155,7 @@ instance Monad (MaybeState s) where
 \end{haskell}
 and, if you are diligent enough, check that it satisfies the monad laws.
 
-There is no general recipe for combining monads. In that sense, monads are not composable. However, we know that adjunctions are composable. We've seen how to get monads from adjunctions and, as we'll soon see, every monad can be obtained this way. So, if we can match adjunctions, the monads they generate will automatically compose.
+There is no general recipe for combining monads. In that sense, monads are not composable. However, we know that adjunctions are composable. We've also seen how to get monads from adjunctions and, as we'll soon see, every monad can be obtained this way. So, if we can match adjunctions, the monads they generate will automatically compose.
 
 Consider two composable adjunctions:
 \[
@@ -1100,13 +1175,13 @@ There are three monads in this picture. There is the ``inner'' monad $R' \circ L
 
 If we call the inner monad $T = R' \circ L'$, then $R \circ T \circ L$ is the composite monad called the \emph{monad transformer}, because it transforms the monad $T$ into a new monad. 
 
-In our example, \hask{Maybe} is the inner monad:
+In our example, we can treat \hask{Maybe} as the inner monad:
 \[ T a = 1 + a \]
 It is transformed using the outer adjunction $L_s \dashv R_s$, where:
 \[ L_s a = a \times s \]
 \[ R_s c = c^s \]
 The result is:
-\[ (1 + a \times s)^s\]
+\[ (R_s \circ T \circ L_s) a = (1 + a \times s)^s\]
 or, in Haskell:
 \begin{haskell}
 s -> Maybe (a, s)
@@ -1221,7 +1296,7 @@ followed by the whiskered inner multiplication $R \circ \mu^i \circ L$. In compo
 
 Let's unpack these equations for the case of the state monad transformer. The state monad is generated by the currying adjunction. The left functor $L_s$ is the product functor \hask{(a, s)}, and the right functor $R_s$ is the exponential, a.k.a., the reader functor \hask{(s -> a)}. 
 
-The outer counit $\varepsilon^o_a$ is function application:
+As we've seen before, the outer counit $\varepsilon^o_a$ is function application:
 \begin{haskell}
 epsilon :: (s -> a, s) -> a
 epsilon (f, x) = f x
@@ -1233,7 +1308,7 @@ eta x = \s -> (x, s)
 \end{haskell}
 
 
-We'll keep the inner monad $(T, \eta^i, \mu^i)$ arbitrary. In Haskell, we'll call these \hask{m}, \hask{return}, and \hask{join}.
+We'll keep the inner monad $(T, \eta^i, \mu^i)$ arbitrary. In Haskell, we'll call this triple \hask{m}, \hask{return}, and \hask{join}.
 
 The composite monad that we get by applying the state monad transformer to the monad $T$, is the composition $R \circ T \circ L$ or, in Haskell:
 \begin{haskell}
@@ -1248,7 +1323,11 @@ runStateT (StateT h) s = h s
 The unit of the monad transformer is the vertical composition of $\eta^o$ and $R \circ \eta^i \circ L$. In components:
 \[ \eta_a = R(\eta^i_{L a}) \circ \eta^o_a \]
 
-There are a lot of moving parts in this formula, so let's analyze it step-by-step. We start from the right: we have the $a$-component of the unit of the adjunction, which is an arrow from $a$ to $R (L a)$. In Haskell, it's the function \hask{eta}. Let's evaluate this function at some \hask{x :: a}. The result is another function \hask{s -> (a, s)}. We pass this function as the argument to $R(\eta^i_{L a})$. 
+There are a lot of moving parts in this formula, so let's analyze it step-by-step. We start from the right: we have the $a$-component of the unit of the adjunction, which is an arrow from $a$ to $R (L a)$. In Haskell, it's the function \hask{eta}. 
+\begin{haskell}
+eta :: a -> s -> (a, s)
+\end{haskell}
+Let's evaluate this function at some \hask{x :: a}. The result is another function \hask{s -> (a, s)}. We pass this function as an argument to $R(\eta^i_{L a})$. 
 
 $\eta^i_{L a}$ is the component of \hask{return} of the inner monad taken at $L a$. Here, $L a$ is the type \hask{(a, s)}. So we are instantiating the polymorphic function \hask{return :: a -> m a} as a function \hask{(a, s) -> m (a, s)}. (The type inferencer will do this automatically for us.)
 
