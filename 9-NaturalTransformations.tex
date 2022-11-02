@@ -420,9 +420,36 @@ Fortunately, the are equal due to naturality of $\beta$.
 \]
 The proof of naturality of $\beta \circ \alpha$ is left as an exercise to a dedicated reader.
 
+We can translate this directly to Haskell. We start with two natural transformations:
+\begin{haskell}
+alpha :: forall x. F x -> F' x
+beta  :: forall x. G x -> G' x
+\end{haskell}
+Their horizontal composition has the following type signature:
+\begin{haskell}
+beta_alpha :: forall x. G (F x) -> G' (F' x)
+\end{haskell}
+It has two equivalent implementations. The first one is:
+\begin{haskell}
+beta_alpha = beta . fmap alpha
+\end{haskell}
+The compiler will automatically pick the correct version of \hask{fmap}, the one for the functor \hask{G}. The second implementation is:
+\begin{haskell}
+beta_alpha = fmap alpha . beta
+\end{haskell}
+Here, the compiler will pick the version of \hask{fmap} for the functor \hask{G'}.
+
+\begin{exercise}
+Implement two versions of horizontal composition of \hask{safeHead} after \hask{reverse}. Compare their results acting on various arguments.
+\end{exercise}
+
+\begin{exercise}
+Do the same with the horizontal composition of \hask{reverse} after \hask{safeHead}. 
+\end{exercise}
+
 \subsection{Whiskering}
 
-Quite often horizontal composition is used with one of the natural transformations being the identity. There is a shorthand notation for such composition. For instance, $\beta \circ id_F$ is written as $\beta \circ F$. 
+Quite often horizontal composition is used with one of the natural transformations being the identity. There is a shorthand notation for such composition. For instance, $\alpha \circ id_F$ is written as $\alpha \circ F$. 
 
 Because of the characteristic shape of the diagram, such composition is called ``whiskering''.
 \[
@@ -435,53 +462,80 @@ Because of the characteristic shape of the diagram, such composition is called `
   \arrow[bend right=50]{r}[name=D1, label=below:$G'$]{} 
  &
 \mathcal{E}
-  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\beta$] {} (D1)}]{}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\alpha$] {} (D1)}]{}
 \end{tikzcd}
 \]
 In components, we have:
-\[ (\beta \circ F)_x = \beta_{F x} \]
+\[ (\alpha \circ F)_x = \alpha_{F x} \]
 
 Let's consider how we would translate this to Haskell. A natural transformation is a polymorphic function. Because of parametricity, it's defined by the same formula for all types. So whiskering on the right doesn't change the formula, it changes function signature. 
 
-For instance, if this is the declaration of \hask{beta}:
+For instance, if this is the declaration of \hask{alpha}:
 \begin{haskell}
-beta :: G x -> G' x
+alpha :: G x -> G' x
 \end{haskell}
 then its whiskered version would be:
 \begin{haskell}
-beta_F :: G (F x) -> G' (F x)
+alpha_f :: G (F x) -> G' (F x)
+alpha_f = alpha
 \end{haskell}
 Because of Haskell's type inference, this shift is often implicit.
 
-Similarly, $id_G \circ \alpha$ is written as $G \circ \alpha$.
+Similarly, $id_H \circ \alpha$ is written as $H \circ \alpha$.
 \[
 \begin{tikzcd}[column sep=huge]
-\mathcal{C}
-  \arrow[bend left=50]{r}[name=U, label=above:$F$]{}
-  \arrow[bend right=50]{r}[name=D, label=below:$F'$]{} 
- &
 \mathcal{D}
-\arrow[r, "G"]
-&
+  \arrow[bend left=50]{r}[name=U, label=above:$G$]{}
+  \arrow[bend right=50]{r}[name=D, label=below:$G'$]{} 
+ &
 \mathcal{E}
+\arrow[r, "H"]
+&
+\mathcal{F}
   \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U) -- node[label=left:$\alpha$] {} (D)}]{}
 \end{tikzcd}
 \]
 In components:
-\[(G \circ \alpha)_x = G (\alpha_x) \]
+\[(H \circ \alpha)_x = H (\alpha_x) \]
 
-In Haskell, the lifting of $\alpha_x$ by $G$ is done using \hask{fmap}, so given:
+In Haskell, the lifting of $\alpha_x$ by $H$ is done using \hask{fmap}, so given:
 \begin{haskell}
-alpha :: F x -> F' x
+alpha :: G x -> G' x
 \end{haskell}
 the whiskered version would be:
 \begin{haskell}
-g_alpha :: G (F x) -> G (F' x)
-g_alpha = fmap alpha
+h_alpha :: H (G x) -> H (G' x)
+h_alpha = fmap alpha
 \end{haskell}
 Again, Haskell's type inference engine figures out which version of \hask{fmap} to use (here, it's the one from the \hask{Functor} instance of \hask{G}).
 
+Finally, in many applications a natural transformation is whiskered on both sides:
+\[
+\begin{tikzcd}[column sep=huge]
+\mathcal{C}
+ \arrow[r, "F"]
+ &
+\mathcal{D}
+  \arrow[bend left=50]{r}[name=U1, label=above:$G$]{}
+  \arrow[bend right=50]{r}[name=D1, label=below:$G'$]{} 
+ &
+\mathcal{E}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\alpha$] {} (D1)}]{}
+  \arrow[r, "H"]
+ &
+ \mathcal{F}
+\end{tikzcd}
+\]
+In components, we have:
+\[ (H \circ \alpha \circ F) x = H (\alpha_{F x})\]
+and in Haskell:
+\begin{haskell}
+h_alpha_f :: H (G (F x)) -> H (G' (F x))
+h_alpha_f = fmap alpha
+\end{haskell}
+
 \subsection{Interchange law}
+
 We can combine vertical composition with horizontal composition, as seen in the following diagram:
 \[
 \begin{tikzcd}[column sep=huge]
@@ -503,6 +557,7 @@ We can combine vertical composition with horizontal composition, as seen in the 
 \end{tikzcd}
 \]
 The interchange law states that the order of composition doesn't matter: we can first do vertical compositions and then the horizontal one, or first do the horizontal compositions and then the vertical one.
+
 
 \section{Universal Constructions Revisited}
 
