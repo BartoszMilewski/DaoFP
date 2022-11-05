@@ -22,6 +22,8 @@
           buildPhase = ''
             set -e
             export PATH="${pkgs.lib.makeBinPath buildInputs}";
+            # Due to quirks of TeX, we must run this *twice* to 
+            # get the ToC to generate.
             pdflatex -shell-escape DaoFP.tex
             pdflatex -shell-escape DaoFP.tex
           '';
