@@ -23,6 +23,7 @@
             set -e
             export PATH="${pkgs.lib.makeBinPath buildInputs}";
             pdflatex -shell-escape DaoFP.tex
+            pdflatex -shell-escape DaoFP.tex
           '';
           installPhase = ''
             mkdir -p $out
