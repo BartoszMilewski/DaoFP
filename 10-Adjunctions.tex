@@ -357,6 +357,10 @@ which form another natural transformation called the \emph{counit} of the adjunc
 
 Notice that, if those two natural transformations were invertible, they would witness the equivalence of categories. But this kind of ``half-equivalence'' is even more interesting in the context of category theory. 
 
+\begin{exercise}
+Derive the unit and counit for the sum and product adjunctions.
+\end{exercise}
+
 \subsection{Triangle identities}
 
 We can use the unit/counit pair to formulate an equivalent  definition of an adjunction. To do that, we start with a pair of natural transformations:
@@ -430,8 +434,8 @@ Corresponding to the identity arrow on the left, we get the unit of the adjuncti
 \[ \eta \colon e \to (e \times a)^a \]
 This is a curried version of the product constructor. In Haskell, we write it as:
 \begin{haskell}
-mkpair :: e -> (a -> (e, a))
-mkpair = curry id
+unit :: e -> (a -> (e, a))
+unit = curry id
 \end{haskell}
 
 The counit is more interesting. Replacing $e$ with $b^a$ we get:
@@ -442,12 +446,54 @@ which is the function application arrow.
 
 In Haskell:
 \begin{haskell}
-apply :: (a -> b, a) -> b
-apply = uncurry id
+counit :: (a -> b, a) -> b
+counit = uncurry id
 \end{haskell}
 
+When the adjunction is between two endofunctors, we can write an alternative Haskell definition of it using the unit and the counit:
+\begin{haskell}
+class (Functor left, Functor right) => 
+  Adjunction left right | left -> right, right -> left where
+    unit   :: x -> right (left x)
+    counit :: left (right x) -> x
+\end{haskell}
+The additional two clauses \hask{left -> right} and \hask{right -> left} tell the compiler that, when using an instance of the adjunction, one functor can be derived from the other. This definition requires the following compile extensions:
+\begin{haskell}
+{-# language MultiParamTypeClasses #-}
+{-# LANGUAGE FunctionalDependencies #-}
+\end{haskell}
+
+The two functors that form the currying adjunction can be written as:
+\begin{haskell}
+data L r x = L (x, r)    deriving (Functor, Show)
+data R r x = R (r -> x)  deriving Functor
+\end{haskell}
+and the \hask{Adjunction} instance for currying is:
+\begin{haskell}
+instance Adjunction (L r) (R r) where
+  unit x = R (\r -> L (x, r)) 
+  counit (L (R f, r)) = f r
+\end{haskell}
+The first triangle identity states that the following polymorphic function:
+\begin{haskell}
+triangle :: L r x -> L r x
+triangle = counit . fmap unit
+\end{haskell}
+is the identity, and so is the second one: 
+\begin{haskell}
+triangle' :: R r x -> R r x
+triangle' = fmap counit . unit
+\end{haskell}
+Notice that these two functions require the use of functional dependencies to be well defined. Triangle identities cannot be expressed in Haskell, so it's up to the implementor of the adjunction to prove them.
 \begin{exercise}
-Derive the unit and counit for the sum and product adjunctions.
+Test a few examples of the first triangle identity for the currying adjunction. Here's an example:
+\begin{haskell}
+triangle (L (2, 'a'))
+\end{haskell}
+\end{exercise}
+
+\begin{exercise}
+How would you test the second triangle identity for the currying adjunction? Hint: the result of \hask{triangle'} is a function, so you can't display it, but you could call it.
 \end{exercise}
 
 \section{Adjunctions Using Universal Arrows}
