@@ -209,7 +209,7 @@ Natural transformations provide a very convenient high-level way of expressing c
 
 A natural transformation is a family of arrows parameterized by objects. In programming, this corresponds to a family of functions parameterized by types, that is a \emph{polymorphic function}. 
 
-The type of the argument to a natural transformation is constructed using one functor, and the return type using another. 
+The type of the argument to a natural transformation is described using one functor, and the return type using another. 
 
 In Haskell, we can define a data type that accepts two type constructors representing two functors, and produces a type of natural transformations:
 
@@ -254,19 +254,13 @@ Incidentally, this is a very inefficient implementation. The actual library func
 
 A useful intuition for understanding natural transformations builds on the idea that functors acts like containers for data. There are two completely orthogonal things that you can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure for moving ``stuff'' between containers without knowing what kind of ``stuff'' it is. 
 
+In other words, a natural transformations repackages the contents of one container into another container. It does it in a way that is agnostic of the type of the contents, which means it cannot inspect, create, or modify this contents. All it can do is to move it to a new location, or drop it. 
+
 Naturality condition enforces the orthogonality of these two operations. It doesn't matter if you first modify the data and then move it to another container; or first move it, and then modify. 
 
 This is another example of successfully decomposing a complex problem into a sequence of simpler ones. Keep in mind, though, that not every operation with containers of data can be decomposed in that way. Filtering, for instance, requires both examining the data, as well as changing the size or even the shape of the container. 
 
 On the other hand, almost every parametrically polymorphic function is a natural transformation. In some cases you may have to consider the identity or the constant functor as either source or the target. For instance, the polymorphic identity function can be though of as a natural transformation between two identity functors.
-
-\section{The Functor Category}
-
-Objects and arrows are drawn differently. Objects are dots and arrows are pointy lines.
-
-In $\mathbf{Cat}$, the category of categories, functors are drawn as arrows. But we have natural transformations that go between functors, so it looks like functors could be objects as well. 
-
-What is an arrow in one category could be an object in another.
 
 \subsection{Vertical composition of natural transformations}
 
@@ -299,7 +293,7 @@ These are just two arrows in $\mathcal{D}$ that are composable. So we can define
 \[ \gamma \colon F \to H\]
 \[ \gamma_x = \beta_x \circ \alpha_x \]
  This is called the \emph{vertical composition} of natural transformations. You'll see it written using a dot $\gamma = \beta \cdot \alpha$ or a simple juxtaposition $\gamma = \beta \alpha$.
-
+ 
 Naturality condition for $\gamma$ can be shown by pasting together (vertically) two naturality squares for $\alpha$ and $\beta$:
 \[
  \begin{tikzcd}
@@ -324,6 +318,10 @@ H x
  \end{tikzcd}
 \]
 
+In Haskell, vertical composition of natural transformation is just regular function composition applied to polymorphic functions. Using the intuition that natural transformations move items between containers, vertical composition combines two such moves, one after another.
+
+\subsection{Functor categories}
+
 Since the composition of natural transformations is defined in terms of composition of arrows, it is automatically associative. 
 
 There is also an identity natural transformation $id_F$ defined for every functor $F$. Its component at $x$ is the usual identity arrow at the object $F x$:
@@ -335,12 +333,19 @@ The hom-set in that category is the set of natural transformations between two f
 \[ [\mathcal{C}, \mathcal{D}](F, G) \]
 with the name of the category followed by the names of the two objects (here, functors) in parentheses.
 
+In category theory objects and arrows are drawn differently. Objects are dots and arrows are pointy lines.
+
+In $\mathbf{Cat}$, the category of categories, functors are drawn as arrows. But in a functor category $[\cat C, \cat D]$ functors are dots and natural transformations are arrows.
+
+What is an arrow in one category could be an object in another.
+
 
 \begin{exercise}
 Prove the naturality condition of the composition of natural transformations:
 \[ \gamma_y \circ F f = H f \circ \gamma_x \]
 Hint: Use the definition of $\gamma$ and the two naturality conditions for $\alpha$ and $\beta$.
 \end{exercise}
+
 
 \subsection{Horizontal composition of natural transformations}
 
@@ -439,6 +444,58 @@ beta_alpha = fmap alpha . beta
 \end{haskell}
 Here, the compiler will pick the version of \hask{fmap} for the functor \hask{G'}.
 
+What's the intuition for horizontal composition? We've seen before that a natural transformation can be seen as repackaging data between two containers--functors. Here we are dealing with nested containers. We start with the outer container described by \hask{F} that is filled with inner containers, each described by \hask{G}. We have two natural transformations, \hask{alpha} for transfering the contents of \hask{F} to \hask{F'}, and \hask{beta} for moving the contents of \hask{G} to \hask{G'}. There are two ways of moving data from \hask{G (F x)} to \hask{G'(F' x)}. We can use \hask{fmap alpha} to repackage all inner containers, and then use \hask{beta} to repackage the outer container. 
+
+\[
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) ellipse (1.2 and 1.8);
+\filldraw[fill=orange!70, draw=white] (-0.5, -0.5) rectangle (0.5, 0.5);
+\node at (0, 0) {$G$};
+\node at (0, -1.3) {$F$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) ellipse (1.2 and 1.8);
+\filldraw[fill=orange!30, draw=white] (0, 0) ellipse (0.8 and 0.4);
+\node at (0, 0) {$G'$};
+\node at (0, -1.3) {$F$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!10, draw=white] (0, 0) circle (1.2);
+\filldraw[fill=orange!30, draw=white] (0, 0) ellipse (0.8 and 0.4);
+\node at (0, 0) {$G'$};
+\node at (0, -0.8) {$F'$};
+\end{tikzpicture}
+\]
+
+
+Or we can first use \hask{beta} to repackage the outer container, and then apply \hask{fmap alpha} to repackage all the inner containers. The end result is the same.
+
+\[
+\begin{tikzpicture}
+\filldraw[fill=blue!50!green!20, draw=white] (0, 0) ellipse (1.2 and 1.8);
+\filldraw[fill=orange!70, draw=white] (-0.5, -0.5) rectangle (0.5, 0.5);
+\node at (0, 0) {$G$};
+\node at (0, -1.3) {$F$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!10, draw=white] (0, 0) circle (1.2);
+\filldraw[fill=orange!70, draw=white] (-0.5, -0.5) rectangle (0.5, 0.5);
+\node at (0, 0) {$G$};
+\node at (0, -0.9) {$F'$};
+\end{tikzpicture}
+\hspace{20pt}
+\begin{tikzpicture}
+\filldraw[fill=blue!10, draw=white] (0, 0) circle (1.2);
+\filldraw[fill=orange!30, draw=white] (0, 0) ellipse (0.8 and 0.4);
+\node at (0, 0) {$G'$};
+\node at (0, -0.9) {$F'$};
+\end{tikzpicture}
+\]
+
+
 \begin{exercise}
 Implement two versions of horizontal composition of \hask{safeHead} after \hask{reverse}. Compare their results acting on various arguments.
 \end{exercise}
@@ -472,14 +529,16 @@ Let's consider how we would translate this to Haskell. A natural transformation 
 
 For instance, if this is the declaration of \hask{alpha}:
 \begin{haskell}
-alpha :: G x -> G' x
+alpha :: forall x. G x -> G' x
 \end{haskell}
 then its whiskered version would be:
 \begin{haskell}
-alpha_f :: G (F x) -> G' (F x)
+alpha_f :: forall x. G (F x) -> G' (F x)
 alpha_f = alpha
 \end{haskell}
-Because of Haskell's type inference, this shift is often implicit.
+Because of Haskell's type inference, this shift is implicit. When a polymorphic function is called, we don't have to specify which component of the natural transformation is executed--the type checker figures it out by looking at the type of the argument. 
+
+The intuition in this case is that we are repackaging the outer container leaving the inner containers intact.
 
 Similarly, $id_H \circ \alpha$ is written as $H \circ \alpha$.
 \[
@@ -500,14 +559,16 @@ In components:
 
 In Haskell, the lifting of $\alpha_x$ by $H$ is done using \hask{fmap}, so given:
 \begin{haskell}
-alpha :: G x -> G' x
+alpha :: forall x. G x -> G' x
 \end{haskell}
 the whiskered version would be:
 \begin{haskell}
-h_alpha :: H (G x) -> H (G' x)
+h_alpha :: forall x. H (G x) -> H (G' x)
 h_alpha = fmap alpha
 \end{haskell}
 Again, Haskell's type inference engine figures out which version of \hask{fmap} to use (here, it's the one from the \hask{Functor} instance of \hask{G}).
+
+The intuition is that we are repackaging the contents of the inner containers leaving the outer container intact.
 
 Finally, in many applications a natural transformation is whiskered on both sides:
 \[
@@ -530,9 +591,11 @@ In components, we have:
 \[ (H \circ \alpha \circ F) x = H (\alpha_{F x})\]
 and in Haskell:
 \begin{haskell}
-h_alpha_f :: H (G (F x)) -> H (G' (F x))
+h_alpha_f :: forall x. H (G (F x)) -> H (G' (F x))
 h_alpha_f = fmap alpha
 \end{haskell}
+
+Here the intuition is that we have a triple layer of containers; and we are rearranging the middle one, leaving the outer container and all the inner containers intact.
 
 \subsection{Interchange law}
 
