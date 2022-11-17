@@ -76,6 +76,11 @@ This is an example of a \emph{string diagram}. You read such a digram bottom-up,
 
 The bottom of this diagram shows the functor $F$ that goes from $\mathcal{C}$ to $\mathcal{D}$. The top of the diagram shows the functor $G$ that goes between the same two categories. The transition happens in the middle, where a natural transformation $\alpha$ maps $F$ to $G$.
 
+In Haskell, this diagram is interpreted as a polymorphic function between two endofunctors:
+\begin{haskell}
+alpha :: forall x. F x -> G x
+\end{haskell}
+
 So far it doesn't seem like we gain a lot by using this new visual representation. But let's apply it to something more interesting: vertical composition of natural transformations:
 \[
 \begin{tikzcd}[column sep=huge]
@@ -127,6 +132,17 @@ The corresponding string diagram shows the two categories and three functors bet
 \end{tikzpicture}
 \]
 As you can see, you can reconstruct the original diagram from the string diagram by scanning it bottom-to-top.
+
+Again, in Haskell we'll be dealing with three endofunctors, and the vertical composition of \hask{beta} after \hask{alpha}:
+\begin{haskell}
+alpha :: forall x. F x -> G x
+beta  :: forall x. G x -> H x
+\end{haskell}
+ is implemented using regular function composition:
+\begin{haskell}
+beta_alpha :: forall x. F x -> H x
+beta_alpha = beta . alpha
+\end{haskell}
 
 Let's continue with the horizontal composition of natural transformations:
 \[
@@ -188,7 +204,9 @@ The bottom of the string diagram corresponds to the composition of functors $G \
 
 \end{tikzpicture}
 \]
-Drawing two parallel vertical lines, in this new system, corresponds to functor composition. You may think of the horizontal composition of natural transformations as happening along the imaginary horizontal line in the middle of the diagram. But what if somebody was sloppy in drawing the diagram, and one of the dots was a little higher than the other? As it turns out, the exact positioning of the dots doesn't matter, due to the interchange law.
+Parallel vertical lines in this new system correspond to functor composition. 
+
+You may think of the horizontal composition of natural transformations as happening along the imaginary horizontal line in the middle of the diagram. But what if somebody was sloppy in drawing the diagram, and one of the dots was a little higher than the other? As it turns out, the exact positioning of the dots doesn't matter, due to the interchange law.
 
 But first, let's illustrate whiskering: horizontal composition in which one of the natural transformation is the identity. We can draw it like this:
 
@@ -272,7 +290,27 @@ But, really, the identity can be inserted at any point on a vertical line, so we
 
 \end{tikzpicture}
 \]
-Similarly, you can easily imagine the diagram for $\alpha \circ G$.
+
+In Haskell, where \hask{beta} is a polymorphic function:
+\begin{haskell}
+beta :: forall x. G x -> G' x
+\end{haskell}
+ we read this diagram as:
+\begin{haskell}
+beta_f :: forall x. G (F x) -> G' (F x)
+beta_f = beta
+\end{haskell}
+with the understanding that the type checker instantiates the polymorphic function \hask{beta} for the correct type.
+
+Similarly, you can easily imagine the diagram for $G \circ \alpha$, and its Haskell realization:
+\begin{haskell}
+g_alpha :: forall x. G (F x) -> G (F' x)
+beta_f = fmap alpha
+\end{haskell}
+with:
+\begin{haskell}
+alpha :: forall x. F x -> F' x
+\end{haskell}
 
 Here's the string diagram that corresponds to the interchange law:
 \[
@@ -462,7 +500,7 @@ which can be visualized as a commuting diagram:
  && T
   \end{tikzcd}
 \]
-The corresponding string diagrams representat the equality of the two paths through this diagram:
+The corresponding string diagrams represents the equality of the two paths through this diagram:
 \[
 \begin{tikzpicture}
 \def\xa{0};
@@ -725,8 +763,14 @@ Reading the left diagram bottom-to-top produces a series of mappings:
 \[  Id_{\mathcal{D}} \circ R \xrightarrow{\eta \circ R} R \circ L \circ R \xrightarrow{R \circ \varepsilon} R \circ Id_{\mathcal{C}}  \]
 This must be equal to the right-hand-side, which may be interpreted as the (invisible) identity natural transformation on $R$
 
+In the case $R$ is an endofunctor, we can translate the first diagram directly to Haskell. The whiskering of the unit of the adjunction $\eta$ by $R$ results in the polymorphic function \hask{unit} being instantiated at \hask{R x}. The whiskering of $\varepsilon$ results in the lifting of \hask{counit} by the functor $R$. The vertical composition translates to function composition:
+\begin{haskell}
+triangle :: forall x. R x -> R x
+triangle = fmap counit . unit
+\end{haskell}
+
 \begin{exercise}
-Draw the string diagrams for the second triangle identity.
+Draw the string diagrams for the second triangle identity and translated the first one to Haskell.
 \end{exercise}
 
 \section{Monads from Adjunctions}
@@ -877,6 +921,13 @@ Compare this with the definition of the monadic $\mu$:
 We get the definition of $\mu$ for the monad $R \circ L$ as the double-whiskering of $\varepsilon$:
 \[ \mu = R \circ \varepsilon \circ L \]
 
+The Haskell translation of the string diagram defining $\mu$ in terms of $\varepsilon$ is always possible. The monadic multiplication, or \hask{join}, becomes:
+\begin{haskell}
+join :: forall x. T (T x) -> T x
+join = fmap counit
+\end{haskell}
+where \hask{fmap} corresponds to the lifting by the endofunctor \hask{T} defined as the composition $R \circ L$. Notice that $\cat D$ in this case is the Haskell category of types and functions, but $\cat C$ can be an outside category.
+
 To complete the picture, we can use string diagrams to derive monadic laws using triangle identities. The trick is to replace all strings in monadic laws by pairs of parallel strings and then rearrange them according to the rules.
 
 To summarize, every adjunction $L \dashv R$ with the unit $\eta$ and counit $\varepsilon$ defines a monad $(R \circ L, \eta, R \circ \varepsilon \circ L)$.
@@ -898,18 +949,18 @@ To additionally complicate things, there is a lot of bookkeeping related to expl
 \subsection{Free monoid and the list monad}
 The list monad is generated by the free monoid adjunction we've seen before. The unit of this adjunction, $\eta_X \colon X \to U (F X)$, injects the elements of the set $X$ as the generators of the free monoid $F X$, after which $U$ extracts the underlying set. 
 
-In Haskell, we represent the free monoid as a list, and its generators are singleton lists. The unit $\eta_X$ maps elements of $X$ to such singletons:
+In Haskell, we represent the free monoid as a list type, and its generators are singleton lists. The unit $\eta_X$ maps elements of $X$ to such singletons:
 \begin{haskell}
 return x = [x]
 \end{haskell}
-To implement the counit, $\varepsilon_M \colon F (U M) \to M$, we take a monoid $M$, forget its multiplication, and use its set of elements as generators for a new free monoid. A component of the counit is a monoid morphism from that free monoid back to $M$. It turns out that this monoid morphism is a special case of a catamorphism. 
+To implement the counit, $\varepsilon_M \colon F (U M) \to M$, we take a monoid $M$, forget its multiplication, and use its set of elements as generators for a new free monoid. A component of the counit is then a monoid morphism from that free monoid back to $M$. It turns out that this monoid morphism is a special case of a catamorphism. 
 
 First, recall the Haskell implementation of a general list catamorphism:
 \begin{haskell}
 foldMap :: Monoid m => (a -> m) -> ([a] -> m)
 foldMap f = foldr mappend mempty . fmap f
 \end{haskell}
-We can interpret it as taking a function from \hask{a} to the underlying set of a monoid \hask{m} and producing a monoid morphism from the free monoid generated by \hask{a} (a list of \hask{a}'s) to \hask{m}. 
+We can interpret it as taking a function from \hask{a} to the underlying set of a monoid \hask{m} and producing a monoid morphism from the free monoid generated by \hask{a} (that is a list of \hask{a}'s) to \hask{m}. 
 
 The counit is a monoid morphism \hask{[m] -> m}. We get it by applying \hask{foldMap} to identity. The result is \hask{foldMap id } or, in terms of \hask{foldr}:
 \begin{haskell}
@@ -962,8 +1013,8 @@ The unit of the adjunction $L_s \dashv R_s$ is a mapping:
 \[ \eta_a \colon a \to (a \times s)^s \]
 which can be implemented in Haskell as:
 \begin{haskell}
-eta :: a -> R s (L s a)
-eta a = R (\s -> L (a, s))
+unit :: a -> R s (L s a)
+unit a = R (\s -> L (a, s))
 \end{haskell}
 You may recognized in it a thinly veiled version of \hask{return} for the state monad:
 \begin{haskell}
@@ -975,8 +1026,8 @@ Here's the component of the counit of this adjunction at $c$:
 \[ \varepsilon_c \colon c^s \times s \to c \]
 It can be implemented in Haskell as:
 \begin{haskell}
-epsilon :: L s (R s a) -> a
-epsilon (L ((R f), s))= f s
+counit :: L s (R s a) -> a
+counit (L ((R f), s))= f s
 \end{haskell}
 which, after stripping data constructors, is equivalent to \hask{apply}, or the uncurried version of \hask{runState}.
 
@@ -985,11 +1036,11 @@ Monad multiplication $\mu$ is given by the whiskering of $\varepsilon$ from both
 This is how it translates to Haskell:
 \begin{haskell}
 mu :: R s (L s (R s (L s a))) -> R s (L s a)
-mu = fmap epsilon
+mu = fmap counit
 \end{haskell}
 Here, whiskering on the right doesn't do anything other than select a component of the natural transformation. This is done automatically by Haskell's type inference engine. 
 
-Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap} (here, it's equivalent to precomposition)t.
+Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap} (here, it's equivalent to precomposition).
 
 Compare this with the implementation of \hask{join}:
 \begin{haskell}
@@ -1005,7 +1056,7 @@ When it's uncurried, its type signature becomes:
 \begin{haskell}
 uncurry runState :: (State s a , s) -> (a, s)
 \end{haskell}
-which is equivalent to that of \hask{epsilon}. 
+which is equivalent to that of \hask{counit}. 
 
 When partially applied, \hask{runState} just strips the data constructor exposing the underlying function type:
 \begin{haskell}
@@ -1090,7 +1141,7 @@ return a = Writer (a, mempty)
 The counit is given by an equivariant map:
 \[ \varepsilon_Q \colon F (U Q) \to Q \]
 
-The left hand side is an M-set constructed by taking the underlying set of $Q$ and taking its product with the underlying set of $M$. The original action of $Q$ is forgotten and replaced by the free action. The obvious choice for counit is:
+The left hand side is the M-set constructed by taking the underlying set of $Q$ and taking its product with the underlying set of $M$. The original action of $Q$ is forgotten and replaced by the free action. The obvious choice for counit is:
 \[ \varepsilon_Q \colon (x, m) \mapsto a_m x \]
 where $x$ is an element of (the underlying set of) $Q$ and $a$ is the action defined in $Q$.
 
@@ -1101,14 +1152,14 @@ It means replacing $Q$ in the definition of $\varepsilon_Q$ with a free M-set wh
 Compare this with the definition of \hask{join} for the writer monad:
 \begin{haskell}
 join :: Monoid m => Writer m (Writer m a) -> Writer m a
-join (Writer ( Writer (x, m), m')) = Writer (x, mappend m' m)
+join (Writer ( Writer (x, m), n)) = Writer (x, mappend n m)
 \end{haskell}
 
 \subsection{Pointed objects and the \hask{Maybe} monad}
 
 Pointed objects are objects with a designated element. Since picking an element is done using an arrow from the terminal object, the category of pointed objects is defined using pairs $(a, p \colon 1 \to a)$, where $a$ is an object in $\mathcal{C}$. 
 
-The morphisms between these pairs are the arrows in $\mathcal{C}$ that preserve the points. Thus an arrow from $(a, p \colon 1 \to a)$ to $(b, q \colon 1 \to b)$ is an arrow $f \colon a \to b$ such that $q = f \circ p$. This category is also called a \emph{coslice category} and is written as $1/\mathcal{C}$.
+The morphisms between these pairs are the arrows in $\mathcal{C}$ that preserve the points. Thus a morphism from $(a, p \colon 1 \to a)$ to $(b, q \colon 1 \to b)$ is an arrow $f \colon a \to b$ such that $q = f \circ p$. This category is also called a \emph{coslice category} and is written as $1/\mathcal{C}$.
 
 There is an obvious forgetful functor $U \colon 1/\mathcal{C} \to \mathcal{C}$ that forgets the point. Its left adjoint is a free functor $F$ that maps an object $a$ to a pair $(1 + a, \text{Left})$. In other words, $F$ freely ads a point to an object. 
 
@@ -1140,7 +1191,7 @@ Suppose that you want to combine multiple effects, say, state with the possibili
 newtype MaybeState s a = MS (s -> Maybe (a, s))
   deriving Functor
 \end{haskell}
-and the function to extract the result (or admit failure):
+and the function to extract the result (or report failure):
 \begin{haskell}
 runMaybeState :: MaybeState s a -> s -> Maybe (a, s)
 runMaybeState (MS h) s = h s
@@ -1175,9 +1226,22 @@ There are three monads in this picture. There is the ``inner'' monad $R' \circ L
 
 If we call the inner monad $T = R' \circ L'$, then $R \circ T \circ L$ is the composite monad called the \emph{monad transformer}, because it transforms the monad $T$ into a new monad. 
 
+\[
+ \begin{tikzcd}
+   &&
+  \mathcal{D}
+  \arrow[loop, "T = R' \circ L'"']
+    \arrow[rr, bend right, "R"']
+&&
+  \mathcal{E}
+  \arrow[ll, bend right, "L"']
+ \end{tikzcd}
+\]
+
+
 In our example, we can treat \hask{Maybe} as the inner monad:
 \[ T a = 1 + a \]
-It is transformed using the outer adjunction $L_s \dashv R_s$, where:
+It is transformed using the outer adjunction $L_s \dashv R_s$, the one that generates the state monad:
 \[ L_s a = a \times s \]
 \[ R_s c = c^s \]
 The result is:
@@ -1188,7 +1252,7 @@ s -> Maybe (a, s)
 \end{haskell}
 which matches the definition of our \hask{MaybeState} monad.
 
-In general, the inner monad $T$ is defined by its unit $\eta^i$ and multiplication $\mu^i$. The outer adjunction is defined by its unit $\eta^o$ and counit $\varepsilon^o$. 
+In general, the inner monad $T$ is defined by its unit $\eta^i$ and multiplication $\mu^i$ (the superscript $i$ standing for ``inner''). The ``outer'' adjunction is defined by its unit $\eta^o$ and counit $\varepsilon^o$. 
 
 The unit of the composite monad is the natural transformation:
 \[ \eta \colon Id \to R \circ T \circ L \]
@@ -1298,13 +1362,13 @@ Let's unpack these equations for the case of the state monad transformer. The st
 
 As we've seen before, the outer counit $\varepsilon^o_a$ is function application:
 \begin{haskell}
-epsilon :: (s -> a, s) -> a
-epsilon (f, x) = f x
+counit :: (s -> a, s) -> a
+counit (f, x) = f x
 \end{haskell}
 and the unit $\eta^o_a$ is the curried pair constructor:
 \begin{haskell}
-eta :: a -> s -> (a, s)
-eta x = \s -> (x, s)
+unit :: a -> s -> (a, s)
+unit x = \s -> (x, s)
 \end{haskell}
 
 
@@ -1323,15 +1387,15 @@ runStateT (StateT h) s = h s
 The unit of the monad transformer is the vertical composition of $\eta^o$ and $R \circ \eta^i \circ L$. In components:
 \[ \eta_a = R(\eta^i_{L a}) \circ \eta^o_a \]
 
-There are a lot of moving parts in this formula, so let's analyze it step-by-step. We start from the right: we have the $a$-component of the unit of the adjunction, which is an arrow from $a$ to $R (L a)$. In Haskell, it's the function \hask{eta}. 
+There are a lot of moving parts in this formula, so let's analyze it step-by-step. We start from the right: we have the $a$-component of the unit of the adjunction, which is an arrow from $a$ to $R (L a)$. In Haskell, it's the function \hask{unit}. 
 \begin{haskell}
-eta :: a -> s -> (a, s)
+unit :: a -> s -> (a, s)
 \end{haskell}
 Let's evaluate this function at some \hask{x :: a}. The result is another function \hask{s -> (a, s)}. We pass this function as an argument to $R(\eta^i_{L a})$. 
 
 $\eta^i_{L a}$ is the component of \hask{return} of the inner monad taken at $L a$. Here, $L a$ is the type \hask{(a, s)}. So we are instantiating the polymorphic function \hask{return :: a -> m a} as a function \hask{(a, s) -> m (a, s)}. (The type inferencer will do this automatically for us.)
 
-Next, we are lifting this component of \hask{return} using $R$. Here, $R$ is the exponential $(-)^s$, so it lifts a function by post-composition. It will post-compose \hask{return} to whatever function is passed to it. In our case, that's the function that was produced by \hask{eta}. Notice that the types match: we are post-composing \hask{(a, s) -> m (a, s)} after \hask{s -> (a, s)}. 
+Next, we are lifting this component of \hask{return} using $R$. Here, $R$ is the exponential $(-)^s$, so it lifts a function by post-composition. It will post-compose \hask{return} to whatever function is passed to it. In our case, that's the function that was produced by \hask{unit}. Notice that the types match: we are post-composing \hask{(a, s) -> m (a, s)} after \hask{s -> (a, s)}. 
 
 We can write the result of this composition as:
 \begin{haskell}
@@ -1344,6 +1408,7 @@ return x = StateT (\s -> return (x, s))
 We inserted the data constructor \hask{StateT} to make the type checker happy. This is the \hask{return} of the composite monad in terms of the \hask{return} of the inner monad.
 
 The same reasoning can be applied to the formula for the component of the composite $\mu$ at some $a$: 
+
 \[ \mu_a = R(\mu^i_{L a}) \circ (R \circ T) (\varepsilon^o_{(T\circ L) a})\]
 The inner $\mu^i$ is the \hask{join} of the monad \hask{m}. Applying $R$ turns it into post-composition. 
 
@@ -1385,9 +1450,11 @@ Every adjunction generates a monad, and so far we've been able to define adjunct
 
 Finding an adjunction for a monad is analogous to factorization. We want to express a functor as a composition of two other functors, $T = R \circ L$. The problem is complicated by the fact that this factorization also requires finding the appropriate intermediate category. We'll find such a category by studying algebras for a monad.
 
-A monad is defined by an endofunctor, so it's possible to define algebras for this endofunctor. Mathematicians often think of monads as tools for generating expressions and algebras as tools for evaluating those expressions. However, expressions generated by monads impose some compatibility conditions on those algebras. 
+A monad is defined by an endofunctor, and we know that it's possible to define algebras for an endofunctor. Mathematicians often think of monads as tools for generating expressions and algebras as tools for evaluating those expressions. However, expressions generated by monads impose some compatibility conditions on those algebras. 
 
-Consider the earlier example of the expression monad \hask{Ex}. An algebra for this monad is a choice of the carrier type, say \hask{Char} and an arrow
+For instance, you may notice that the monadic unit $\eta_a \colon a \to T a$ has the type signature that looks like the inverse of the structure map of an algebra $\alpha \colon T a \to a$. Of course, $\eta$ is a natural transformation that is defined for every type, whereas an algebra has a fixed carrier type. Nevertheless, we might reasonably expect that one might undo the action of the other.
+
+Consider the earlier example of the expression monad \hask{Ex}. An algebra for this monad is a choice of the carrier type, let's say \hask{Char} and an arrow:
 \begin{haskell}
 alg :: Ex Char -> Char
 \end{haskell}
@@ -1395,16 +1462,16 @@ Since \hask{Ex} is a monad, it defines a unit, or \hask{return}, which is a poly
 \begin{haskell}
 return x = Var x
 \end{haskell}
-We can instantiate the unit for an arbitrary type, in particular for the carrier type of our algebra. It makes sense that evaluating \hask{Var c}, where \hask{c} is an element of \hask{Char} should give us back the same \hask{c}. In other words, we'd like:
+We can instantiate the unit for an arbitrary type, in particular for the carrier type of our algebra. It makes sense to demand that \emph{evaluating} \hask{Var c}, where \hask{c} is a character, should give us back the same \hask{c}. In other words, we'd like:
 \begin{haskell}
  alg . return = id
 \end{haskell}
-This condition immediately eliminates a lot of algebras, such as:
+This condition will immediately eliminate a lot of algebras, such as:
 \begin{haskell}
 alg (Var c) = 'a' -- not compatible with the monad Ex
 \end{haskell}
 
-The second condition we'd like to impose is that the algebra respects substitution. A monad lets us flatten nested expressions using \hask{join}. An algebra lets us evaluate such expressions. 
+The second condition we'd like to impose is that the algebra that's compatible with a monad respects substitution. A monad lets us flatten nested expressions using \hask{join}. An algebra lets us evaluate such expressions. 
 
 There are two ways of doing that: we can apply the algebra to a flattened expression, or we can apply it to the inner expression first (using \hask{fmap}), and then evaluate the resulting expression. 
 \begin{haskell}
@@ -1455,17 +1522,30 @@ Since monad algebras are just special kinds of algebras, they form a sub-categor
   \end{tikzcd}
 \]
 
-In light of this definition, we can re-interpret the second monad-algebra diagram as asserting that the structure map $\alpha$ of a monad algebra is also an algebra morphism from $(T a, \mu_a)$ to $(a, \alpha)$. This will come in handy in what follows.
+In light of this definition, we can re-interpret the second monad-algebra diagram as asserting that the structure map $\alpha$ of a monad algebra (the bottom arrow) is also an algebra morphism from $(T a, \mu_a)$ to $(a, \alpha)$. This will come in handy in what follows.
 
 \subsection{Eilenberg-Moore category}
 
-The category of monad algebras for a given monad $T$ on $ \mathcal{C}$ is called the Eilenberg-Moore category and is denoted by $ \mathcal{C}^T$. 
+The category of monad algebras for a given monad $T$ on $ \mathcal{C}$ is called the Eilenberg-Moore category and is denoted by $ \mathcal{C}^T$. It turns out that it is a good choice for the intermediate category that lets us factorize the monad $T$ as a composition of a pair of adjoint functors.
 
-There is an obvious forgetful functor $U^T$ from $ \mathcal{C}^T$ to $ \mathcal{C}$. It maps an algebra $(a, \alpha)$ to its carrier $a$, and treats algebra morphisms as regular morphisms between carriers. 
+The process goes as follows: we define a pair of functors, show that they form an adjunction, and then show that the monad generated by this adjunction is the original monad.
 
-There is a free functor $F^T$ that is left adjoint to $U^T$. It's defined to map an object $a$ of $ \mathcal{C}$ to a monad algebra with the carrier $T a$. The structure map of this algebra is the component of monad multiplication $\mu_a \colon T(T a) \to T a$. 
+First of all, there is an obvious forgetful functor, which we'll call $U^T$, from $ \mathcal{C}^T$ to $ \mathcal{C}$. It maps an algebra $(a, \alpha)$ to its carrier $a$, and treats algebra morphisms as regular morphisms between carriers. 
 
-It's easy to check that $(T a, \mu_a)$ is indeed a monad algebra---the commuting conditions follow from monad laws. Indeed, substituting the algebra $(T a, \mu_a)$ into the monad-algebra diagrams, we get (with the algebra part drawn in red):
+More interestingly, there is a free functor $F^T$ that is the left adjoint to $U^T$. 
+\[
+ \begin{tikzcd}
+   \mathcal{C}^T
+    \arrow[rr, bend right, "U^T"']
+&&
+  \mathcal{C}
+  \arrow[ll, bend right, "F^T"']
+ \end{tikzcd}
+\]
+
+On objects, $F^T$ maps an object $a$ of $ \mathcal{C}$ to a \emph{monad algebra}, an object in $\cat{C}^T$. For the carrier of this algebra we pick not $a$ but $T a$. For the structure map, which is the mapping $T (T a) \to T a$ we pick the component of monad multiplication $\mu_a \colon T(T a) \to T a$. 
+
+It's easy to check that this algebra $(T a, \mu_a)$ is indeed a monad algebra---the necessary commuting conditions follow from monad laws. Indeed, substituting the algebra $(T a, \mu_a)$ into the monad-algebra diagrams, we get (with the algebra part drawn in red):
 \[
  \begin{tikzcd}
  T a
@@ -1491,9 +1571,21 @@ T (T a)
 \]
 The first diagram is just the left monadic unit law in components. The $\eta_{T a}$ arrow corresponds to the whiskering of $\eta \circ T$. The second diagram is the associativity of $\mu$ with the two whiskerings $\mu \circ T$ and $T \circ \mu$ expressed in components.
 
-As is true for all adjunctions, the composition $U^T \circ F^T$ is a monad. It so happens that this particular monad is identical to the original monad $T$. 
 
-Indeed, on objects, it first maps $a$ to a free monad algebra $(T a, \mu)$ and then forgets the structure map. The net result is the mapping of $a$ to $T a$, which is exactly what the original monad did. On arrows, it lifts an arrow $f \colon a \to b$ using $T$. The fact that the arrow $T f$ is an algebra morphism from $(T a, \mu_a)$ to $(T b, \mu_b)$ follows from naturality of $\mu$:
+To prove that we have an adjunction, we'll define two natural transformations to serve as the unit and the counit of the adjunction. 
+
+For the unit of the adjunction we pick the monadic unit $\eta$ of $T$. They both have the same signature---in components, $\eta_a \colon a \to U^T (F^T a)$.
+
+The counit is a natural transformation:
+\[ \varepsilon \colon F^T \circ U^T \to Id \]
+The component of $\varepsilon$ at $(a, \alpha)$ is an algebra morphism from the free algebra generated by $a$, that is $(T a, \mu_a)$, back to $(a, \alpha)$. As we've seen earlier, $\alpha$ itself is such a morphism. We can therefore pick $\varepsilon_{(a, \alpha)} = \alpha$.
+
+Triangular identities for these definitions of $\eta$ and $\varepsilon$ follow from unit laws for the monad and the monad algebra.
+
+
+As is true for all adjunctions, the composition $U^T \circ F^T$ is a monad. We'll show that this the same monad we started with. Indeed, on objects, the composition $U^T (F^T a)$ first maps $a$ to a free monad algebra $(T a, \mu)$ and then forgets the structure map. The net result is the mapping of $a$ to $T a$, which is exactly what the original monad did. 
+
+On arrows, it lifts an arrow $f \colon a \to b$ using $T$. The fact that the arrow $T f$ is an algebra morphism from $(T a, \mu_a)$ to $(T b, \mu_b)$ follows from naturality of $\mu$:
 \[
  \begin{tikzcd}
  T (T a)
@@ -1508,35 +1600,65 @@ Indeed, on objects, it first maps $a$ to a free monad algebra $(T a, \mu)$ and t
   \end{tikzcd}
 \]
 
+Finally, we have to show that the unit and the counit of the monad $U^T \circ F^T$ are the same as the unit and the counit of our original monad.
 
+The units are the same by construction.
 
-To prove that we have an adjunction, we can either construct the natural isomorphism between hom-sets, or define two natural transformations to serve as the unit and the counit of the adjunction. 
+The monad multiplication of $U^T \circ F^T$ is given by the whiskering $U^T \circ \varepsilon \circ F^T$ of the unit of the adjunction. In components, this means instantiating $\varepsilon$ at $(T a, \mu_a)$, which gives us $\mu_a$ (the action of $U^T$ on arrows is trivial). This is indeed the original monad multiplication.
 
-We define the unit of the adjunction as the monadic unit $\eta$ of $T$. The counit is a natural transformation whose component at $(a, \alpha)$ is an algebra morphism from the free algebra generated by $a$, that is $(T a, \mu_a)$, back to $(a, \alpha)$. As we've seen earlier, $\alpha$ itself is such a morphism. We can therefore pick $\varepsilon_{(a, \alpha)} = \alpha$.
-
-Triangular identities for these definitions of $\eta$ and $\varepsilon$ follow from unit laws for the monad and the monad algebra.
-
-The whiskering of $U^T \circ \varepsilon \circ F^T$ in components means instantiating $\varepsilon$ at $(T a, \mu_a)$, which produces $\mu_a$ (the action of $U^T$ on arrows is trivial). 
-
-We have thus shown that, for any monad $T$ we can define the Eilenberg-Moore category and a pair of adjoint functors that give rise to this monad.
+We have thus shown that, for any monad $T$ we can define the Eilenberg-Moore category and a pair of adjoint functors that factorize this monad.
 
 \subsection{Kleisli category}
 
 Inside every Eilenberg-Moore category there is a smaller Kleisli category struggling to get out. This smaller category is the image of the free functor we have constructed in the previous section. 
 
-Despite appearances, the image of a functor does not necessarily define a subcategory. Granted, it maps identities to identities and composition to composition. The problem may arise if two arrows that were not composable in the source category become composable in the target category. This may happen if the target of the first arrow is mapped to the same object as the source of the second arrow. However, the free functor $F^T$ maps distinct objects into distinct free algebras, so its image is indeed a subcategory of $\mathcal{C}^T$.
+Despite appearances, the image of a functor does not necessarily define a subcategory. Granted, it maps identities to identities and composition to composition. The problem may arise if two arrows that were not composable in the source category become composable in the target category. This may happen if the target of the first arrow is mapped to the same object as the source of the second arrow. In the example below, $F f$ and $F g$ are composable, but their composition $F g \circ F f$ may be absent from the image of the first category.
 
-We have encountered the Kleisli category before. There are many ways of constructing the same category, and the simplest way to describe the Kleisli category is in terms of Kleisli arrows. 
+
+\[
+ \begin{tikzcd}
+ a
+ \arrow[d, "f"]
+ \\ b
+ \\ c
+ \arrow[d, "g"]
+ \\ d
+ \end{tikzcd}
+  \hspace{30pt}
+ \begin{tikzcd}
+ F a
+ \arrow[d, "F f"]
+ \arrow[dd, dashed, bend left=90, "F g \circ F f"]
+ \\ F b = F c
+  \arrow[d, "F g"]
+ \\ F d
+ \end{tikzcd}
+\]
+
+
+However, the free functor $F^T$ maps distinct objects into distinct free algebras, so its image is indeed a subcategory of $\mathcal{C}^T$.
+
+We have encountered the Kleisli category before. There are many ways of constructing the same category, and the simplest one is to describe the Kleisli category is in terms of Kleisli arrows. 
 
 A Kleisli category for the monad $(T, \eta, \mu)$ is denoted by $\mathcal{C}_T$. Its objects are the same as the objects of $\mathcal{C}$, but an arrow in $\mathcal{C}_T$ from $a$ to $b$ is represented by an arrow in $\mathcal{C}$ that goes from $a$ to $T b$. You may recognize it as the Kleisli arrow \hask{ a -> m b} we've defined before. Because $T$ is a monad, these Kleisli arrows can be composed using the ``fish'' operator \hask{<=<}. 
 
-To establish the adjunction, let's define the left functor $L_T \colon \mathcal{C} \to \mathcal{C}_T$ as identity on objects. We still have to define what it does to arrows. It must map a regular arrow $f \colon a \to b$ to a Kleisli arrow from $a$ to $b$. This Kleisli arrow $a \twoheadrightarrow b$ is represented by an arrow $a \to T b$ in $\mathcal{C}$. We pick the composite $\eta_b \circ f$:
+To establish the adjunction:
+\[
+ \begin{tikzcd}
+   \mathcal{C}_T
+    \arrow[rr, bend right, "R^T"']
+&&
+  \mathcal{C}
+  \arrow[ll, bend right, "L_T"']
+ \end{tikzcd}
+\]
+we define the left functor $L_T \colon \mathcal{C} \to \mathcal{C}_T$ as identity on objects. We still have to define what it does to arrows. It should map a regular arrow $f \colon a \to b$ to a Kleisli arrow from $a$ to $b$. This Kleisli arrow $a \twoheadrightarrow b$ is represented by an arrow $a \to T b$ in $\mathcal{C}$. Such an arrow always exists as the composite $\eta_b \circ f$:
 \[ L_T f \colon a \xrightarrow{f} b \xrightarrow{\eta_b} T b\]
 
-The right functor $R_T \colon \mathcal{C}_T \to \mathcal{C}$ is defined on objects as a mapping that takes an $a$ in the Kleisli category to an object $T a$ in $\mathcal{C}$. Given a Kleisli arrow $a \twoheadrightarrow b$, which is represented by an arrow $g \colon a \to T b$, $R_T$ will map it to an arrow $R_T a \to R_T b$, that is an arrow $T a \to T b$ in $\mathcal{C}$. We take this arrow to be $\mu_b \circ T g$:
+The right functor $R_T \colon \mathcal{C}_T \to \mathcal{C}$ is defined on objects as a mapping that takes an $a$ in the Kleisli category to an object $T a$ in $\mathcal{C}$. Given a Kleisli arrow $a \twoheadrightarrow b$, which is represented by an arrow $g \colon a \to T b$, $R_T$ will map it to an arrow $R_T a \to R_T b$, that is an arrow $T a \to T b$ in $\mathcal{C}$. We take this arrow to be the composite $\mu_b \circ T g$:
 \[  T a \xrightarrow{T g} T(T b) \xrightarrow{\mu_b} T b\]
 
-To establish the adjunction, we show the isomorphism of hom-sets:
+To establish the adjunction, we'll show the isomorphism of hom-sets:
 \[\mathcal{C}_T(L_T a, b) \cong \mathcal{C}(a, R_T b)\]
 An element of the left hand-side is a Kleisli arrow $a \twoheadrightarrow b$, which is represented by $f \colon a \to T b$. We can find the same arrow on the right hand side, since $R_T b$ is $T b$. So the isomorphism is between Kleisli arrows in $\mathcal{C}^T$ and the arrows in $\mathcal{C}$ that represent them.
 
