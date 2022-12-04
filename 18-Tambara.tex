@@ -14,11 +14,11 @@ The situation is somewhat analogous to the problem of composing geometric transf
 
 The theory or representations is a science in itself. Here, we'll approach it from the categorical perspective. Instead of groups, we'll consider monoids. A monoid can be defined as a special object in a monoidal category, but it can also be thought of as a single-object category $\cat M$. If we call its object $*$, the hom-set $\cat M( *, *)$ contains all the information we need. 
 
-Monoidal product is simply the composition of morphisms. By the laws of a category, it's associative and unital---the identity morphism serving as the monoidal unit.
+What we called ``product'' in a monoid is replaced by the composition of morphisms. By the laws of a category, it's associative and unital---the identity morphism serving as the monoidal unit.
 
 In this sense, every single-object category is automatically a monoid and all monoids can be made into single-object categories. 
 
-For instance, a monoid of whole numbers with addition can be thought of as a category with a single object $*$ and a morphism for every number. To compose two such morphisms, you add their numbers, as in the example below:
+For instance, a monoid of the whole numbers with addition can be thought of as a category with a single object $*$ and a morphism for every number. To compose two such morphisms, you add their numbers, as in the example below:
 \[
  \begin{tikzcd}
   *
@@ -31,7 +31,7 @@ For instance, a monoid of whole numbers with addition can be thought of as a cat
 \]
 The morphism corresponding to zero is automatically the identity morphism. 
 
-We can represent a monoid as transformations of a set. Such a representation is given by a functor $F \colon M \to \Set$. It maps the single object $*$ to some set $S$, and it maps the hom-set $\cat M(*, *)$ to a set of functions $S \to S$. By functor laws, it maps identity to identity and composition to composition, so it preserves the structure of the monoid. 
+We can \emph{represent} a monoid as transformations of a set. Such a representation is given by a functor $F \colon \cat M \to \Set$. It maps the single object $*$ to some set $S$, and it maps the hom-set $\cat M(*, *)$ to a set of functions $S \to S$. By functor laws, it maps identity to identity and composition to composition, so it preserves the structure of the monoid. 
 
 If the functor is fully faithful, its image contains exactly the same information as the monoid and nothing more. But, in general, functors cheat. The hom-set $\Set (S, S)$ may contain some other functions that are not in the image of $\cat M(*, *)$; and multiple morphisms in $\cat M$ can be mapped to a single function. 
 
@@ -67,19 +67,19 @@ It's a relationship between three functions acting on two sets:
 The naturality condition tells us that:
 \[ G m \circ \alpha = \alpha \circ F m \]
 
-In other words, if you pick an element $x \in F *$, you can map it to $G *$ using $\alpha$ and then apply the transformation corresponding to $m$; or you can first apply the transformation $F m$ and then map the result using $\alpha$. The result is the same in both cases.
+In other words, if you pick any element $x$ in the set $F *$, you can map it to $G *$ using $\alpha$ and then apply the transformation $G m$ corresponding to $m$; or you can first apply the transformation $F m$ and then map the result using $\alpha$. The result must be the same.
 
-Such functions are called \index{equivariant function}\emph{equivariant}. We often call $F m$ the \emph{action} of $m$ on the set $F *$. An equivariant function maps an action on one set to its corresponding action on another set. 
+Such functions are called \index{equivariant function}\emph{equivariant}. We often call $F m$ the \emph{action} of $m$ on the set $F *$. An equivariant function connects an action on one set to its corresponding action on another set using either pre-composition or post-composition. 
 
 \subsection{Tannakian reconstruction of a monoid}
 
 How much information do we need to reconstruct a monoid from its representations? Just looking at the sets is definitely not enough, since any monoid can be represented on any set. But if we include structure-preserving functions between these sets, we might have a chance. 
 
-Consider a set of \emph{all} functions $\Set(F *, F *)$ for a given functor $F \colon \cat M \to \Set$. At least some of these are the actions of the monoid. These are the functions of the form $F m$, where $m$ is an arrow in $\cat M$. Keep in mind, though, that there may be many more functions in that hom-set.
+Given a functor $F \colon \cat M \to \Set$, consider the set of \emph{all} functions $F* \to F*$, that is the hom-set $\Set(F *, F *)$, . At least some of these functions are the actions of the monoid. These are the functions of the form $F m$, where $m$ is an arrow in $\cat M$. Keep in mind, though, that there may be many more functions in that hom-set that don't correspond to actions.
 
-Now let's look at the ``neighboring'' set $G *$, the image of some other functor $G$. In its hm-set  $\Set(G *, G *)$ we'll find, among others, the corresponding actions of the form $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will preserve these actions.
+Now let's look at another set $G *$, which is the image of some other functor $G$. In its hom-set  $\Set(G *, G *)$ we'll find, among others, the corresponding actions of the form $G m$. An equivariant function, that is a natural transformation in $[\cat M, \Set]$, will connect any two related action $F m$ to $G m$.
 
-Now imagine creating a gigantic tuple by taking one function from each of the sets $\Set (F *, F *)$, for all functors $F\colon \cat M \to \Set$. We are interested only in tuples whose elements are correlated. Here's what I mean: If we pick $g \in  \Set (G*, G *)$ and  $h \in  \Set (H*,  H*)$ and there is a natural transformation (equivariant function) $\alpha$ between the two functors $G$ and $H$, we want the two function to be related:
+Now imagine creating a gigantic tuple by taking one function from each of the sets $\Set (F *, F *)$, for all functors $F\colon \cat M \to \Set$. We are interested only in tuples whose elements are connected. Here's what I mean: If we pick $g \in  \Set (G*, G *)$ and  $h \in  \Set (H*,  H*)$ and there is a natural transformation (equivariant function) $\alpha$ between the two functors $G$ and $H$, we want the two functions to be related:
 \[ \alpha \circ g = h \circ \alpha \]
 or, pictorially:
 \[
@@ -91,7 +91,7 @@ or, pictorially:
   \arrow[loop, "h"']
   \end{tikzcd}
 \]
-Notice that this will guarantee that actions are mapped to corresponding actions if, for instance, $g = G m$ and $h = H m$. 
+Notice that this correlation also works on pairs $g$ and $h$ which are not of the form $g = G m$ and $h=H m$.
 
 Such tuples are exactly the elements of the end:
 \[ \int_F \Set(F *, F *) \]
@@ -111,12 +111,13 @@ whose wedge condition provides the constraints we are looking for.
  & \Set (G *, H *)
  \end{tikzcd}
 \]
-
-Notice that this is the end over the whole functor category $[\cat M, \Set ]$, so the wedge condition relates the entries that are connected by natural transformations. In this case, natural transformations are equivariant functions. 
+Here $\alpha$ is a morphism in the functor category $[\cat M, \Set ]$:
+\[ \alpha \colon G \to H \]
+that is an equivariant function between the two representations. 
 
 Here are some details. The profunctor under the end is given by:
 \[ P \langle G, H \rangle = \Set (G *, H *) \]
-It's a functor:
+It's a functor of the form:
 \[ P \colon [\cat M, \Set]^{op} \times [\cat M, \Set] \to \Set \]
 Consider its action on pairs of morphisms in $[\cat M, \Set]$. Given a pair of natural transformations:
 \begin{align*}
@@ -139,11 +140,11 @@ In other words, we can recover the monoid from its representations. We'll see th
 
 \subsection{Cayley's theorem}
 
-In group theory, Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element has an inverse. Permutations are just bijective functions that map a set to itself. They \emph{permute} the elements of a set.
+In group theory, Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element has an inverse. Permutations are bijective functions that map a set to itself. They \emph{permute} the elements of a set.
 
 In category theory, Cayley's theorem is practically built into the definition of a monoid and its representations. 
 
-The connection between the single-object interpretation and the more traditional set-of-elements interpretation of a monoid is easy to establish. We do this by constructing the functor $F \colon \cat M \to \Set$ that maps $*$ to the special set $S$ that is given by the hom-set: $S = \cat M(*, *)$. Elements of this set are morphisms in $\cat M$. We define the action of $F$ on morphisms as post-composition:
+The connection between the single-object interpretation and the more traditional set-of-elements interpretation of a monoid is easy to establish. We do this by constructing the functor $F \colon \cat M \to \Set$ that maps $*$ to the special set $S$ that is equal to the hom-set: $S = \cat M(*, *)$. Elements of this set are morphisms in $\cat M$. We define the action of $F$ on morphisms as post-composition:
 \[ (F m) n = m \circ n \]
 Here $m$ is a morphism in $\cat M$ and $n$ is an element of $S$, which happens to also be a morphism in $\cat M$.
 
@@ -258,6 +259,12 @@ It's important to realize how the structure of the functor category enters the e
  & \Set (G a, H b)
  \end{tikzcd}
 \]
+
+To get some intuition about Tannakian reconstruction, you may recall that $\Set$-valued functors have the interpretation as proof-relevant subsets. A functor $F \colon \cat C \to \Set$ (a co-presheaf) defines a subset of the objects of (a small category) $\cat C$. An object $a$ is in that subset if $F a$ is non-empty. Each element of $F a$ can be interpreted as a proof of that. 
+
+But unless the category in question is discrete, not all subsets correspond to co-presheaves. In particular, whenever there is an arrow $f \colon a \to b$, there also is a function $F f \colon F a \to F b$. According to our interpretation, such function maps every proof that $a$ is in the subset  defined by $F$ to a proof that $b$ is in that subset. Co-presheaves thus define proof-relevant subsets that are compatible with the structure of the category.
+
+Let's reinterpret Tannakian reconstruction in the same spirit. An element of the left-hand side is a proof that for every subset that is compatible with the structure of $\cat C$, if $a$ belongs to that subset, so does $b$. That is only possible if there is an arrow from $a$ to $b$. 
 
 \subsection{Tannakian reconstruction in Haskell}
 
@@ -771,7 +778,7 @@ It turns out that the original derivation of profunctor optics still works for t
  =\int_{P \colon \cat T} \Set \big((U P) \langle a, b\rangle, (U P) \langle s, t\rangle \big) \]
 where the end is taken over a generalized Tambara module.
 
-\section{General Optics}
+\section{Mixed Optics}
 
 Whenever we have an action of a monoidal category $\cat M$ on $\cat C$ we can define the corresponding optic. A category with such an action is called an \index{actegory}\emph{actegory}. We can go even further by considering two separate actions. Suppose that $\cat M$ can act on both $\cat C$ and $\cat D$. We'll use the same notation for both actions:
 \[ \bullet \colon \cat M \times \cat C \to \cat C \]
