@@ -367,7 +367,45 @@ newtype CoEndCompose p q a b = CoEndCompose (Coend (ProPair q p a b))
 Define a \hask{Profunctor} instance for \hask{CoEndCompose}.
 \end{exercise}
 
+\subsection{Colimits as coends}
+A function of two variables that ignores one of its arguments is equivalent to a function of one variable. Similarly, a profunctor that ignores one of its arguments is equivalent to a functor. Conversely, given a functor $F$, we can construct a profunctor:
+\[P \langle x, y \rangle = F y \]
+Similarly, its action on a pair of arrows ignores one of the arrows:
+\[P \langle f, g \rangle = F g \]
+For any   $f \colon x \to y$, our definition of a coend for such a profunctor reduces to the following diagram:
+\[
+ \begin{tikzcd}
+ & F x
+ \arrow[ld, "F f"']
+ \arrow[rd, dashed, "id_{F x}"]
+ \\
+ F y
+ \arrow[dr, "i_y"']
+ \arrow[ddr, bend right,  "g_y"']
+ && F x
+ \arrow[dl, "i_x"]
+ \arrow[ddl, bend left,  "g_x"]
+ \\
+ &\int^x F x
+ \arrow[d, dashed, "h"]
+ \\
+ &d
+ \end{tikzcd}
+\]
+After shrinking the identity arrows, the original co-wedge becomes a co-cone, and the universal condition turns into the definition of a colimit. This justifies the use the coend notation for colimits:
+\[ \int^x F x = \text{colim} F \]
+The functor $F$ defines a diagram in the target category. The source category, in this case, is the pattern.
 
+We can gain a useful intuition if we consider a discrete category, in which a profunctor is a (possibly infinite) matrix and a coend is the sum (coproduct) if its diagonal elements. A profunctor that is constant along one axis corresponds to a matrix whose rows are identical (each given by a ``vector'' $F x$). The sum of the diagonal elements of such a matrix is equal to the sum of all components of the vector $F x$.
+\[
+\begin{pmatrix}
+\color{red} F a & F b & F c & ... \\
+F a & \color{red}F b & F c & ...\\
+F a & F b &\color{red}F c & ...\\
+... & ... & ... & ...
+\end{pmatrix}
+\]
+In a non-discrete category, this sum generalizes to a colimit.
 \section{Ends}
 
 Just like a coend generalizes a sum of the diagonal elements of a profunctor---its dual, an end, generalizes the product. A product is defined by its projections, and so is an end. 
@@ -521,6 +559,35 @@ The set of natural transformations, or the hom-set in the functor category, is t
 \[ [\mathcal{C}, \mathcal{D}] (F, G) \cong \int_{x \colon  \mathcal{B}} \mathcal{C}(F x, G x)\]
 
 As we discussed earlier, to construct an \hask{End} we have to give it a whole family of values parameterized by types. Here, these values are the components of a polymorphic function. 
+
+\subsection{Limits as ends}
+Just like we were able to express colimits as coends, we can express limits as ends. As before, we define a profunctor that ignores its first argument:
+\begin{align*}
+ P \langle x, y \rangle &= F y \\
+ P \langle f, g \rangle &= F g 
+\end{align*}
+The universal condition that defines an end becomes the definition of a universal cone:
+\[
+ \begin{tikzcd}
+ &d
+ \arrow[ddl, bend right, "g_x"']
+ \arrow[ddr, bend left, "g_y"]
+ \arrow[d, dashed, "h"]
+ \\
+ & \int_x F x
+ \arrow[ld, "\pi_x"']
+ \arrow[rd, "\pi_y"]
+ \\
+ F x
+ \arrow[dr, "F f"']
+ &&F y
+ \arrow[dl, dashed, "id_{F y}"]
+ \\
+ & F y
+ \end{tikzcd}
+\]
+We can thus use the end notation for limits:
+\[ \int_x F x = \text{lim} F \]
 
 \section{Continuity of the Hom-Functor}
 
