@@ -311,93 +311,8 @@ boolToStrGetter :: Getter Bool String
 boolToStrGetter = toRep (show) . toRep (bool 0 1)
 \end{haskell}
 Other optics don't compose so easily, but their functor (and profunctor) representations do. 
-\subsection{Pointed getter}
-
-Here's a little toy example in Haskell that illustrates the need for more interesting reconstructions. It's an optic that can either act as a getter or it can return a default value.
-\begin{haskell}
-data PtdGetter s t = Pt t | Fun (s -> t)
-\end{haskell}
-We can apply this getter to a source value and get a result of type \hask{t}:
-\begin{haskell}
-apply :: PtdGetter s t -> s -> t
-apply (Pt t) _ = t
-apply (Fun g) s = g s
-\end{haskell}
-
-These getters compose, but their composition is non-trivial:
-\begin{haskell}
-composePG :: PtdGetter x t -> PtdGetter s x -> PtdGetter s t
-composePG (Pt t) _ = Pt t
-composePG (Fun g) (Pt x) = Pt (g x)
-composePG (Fun g) (Fun g') = Fun (g . g')
-\end{haskell}
-The composition is associative, and there is an identity getter:
-\begin{haskell}
-idPG :: PtdGetter a a
-idPG = Fun id
-\end{haskell}
-so we do have a category in which pointed getters form hom-sets. 
-
-The functor representation for this toy optic exists, but we have to restrict the type of functors over which we take the end. Here's the definition of a class of \hask{Pointed} functors:
-\begin{haskell}
-class Functor f => Pointed f where
-  eta :: a -> f a
-\end{haskell}
-Our \hask{PointedGetter} is represented by the following Tannakian-like formula:
-\begin{haskell}
-type PtdGetterF s t = forall f. Pointed f => f s -> f t
-\end{haskell}
-This time we are defining a function that is polymorphic not over all functors but over a restricted class of \hask{Pointed} functors.
-
-As before, we can apply this optic to retrieve the target. The trick is to encapsulate the source in the identity functor:
-\begin{haskell}
-applyF :: PtdGetterF s t -> s -> t
-applyF g = unId . g . Id
-\end{haskell}
-This works because the identity functor is pointed:
-\begin{haskell}
-instance Pointed Id where
-  eta = Id
-\end{haskell}
-
-The equivalence of the two formulations is witnessed by this pair of functions:
-\begin{haskell}
-toPGF :: PtdGetter s t -> PtdGetterF s t
-toPGF (Pt t) = \_ -> eta t
-toPGF (Fun g) = fmap g
-
-fromPGF :: PtdGetterF s t -> PtdGetter s t
-fromPGF g = Fun (unId . g . Id)
-\end{haskell}
-This time, however, the functor representation has definite advantage over the original: a composition of two \hask{PtdGetterF} optics is just function composition.
-\begin{exercise}
-Define two composable \hask{PtdGetter} optics---for instance, one going from a pair \hask{(Int, Bool)} to \hask{Int} and another from \hask{Int} to \hask{String}. Compose them first using \hask{composePG}, then convert them to the functor representation, and compose them using function composition.
-\end{exercise}
-
 
 \subsection{Tannakian reconstruction with adjunction}
-
-In the toy example, we performed the reconstruction over a category of functors that were equipped with additional structure. In category theory we would describe pointed functors as endofunctors $P \colon \Set \to \Set$ equipped with natural transformations:
-\[ \eta \colon Id \to P \]
-They form their own category, let's call it $\mathbf{Ptd}$,  with morphisms that are natural transformations that preserve the structure. Such a transformation $\alpha \colon (P, \eta) \to (P', \eta')$ must make the following triangle commute:
-\[
- \begin{tikzcd}
- & a
- \arrow[dl, "\eta"']
- \arrow[dr, "\eta'"]
- \\
- P a
- \arrow[rr, "\alpha_a"]
- && P' a
- \end{tikzcd}
-\]
-
-Every pointed functor is a functor---a statement that is formalized by saying that there is a forgetful functor $U \colon\mathbf{Ptd} \to [\Set, \Set]$, which forgets the additional structure. Notice that $U$ is a functor between functor categories. 
-
-This functor has a left adjoint, the free functor $F$. Any endofunctor $Q \colon \Set \to \Set$ can be freely made into a pointed functor using the coproduct:
-\[ (F Q) a = a + Q a \]
-together with the natural transformation:
-\[ \eta_a = \text{Left} \]
 
 The trick in generalizing the Tannakian reconstruction is to define the end over a specialized functor category $\cat T$, 
  but applying the forgetful functor to its functors. We assume that we have the free/forgetful adjunction $F \dashv U$ between $\cat T$ and $[\cat C, \Set]$:
@@ -429,12 +344,6 @@ Compare this with the earlier formula for Tannakian reconstruction, especially i
 \[ \int_{F \colon [\cat C, \Set]} \Set (F a, F s) \cong \cat C(a, -) s\]
 
 Keep in mind that, in the derivation of optics, we'll replace $a$ and $s$ with pairs of objects $\langle a, b \rangle$ and $\langle s, t \rangle$  from $\cat C^{op} \times \cat C$. In that case our functors will become profunctors.
-
-Going back to our toy example, the monad $\Phi$ is given by:
-\[ (\Phi Q) s = s + Q s \]
-which is just the action of the free functor $F$ followed by forgetting the $\eta$. Replacing $Q$ with the representable $\cat C (a, -)$ we get:
-\[ s + \cat C (a, s) \]
-In Haskell, this translates directly to our \hask{PtdGetter}.
 
 The bottom line is that we were able to reconstruct a hom-set in a category of simple optics from the category of functors with some additional structure. 
 
