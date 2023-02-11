@@ -938,8 +938,8 @@ Another way of describing a composite object is to say that it can be split into
 
 In Haskell, we would express this idea using an existential type:
 \begin{haskell}
-data Lens s a where
-    Lens :: (s -> (c, a), (c, a) -> s) -> Lens s a
+data LensE s a where
+    LensE :: (s -> (c, a), (c, a) -> s) -> LensE s a
 \end{haskell}
 This tells us that there exists some unspecified type \hask{c} such that \hask{s} can be split into, and reconstructed from, a product \hask{(c, a)}. 
 
@@ -961,11 +961,11 @@ This tells us that there exists some unspecified type \hask{c} such that \hask{s
 
 The \hask{get}/\hask{set} version of the lens can be derived from this existential form.
 \begin{haskell}
-toGet :: Lens s a -> (s -> a)
-toGet (Lens (l, r)) = snd . l
+toGet :: LensE s a -> (s -> a)
+toGet (LensE (l, r)) = snd . l
 
-toSet :: Lens s a -> (s -> a -> s)
-toSet (Lens (l, r)) s a = r (fst (l s), a)
+toSet :: LensE s a -> (s -> a -> s)
+toSet (LensE (l, r)) s a = r (fst (l s), a)
 \end{haskell}
 
 Notice that we don't need to know anything about the type of the residue. We take advantage of the fact that the existential lens contains both the producer and the consumer of \hask{c} and we're just mediating between the two.
@@ -1009,22 +1009,22 @@ is a profunctor in $\langle x, y\rangle$.
 \subsection{Type-changing lens in Haskell}
 In Haskell, we can define a type-changing lens as the following existential type:
 \begin{haskell}
-data Lens s t a b where
- Lens :: (s -> (c, a)) -> ((c, b) -> t) -> Lens s t a b
+data LensE s t a b where
+  LensE :: (s -> (c, a)) -> ((c, b) -> t) -> LensE s t a b
 \end{haskell}
 As before, we can use it to get and set the focus:
 \begin{haskell}
-toGet :: Lens s t a b -> (s -> a)
-toGet (Lens l r) = snd . l
+toGet :: LensE s t a b -> (s -> a)
+toGet (LensE l r) = snd . l
 
-toSet :: Lens s t a b -> (s -> b -> t)
-toSet (Lens l r) s a = r (fst (l s), a)
+toSet :: LensE s t a b -> (s -> b -> t)
+toSet (LensE l r) s a = r (fst (l s), a)
 \end{haskell}
 
 The simplest example of a lens acts on a product. It can extract or replace one component of the product, treating the other as the residue. In Haskell, we'd implement it as:
 \begin{haskell}
-prodLens :: Lens (c, a) (c, b) a b
-prodLens = Lens id id
+prodLens :: LensE (c, a) (c, b) a b
+prodLens = LensE id id
 \end{haskell}
 Here, the type of the whole is the product \hask{(c, a)}. When we replace \hask{a} with \hask{b} we end up with the target type \hask{(c, b)}. Since the source and the target are already products, the two functions in the definition of the existential lens are just identities.
 
@@ -1086,8 +1086,8 @@ We can now construct a composite lens that can access \hask{a'} and \hask{b'} in
 
 
 \begin{haskell}
-compLens :: Lens a b a' b' -> Lens s t a b -> Lens s t a' b'
-compLens (Lens l2 r2) (Lens l1 r1) = Lens l3 r3
+compLens :: LensE a b a' b' -> LensE s t a b -> LensE s t a' b'
+compLens (LensE l2 r2) (LensE l1 r1) = LensE l3 r3
   where l3 = assoc' . bimap id l2  . l1
         r3 = r1 . bimap id r2 . assoc
 \end{haskell}
@@ -1110,7 +1110,7 @@ instance Bifunctor (,) where
 
 As an example, let's compose two product lenses:
 \begin{haskell}
-l3 :: Lens (c, (c', a')) (c, (c', b')) a' b'
+l3 :: LensE (c, (c', a')) (c, (c', b')) a' b'
 l3 = compLens prodLens prodLens
 \end{haskell}
 and apply it to a nested product:
