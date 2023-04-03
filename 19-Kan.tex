@@ -29,9 +29,11 @@ In a typical categorical manner, we may ask the question: What if we replace the
 
 A natural setting for generalizing a product is a monoidal category with a tensor product $\otimes$ and a unit object $I$. If we have an adjunction:
 \[ \cat C (a \otimes b, c) \cong \cat C (a, [b, c]) \]
-we'll call the category \emph{closed monoidal}. In a typical categorical abuse of notation, unless it leads to confusion, we'll use the same symbol (a pair of square brackets)  for the monoidal internal hom as we did for the cartesian hom.
+we'll call the category \emph{closed monoidal}. In a typical categorical abuse of notation, unless it leads to confusion, we'll use the same symbol (a pair of square brackets)  for the monoidal internal hom as we did for the cartesian hom. There is an alternative \index{lollipop}lollipop notation for the right adjoint to the tensor product:
+\[ \cat C (a \otimes b, c) \cong \cat C (a, b \multimap c) \]
+It is often used in the context of \index{linear types}linear types.
 
-The definition of an internal hom works well for a symmetric monoidal category. If the tensor product is not symmetric, the adjunction defines a \emph{left closed} monoidal category. The left internal hom is adjoint to the ``post-multiplication'' functor $(- \otimes b)$. The right-closed structure is defined as the right adjoint to the ``pre-multiplication'' functor $(b \otimes -)$. If both are defined than the category is called \index{bi-closed monoidal category}\emph{bi-closed}.
+The definition of the internal hom works well for a symmetric monoidal category. If the tensor product is not symmetric, the adjunction defines a \emph{left closed} monoidal category. The left internal hom is adjoint to the ``post-multiplication'' functor $(- \otimes b)$. The right-closed structure is defined as the right adjoint to the ``pre-multiplication'' functor $(b \otimes -)$. If both are defined than the category is called \index{bi-closed monoidal category}\emph{bi-closed}.
 
 
 \subsection{Internal hom for Day convolution}

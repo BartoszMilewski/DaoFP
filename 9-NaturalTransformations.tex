@@ -228,13 +228,45 @@ The body of this function is very simple, just the variable \hask{x}. It doesn't
 
 This is in contrast to \index{ad-hoc polymorphism}\emph{ad-hoc polymorphism}. An ad-hoc polymorphic function may use different implementations for different types. An example of such a function is \hask{fmap}, the member function of the \hask{Functor} typeclass. There is one implementation of \hask{fmap} for lists, a different one for \hask{Maybe}, and so on, case by case. 
 
-It turns out that limiting the type of a natural transformation to adhere to parametric polymorphism has far reaching consequences. Such a function automatically satisfies naturality conditions. It's an example of \index{parametricity}parametricity producing so called \index{theorems for free}\emph{theorems for free}. 
-
 The standard definition of a (parametric) natural transformation in Haskell uses a \emph{type synonym:}
 \begin{haskell}
 type Natural f g = forall a. f a -> g a
 \end{haskell}
 A \index{\hask{type} synonym}\hask{type} declaration introduces an alias, a shorthand, for the right-hand-side.
+
+It turns out that limiting the type of a natural transformation to adhere to parametric polymorphism has far reaching consequences. Such a function automatically satisfies naturality conditions. It's an example of \index{parametricity}parametricity producing so called \index{theorems for free}\emph{theorems for free}. 
+
+We can't express equalities of arrows in Haskell, but we can use naturality to transform programs. In particular, if \hask{alpha} is a natural transformation, we can replace:
+\begin{haskell}
+fmap h . alpha
+\end{haskell}
+with:
+\begin{haskell}
+alpha . fmap h
+\end{haskell}
+Here, the compiler will automatically figure out what versions of \hask{fmap} and which components of \hask{alpha} to use. 
+
+We can also use more advanced language options to make the choices explicit. We can express naturality using a pair of functions: 
+\begin{haskell}
+oneWay :: 
+  forall f g a b. (Functor f, Functor g) => 
+  Natural f g -> (a -> b) -> f a -> g b
+oneWay alpha h = fmap @g h . alpha @a
+\end{haskell}
+\begin{haskell}
+otherWay :: 
+  forall f g a b. (Functor f, Functor g) => 
+  Natural f g -> (a -> b) -> f a -> g b
+otherWay alpha h = alpha @b . fmap @f h
+\end{haskell}
+The annotations \hask{@a} and \hask{@b} specify the components of the parametrically polymorphic function \hask{alpha}, and the annotations \hask{@f} and \hask{@g} specify the functors for which the ad-hoc polymorphic \hask{fmap} is instantiated.
+
+The following Haskell extensions have to be specified at the top of the file:
+\begin{haskell}
+{-# language RankNTypes #-}
+{-# language TypeApplications #-}
+{-# language ScopedTypeVariables #-}
+\end{haskell}
 
 Here's an example of a useful function that is a natural transformation between the list functor and the \hask{Maybe} functor:
 \begin{haskell}
@@ -1237,9 +1269,93 @@ A functor from some category $\mathcal{C}$ to the category of sets can be though
 
 A hom-functor produces a model of the category as viewed from a certain vantage point. The functor $\mathcal{C}(a, -)$, for instance, offers the panorama of $\mathcal{C}$ from the vantage point of $a$. It organizes all the arrows emanating from $a$ into neat packages that are connected by images of arrows that go between them, all in accordance with the original structure of the source category. 
 
-Some vantage points are better than others. For instance, the view from the initial object is quite sparse. Every object $x$ is mapped to a singleton set corresponding to the unique mapping $0 \to x$. 
+\[
+\begin{tikzpicture}
+\def\ax{0}
+\def\ay{0.5}
+\def\xx{-0.5}
+\def\xy{2.7}
+\def\yx{2}
+\def\yy{2.5}
+\def\zx{2}
+\def\zy{0.5}
+\def\vx{-1.5}
+\def\vy{1.7}
+\filldraw[black] (\ax, \ay) circle (1 pt);
+\node (a) at (\ax, \ay) {};
+\node[left] at (\ax, \ay) {$a$};
+\filldraw[blue] (\xx, \xy) circle (1 pt);
+\node[above] at (\xx, \xy) {$x$};
+\filldraw[red] (\yx, \yy) circle (1 pt);
+\node[above] at (\yx, \yy) {$y$};
+\filldraw[brown] (\zx, \zy) circle (1 pt);
+\node[right] at (\zx, \zy) {$z$};
+\filldraw[black] (\vx, \vy) circle (1 pt);
+\node[below] at (\vx, \vy) {$v$};
 
-The view from the terminal object is more interesting: it maps all objects to their sets of (global) elements. 
+\draw [->] (a) edge[out=225, in=315, loop] (a);
+
+\draw[dashed] (\xx, \xy) edge[->, bend left, shorten > = 4 pt] (\yx, \yy);
+\draw[dashed] (\zx, \zy) edge[->, bend right, shorten > = 4 pt] (\yx, \yy);
+
+\draw[blue] (\ax, \ay) edge[->, bend left, shorten > = 4 pt] (\xx, \xy);
+\draw[blue] (\ax, \ay) edge[->, bend right, shorten > = 4 pt] (\xx, \xy);
+
+\draw[red] (\ax, \ay) edge[->, bend left, shorten > = 4 pt] (\yx, \yy);
+\draw[red] (\ax, \ay) edge[->, bend right, shorten > = 4 pt] (\yx, \yy);
+\draw[red] (\ax, \ay) edge[->, shorten > = 4 pt] (\yx, \yy);
+
+\draw[brown] (\ax, \ay) edge[->, shorten > = 4 pt] (\zx, \zy);
+\end{tikzpicture}
+\hspace{80pt}
+\begin{tikzpicture}
+\def\ax{0}
+\def\ay{0.5}
+\def\xx{-0.5}
+\def\xy{2.7}
+\def\yx{2}
+\def\yy{2.5}
+\def\zx{2}
+\def\zy{0.5}
+\def\vx{-1.5}
+\def\vy{1.7}
+\def\sx{0.7}
+\def\sy{1.6}
+
+\node at (\sx, \sy) {$\Set$};
+
+\draw[black] (\vx, \vy) circle (0.2);
+\node[below] at (\vx, \vy - 0.2) {$v$};
+
+\draw[black] (\ax, \ay) circle (0.2);
+\filldraw[black] (\ax, \ay) circle (1 pt);
+\node[below] at (\ax, \ay-0.2) {$a$};
+
+\draw[blue] (\xx, \xy) circle (0.35);
+\filldraw[blue] (\xx - 0.1, \xy) circle (1 pt);
+\filldraw[blue] (\xx + 0.1, \xy) circle (1 pt);
+\node[above] at (\xx, \xy - 0.8) {$x$};
+
+\draw[red] (\yx, \yy) circle (0.4);
+\filldraw[red] (\yx-0.15, \yy+0.1) circle (1 pt);
+\filldraw[red] (\yx+0.15, \yy+0.1) circle (1 pt);
+\filldraw[red] (\yx, \yy-0.2) circle (1 pt);
+\node[below] at (\yx, \yy - 0.4) {$y$};
+
+\draw[brown] (\zx, \zy) circle (0.2);
+\filldraw[brown] (\zx, \zy) circle (1 pt);
+\node[below] at (\zx, \zy - 0.2) {$z$};
+
+\draw[dashed] (\xx, \xy) edge[->, bend left, shorten > = 15, shorten < = 15] (\yx, \yy);
+\draw[dashed] (\zx, \zy) edge[->, bend right, shorten > = 15, shorten < = 10] (\yx, \yy);
+
+\end{tikzpicture}
+\]
+
+
+Some vantage points are better than others. For instance, the view from the initial object is quite sparse. Every object $x$ is mapped to a singleton set $\cat C(0, x)$ corresponding to the unique mapping $0 \to x$. 
+
+The view from the terminal object is more interesting: it maps all objects to their sets of (global) elements $\cat C(1, x)$. 
 
 The Yoneda lemma may be considered one of the most profound statements, or one of the most trivial statements in category theory. Let's start with the profound version. 
 
@@ -1249,29 +1365,102 @@ The set of natural transformation is the hom-set in the functor category $[\math
 
 \[ [\mathcal{C}, \mathbf{Set}]( \mathcal{C}(a, -), F) \cong F a \]
 
-The reason this works is because all the mappings involved in this theorem are bound by the requirements of preserving the structure of the category $\mathcal{C}$ and the structure of its models. In particular, naturality conditions impose a huge set of constraints on the way the mapping propagates from one point to another. 
+The reason this works is because all the mappings involved in this theorem are bound by the requirements of preserving the structure of the category $\mathcal{C}$ and the structure of its models. In particular, naturality conditions impose a huge set of constraints on the way the components of a natural transformation propagate from one point to another. 
 
 The proof of the Yoneda lemma starts with a single identity arrow and lets naturality propagate it across the whole category.
 
 Here's the sketch of the proof. It consists of two parts: First, given a natural transformation we construct an element of $F a$. Second, given an element of $F a$ we construct the corresponding natural transformation. 
 
-First, let's pick an arbitrary element on the left-hand side: a natural transformation $\alpha$. Its component at $x$ is a function
+First, let's pick an arbitrary element on the left-hand side: a natural transformation $\alpha$. Its component at $x$ is a function:
 \[ \alpha_x \colon \mathcal{C}(a, x) \to F x \]
-We can now apply the Yoneda trick: substitute $a$ for $x$ 
+We can now apply the Yoneda trick: substitute $a$ for $x$:
 \[ \alpha_a \colon \mathcal{C}(a, a) \to F a \]
-and then pick the identity $id_a$ as the canonical element of $\mathcal{C}(a, a)$. This gives us an element $\alpha_a (id_a)$ in the set $F a$.
+and then pick the identity $id_a$ as the canonical element of $\mathcal{C}(a, a)$. This gives us an element $\alpha_a (id_a)$ in the set $F a$. This defines a mapping in one direction, from natural transformations to elements of the set $F a$.
 
-Now the other way around. Take an element $p$ of the set $F a$. We want to implement a natural transformation that takes an arrow $h$ from $ \mathcal{C}(a, x)$ and produces an element of $F x$. This is simply done by lifting the arrow $h$ using $F$. We get a function
+Looking at the picture of the hom-functor $\cat C(a, -)$, we notice that its action on $a$ itself is always a non-empty set. If there is a natural transformation from it to $F$, it means that $F a$ must be non-empty too.
+\[
+\begin{tikzpicture}
+\def\ax{0}
+\def\ay{0.5}
+\def\xx{-0.5}
+\def\xy{3.7}
+\filldraw[black] (\ax, \ay) circle (1 pt);
+\node (a) at (\ax, \ay) {};
+\node[left] at (\ax, \ay) {$a$};
+\filldraw[blue] (\xx, \xy) circle (1 pt);
+\node[above] at (\xx, \xy) {$x$};
+
+\draw [->] (a) edge[out=225, in=315, loop] (a);
+\node[right] at (\ax + 0.3, \ay - 0.35) {$id_a$};
+
+\draw[blue] (\ax, \ay) edge[->, "$h$", bend right, shorten > = 4 pt] (\xx, \xy);
+
+\end{tikzpicture}
+\hspace{80pt}
+\begin{tikzpicture}
+
+\def\ax{0}
+\def\ay{0.5}
+\def\xx{-0.5}
+\def\xy{3.7}
+
+\def\fax{3}
+\def\fay{0.5}
+\def\fxx{3 - 0.5}
+\def\fxy{3.7}
+
+\def\px{\fax - 0.3}
+\def\hx{\xx + 0.35}
+% C(a,a)
+\draw[black] (\ax, \ay) circle (0.2);
+\filldraw[black] (\ax, \ay) circle (1 pt);
+\node[below] at (\ax, \ay-0.2) {$\cat C (a, a)$};
+% C(a,x)
+\draw[black] (\xx, \xy) ellipse (0.7 and 0.4);
+
+\filldraw[blue] (\xx + 0.35, \xy) circle (1 pt);
+\node[left, blue] at (\hx, \xy) {$h$};
+
+\node[above] at (\xx, \xy - 1.1) {$\cat C (a, x)$};
+\draw[dashed] (\hx, \xy) edge[->, "$\alpha_x$", shorten > = 4 pt] (\fxx, \fxy);
+
+% F a
+\draw[red] (\fax, \fay) ellipse (0.7 and 0.4);
+\filldraw[red] (\px, \fay) circle (1 pt);
+\node[right, red] at (\px, \fay) {$p$};
+\node[right, red] at (\fax + 0.7, \fay) {$F a$};
+\draw[dashed] (\ax, \ay) edge[->, "$\alpha_a$", shorten > = 3 pt] (\px, \fay);
+% F x
+\draw[red] (\fxx, \fxy) circle (0.4);
+\filldraw[red] (\fxx, \fxy) circle (1 pt);
+\node[right, red] at (\fxx + 0.35, \fxy) {$F x$};
+
+\draw[blue] (\px, \fay) edge[->, "$F h$", bend right, shorten > = 12, shorten < = 12] (\fxx, \fxy);
+
+\end{tikzpicture}
+\]
+
+
+Now the other way around. Given an element $p$ of the set $F a$ we want to construct a natural transformation $\alpha$. First, we pick $p$ to be the action of $\alpha_a$ on $id_a \in \cat C(a, a)$. 
+
+Now let's take an arbitrary object $x$ and an arbitrary element of $\cat C(a, x)$. Such an element corresponds to some arrow $h \colon a \to x$. Our natural transformation must map it to an element of $F x$. We can do it by lifting the arrow $h$ using $F$. We get a function:
 \[F h \colon F a \to F x \]
-We can apply this function to $p$ to get an element of $F x$. We take this element as the action of $\alpha_x$ on $h$.
+We can apply this function to $p$ and get an element of $F x$. We take this element as the action of $\alpha_x$ on $h$:
+\[ \alpha_x h = (F h) p \]
 
+The isomorphism in the Yoneda lemma is natural not only in $a$ but also in $F$. In other words, you can ``move'' from the functor $F$ to another functor $G$ by applying an arrow in the functor category, that is a natural transformation. This is quite a leap in the levels of abstraction, but all the definitions of functoriality and naturality work equally well in the functor category, where objects are functors, and arrows are natural transformations.
+
+\begin{exercise}
+Fill in the gap in the proof when $F a$ is empty.
+\end{exercise}
 \begin{exercise}
 Show that the mapping 
 \[ \mathcal{C}(a, x) \to F x\]
 defined above is a natural transformation. Hint: Vary $x$ using some $f \colon x \to y$.
 \end{exercise}
-
-The isomorphism in the Yoneda lemma is natural not only in $a$ but also in $F$. In other words, you can ``move'' from the functor $F$ to another functor $G$ by applying an arrow in the functor category, that is a natural transformation. This is quite a leap in the levels of abstraction, but all the definitions of functoriality and naturality work equally well in the functor category, where objects are functors, and arrows are natural transformations.
+\begin{exercise}
+Show that the formula for $\alpha_x$ can be derived from the assumption that $\alpha_a (id_a) = p$ and the naturality condition. Hint: The lifting of $h$ by the hom-functor $\cat C(a, h)$ is given by post-composition.
+\end{exercise}
 
 \subsection{Yoneda lemma in programming}
 
@@ -1416,11 +1605,11 @@ Describe limits and colimits as representing objects. What are the functors they
 
 The idea that objects can be described by the way they interact with other objects is sometimes illustrated by playing imaginary guessing games. One category theorist picks a secret object in a category, and the other has to guess which object it is (up to isomorphism, of course). 
 
-The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond, each time, with a set: the set of arrows from the probing object $a$ to the secret object $x$. This, of course, is the hom-set $\mathcal{C}(a, x)$. 
+The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond each time with a set: the set of arrows from the probing object $a$ to the secret object $x$. This, of course, is the hom-set $\mathcal{C}(a, x)$. 
 
-The totality of these answers, as long as the opponent is not cheating, will define a presheaf $F \colon \mathcal{C} \to \mathbf{Set}$, and the object they are hiding is its representing object. 
+The totality of these answers, as long as the opponent is not cheating, will define a presheaf $F \colon \mathcal{C}^{op} \to \mathbf{Set}$, and the object they are hiding is its representing object. 
 
-But how do we know they are not cheating? To test that, we have to be able to ask questions about arrows. For every arrow we select, they should give us a function between two sets---the sets they gave us for its endpoints. We can then check if all identity arrows are mapped to identity functions, and whether compositions of arrows map to compositions of functions. In other words, we'll be able to verify that $F$ is a functor. 
+But how do we know that they are not cheating? To test that, we have to be able to ask questions about arrows. For every arrow we select, they should give us a function between two sets---the sets they gave us for its endpoints. We can then check if all identity arrows are mapped to identity functions, and whether compositions of arrows map to compositions of functions. In other words, we'll be able to verify that $F$ is a functor. 
 
 However, a clever enough opponent may still fool us. The presheaf they are revealing to us may describe a fantastical object---a figment of their imagination---and we won't be able to tell. It turns out that such imaginary objects are often as interesting as the real ones. 
 

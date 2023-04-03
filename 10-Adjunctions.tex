@@ -296,6 +296,11 @@ Dually, the colimit is described by the following natural isomorphism:
 We can write both adjunctions using one terse formula:
 \[ \text{Colim} \dashv \Delta \dashv \text{Lim}\]
 
+In particular, since the product category $\cat C \times \cat C$ is equivalent to $\cat C^2$, or the functor category $[\mathbf{2}, \cat C]$, we can rewrite a product and a coproduct as a limit and a colimit:
+\[ [\mathbf{2}, \cat C](\Delta_x, \langle a, b \rangle) \cong \cat C(x, a \times b) \]
+\[ \cat C( a + b, x) \cong [\mathbf{2}, \cat C]( \langle a, b \rangle, \Delta_x) \]
+where $\langle a, b \rangle$ denotes a diagram that is the action of a functor $D \colon \mathbf{2} \to \cat C$ on the two objects of $\mathbf{2}$.
+
 \section{Unit and Counit of an Adjunction}
 
 We compare arrows for equality, but we prefer to use isomorphisms for comparing objects. 
@@ -348,6 +353,12 @@ We can now use the Yoneda trick and pick the identity arrow $id_{L x}$ on the le
 Not only is this mapping defined for every $x$, but it's also natural in $x$. The natural transformation $\eta$ is called the \emph{unit} of the adjunction. If we observe that the $x$ on the left is the action of the identity functor on $x$, we can write:
 \[ \eta \colon \text{Id}_{\mathcal{D}} \to R \circ L \]
 
+As an example, let's evaluate the unit of the coproduct adjunction:
+\[  \mathcal{C} (a + b, x) \cong (\mathcal{C} \times \mathcal{C})( \langle a, b \rangle , \Delta x)\]
+by replacing $x$ with $a + b$. We get:
+\[ \eta_{\langle a, b \rangle} \colon \langle a, b \rangle \to \Delta(a + b) \]
+This is a pair of arrows that are exactly the two injections $\langle \text{Left}, \text{Right} \rangle$.
+
 We can do a similar trick by replacing $x$ with $R y$:
 \[  \mathcal{C} (L (R y), y) \cong \mathcal{D}( R y , R y)\]
 Corresponding to $id_{R y}$ on the right, we get a family of arrows on the left:
@@ -357,8 +368,14 @@ which form another natural transformation called the \emph{counit} of the adjunc
 
 Notice that, if those two natural transformations were invertible, they would witness the equivalence of categories. But this kind of ``half-equivalence'' is even more interesting in the context of category theory. 
 
+As an example, let's evaluate the counit of the product adjunction:
+\[  (\mathcal{C} \times \mathcal{C})( \Delta x,  \langle a, b \rangle ) \cong  \mathcal{C} (x, a \times b)  \]
+by replacing $x$ with $a \times b$. We get:
+\[ \varepsilon_{\langle a, b \rangle} \colon \Delta (a \times b) \to \langle a, b \rangle \]
+This is a pair of arrows that are exactly the two projections $\langle \text{fst}, \text{snd} \rangle$.
+
 \begin{exercise}
-Derive the unit and counit for the sum and product adjunctions.
+Derive the counit of the coproduct adjunction and the unit of the product adjunction.
 \end{exercise}
 
 \subsection{Triangle identities}

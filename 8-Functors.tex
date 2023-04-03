@@ -429,6 +429,11 @@ and
 \[\mathcal{C}(x, a) \cong \mathcal{C}(x, b)\]
 We'll discuss naturality conditions in the next chapter.
 
+Another way of looking at the hom-functor $\cat C(a, -)$ is as an oracle that  provides answers to the question: ``Is $a$ connected to me?'' If the set $\cat C(a, x)$ is empty, the answer is negative: ``$a$ is not connected to $x$.'' Otherwise, every element of the set $\cat C(a, x)$ is a proof that such connection exists. 
+
+Conversely, the contravariant functor $\cat C (-, a)$ answers the question: ``Am I connected to $a$?''
+
+Taken together, the profunctor $\cat C(x, y)$ establishes a \index{proof-relevant relation}\emph{proof-relevant} relation between objects. Every element of the set $\cat C(x, y)$ is a proof that $x$ is connected to $y$. If the set is empty, the two objects are unrelated. 
 
 \section{Functor Composition}
 

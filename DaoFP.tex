@@ -82,6 +82,20 @@ When faced with a new categorical concepts I would often look them up on Wikiped
 
 There is a lot of folklore knowledge in category theory and in computer science that is nowhere to be found in the literature. It's very difficult to acquire useful intuitions when going through dry definitions and theorems. I tried, as much as possible, to provide the missing intuitions and explain not only the whats but also the whys.
 
+The title of this book alludes to Benjamin Hoff's ``The Tao of Pooh'' and to Robert Pirsig's ``Zen and the Art of Motorcycle Maintenance,'' both being attempts by Westerners to assimilate elements of Easter philosophy. Loosely speaking, the idea is that category theory is to programming as the Dao\footnote{Dao is the more modern spelling of Tao} is to Western philosophy. Many of the definitions of category theory make no sense on first reading but in time you learn to appreciate their deep wisdom. If category theory were to be summarized in one soundbite, it would be: ``Things are defined by they relationship to the Universe.'' 
+
+\subsection{Set theory}
+
+Some familiarity with the basics of set theory is necessary to learn category theory. For instance the idea that sets contain elements. We say that, given a set $S$ and an element $a$, it makes sense to ask whether $a$ is an element of $S$ or not. This is written as $a \in S$. It's also possible to have an empty set that contains no elements. 
+
+The important property of elements of a set is that they can be compared for equality. Given two elements $a \in S$ and $b \in S$, we can ask: Is $a$ equal to $b$? Or we may impose the condition that $a = b$, in case $a$ and $b$ are results of two different recipes for selecting elements of the set $S$.
+
+A cartesian product of two sets $S \times T$ is defined as a set of all pairs of elements $\langle s, t\rangle$, such that $s \in S$ and $t \in T$.
+
+A function $f \colon S \to T$ from the source set called the \emph{domain} of $f$ to the target set called the \emph{codomain} is also defined as a set of pairs. These are the pairs of the form $\langle s, t \rangle$ where $t = f s$. Here $f s$ is the result of the action of $f$ on the argument $s$. You might be more familiar with the notation $f(s)$ for function application, but here I'll follow the Haskell convention of omitting the parentheses (and commas, for functions of multiple variables).
+
+In programming we are used to functions being defined by a sequence of instructions. We provide an argument $s$ and apply the instructions to eventually produce the result $t$. We are often worried about how long it my take to evaluate the result, or if the algorithm terminates at all. In mathematics we assume that, for any given argument $s \in S$ the result $t \in T$ is immediately available, and that it's unique. In programming we call such functions pure and total.
+
 \subsection{Conventions}
 
 I tried to keep the notation coherent throughout the book. It's based loosely on the prevailing style in nLab.

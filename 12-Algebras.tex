@@ -601,7 +601,7 @@ But there is a way to get rid of all these duplicates. The trick is to replace t
  &&i
   \end{tikzcd}
 \]
-It's almost the same as the sum, but with additional arrows at the base of the cocone. These arrows are the liftings of the unique arrow $\mbox{!`}$ that goes from the initial object to $F 0$ (we called it \hask{absurd} in Haskell). The effect of these arrows is to collapse the set of infinitely many copies of the same tree down to just one representative. 
+It's almost the same as the sum, but with additional arrows at the base of the cocone. These arrows are the cumulative liftings of the unique arrow $\mbox{!`}$ that goes from the initial object to $F 0$ (we called it \hask{absurd} in Haskell). The effect of these arrows is to collapse the set of infinitely many copies of the same tree down to just one representative. 
 
 To see that, consider for instance a tree of depth $n$. It can be first found as an element of $F^n 0$, that is to say, as an arrow $t \colon 1 \to F^n 0$. It is injected into the colimit $i$ as the composite $i_n \circ t$. 
 
@@ -625,7 +625,7 @@ To see that, consider for instance a tree of depth $n$. It can be first found as
 \]
 The same shape of a tree is also found in $F^{n+1} 0$, as the composite $t' = F^n (\mbox{!`}) \circ t$. It is injected into the colimit as the composite $i_{n+1} \circ t' = i_{n+1} \circ F^n (\mbox{!`}) \circ t$. 
 
-This time, however, we have the commuting triangle as the face of the cocone:
+This time, however, we have the commuting triangle--- the face of the cocone:
 \[i_{n+1} \circ F^n (\mbox{!`}) = i_n \]
 which means that:
 \[ i_{n+1} \circ t' =  i_{n+1} \circ F^n (\mbox{!`}) \circ t =  i_n \circ t\]
@@ -637,7 +637,7 @@ Fortunately, this assumption holds in $\mathbf{Set}$.
 
 Here's the sketch of the proof: First we'll construct an arrow $i \to F i$ and then an arrow in the opposite direction. We'll skip the proof that they are the inverse of each other.
 
-We start with the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $\text{Colim} (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $\text{Colim} (F \Gamma)$. And the latter, by our assumption, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
+We start with the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $\text{Colim} (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $\text{Colim} (F \Gamma)$. And the latter, by our assumption that $F$ preserves the colimit, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
 
 To construct this cocone, notice that $\text{Colim} (F \Gamma$) is, by definition, the apex of a cocone $F \Gamma$. 
 
@@ -747,10 +747,12 @@ Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be 
 
 
 From the universality of $\text{Colim} (F \Gamma)$ it follows that there is a mapping out 
-\[\text{Colim} (F \Gamma) \cong F i \to i \]
+\[\text{Colim} (F \Gamma) \to i \]
+and thus we have the mapping in the other direction:
+\[ F i \to i \]
 This shows that $i$ is a carrier of an algebra. In fact, it can be shown that the two mappings are the inverse of each other, as we would expect from the Lambek's lemma.
 
-To show that this is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(a, \alpha \colon F a \to a)$. Again, we can use universality, if we can construct a cocone from $\Gamma$ to $a$. 
+To show that this is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(a, \alpha \colon F a \to a)$. Again, we can use universality, as long as we can construct a cocone from $\Gamma$ to $a$. 
 
 \[
  \begin{tikzcd}

@@ -9,7 +9,7 @@ Don't think about how things are implemented in hardware. What computers are is 
 
 \section{Types and Functions}
 
-Paraphrasing Lao Tzu: \emph{The type that can be described is not the eternal type}. In other words, type is a primitive notion. It cannot be defined.
+Paraphrasing Lao Tzu\footnote{The modern spelling of Lao Tzu is Laozi, but I'll be using the traditional one. Lao Tzu was the semi-legendary author of Tao Te Ching (or Daodejing), a classic text on Daoism.}: \emph{The type that can be described is not the eternal type}. In other words, type is a primitive notion. It cannot be defined.
 
 Instead of calling it a \emph{type}, we could as well call it an \emph{object} or a \emph{proposition}. These are the words that are used to describe it in different areas of mathematics (type theory, category theory, and logic, respectively).
 
@@ -42,7 +42,7 @@ Its dual is an object that has a unique incoming arrow from every object. It's c
 
 In mathematics, the initial object is often denoted by $0$ and the terminal object by $1$.
 
-The initial object is the source of everything. As a type it's known, in Haskell, as \hask{Void}. It symbolizes the chaos from which everything arises. Since there is an arrow from \hask{Void} to everything, there is also an arrow from \hask{Void} to itself. 
+The initial object is the source of everything. As a type it's known, in Haskell, as \hask{Void} and in math as $0$. It symbolizes the chaos from which everything arises. Since there is an arrow from \hask{Void} to everything, there is also an arrow from \hask{Void} to itself. 
 
 \[
  \begin{tikzcd}
@@ -53,7 +53,7 @@ The initial object is the source of everything. As a type it's known, in Haskell
 
 Thus \hask{Void} begets \hask{Void} and everything else.
 
-The terminal object unites everything. As a type it's know as Unit. It symbolizes the ultimate order.
+The terminal object unites everything. As a type it's know as Unit. In math it's called $1$. It symbolizes the ultimate order.
 
 In logic, the terminal object signifies the ultimate truth, symbolized by $T$ or $ \top$. The fact that there's an arrow to it from any object means that $ \top$ is true no matter what your assumptions are. 
 
