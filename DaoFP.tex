@@ -86,7 +86,11 @@ The title of this book alludes to Benjamin Hoff's ``The Tao of Pooh'' and to Rob
 
 \subsection{Set theory}
 
-Some familiarity with the basics of set theory is necessary to learn category theory. For instance the idea that sets contain elements. We say that, given a set $S$ and an element $a$, it makes sense to ask whether $a$ is an element of $S$ or not. This is written as $a \in S$. It's also possible to have an empty set that contains no elements. 
+Traditionally, set theory was considered the foundation of mathematics, although more recently type theory is vying for this title. In a sense, set theory is the assembly language of mathematics, and as such contains a lot of implementation details that often obscure  the presentation of high level ideas. 
+
+Category theory is not trying to replace set theory, and it's often used to build abstractions that are later modeled using sets. In fact the fundamental theorem of category theory, the Yoneda lemma, connects categories to their models in set theory. We can find useful intuition in computer graphics, where we build and manipulate abstract worlds only to project and sample them for a digital display at the last moment.
+
+It's not necessary to be fluent in set theory in order to study category theory. But some familiarity with the basics is necessary. For instance the idea that sets contain elements. We say that, given a set $S$ and an element $a$, it makes sense to ask whether $a$ is an element of $S$ or not. This statement is written as $a \in S$. It's also possible to have an empty set that contains no elements. 
 
 The important property of elements of a set is that they can be compared for equality. Given two elements $a \in S$ and $b \in S$, we can ask: Is $a$ equal to $b$? Or we may impose the condition that $a = b$, in case $a$ and $b$ are results of two different recipes for selecting elements of the set $S$.
 
