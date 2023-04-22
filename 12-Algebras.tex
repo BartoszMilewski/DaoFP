@@ -545,7 +545,7 @@ We can continue this process, adding deeper and deeper trees at each step. In th
 If we knew how to define $F^{\infty} 0$, we would cover all possible trees. The next best thing we could try is to add up all these partial trees and construct an infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. 
 
 An infinite sum (a coproduct):
-$$ \coprod_{n = 0}^{\infty} F^n 0$$
+$$ \sum_{n = 0}^{\infty} F^n 0$$
 is just like a finite sum, except that it has infinitely many constructors $i_n$:
 \[
  \begin{tikzcd}
@@ -561,7 +561,7 @@ is just like a finite sum, except that it has infinitely many constructors $i_n$
  & ...
  \\
  \\
- &&\coprod_{n = 0}^{\infty} F^n 0
+ &&\sum_{n = 0}^{\infty} F^n 0
   \end{tikzcd}
 \]
 It has the universal mapping-out property, just like the sum of two types, only with infinitely many cases. (Obviously, we can't express it in Haskell.)
