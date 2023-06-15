@@ -154,13 +154,15 @@ swap (x, y) = (y, x)
 
 It's important to keep in mind that the product is symmetric only ``up to isomorphism.'' It doesn't mean that swapping the order of pairs won't change the behavior of a program. Symmetry means that the information content of a swapped pair is the same, but access to it needs to be modified.
 
-Here's the diagram that can be used to prove that the terminal object is the unit of the product, $1 \times a \cong a$.
+The terminal object is the unit of the product, $1 \times a \cong a$. The arrow that witnesses the isomorphism between $1 \times a$ and $a$ is called the \emph{left unitor}:
+\[ \lambda \colon 1 \times a \to a \]
+It can be implemented as $\lambda = \text{snd}$. Its inverse $\lambda^{-1}$ is defined as the unique arrow in the following diagram:
 \[
  \begin{tikzcd}
- &x
- \arrow[d, dashed, "h"]
+ &a
+ \arrow[d, dashed, "\lambda^{-1}"]
  \arrow[ddl, bend right, "!"']
- \arrow[ddr, bend left, "f"]
+ \arrow[ddr, bend left, "\text{id}"]
  \\
  & 1 \times a
   \arrow[dl,  "\text{fst}"]
@@ -168,19 +170,29 @@ Here's the diagram that can be used to prove that the terminal object is the uni
  \\
 1 && a
  \end{tikzcd}
- \qquad
+ \]
+The arrow from $a$ to $1$ is called \index{!}$!$ (pronounced, \emph{bang}). This indeed shows that 
+\[\text{snd} \circ \lambda^{-1} = \text{id} \] 
+We still have to prove that $\lambda^{-1}$ is the left inverse of $\text{snd}$. Consider the following diagram:
+\[
  \begin{tikzcd}
- x
- \arrow[dd, "f"]
-\\
-\\
-a
-  \end{tikzcd}
-\]
-The unique arrow from $x$ to $1$ is called \index{!}$!$ (pronounced, \emph{bang}). Because of its uniqueness, the mapping-in, $h$, is totally determined by $f$.
-
-The invertible arrow that witnesses the isomorphism between $1 \times a$ and $a$ is called the \emph{left unitor}:
-\[ \lambda \colon 1 \times a \to a \]
+ &1 \times a
+ \arrow[d, dashed, "h"]
+ \arrow[ddl, bend right, "!"']
+ \arrow[ddr, bend left, "\text{snd}"]
+ \\
+ & 1 \times a
+  \arrow[dl,  "\text{fst}"]
+ \arrow[dr,   "\text{snd}"']
+ \\
+1 && a
+ \end{tikzcd}
+ \]
+ It obviously commutes for $h = id$. It also commutes for $h = \lambda^{-1}  \circ  \text{snd}$, because we have:
+ \[  \text{snd} \circ \lambda^{-1}  \circ  \text{snd} = \text{snd} \]
+ Since $h$ is supposed to be unique, we conclude that:
+\[ \lambda^{-1}  \circ  \text{snd} = id \]
+This kind of reasoning with universal constructions is pretty standard.
 
 Here are some other isomorphisms written in Haskell (without proofs of having the inverse). This is associativity:
 \begin{haskell}

@@ -451,6 +451,22 @@ A mapping out of the sum on the left is given by a pair of arrows:
 f &\colon b\times a \to (b + c) \times a \\
 g &\colon c\times a \to (b + c) \times a 
 \end{align*}
+\[
+ \begin{tikzcd}
+ b \times a
+ \arrow[dr,  bend left, "\text{Left}"]
+ \arrow[ddr, bend right, "f"']
+ && c \times a
+ \arrow[dl, bend right, "\text{Right}"']
+ \arrow[ddl, bend left, "g"]
+ \\
+& b \times a + c \times a
+\arrow[d, dashed, "\text{dist}"]
+\\
+& (b + c) \times a
+ \end{tikzcd}
+\]
+
 We write it in Haskell as:
 \begin{haskell}
 dist = either f g
@@ -465,6 +481,21 @@ Now we need to implement $f$ and $g$. They are mappings into the product, so eac
 f' &\colon b \times a \to (b + c) \\
 f'' &\colon b \times a \to  a
 \end{align*}
+\[
+ \begin{tikzcd}
+ & b \times a
+\arrow[d, dashed, "f"]
+ \arrow[ddl, bend right, "f'"']
+ \arrow[ddr, bend left, "f''"]
+\\
+& (b + c) \times a
+ \arrow[dl,  "\text{fst}"]
+  \arrow[dr,   "\text{snd}"']
+\\
+b + c && a
+ \end{tikzcd}
+\]
+
 In Haskell:
 \begin{haskell}
     f = f' &&& f''
@@ -476,6 +507,22 @@ The first arrow can be implemented by projecting the first component $b$ and the
  f' &= \text{Left} \circ \text{fst} \\
  f'' &= \text{snd}
 \end{align*}
+Similarly, we decompose $g$ into a pair $g'$ and $g''$:
+\[
+ \begin{tikzcd}
+ & c \times a
+\arrow[d, dashed, "g"]
+ \arrow[ddl, bend right, "g'"']
+ \arrow[ddr, bend left, "g''"]
+\\
+& b + c \times a
+ \arrow[dl,  "\text{fst}"]
+  \arrow[dr,   "\text{snd}"']
+\\
+(b + c) && a
+ \end{tikzcd}
+\]
+
 Combining all these together, we get:
 \begin{haskell}
 dist = either f g

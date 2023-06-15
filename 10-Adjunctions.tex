@@ -782,15 +782,15 @@ The answer to this question is given by the Freyd's adjoint functor theorem. At 
 
 In what follows, we'll focus our attention on constructing the right adjoint to a functor $L \colon \cat D \to \cat C$. A dual reasoning can be used to solve the converse problem of finding the left adjoint to a functor $R \colon \cat C \to \cat D$.
 
-The first observation is that, since the left functor in an adjunction preserves colimits, we have to assume that our functor $L$  preserves colimits. This gives us a hint that the construction of the right adjoint relies on the ability to construct colimits in $\cat D$, and being able to somehow transport them back to $\cat C$ using $L$. 
+The first observation is that, since the left functor in an adjunction preserves colimits, we have to postulate that our functor $L$  preserves colimits. This gives us a hint that the construction of the right adjoint relies on the ability to construct colimits in $\cat D$, and being able to somehow transport them back to $\cat C$ using $L$. 
 
-We could demand that all colimits, large and small, exist in $\cat D$ but this condition is too strong. Even a small category with all colimits is automatically a preorder---that is, it can't have more than one morphism between any two objects. 
+We could demand that all colimits, large and small, exist in $\cat D$ but this condition is too strong. Even a small category that has all colimits is automatically a preorder---that is, it can't have more than one morphism between any two objects. 
 
-But let's ignore size problems for a moment, and see how one would construct the right adjoint to a colimit-preserving functor $L$, whose source category $\cat D$ is small and and has all colimits, large and small (thus it is a preorder).
+But let's ignore size problems for a moment, and see how one would construct the right adjoint to a colimit-preserving functor $L$, whose source category $\cat D$ is small and has all colimits, large and small (thus it is a preorder).
 
 \subsection{Freyd's theorem in a preorder}
 
-The easiest way to define the right adjoint to $L$ is to construct, for every object $c$, a universal arrow from $L$ to $c$. Such an arrow is the terminal object in the comma category $L/c$---the category of arrows that converge on the object $c$, and which originate of the image of $L$.
+The easiest way to define the right adjoint to $L$ is to construct, for every object $c$, a universal arrow from $L$ to $c$. Such an arrow is the terminal object in the comma category $L/c$---the category of arrows which originate in the image of $L$ and converge on the object $c$.
 
 \[
 \begin{tikzpicture}
