@@ -476,28 +476,28 @@ beta_alpha = fmap alpha . beta
 \end{haskell}
 Here, the compiler will pick the version of \hask{fmap} for the functor \hask{G'}.
 
-What's the intuition for horizontal composition? We've seen before that a natural transformation can be seen as repackaging data between two containers--functors. Here we are dealing with nested containers. We start with the outer container described by \hask{F} that is filled with inner containers, each described by \hask{G}. We have two natural transformations, \hask{alpha} for transfering the contents of \hask{F} to \hask{F'}, and \hask{beta} for moving the contents of \hask{G} to \hask{G'}. There are two ways of moving data from \hask{G (F x)} to \hask{G'(F' x)}. We can use \hask{fmap alpha} to repackage all inner containers, and then use \hask{beta} to repackage the outer container. 
+What's the intuition for horizontal composition? We've seen before that a natural transformation can be seen as repackaging data between two containers--functors. Here we are dealing with nested containers. We start with the outer container described by \hask{G} that is filled with inner containers, each described by \hask{F}. We have two natural transformations, \hask{alpha} for transfering the contents of \hask{F} to \hask{F'}, and \hask{beta} for moving the contents of \hask{G} to \hask{G'}. There are two ways of moving data from \hask{G (F x)} to \hask{G'(F' x)}. We can use \hask{fmap alpha} to repackage all inner containers, and then use \hask{beta} to repackage the outer container. 
 
 \[
 \begin{tikzpicture}
 \filldraw[fill=blue!50!green!20, draw=white] (0, 0) ellipse (1.2 and 1.8);
 \filldraw[fill=orange!70, draw=white] (-0.5, -0.5) rectangle (0.5, 0.5);
-\node at (0, 0) {$G$};
-\node at (0, -1.3) {$F$};
+\node at (0, 0) {$F$};
+\node at (0, -1.3) {$G$};
 \end{tikzpicture}
 \hspace{20pt}
 \begin{tikzpicture}
 \filldraw[fill=blue!50!green!20, draw=white] (0, 0) ellipse (1.2 and 1.8);
 \filldraw[fill=orange!30, draw=white] (0, 0) ellipse (0.8 and 0.4);
-\node at (0, 0) {$G'$};
-\node at (0, -1.3) {$F$};
+\node at (0, 0) {$F'$};
+\node at (0, -1.3) {$G$};
 \end{tikzpicture}
 \hspace{20pt}
 \begin{tikzpicture}
 \filldraw[fill=blue!10, draw=white] (0, 0) circle (1.2);
 \filldraw[fill=orange!30, draw=white] (0, 0) ellipse (0.8 and 0.4);
-\node at (0, 0) {$G'$};
-\node at (0, -0.8) {$F'$};
+\node at (0, 0) {$F'$};
+\node at (0, -0.8) {$G'$};
 \end{tikzpicture}
 \]
 
@@ -508,22 +508,22 @@ Or we can first use \hask{beta} to repackage the outer container, and then apply
 \begin{tikzpicture}
 \filldraw[fill=blue!50!green!20, draw=white] (0, 0) ellipse (1.2 and 1.8);
 \filldraw[fill=orange!70, draw=white] (-0.5, -0.5) rectangle (0.5, 0.5);
-\node at (0, 0) {$G$};
-\node at (0, -1.3) {$F$};
+\node at (0, 0) {$F$};
+\node at (0, -1.3) {$G$};
 \end{tikzpicture}
 \hspace{20pt}
 \begin{tikzpicture}
 \filldraw[fill=blue!10, draw=white] (0, 0) circle (1.2);
 \filldraw[fill=orange!70, draw=white] (-0.5, -0.5) rectangle (0.5, 0.5);
-\node at (0, 0) {$G$};
-\node at (0, -0.9) {$F'$};
+\node at (0, 0) {$F$};
+\node at (0, -0.9) {$G'$};
 \end{tikzpicture}
 \hspace{20pt}
 \begin{tikzpicture}
 \filldraw[fill=blue!10, draw=white] (0, 0) circle (1.2);
 \filldraw[fill=orange!30, draw=white] (0, 0) ellipse (0.8 and 0.4);
-\node at (0, 0) {$G'$};
-\node at (0, -0.9) {$F'$};
+\node at (0, 0) {$F'$};
+\node at (0, -0.9) {$G'$};
 \end{tikzpicture}
 \]
 

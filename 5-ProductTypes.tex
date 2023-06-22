@@ -10,7 +10,7 @@ data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 But if we combine two digits into a single data structure, a two-digit decimal number, we'll be able to encode a hundred numbers. Or, as Lao Tzu would say, with just four digits you can encode ten thousand numbers.
 
-A data type that combines two types in this manner is called a product, or a \emph{cartesian} product. Its defining quality is the elimination rule: there are two arrows coming from $a \times b$; one called ``$\text{fst}$'' goes to $a$, and another called ``$\text{snd}$'' goes to $b$. They are called \emph{projections}. They let us retrieve $a$ and $b$ from the product $a \times b$.
+A data type that combines two types in this manner is called a product, or a \index{cartesian product}\emph{cartesian} product. Its defining quality is the elimination rule: there are two arrows coming from $a \times b$; one called ``$\text{fst}$'' goes to $a$, and another called ``$\text{snd}$'' goes to $b$. They are called (cartesian) \index{cartesian projections}\emph{projections}. They let us retrieve $a$ and $b$ from the product $a \times b$.
 
 \[
  \begin{tikzcd}
