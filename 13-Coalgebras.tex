@@ -143,6 +143,7 @@ The terminal coalgebra $(t, \tau)$ is defined by its universal property: there i
  
  Just like with algebras, we can use the Lambek's lemma to ``solve'' for \hask{h}:
  \[ h = \tau^{-1} \circ F h \circ \alpha \]
+ The solution is called an anamorphism and is sometimes written using \index{lens bracket}\index{$\llens \rlens$}``lens brackets'' as $\llens \alpha \rlens$.
  
  Since the terminal coalgebra (just like the initial algebra) is a fixed point of a functor, the above recursive formula can be translated directly to Haskell as:
  \begin{haskell}
