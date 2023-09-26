@@ -335,25 +335,21 @@ It turns out that in a self-enriched category $\cat V$ every strong endofunctor 
 Using the hom adjunction, this is isomorphic to:
 \[ \cat V([a, b] \otimes F a, F b) \]
 We can construct this mapping by composing the strength and the counit of the adjunction (the evaluation morphism):
-\[ [a, b] \otimes F a \xrightarrow{\sigma_{[a, b] a}} F ([a, b] \otimes a) \xrightarrow{\epsilon_{a b}} F b \]
+\[ [a, b] \otimes F a \xrightarrow{\sigma_{[a, b] a}} F ([a, b] \otimes a) \xrightarrow{F \epsilon_{a b}} F b \]
 
-Conversely, every enriched endofunctor in $\cat V$ is strong. To show that, we need to define a natural transformation with components that are elements of the following hom-sets:
-\[ \sigma_{a b} \in \cat V(a \otimes F b, F (a \otimes b)) \]
+Conversely, every enriched endofunctor in $\cat V$ is strong. To show strength, we need to define the mapping $\sigma_{a b}$, or equivalently (by hom-adjunction):
+\[ a \to [F b, F (a \otimes b)] \]
 Recall the definition of the unit of the hom adjunction, the coevaluation morphism:
 \[ \eta_{a b} \colon a \to [b, a \otimes b] \]
-Using the unit and the counit, together with the action of the enriched functor on an internal hom, we construct the following composite:
-\[ a \otimes F b \xrightarrow{\eta_{a b} \otimes Fb} [b, a \otimes b] \otimes F b \xrightarrow{F_{b, a \otimes b} \otimes F b} [F b, F (a \otimes b)] \otimes F b \xrightarrow{\epsilon} F (a \otimes b)\]
+We construct the following composite:
+\[ a \xrightarrow{\eta_{a b}} [b, a \otimes b] \xrightarrow{F_{b, a \otimes b}} [F b, F (a \otimes b)] \]
 
 This can be translated directly to Haskell:
 \begin{haskell}
 strength :: Functor f => (a, f b) -> f (a, b)
-strength = eval . bimap fmap id . bimap coeval id
+strength = uncurry (\a -> fmap (coeval a))
 \end{haskell}
-with the following definitions of \hask{eval} and \hask{coeval}:
-\begin{haskell}
-eval :: (a -> b, a) -> b
-eval (f, a) = f a
-\end{haskell}
+with the following definition of \hask{coeval}:
 \begin{haskell}
 coeval :: a -> (b -> (a, b))
 coeval a = \b -> (a, b)
