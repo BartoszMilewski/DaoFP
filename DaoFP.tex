@@ -23,6 +23,7 @@
 \usetikzlibrary{backgrounds}
 \usepackage{float}
 \usepackage{xcolor}
+\usepackage{stix}
 
 \newtheorem{exercise}{Exercise}[section]
 \newcommand{\exinline}[1]{(\refstepcounter{exercise}Exercise~\theexercise\label{#1})}
@@ -45,7 +46,7 @@
 \newcommand{\hask}[1]{\mintinline{Haskell}{#1}}
 \newenvironment{haskell}
   {\VerbatimEnvironment
-  	%\begin{minted}[escapeinside=??, mathescape=true, frame=single, framesep=5pt, tabsize=1, bgcolor=black!5]{Haskell}}
+         \fvset{formatcom=\upshape} % Use upright shape for this environment
   	\begin{minted}[escapeinside=??, mathescape=true, tabsize=1, bgcolor=black!3, xleftmargin=3pt ]{Haskell}}
   {\end{minted}}
 \makeatletter
@@ -53,6 +54,11 @@
 \patchcmd{\minted@colorbg}{\medskip}{}{}{}
 \patchcmd{\endminted@colorbg}{\medskip}{}{}{}
 \makeatother
+
+% lens brackets for anamorphisms
+\newcommand{\llens}{\mathopen{[\!(}}
+\newcommand{\rlens}{\mathclose{)\!]}}
+
 
 \makeindex
 
