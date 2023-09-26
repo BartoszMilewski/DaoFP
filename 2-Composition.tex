@@ -41,7 +41,7 @@ and not have to keep track which decomposition came first. This is called \emph{
 
 Composition is the source of two mappings of arrows called pre-composition and post-composition. 
 
-When an arrow $f$ is post-composed with an arrow $h$, it produces the arrow $f \circ h$. Of course, $f$ can be post-composed only with arrows whose target is the source of $f$. Post-composition by $f$ is written as $(f \circ -)$, leaving a hole for $h$. As Lao Tzu would say, ``Usefulness of post-composition comes from what is not there.''
+When you \index{post-composition}\emph{post-compose} an arrow $f$ to an arrow $h$, it produces the arrow $f \circ h$. Of course, you can post-compose $f$ only to arrows whose target is the source of $f$. Post-composition by $f$ is written as $(f \circ -)$, leaving a hole for $h$. As Lao Tzu would say, ``Usefulness of post-composition comes from what is not there.''
 
 Thus an arrow $f \colon a \to b$ induces a mapping of arrows $(f \circ -)$ that maps arrows which are probing $a$ to arrows which are probing $b$. 
 
@@ -71,7 +71,7 @@ Since objects have no internal structure, when we say that $f$ transforms $a$ to
 
 Post-composition lets us shift focus from one object to another.
 
-Dually, you can pre-compose $f$, or apply $(- \circ f)$ to arrows originating in $b$ and map them to arrows originating in $a$. 
+Dually, you can \index{pre-composition}\emph{pre-compose} $f$, or apply $(- \circ f)$ to arrows originating in $b$ and map them to arrows originating in $a$. 
 
 \[
  \begin{tikzcd}
@@ -96,13 +96,24 @@ Dually, you can pre-compose $f$, or apply $(- \circ f)$ to arrows originating in
   \end{tikzcd}
 \]
 
-Pre-composition let us shift the perspective from one observer to another. Notice that the outgoing arrows are mapped in the direction opposite to the arrow $f$.
+Pre-composition let us shift the perspective from one observer to another. Notice that the outgoing arrows are mapped in the direction opposite to the direction of $f$.
 
 Pre- and post-composition are mappings of arrows. Since arrows form sets, these are \emph{functions} between sets. 
 
 Another way of looking at pre- and post-composition is that they are the result of partial application of the two-hole composition operator $(- \circ -)$, in which we pre-fill one hole or the other with an arrow.
 
 In programming, an outgoing arrow is interpreted as extracting data from the source. An incoming arrow is interpreted as producing or constructing the target. Outgoing arrows define the interface, incoming arrows define the constructors.
+
+For Haskell programmers, here's the implementation of post-composition as a higher-order function:
+\begin{haskell}
+postCompWith :: (a -> b) -> (x -> a) -> (x -> b)
+postCompWith f = \h -> f . h
+\end{haskell}
+And similarly for pre-composition:
+\begin{haskell}
+preCompWith :: (a -> b) -> (b -> x) -> (a -> x)
+preCompWith f = \h -> h . f
+\end{haskell}
 
 Do the following exercises to convince yourself that shifts in focus and perspective are composable.
 \begin{exercise}\label{ex-yoneda-composition}
