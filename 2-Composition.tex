@@ -24,7 +24,9 @@ Given an arrow $f$ from $a$ to $b$ and an arrow $g$ from $b$ to $c$, their compo
 
 In math we denote composition using a little circle
 \[h = g \circ f\]
-We read this: ``$h$ is equal to $g$ after $f$.'' The order of composition might seem backward, but this is because we think of functions as taking arguments on the right.
+We read this: ``$h$ is equal to $g$ after $f$.'' The choice of the word ``after'' suggests temporal ordering of actions, which in most cases is a useful intuition.
+
+The order of composition might seem backward, but this is because we think of functions as taking arguments on the right.
 In Haskell we replace the circle with a dot:
 \begin{haskell}
 h = g . f
@@ -134,11 +136,11 @@ Show that pre-composition $(- \circ f)$ is composable, but the order of composit
 
 \section{Function application}
 
-We are ready to write our first program. There is a saying: ``A journey of a thousand miles begins with a single step.'' Our journey is from $1$ to $b$. The single step is an arrow from the terminal object $1$ to $a$. It's an element of $a$. We can write it as
+We are ready to write our first program. There is a saying: ``A journey of a thousand miles begins with a single step.'' Consider a journey from $1$ to $b$. Our single step can be an arrow from the terminal object $1$ to some $a$. It's an element of $a$. We can write it as:
 \[1 \xrightarrow x a \]
-The rest of the journey is the arrow 
+The rest of the journey is the arrow:
 \[a \xrightarrow f b\]
-These two arrows are composable (they share the object $a$ in the middle) and their composition is the arrow $y$ from $1$ to $b$. In other words, $y$ is an \emph{element} of $b$
+These two arrows are composable (they share the object $a$ in the middle) and their composition is the arrow $y$ from $1$ to $b$. In other words, $y$ is an \emph{element} of $b$:
 
 \[
  \begin{tikzcd}
@@ -150,12 +152,12 @@ These two arrows are composable (they share the object $a$ in the middle) and th
 & b
  \end{tikzcd}
 \]
-We can write it as
+We can write it as:
 \[y = f \circ x \]
 
 We used $f$ to map an \emph{element} of $a$ to an \emph{element} of $b$. Since this is something we do quite often, we call it the \emph{application} of a function $f$ to $x$, and use the shorthand notation
 \[y = f x \]
-Let's translate it to Haskell. We start with an element $x$ of $a$ (a shorthand for \hask{()->a})
+Let's translate it to Haskell. We start with an element $x$ of $a$ (a shorthand for \hask{x :: ()-> a})
 \begin{haskell}
 x :: a
 \end{haskell}
@@ -177,7 +179,7 @@ We call this the application of a function to an argument, but we were able to e
 
 You may think of arrows as representing change: object $a$ becomes object $b$. An arrow that loops back represents a change in an object itself. But change has its dual: lack of change, inaction or, as Lao Tzu would say \emph{wu wei}. 
 
-Every object has a special arrow called the identity, which leaves the object unchanged. It means that, when you compose this arrow with any other arrow, either incoming or outgoing, you get that arrow back. Identity arrow does nothing to an arrow. 
+Every object has a special arrow called the identity, which leaves the object unchanged. It means that, when you compose this arrow with any other arrow, either incoming or outgoing, you get that arrow back. Thought of as an action, the identity arrow does nothing and takes no time.
 
 An identity arrow on the object $a$ is called $id_a$. So if we have an arrow $f \colon a \to b$, we can compose it with identities on either side
 
