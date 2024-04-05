@@ -429,13 +429,13 @@ Similar to \hask{bimap} being an interface to the typeclass \hask{Bifunctor}, \h
 
 \section{Bicartesian Closed Categories}
 
-A category in which both the product and the exponential is defined for any pair of objects, and which has a terminal object, is called \emph{cartesian closed}. If it also has sums (coproducts) and the initial object, it's called \emph{bicartesian closed}. 
+A category in which both the product and the exponential is defined for any pair of objects, and which has a terminal object, is called \emph{cartesian closed}. The idea is that hom-sets are not something alien to the category in question: the category is ``closed'' under the operation of forming hom-sets.
+
+If the category also has sums (coproducts) and the initial object, it's called \emph{bicartesian closed}. 
 
 This is the minimum structure for modeling programming languages. 
 
-Data types constructed using these operations are called \emph{algebraic data types}.
-
-We have addition, multiplication, and exponentiation (but not subtraction or division) of types, with all the familiar laws we know from high-school algebra. They are satisfied up to isomorphism. There is one more algebraic law that we haven't discussed yet.
+Data types constructed using these operations are called \emph{algebraic data types}. We have addition, multiplication, and exponentiation (but not subtraction or division) of types; with all the familiar laws we know from high-school algebra. They are satisfied up to isomorphism. There is one more algebraic law that we haven't discussed yet.
 
 \subsection{Distributivity}
 

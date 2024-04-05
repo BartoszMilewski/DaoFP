@@ -2,7 +2,7 @@
 \begin{document}
 \setcounter{chapter}{14}
 
-\chapter{Monads from Adjunctions}
+\chapter{Monads and Adjunctions}
 
 \section{String Diagrams}
 
@@ -1191,7 +1191,7 @@ Suppose that you want to combine multiple effects, say, state with the possibili
 newtype MaybeState s a = MS (s -> Maybe (a, s))
   deriving Functor
 \end{haskell}
-and the function to extract the result (or report failure):
+together with the function to extract the result (or report failure):
 \begin{haskell}
 runMaybeState :: MaybeState s a -> s -> Maybe (a, s)
 runMaybeState (MS h) s = h s
@@ -1427,7 +1427,7 @@ Putting all this together, we get a point-free formula for \hask{join} of the st
 join :: StateT s m (StateT s m a) -> StateT s m a
 join mma = StateT (join . fmap (uncurry runStateT) . runStateT mma)
 \end{haskell}
-Here, the partially applied \hask{runStateT mma} strips off the data constructor from the argument \hask{mma}:
+Here, the partially applied \hask{(runStateT mma)} strips off the data constructor from the argument \hask{mma}:
 \begin{haskell}
 runStateT mma :: s -> m (a, x)
 \end{haskell}

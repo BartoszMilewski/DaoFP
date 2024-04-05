@@ -611,7 +611,7 @@ Notice that, in both cases, the right-hand side is an end.
 
 The Fubini rule in calculus states the conditions under which we can switch the order of integration in double integrals. It turns out that we can similarly switch the order of double ends and coends. The Fubini rule for ends works for functors of the form $P \colon \cat C \times \cat C^{op} \times \cat D \times \cat D^{op} \to \cat E$. The following expressions, as long as they exist, are isomorphic:
 \[ \int_{c \colon \cat C} \int_{d \colon \cat D} P\langle c, c \rangle \langle d, d \rangle \cong  \int_{d \colon \cat D} \int_{c \colon \cat C} P\langle c, c \rangle \langle d, d \rangle \cong  \int_{\langle c, d \rangle \colon \cat C \times \cat D}  P\langle c, c \rangle \langle d, d \rangle \]
-In the last end, the funtor $P$ is reinterpreted as $P \colon (\cat C  \times \cat D)^{op} \times (\cat C \times \cat D)\to \cat E$
+In the last end, the functor $P$ is reinterpreted as $P \colon (\cat C  \times \cat D)^{op} \times (\cat C \times \cat D)\to \cat E$
 
 The analogous rule works for coends as well.
 
@@ -704,7 +704,9 @@ Informally, if we could define subtraction as the right adjoint to coproduct, we
 There is nothing special about coproduct so, in general, Day convolution is defined for any monoidal category with a tensor product:
 \[ (F \star G) x = \int^{a, b} \cat C (a \otimes b, x) \times F a \times G b \]
 
-In fact, Day convolution for a monoidal category $(\cat C, \otimes, I)$ endows the category of co-presheaves $[\cat C, \Set]$ with a monoidal structure. It's easy to check that Day convolution is associative (up to isomorphism) and that $\cat C(I, -)$ serves as the unit object. For instance, we have:
+In fact, Day convolution for a monoidal category $(\cat C, \otimes, I)$ endows the category of co-presheaves $[\cat C, \Set]$ with a monoidal structure. Simply said, if you can multiply (tensor) objects in $\cat C$, you can multiply (tensor) set-valued functors on $\cat C^{op}$.
+
+It's easy to check that Day convolution is associative (up to isomorphism) and that $\cat C(I, -)$ serves as the unit object. For instance, we have:
 \[ (\cat C(I, -) \star G) x =  \int^{a, b} \cat C (a \otimes b, x) \times \cat C(I, a) \times G b \cong 
   \int^{b} \cat C (I \otimes b, x) \times  G b \cong G x\]
 So the unit of Day convolution is the Yoneda functor taken at monoidal unit, which lends itself to the anagrammatic slogan, ``ONE of DAY is a YONEDA of ONE.''
@@ -720,7 +722,7 @@ data Day f g x where
   Day :: ((a, b) -> x) -> f a -> g b -> Day f g x
 \end{haskell}
 
-If we think of functors as containers of values, Day convolution tells us how to combine two different containers into one, given a function that combines two different values into one. 
+If we think of functors as containers of values, Day convolution tells us how to combine two different containers into one--given a function that combines two different values into one. 
 
 \begin{exercise}
 Define the \hask{Functor} instance for \hask{Day}.
@@ -958,7 +960,6 @@ This tells us that there exists some unspecified type \hask{c} such that \hask{s
 \]
 
 
-
 The \hask{get}/\hask{set} version of the lens can be derived from this existential form.
 \begin{haskell}
 toGet :: LensE s a -> (s -> a)
@@ -1012,7 +1013,8 @@ In Haskell, we can define a type-changing lens as the following existential type
 data LensE s t a b where
   LensE :: (s -> (c, a)) -> ((c, b) -> t) -> LensE s t a b
 \end{haskell}
-As before, we can use it to get and set the focus:
+
+As before, we can use the existential lens to get and set the focus:
 \begin{haskell}
 toGet :: LensE s t a b -> (s -> a)
 toGet (LensE l r) = snd . l
@@ -1020,6 +1022,11 @@ toGet (LensE l r) = snd . l
 toSet :: LensE s t a b -> (s -> b -> t)
 toSet (LensE l r) s a = r (fst (l s), a)
 \end{haskell}
+
+The two functions, \hask{s->(c, a)} and \hask{(c, b)-> t} are often called the \emph{forward} and the \emph{backward} pass. 
+The forward pass can be used to extract the focus \hask{a}. The backward pass provides the answer to the question: If we wanted the result of the forward pass to be some other \hask{b}, what \hask{t} should we pass to it? 
+
+And sometimes we're just asking: What change \hask{t} should we make to the input if we wanted to change the focus by \hask{b}. The latter point of view is especially useful when using lenses to describe \index{neural networks}neural networks.
 
 The simplest example of a lens acts on a product. It can extract or replace one component of the product, treating the other as the residue. In Haskell, we'd implement it as:
 \begin{haskell}

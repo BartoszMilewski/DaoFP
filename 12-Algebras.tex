@@ -557,7 +557,7 @@ is just like a finite sum, except that it has infinitely many constructors $i_n$
   \arrow[dd, "i_2"]
  & ...
  & F^n 0
-  \arrow[ddll, "i_n"]
+  \arrow[ddll, red, "i_n"]
  & ...
  \\
  \\
@@ -576,7 +576,7 @@ Similarly, \hask{Just Nothing} shows up in all powers starting with two.
 
 \hask{Just(Just(Nothing))} shows up in all powers starting with three, and so on...
 
-But there is a way to get rid of all these duplicates. The trick is to replace the sum by a colimit. Instead of a diagram consisting of discrete objects, we can construct a chain. Let's call this chain $\Gamma$, and its colimit $i$:
+But there is a way to get rid of all these duplicates. The trick is to replace the sum by a colimit. Instead of a diagram consisting of discrete objects, we can construct a chain (such chains are called $\omega$-chains). Let's call this chain $\Gamma$, and its colimit $i$:
 \[i = \text{Colim} \, \Gamma \]
 
 \[
@@ -609,16 +609,16 @@ To see that, consider for instance a tree of depth $n$. It can be first found as
  \begin{tikzcd}
  ...
 & 1
-\arrow[d, "t"]
+\arrow[d, red, "t"]
 \arrow[dr, "t'"]
  \\
  ...
  \arrow[r]
  & F^n 0 
- \arrow[r, "F^n (\mbox{!`})"]
- \arrow[d, "i_n"]
+ \arrow[r,  blue, "F^n (\mbox{!`})"]
+ \arrow[d, blue, "i_n"]
  & F^{n+1} 0
- \arrow[dl, "i_{n+1}"]
+ \arrow[dl, blue, "i_{n+1}"]
  \\
  &  i
   \end{tikzcd}
@@ -631,15 +631,15 @@ which means that:
 \[ i_{n+1} \circ t' =  i_{n+1} \circ F^n (\mbox{!`}) \circ t =  i_n \circ t\]
 The two copies of the tree have been identified in the colimit. You can convince yourself that this procedure removes all duplicates.
 
-We can  prove directly that $i = \text{Colim}\, \Gamma$ is the initial algebra. There is however one assumption that we have to make: the functor $F$ must preserve the colimit. The colimit of $F \Gamma$ must be equal to $F i$.
+We can  prove directly that $i = \text{Colim}\, \Gamma$ is the initial algebra. There is however one assumption that we have to make: the functor $F$ must preserve the colimits of $\omega$-chains. The colimit of $F \Gamma$ must be equal to $F i$.
 \[ \text{Colim} (F \Gamma) \cong F i \]
-Fortunately, this assumption holds in $\mathbf{Set}$. 
+Fortunately, this assumption holds in $\mathbf{Set}$\footnote{This is the consequence of the fact that colimits in $\Set$ are built from disjoint unions of sets.}. 
 
-Here's the sketch of the proof: First we'll construct an arrow $i \to F i$ and then an arrow in the opposite direction. We'll skip the proof that they are the inverse of each other.
+Here's the sketch of the proof: First we'll construct an arrow $i \to F i$ and then an arrow $\iota \colon F i \to i$ in the opposite direction. We'll skip the proof that they are the inverse of each other. Then we'll show the universality of $(i, \iota)$ by constructing a catamorphism to an arbitrary algebra.
 
-We start with the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $\text{Colim} (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $\text{Colim} (F \Gamma)$. And the latter, by our assumption that $F$ preserves the colimit, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
+To construct the mapping $i \to F i$ we'll use the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $\text{Colim} (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $\text{Colim} (F \Gamma)$. The latter, by our assumption that $F$ preserves colimits, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
 
-To construct this cocone, notice that $\text{Colim} (F \Gamma$) is, by definition, the apex of a cocone $F \Gamma$. 
+To construct this cocone, first notice that $\text{Colim} (F \Gamma$) is, by definition, the apex of a cocone $F \Gamma$. 
 
 \[
  \begin{tikzcd}
@@ -665,7 +665,7 @@ To construct this cocone, notice that $\text{Colim} (F \Gamma$) is, by definitio
 \]
 The diagram $F \Gamma$ is the same as $\Gamma$, except that it's missing the naked initial object at the start of the chain.
 
-The spokes of the cocone we are looking for are marked in red in the diagram below:
+The spokes of the cocone we are looking for, from $\Gamma$ to $\text{Colim} (F \Gamma)$, are marked in red in the diagram below:
 \[
  \begin{tikzcd}
  0
@@ -704,10 +704,10 @@ The spokes of the cocone we are looking for are marked in red in the diagram bel
  &&\text{Colim} (F \Gamma)
   \end{tikzcd}
 \]
-Since $i = \text{Colim} \Gamma$ is the apex of the universal cocone based on $\Gamma$, there must be a unique mapping out of it to $\text{Colim} (F \Gamma)$ which, as we said, was equal to $F i$:
+Since $i = \text{Colim}\, \Gamma$ is the apex of the universal cocone based on $\Gamma$, there must be a unique mapping out of it to $\text{Colim} (F \Gamma)$ which, as we said, was equal to $F i$. This is the mapping we were looking for:
 \[ i \to F i \]
 
-Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be embedded in it. It means that we can construct a cocone from $F \Gamma$ to the apex $i$ by going through (a sub-chain of) $\Gamma$. 
+Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be embedded in it. It means that we can construct a cocone from $F \Gamma$ to the apex $i$ by going through (a sub-chain of) $\Gamma$ (the red arrows below). 
 
 \[
  \begin{tikzcd}
@@ -746,13 +746,13 @@ Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be 
 \]
 
 
-From the universality of $\text{Colim} (F \Gamma)$ it follows that there is a mapping out 
+From the universality of the $\text{Colim} (F \Gamma)$ it follows that there is a mapping out 
 \[\text{Colim} (F \Gamma) \to i \]
 and thus we have the mapping in the other direction:
-\[ F i \to i \]
+\[ \iota \colon F i \to i \]
 This shows that $i$ is a carrier of an algebra. In fact, it can be shown that the two mappings are the inverse of each other, as we would expect from the Lambek's lemma.
 
-To show that this is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(a, \alpha \colon F a \to a)$. Again, we can use universality, as long as we can construct a cocone from $\Gamma$ to $a$. 
+To show that  $(i, \iota)$ is indeed the initial algebra, we have to construct a mapping out of it to an arbitrary algebra $(a, \alpha \colon F a \to a)$. Again, we can use universality, as long as we can construct a cocone from $\Gamma$ to $a$. 
 
 \[
  \begin{tikzcd}

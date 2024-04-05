@@ -57,8 +57,8 @@ The simplest round trip is a composition of two arrows going in opposite directi
 There are two possible round trips. One is $g \circ f$, which goes from $a$ to $a$. The other is $f \circ g$ , which goes from $b$ to $b$.
 
 If both of them result in identities, then we say that $g$ is the \emph{inverse} of $f$
-\[ g \circ f = id_A\]
-\[f \circ g = id_B\]
+\[ g \circ f = id_a\]
+\[f \circ g = id_b\]
 and we write it as $g = f^{-1}$ (pronounced $f$ \emph{inverse}). The arrow $ f^{-1}$ undoes the work of the arrow $f$. 
 
 Such a pair of arrows is called an \emph{isomorphism} and the two objects are called \emph{isomorphic}.
@@ -95,13 +95,15 @@ Similarly, for any arrow probing $b$ there is a corresponding arrow probing $a$.
 
 We can move focus back and forth between $a$ and $b$ using the mappings $(f \circ -)$ and $(f^{-1} \circ -)$.
 
-We can combine these two mappings (see exercise \ref{ex-yoneda-composition}) to form a round trip. The result is the same as if we applied the composite $((f^{-1} \circ f) \circ -)$. But this is equal to $(id_A \circ  -)$ which, as we know from exercise \ref{ex-yoneda-identity}, leaves the arrows unchanged.
+We can combine these two mappings (see exercise \ref{ex-yoneda-composition}) to form a round trip. The result is the same as if we applied the composite $((f^{-1} \circ f) \circ -)$. But this is equal to $(id_a \circ  -)$ which, as we know from exercise \ref{ex-yoneda-identity}, leaves the arrows unchanged.
 
 Similarly, the round trip induced by $f \circ f^{-1}$ leaves the arrows $x \to b$ unchanged. 
 
 This creates a ``buddy system'' between the two groups of arrows. Imagine each arrow sending a message to its buddy, as determined by $f$ or $f^{-1}$. Each arrow would then receive exactly one message, and that would be a message from its buddy. No arrow would be left behind, and no arrow would receive more than one message. Mathematicians call this kind of buddy system a \emph{bijection} or one-to-one correspondence.
 
 Therefore, arrow by arrow, the two objects $a$ and $b$ look exactly the same from the perspective of $x$. Arrow-wise, there is no difference between the two objects. 
+
+Two isomorphic objects have exactly the same properties.
 
 In particular, if you replace $x$ with the terminal object $1$, you'll see that the two objects have the same elements. For every element $x \colon 1 \to a$ there is a corresponding element $y \colon 1 \to b$, namely $y = f \circ x$, and vice versa. There is a bijection between the elements of isomorphic objects.
 

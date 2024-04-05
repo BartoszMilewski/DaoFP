@@ -199,6 +199,8 @@ idWithEffects :: a -> f a
 \end{haskell}
 It must behave like identity with respect to \hask{composeWithEffects}.
 
+Another way of looking at this arrow is that it lets you add a trivial effect to any value of type \hask{a}. It's the effect that combined with any other effect does nothing to it.
+
 We have just defined a monad! After some renaming and rearranging, we can write it as a typeclass:
 \begin{haskell}
 class Functor m => Monad m where
@@ -326,13 +328,13 @@ instance Monad Maybe where
   (Just a) >>= k = k a
   return = Just
 \end{haskell}
-
+Adding a trivial effect to any value means enclosing it in \hask{Just}.
 \subsection{Logging}
 In order to compose functions that produce logs, we need a way to combine individual log entries. This is why the writer monad:
 \begin{haskell}
 newtype Writer w a = Writer (a, w)
 \end{haskell}
-requires the type of the log to be an instance of \hask{Monoid}. This allows us to append logs, and also to create an empty log.
+requires the type of the log to be an instance of \hask{Monoid}. This allows us to append logs, and also to create a trivial effect: an empty log.
 \begin{haskell}
 instance Monoid w => Monad (Writer w) where
   (Writer (a, w)) >>= k = let (Writer (b, w')) = k a
@@ -420,7 +422,7 @@ instance Monad [] where
   as >>= k = concat (fmap k as)
   return a = [a]
 \end{haskell}
-Here, \hask{return} constructs a singleton list.
+Here, \hask{return} constructs a singleton list. Thus a trivial version of nondeterminism is determinism.
 
 What imperative languages do using nested loops we can do in Haskell using the list monad. Think of \hask{as} in bind as aggregating the result of running the inner loop and \hask{k} as the code that runs in the outer loop. 
 
@@ -482,7 +484,7 @@ Combining the two, you may construct a simple \hask{main} object:
 main :: IO ()
 main = getLine >>= putStrLn
 \end{haskell}
-which echos a string you type.
+which echoes a string you type.
 
 \section{Do Notation}
 
@@ -1209,7 +1211,7 @@ instance Monad m => Monoidal m where
 \end{haskell}
 (Warning: to compile this code you'll need to turn a few compiler extensions.) If you desugar this code to use monadic bind and lambdas, you'll notice that the final \hask{return} needs access to both \hask{a} and \hask{b}, which are defined in outer environments. This would be impossible without a monad being strong.
 
-In category theory, though, not every endofunctor in a monoidal category is strong. For now, the magic incantation is that the category we're working with is self-enriched, and every endofunctor defined in Haskell is canonically enriched. We'll come back to it when we talk about enriched categories. In Haskell strength boils down to the fact that we can always \hask{fmap} a partially applied pair constructor \hask{(a, )}.
+In category theory, though, not every endofunctor in a monoidal category is strong. For now, the magic incantation is that the category we're working with is self-enriched, and every endofunctor defined in Haskell is enriched. We'll come back to it when we talk about enriched categories. In Haskell strength boils down to the fact that we can always \hask{fmap} a partially applied pair constructor \hask{(a, )}.
 
 \subsection{Applicative functors}
 
@@ -1310,7 +1312,7 @@ In the latter, we used the pair constructor \hask{(,)} as a two-argument functio
 
 \subsection{Monads and applicatives}
 
-Since in a cartesian closed category every monad is lax monoidal, it is automatically applicative. We can show it directly by implementing \hask{ap}, which has the same type signature as the splat operator:
+Since in a cartesian closed category every monad\footnote{Again, the correct incantation is ``every enriched monad''} is lax monoidal, it is automatically applicative. We can show it directly by implementing \hask{ap}, which has the same type signature as the splat operator:
 \begin{haskell}
 ap :: (Monad m) => m (a -> b) -> m a -> m b
 ap fs as = do 
