@@ -43,7 +43,7 @@ and not have to keep track which decomposition came first. This is called \emph{
 
 Composition is the source of two mappings of arrows called pre-composition and post-composition. 
 
-When you \index{post-composition}\emph{post-compose} an arrow $f$ to an arrow $h$, it produces the arrow $f \circ h$. Of course, you can post-compose $f$ only to arrows whose target is the source of $f$. Post-composition by $f$ is written as $(f \circ -)$, leaving a hole for $h$. As Lao Tzu would say, ``Usefulness of post-composition comes from what is not there.''
+When you \index{post-composition}\emph{post-compose} an arrow $h$ with an arrow $f$, it produces the arrow $f \circ h$ (the arrow $f$ is applied \emph{after} the arrow $h$). Of course, you can post-compose $h$ only with arrows whose source is the target of $h$. Post-composition by $f$ is written as $(f \circ -)$, leaving a hole for $h$. As Lao Tzu would say, ``Usefulness of post-composition comes from what is not there.''
 
 Thus an arrow $f \colon a \to b$ induces a mapping of arrows $(f \circ -)$ that maps arrows which are probing $a$ to arrows which are probing $b$. 
 
@@ -73,7 +73,7 @@ Since objects have no internal structure, when we say that $f$ transforms $a$ to
 
 Post-composition lets us shift focus from one object to another.
 
-Dually, you can \index{pre-composition}\emph{pre-compose} $f$, or apply $(- \circ f)$ to arrows originating in $b$ and map them to arrows originating in $a$. 
+Dually, you can \index{pre-composition}\emph{pre-compose} by $f$, or apply $(- \circ f)$ to arrows originating in $b$ to map them to arrows originating in $a$ (notice the change of direction). 
 
 \[
  \begin{tikzcd}
@@ -98,13 +98,13 @@ Dually, you can \index{pre-composition}\emph{pre-compose} $f$, or apply $(- \cir
   \end{tikzcd}
 \]
 
-Pre-composition lets us shift the perspective from one observer to another. Notice that the outgoing arrows are mapped in the direction opposite to the direction of $f$.
+Pre-composition lets us shift the perspective from observer $b$ to observer $a$.
 
 Pre- and post-composition are mappings of arrows. Since arrows form sets, these are \emph{functions} between sets. 
 
-Another way of looking at pre- and post-composition is that they are the result of partial application of the two-hole composition operator $(- \circ -)$, in which we pre-fill one hole or the other with an arrow.
+Another way of looking at pre- and post-composition is that they are the result of partial application of the two-hole composition operator $(- \circ -)$, in which we can pre-fill one hole or the other with a fixed arrow.
 
-In programming, an outgoing arrow is interpreted as extracting data from the source. An incoming arrow is interpreted as producing or constructing the target. Outgoing arrows define the interface, incoming arrows define the constructors.
+In programming, an outgoing arrow is interpreted as extracting data from its source. An incoming arrow is interpreted as producing or constructing the target. Outgoing arrows define the interface, incoming arrows define the constructors.
 
 For Haskell programmers, here's the implementation of post-composition as a higher-order function:
 \begin{haskell}
@@ -122,7 +122,7 @@ Do the following exercises to convince yourself that shifts in focus and perspec
 Suppose that you have two arrows, $f \colon a \to b$ and $g \colon b \to c$. Their composition $g \circ f$ induces a mapping of arrows $((g \circ f) \circ -)$. Show that the result is the same if you first apply $(f \circ -)$ and follow it by $(g \circ -)$. Symbolically:
 \[((g \circ f) \circ -) = (g \circ -) \circ (f \circ -)\]
 
-Hint: Pick an arbitrary object $x$ and an arrow $h \colon x \to a$ and see if you get the same result. Note that $\circ$ is overloaded here. It means regular function composition when put between two post-compositions.
+Hint: Pick an arbitrary object $x$ and an arrow $h \colon x \to a$ and see if you get the same result. Note that $\circ$ is overloaded here. On the right, it means regular function composition when put between two post-compositions.
 \end{exercise}
 
 \begin{exercise}
@@ -179,7 +179,7 @@ We call this the application of a function to an argument, but we were able to e
 
 You may think of arrows as representing change: object $a$ becomes object $b$. An arrow that loops back represents a change in an object itself. But change has its dual: lack of change, inaction or, as Lao Tzu would say \emph{wu wei}. 
 
-Every object has a special arrow called the identity, which leaves the object unchanged. It means that, when you compose this arrow with any other arrow, either incoming or outgoing, you get that arrow back. Thought of as an action, the identity arrow does nothing and takes no time.
+Every object has a special arrow called the identity, which leaves the object unchanged. It means that, when you compose this arrow with any other arrow, either incoming or outgoing, you get that other arrow back. Thought of as an action, the identity arrow does nothing and takes no time.
 
 An identity arrow on the object $a$ is called $id_a$. So if we have an arrow $f \colon a \to b$, we can compose it with identities on either side
 

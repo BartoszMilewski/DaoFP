@@ -23,16 +23,16 @@ a && b
 \]
 
 Suppose that somebody gave you an element of a product, that is an arrow $h$ from the terminal object $1$ to $a \times b$. You can easily retrieve a pair of elements, just by using composition: an element of $a$ given by 
-\[a = \text{fst} \circ h \]
+\[x = \text{fst} \circ h \]
 and an element of $b$ given by
-\[b = \text{snd} \circ h \]
+\[y = \text{snd} \circ h \]
 
 \[
  \begin{tikzcd}
  & 1
 \arrow[d, dashed, "h"]
- \arrow[ddl, bend right, "a"']
- \arrow[ddr, bend left, "b"]
+ \arrow[ddl, bend right, "x"']
+ \arrow[ddr, bend left, "y"]
 \\
 &a \times b
  \arrow[dl,  "\text{fst}"]
@@ -59,7 +59,7 @@ a && b
  \end{tikzcd}
 \]
 
-As we did before with the sum type, we can turn this idea around, and use this diagram to \emph{define} the product type: A pair of functions $f$ and $g$ should be in one-to-one correspondence with a \index{mapping in}\emph{mapping in} from $c$ to $a \times b$. This is the \emph{introduction} rule for the product.
+As we did before with the sum type, we can turn this idea around, and use this diagram to \emph{define} the product type: We impose the condition that a pair of functions $f$ and $g$ be in one-to-one correspondence with a \index{mapping in}\emph{mapping in} from $c$ to $a \times b$. This is the \emph{introduction} rule for the product.
 
 In particular, the mapping out of the terminal object is used in Haskell to define a product type. Given two elements, \hask{a :: A} and \hask{b :: B}, we construct the product 
 
@@ -239,7 +239,7 @@ Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
 f &\colon a \to a' \\
 g &\colon b \to b'
 \end{align*}
-The composition of these arrows with the projections $\text{fst}$ and $\text{snd}$, respectively, can be used to define the mapping between the products:
+The composition of these arrows with the projections $\text{fst}$ and $\text{snd}$, respectively, can be used to define the mapping $h$ between the products:
 
 \[
  \begin{tikzcd}
@@ -351,7 +351,7 @@ g &\colon b \to b'
  to operate on tensor products:
 \[ a \otimes b \xrightarrow{f \otimes g} a' \otimes b' \]
 
-If we think of morphisms as actions, their tensor product corresponds to performing two actions in parallel. Contrast this with the composition of morphisms, which suggests their temporal ordering.
+If we think of morphisms as actions, their tensor product corresponds to performing two actions in parallel. Contrast this with the serial composition of morphisms, which suggests their temporal ordering.
 
 You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, which requires both objects $a$ and $b$; but it has no elimination rule. Once created, a tensor product ``forgets'' how it was created. Unlike a cartesian product, it has no projections. 
 
@@ -371,7 +371,7 @@ A category with a single object is called a monoid. The combining operation is t
 
 This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
 
-In a category, we are forced to define operations in bulk, rather than looking at individual elements. So we start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
+However, in a category, rather than looking at individual elements, we prefer to define operations in bulk. So we start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
 \[ \mu \colon m \times m \to m \]
 The unit element can be defined as an arrow from the terminal object $1$:
 \[ \eta \colon 1 \to m \]

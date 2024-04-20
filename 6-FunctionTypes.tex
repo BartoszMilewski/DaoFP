@@ -81,11 +81,11 @@ Here's the corresponding diagram
 & b
  \end{tikzcd}
 \]
-This commuting diagram tells us that, given an $h$, we can construct an $f$; but we can also demand the converse: Every mapping out of a product, $f \colon c \times a \to b$ should uniquely define a mapping into the exponential, $h \colon c \to b^a$. 
+This commuting diagram tells us that, given an $h$, we can construct an $f$; but we can also demand the converse: Every mapping out, $f \colon c \times a \to b$, should uniquely define a mapping into the exponential, $h \colon c \to b^a$. 
 
-We can use this property, this one-to-one correspondence between two sets of arrows, to define the exponential object. This is the \emph{introduction rule} for the function object. 
+We can use this property, this one-to-one correspondence between two sets of arrows, to define the exponential object. This is the \emph{introduction rule} for the function object $b^a$. 
 
-We've seen that product was defined using its mapping-in property. Function application, on the other hand, is defined as a \emph{mapping out} from a product. 
+We've seen that product was defined using its mapping-in property. Function application, on the other hand, is defined as a \emph{mapping out} of a product. 
 
 \subsection{Currying}
 
@@ -95,11 +95,11 @@ So far we've been only considering functions of one argument. This is not a real
 \begin{haskell}
 f :: (c, a) -> b
 \end{haskell}
-\hask{h} on the other hand is a function that returns a function (object)
+\hask{h} on the other hand is a function that returns a function:
 \begin{haskell}
 h :: c -> (a -> b)
 \end{haskell}
-Currying is the isomorphism between these two types. 
+Currying is the isomorphism between these two sets of arrows. 
 
 This isomorphism can be represented in Haskell by a pair of (higher-order) functions. Since, in Haskell, currying works for any types, these functions are written using type variables---they are \emph{polymorphic}:
 \begin{haskell}
@@ -185,7 +185,7 @@ This new mapping $h$ can be seen as a constructor of the function object. The re
 
 Corresponding to our original expression $a x^2 + b x + c$ there is a particular function in $\mathbb{C}^{\mathbb{C}}$ that we write as:
 \[  \lambda x . \,a x^2 + b x + c \]
-or, in Haskell, with the backslash replacing $\lambda$,
+or, in Haskell, with the \index{backslash}backslash replacing $\lambda$,
 \begin{haskell}
 \x -> a * x^2 + b * x + c
 \end{haskell}
@@ -408,9 +408,9 @@ The question is: can we find an arrow $g$ to complete this diagram?
 \[g \colon b^a \times a' \to b'\]
 If we find such a $g$, it will uniquely define our $k$.
 
-The way to think about this problem is to consider how we would implement $g$. It takes the product $b^a \times a'$ as its argument. Think of it as a pair: an element of the function object from $a$ to $b$ and an element of $a'$. The only thing we can do with the function object is to apply it to something. But $b^a$ requires an argument of type $a$, and all we have at our disposal is $a'$. We can't do anything unless somebody gives us an arrow $a' \to a$. This arrow applied to $a'$ will generate the argument for $b^a$. However, the result of the application is of type $b$, and $g$ is supposed to produce a $b'$. Again, we'll request an arrow $b \to b'$ to complete our assignment. 
+The way to think about this problem is to consider how we would implement $g$. It takes the product $b^a \times a'$ as its argument. Think of it as a pair: an element of the function object from $a$ to $b$ and an element of $a'$. The only thing we can do with the function object is to apply it to something. But $b^a$ requires an argument of type $a$, and all we have at our disposal is $a'$. We can't do anything unless somebody gives us an arrow $a' \to a$. This arrow applied to $a'$ will generate the argument for $b^a$. However, the result of the application is of type $b$, and $g$ is supposed to produce a $b'$. Again, we'll need an arrow $b \to b'$ to complete our assignment. 
 
-This may sound complicated, but the bottom line is that we require two arrows between the primed and non-primed objects. The twist is that the first arrow goes from $a'$ to $a$, which feels backward from the usual. In order to map $b^a$ to $b'^{a'}$ we need a pair of arrows:
+This may sound complicated, but the bottom line is that we require two arrows between the primed and non-primed objects. The twist is that the first arrow goes from $a'$ to $a$, which feels backward from the usual functoriality considerations. In order to map $b^a$ to $b'^{a'}$ we need a pair of arrows:
 \begin{align*}
 f &\colon a' \to a \\
 g &\colon b \to b' 

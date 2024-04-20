@@ -37,7 +37,7 @@ We often illustrate such equalities by drawing \emph{commuting} diagrams, e.g.,
 
 Thus we compare arrows for equality.
 
-We do \emph{not} compare objects for equality. We see objects as confluences of arrows, so if we want to compare two objects, we look at the arrows.
+We do \emph{not} compare objects for equality\footnote{Half-jokingly, invoking equality of objects is considered ``evil'' in category theory.}. We see objects as confluences of arrows, so if we want to compare two objects, we look at the arrows.
 
 \section{Isomorphic Objects}
 
@@ -63,14 +63,14 @@ and we write it as $g = f^{-1}$ (pronounced $f$ \emph{inverse}). The arrow $ f^{
 
 Such a pair of arrows is called an \emph{isomorphism} and the two objects are called \emph{isomorphic}.
 
-What does the existence of an isomorphisms tell us about the two objects they connect? 
+What does the existence of an isomorphisms tell us about the two objects it connects? 
 
-We have said that objects are described by their interactions with other objects. So let's consider what the two isomorphic objects look like from the perspective of an observer object $x$. Take an arrow $h$ coming from $x$ to $a$.
+We have said that objects are described by their interactions with other objects. So let's consider what the two isomorphic objects look like from the perspective of an observer  $x$. Take an arrow $h$ coming from $x$ to $a$.
 
 \[
  \begin{tikzcd}
  & x
- \arrow[ld, "h"']
+ \arrow[ld, red, "h"']
  \\
  a
  \arrow[rr, "f"]
@@ -83,7 +83,7 @@ There is a corresponding arrow coming from $x$ to $b$. It's just the composition
  \begin{tikzcd}
  & x
  \arrow[ld, "h"']
- \arrow[rd, "f \circ h"]
+ \arrow[rd, red, "f \circ h"]
  \\
  a
  \arrow[rr, "f"]
@@ -117,7 +117,7 @@ When dealing with objects, we use isomorphism in place of equality.
 
 In programming, two isomorphic types have the same external behavior. One type can be implemented in terms of the other and vice versa. One can be replaced by the other without changing the behavior of the system (except, possibly, the performance). 
 
-In classical logic, if B follows from A and A follows from B then A and B are logically equivalent. We often say that B is true ``if and only if'' A is true. However, unlike previous parallels between logic and type theory, this one is not as straightforward if you consider proofs to be relevant. In fact, it led to the development of a new branch of fundamental mathematics, homotopy type theory, or HoTT for short.
+In classical logic, if B follows from A and A follows from B then A and B are logically equivalent. We often say that B is true ``if and only if'' A is true. However, unlike previous parallels between logic and type theory, this one is not as straightforward if you consider proofs to be relevant. In fact, it led to the development of a new branch of fundamental mathematics called homotopy type theory, or HoTT for short.
 
 \begin{exercise}
 Make an argument that there is a bijection between arrows that are \emph{outgoing} from two isomorphic objects. Draw the corresponding diagrams.
@@ -149,8 +149,8 @@ Indeed, an arrow $h$ probing $a$ from $x$ is related to the arrow $h\circ g$ pro
  x
  \arrow[d, "h"']
  && y
- \arrow[ll, "g"']
-  \arrow[dll, "h \circ g"']
+ \arrow[ll, dashed, "g"']
+  \arrow[dll, red, "h \circ g"']
  \\
  a
  \arrow[rr, "f"]
@@ -165,8 +165,8 @@ Similarly, an arrow $h'$ probing $b$ from $x$ corresponds to the arrow $h' \circ
  x
  \arrow[drr, "h'"]
  && y
- \arrow[ll, "g"']
-  \arrow[d, "h' \circ g"]
+ \arrow[ll, dashed, "g"']
+  \arrow[d, red, "h' \circ g"]
  \\
  a
  \arrow[rr, "f"]
@@ -181,10 +181,20 @@ The important observation is that the change of perspective preserves the buddy 
 \[(- \circ g) \circ (f \circ -) = (f \circ -) \circ (- \circ g)\]
 and we call it the \emph{naturality} condition.
 
-The meaning of this equation is revealed when you apply it to a morphism $h \colon x \to a$. Both sides evaluate to $f \circ h \circ g$.  \[
+
+The meaning of this equation is revealed when you apply it to a morphism $h \colon x \to a$. Both sides evaluate to $f \circ h \circ g$.
+\[
  \begin{tikzcd}
- y \arrow[r, "g"] &x \arrow[r, "h"] & a \arrow[r, "f"] & b
-\end{tikzcd}
+ h
+ \arrow[r, mapsto, "(- \circ g)"]
+ \arrow[d, mapsto, "(f \circ -)"']
+ & h \circ g
+ \arrow[d, mapsto, "(f \circ -)"]
+ \\
+ f \circ h
+ \arrow[r, mapsto, "(- \circ g)"]
+& f \circ h \circ g
+ \end{tikzcd}
 \]
 
 Here, the naturality condition is satisfied automatically due to associativity, but we'll soon see it generalized to less trivial circumstances.
@@ -198,12 +208,12 @@ We can also reverse the roles of observers and subjects. For instance, using an 
  a
  \arrow[rr, "f"]
  \arrow[d, "h"']
- \arrow[rrd, "g\circ h"]
+ \arrow[rrd, red, "g\circ h"]
  && b
   \arrow[ll, bend right,  "f^{-1}"']
  \\
  x
- \arrow[rr, "g"']
+ \arrow[rr, dashed, "g"']
   && y
  \end{tikzcd}
 \]
@@ -235,9 +245,6 @@ If you want to see if two objects are isomorphic, at the arrows look!
 \medskip
 
 When two objects $a$ and $b$ are isomorphic, any isomorphism $f$ induces a one-to-one mapping $(f \circ -)$ between corresponding sets of arrows.  
-
-
-Suppose that we don't know if the objects are isomorphic, but we know that there is an invertible mapping, $\alpha_x$, between sets of arrows impinging on $a$ and $b$ from every object $x$. In other words, for every $x$, $\alpha_x$ is a bijection of arrows. 
 \[
  \begin{tikzcd}
  \node(x) at (0, 2) {x};
@@ -262,7 +269,12 @@ Suppose that we don't know if the objects are isomorphic, but we know that there
  \draw[->, red, dashed] (aa) -- node[above]{(f \circ -)} (bb);
 \draw[->] (a) -- node[below]{f} (b);
  \end{tikzcd}
- \qquad
+\]
+The function $(f \circ -)$ maps every arrow $h \colon x \to a$ to an arrow $f \circ a \colon x \to b$. It's inverse $(f^{-1} \circ -)$ maps every arrow $h' \colon x \to b$ to an arrow $(f^{-1} \circ h')$.
+
+
+Suppose that we don't know if the objects are isomorphic, but we know that there is an invertible mapping, $\alpha_x$, between sets of arrows impinging on $a$ and $b$ from every object $x$. In other words, for every $x$, $\alpha_x$ is a bijection of arrows. 
+\[
  \begin{tikzcd}
  \node(x) at (0, 2) {x};
  \node(a) at (-2, 0) {a};
@@ -286,7 +298,7 @@ Suppose that we don't know if the objects are isomorphic, but we know that there
  \draw[->, red, dashed] (aa) -- node[above]{\alpha_x} (bb);
  \end{tikzcd}
 \]
-On the left, the bijection of arrows is generated by the isomorphism $f$. On the right, the bijection of arrows is given by $\alpha_x$. Does it mean that the two objects on the right are isomorphic? Can we construct the isomorphism $f$ from the family of mappings $\alpha_x$? The answer is ``yes'', as long as the family $\alpha_x$ satisfies the naturality condition.
+Before, the bijection of arrows was generated by the isomorphism $f$. Now, the bijection of arrows is given to us by $\alpha_x$. Does it mean that the two objects are isomorphic? Can we construct the isomorphism $f$ from the family of mappings $\alpha_x$? The answer is ``yes'', as long as the family $\alpha_x$ satisfies the naturality condition.
 
 Here's the action of $\alpha_x$ on a particular arrow $h$. 
 \[
@@ -299,7 +311,7 @@ Here's the action of $\alpha_x$ on a particular arrow $h$.
   && b
  \end{tikzcd}
 \]
-This mapping, along with its inverse $\alpha^{-1}_x$, which takes arrows $x \to b$ to arrows $x \to a$, would play the role of $(f \circ -)$ and $(f^{-1} \circ -)$, if there was indeed an isomorphism $f$. The family of maps $\alpha$ describes an ``artificial'' way of switching focus between our two objects.
+This mapping, along with its inverse $\alpha^{-1}_x$, which takes arrows $x \to b$ to arrows $x \to a$, would play the role of $(f \circ -)$ and $(f^{-1} \circ -)$, if there was indeed an isomorphism $f$. The family of maps $\alpha$ describes an ``artificial'' way of switching focus from $a$ to $b$.
 
 Here's the same situation from the point of view of another observer $y$:
 \[
@@ -313,7 +325,7 @@ Here's the same situation from the point of view of another observer $y$:
   && b
  \end{tikzcd}
 \]
-Notice that $y$ is using the mapping $\alpha_y$ to switch focus from $a$ to $b$. 
+Notice that $y$ is using a different mapping $\alpha_y$ from the same family. 
 
 These two mappings, $\alpha_x$ and $\alpha_y$, become entangled whenever there is a morphism $g \colon y \to x$. In that case, pre-composition with $g$ allows us to switch perspective from $x$ to $y$ (notice the direction)
 
@@ -322,8 +334,8 @@ These two mappings, $\alpha_x$ and $\alpha_y$, become entangled whenever there i
  x
  \arrow[d, "h"']
  && y
- \arrow[ll, "g"']
- \arrow[lld, "h \circ g"]
+ \arrow[ll, dashed, "g"']
+ \arrow[lld, red, "h \circ g"]
  \\
  a
   && b
@@ -339,14 +351,23 @@ In both cases we end up looking at $b$ from $y$. We've done this exercise before
 
 If we want the $\alpha$'s to give us an isomorphism, we have to impose the equivalent naturality condition:
 \[ \alpha_y \circ (- \circ g) = (- \circ g) \circ \alpha_x \]
-We want the $\alpha$'s to be compatible with pre-composition.
-Or, when acting on some arrow $h \colon x \to a$:
-\[\alpha_y(h \circ g) = (\alpha_x h) \circ g \]
-This way, if we replace all $\alpha$'s with $(f \circ -)$, things will work out. 
+When acting on some arrow $h \colon x \to a$, we want this diagram to commute:
+\[
+ \begin{tikzcd}
+ h
+ \arrow[r, mapsto, "(- \circ g)"]
+ \arrow[d, mapsto, red, "\alpha_x"]
+ & h \circ g
+ \arrow[d, mapsto, red, "\alpha_y"]
+ \\
+ \alpha_x h
+ \arrow[r, mapsto, "(- \circ g)"]
+&(\alpha_x h) \circ g = \alpha_y (h \circ g)
+ \end{tikzcd}
+\]
+This way we know that replacing all $\alpha$'s with $(f \circ -)$ will work. But does such $f$ exist? Can we reconstruct $f$ from the $\alpha$'s? The answer is yes, and we'll use the Yoneda trick to accomplish that.
 
-And indeed they do! This is called the Yoneda trick. It's a way to reconstruct $f$ from the $\alpha$'s. This is how it works:
-
-Since $\alpha_x$ is defined for any object $x$, it is also defined for $a$. By definition, $\alpha_a$ takes a morphism $a \to a$ to a morphism $a \to b$. We know for sure that there is at least one morphism $a \to a$, namely the identity $id_a$. It turns out that the isomorphism $f$ we are seeking is given by:
+Since $\alpha_x$ is defined for any object $x$, it is also defined for $a$ itself. By definition, $\alpha_a$ takes a morphism $a \to a$ to a morphism $a \to b$. We know for sure that there is at least one morphism $a \to a$, namely the identity $id_a$. It turns out that the isomorphism $f$ we are seeking is given by:
 \[f = \alpha_a (id_a)\]
 or, pictorially:
 \[
@@ -360,7 +381,7 @@ a
  \end{tikzcd}
 \]
 
-Let's verify this. If $f$ is the isomorphism then our $\alpha_x$ should be equal to  $(f \circ -)$ for any $x$. To see that, let's rewrite the naturality condition replacing $x$ with $a$. We get:
+Let's verify this. If $f$ is indeed our isomorphism then, for any $x$, $\alpha_x$ should be equal to  $(f \circ -)$. To see that, let's rewrite the naturality condition replacing $x$ with $a$. We get:
 \[\alpha_y(h \circ g) = (\alpha_a h) \circ g \]
 as illustrated in the following diagram:
 \[
@@ -391,15 +412,41 @@ As Lao Tzu would say, the duality between the observer and the observed cannot b
 Again, we want to show that two objects $a$ and $b$ are isomorphic, but this time we want to treat them as observers. An arrow $h \colon a \to x$ probes an arbitrary object $x$ from the perspective of $a$. Previously, when we knew that the two objects were isomorphic, we were able to switch perspective to $b$ using $(- \circ f^{-1})$. This time we have at our disposal a transformation $\beta_x$ instead. It establishes the bijection between arrows impinging on $x$.
 \[
  \begin{tikzcd}
- a
- \arrow[d, "h"']
- && b
- \arrow[lld, blue, "\beta_x h"]
- \\
  x
+ \\
+ a
+\arrow[u, "h"]
+ && b
+  \arrow[llu, red, "\beta_x h"']
   \end{tikzcd}
 \]
 If we want to observe another object, $y$, we will use $\beta_y$ to switch perspectives between $a$ and $b$, and so on. 
+
+\[
+ \begin{tikzcd}
+ \node(x) at (0, 2) {x};
+ \node(a) at (-2, 0) {a};
+ \node(b) at (2, 0) {b};
+ \node(c1) at (-1, 1.5) {};
+ \node(c2) at (-1.5, 1) {};
+ \node(c3) at (-1, 2) {};
+ \node(c4) at (-2, 1) {};
+ \node(d1) at (1, 1.5) {};
+ \node(d2) at (1.5, 1) {};
+ \node(d3) at (1, 2) {};
+ \node(d4) at (2, 1) {};
+\node (aa) at (-1, 0.75) {};
+ \node (bb) at (1, 0.75) {};
+ \draw[<-] (x) .. controls (c1)  and (c2) .. (a); % bend
+ \draw[<-, green] (x) .. controls (c3)  and (c4) .. (a); % bend
+ \draw[<-, blue] (x) -- (a); 
+  \draw[<-] (x) .. controls (d1)  and (d2) .. (b); % bend
+ \draw[<-, green] (x) .. controls (d3)  and (d4) .. (b); % bend
+ \draw[<-, blue] (x) -- (b); 
+ \draw[->, red, dashed] (aa) -- node[above]{\beta_x} (bb);
+ \end{tikzcd}
+\]
+
 
 If the two objects $x$ and $y$ are connected by an arrow $g \colon x \to y$ then we also have an option of switching focus using $(g \circ -)$. If we want to do both: switch perspective and switch focus, there are two ways of doing it. Naturality demands that the results be equal:
 \[ (g \circ -) \circ \beta_x = \beta_y \circ (g \circ -) \]

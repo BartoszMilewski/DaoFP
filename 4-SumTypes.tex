@@ -115,7 +115,7 @@ we define the mapping out
 h :: Bool -> A
 h b = if b then x else y
 \end{haskell}
-Here, \hask{b} is a term of type \hask{Bool}. 
+Here, \hask{b} is a term of the type \hask{Bool}. 
 
 In general, a data type is created using \index{introduction rule}\emph{introduction} rules and deconstructed using \index{elimination rule}\emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and another using \hask{False}. The \hask{if}, \hask{then}, \hask{else} construct defines the elimination rule. 
 
@@ -433,7 +433,7 @@ Let's look at the definition of $1 + 0$ and it's mapping out to any object $a$. 
  a
  \end{tikzcd}
 \]
-We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \mbox{!`})$, we can simply assign it to the arrow $x$ originating in $1$. Since there is only one $\mbox{!`}$, the mapping is a bijection. 
+We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. The arrow $h$ is determined by the pair $(x, \mbox{!`})$. Since there is only one $\mbox{!`}$, there  is a bijection between $h$'s and $x$'s. 
 
 We define $\beta_a$ to map any $h$ defined by a pair $(x, \mbox{!`})$ to $x$. Conversely, $\beta^{-1}_a$ maps $x$ to the pair $(x, \mbox{!`})$. But is it a natural transformation? 
 
@@ -442,7 +442,7 @@ To answer that, we need to consider what happens when we change focus from $a$ t
 \item Make $h$ switch focus by post-composing both $x$ and $\mbox{!`}$ with $g$. We get a new pair $(y = g \circ x, \mbox{!`})$. Follow it by $\beta_b$.
 \item Use $\beta_a$ to map $(x, \mbox{!`})$ to $x$. Follow it with the post-composition $(g \circ -)$. 
 \end{itemize}
-In both cases we get the same arrow $y = g \circ x$. So the transformation $\beta$ is natural. Therefore $1 + 0$ is isomorphic to $1$.
+In both cases we get the same arrow $y = g \circ x$. So the mapping $\beta$ is natural. Therefore $1 + 0$ is isomorphic to $1$.
 
 In Haskell, we can define the two functions that form the isomorphism, but there is no way of directly expressing the fact that they are the inverse of each other.
 \begin{haskell}
@@ -484,7 +484,7 @@ A very similar argument can be used to show that $a + 0 \cong a$. The following 
 We can translate this argument to Haskell by implementing a (polymorphic) function \hask{h} that works for any type \hask{a}. 
 
 \begin{exercise}
-Implement, in Haskell, the two functions that form the isomorphism between \hask{Either a Void} and \hask{a}.
+Implement, in Haskell, the two functions that form the isomorphism between \hask{(Either a Void)} and \hask{a}.
 \end{exercise}
 
 We could use a similar argument to show that $0 + a \cong a$, but there is a more general property of sum types that obviates that.
@@ -492,7 +492,7 @@ We could use a similar argument to show that $0 + a \cong a$, but there is a mor
 
 There is a nice left-right symmetry in the diagrams that define the sum type, which suggests that it satisfies the commutativity rule, $a + b \cong b + a$. 
 
-Let's consider mappings out of both sides. You can easily see that, for every $h$ that is determined by a pair $(f, g)$ on the left, there is a corresponding $h'$ given by a pair $(g, f)$ on the right. That establishes the bijection of arrows.
+Let's consider mappings out of both sides of this formula. You can easily see that, for every $h$ that is determined by a pair $(f, g)$ on the left, there is a corresponding $h'$ given by a pair $(g, f)$ on the right. That establishes the bijection of arrows.
 
 \[
  \begin{tikzcd}
@@ -528,21 +528,21 @@ Let's consider mappings out of both sides. You can easily see that, for every $h
 Show that the bijection defined above is natural. Hint: Both $f$ and $g$ change focus by post-composition with $k \colon x \to y$.
 \end{exercise}
 \begin{exercise}
-Implement, in Haskell, the function that witnesses the isomorphism between \hask{Either a b} and \hask{Either b a}. Notice that this function is its own inverse.
+Implement, in Haskell, the function that witnesses the isomorphism between \hask{(Either a b)} and \hask{(Either b a)}. Notice that this function is its own inverse.
 \end{exercise}
 
 \subsection{Associativity}
 
 Just like in arithmetic, the sum that we have defined is associative:
 \[(a + b) + c \cong a + (b + c) \]
-It's easy to write the mapping out for the left hand side:
+It's easy to write the mapping out for the left-hand side:
 \begin{haskell}
 h :: Either (Either a b) c -> x
 h (Left (Left a))  = f1 a
 h (Left (Right b)) = f2 b
 h (Right c)        = f3 c
 \end{haskell}
-Notice the use of nested patterns like \hask{(Left (Left a))}, etc. The mapping is fully defined by a triple of functions. The same functions can be used to define the mapping out of the right hand side:
+Notice the use of nested patterns like \hask{(Left (Left a))}, etc. The mapping is fully defined by a triple of functions. The same functions can be used to define the mapping out of the right-hand side:
 \begin{haskell}
 h' :: Either a (Either b c) -> x
 h' (Left a)          = f1 a

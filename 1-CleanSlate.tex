@@ -42,7 +42,11 @@ Its dual is an object that has a unique incoming arrow from every object. It's c
 
 In mathematics, the initial object is often denoted by $0$ and the terminal object by $1$.
 
-The initial object is the source of everything. As a type it's known, in Haskell, as \hask{Void} and in math as $0$. It symbolizes the chaos from which everything arises. Since there is an arrow from \hask{Void} to everything, there is also an arrow from \hask{Void} to itself. 
+The arrow from $0$ to any object $a$ is denoted by $\mbox{!`}_a$, often abbreviated to $\mbox{!`}$.
+
+The arrow from any object $a$ to $1$ is denoted by $!_a$, often abbreviated to $!$.
+
+The initial object is the source of everything. As a type it's known in Haskell as \hask{Void}. It symbolizes the chaos from which everything arises. Since there is an arrow from \hask{Void} to everything, there is also an arrow from \hask{Void} to itself. 
 
 \[
  \begin{tikzcd}
@@ -53,7 +57,7 @@ The initial object is the source of everything. As a type it's known, in Haskell
 
 Thus \hask{Void} begets \hask{Void} and everything else.
 
-The terminal object unites everything. As a type it's known as Unit. In math it's called $1$. It symbolizes the ultimate order.
+The terminal object unites everything. As a type it's known as Unit. It symbolizes the ultimate order.
 
 In logic, the terminal object signifies the ultimate truth, symbolized by $T$ or $ \top$. The fact that there's an arrow to it from any object means that $ \top$ is true no matter what your assumptions are. 
 
@@ -63,7 +67,7 @@ In English, there is a special grammatical construct for counterfactual implicat
 
 A programming language lets us communicate with each other and with computers. Some languages are easier for the computer to understand, others are closer to the theory. We will use Haskell as a compromise.
 
-In Haskell, the initial object corresponds to the type called \hask{Void}. The name for the terminal type is \hask{()}, a pair of empty parentheses, pronounced Unit. This notation will make sense later.
+In Haskell, the name for the terminal type is \hask{()}, a pair of empty parentheses, pronounced Unit. This notation will make sense later.
 
 There are infinitely many types in Haskell, and there is a unique function/arrow from \hask{Void} to each one of them. All these functions are known under the same name: \hask{absurd}.
 
