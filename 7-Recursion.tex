@@ -133,7 +133,9 @@ and plug $h$ and $\text{init}$ into it:
   \end{tikzcd}
 \]
 
-The intuition is that an arrow from $N$ to $a$ represents a \emph{sequence} $a_n$ of elements of $a$. The zeroth element is given by $a_0=\mathit{init}$. The next element is
+The intuition is that an arrow from $N$ to $a$ represents a \emph{sequence} $a_n$ of elements of $a$. The zeroth element is given by 
+\[a_0=\mathit{init}\]
+The next element is
 \[a_1 = h \circ S \circ Z \]
 followed by
 \[a_2 = h \circ S \circ S \circ Z \]
@@ -262,7 +264,9 @@ data List a where
 
 \subsection{Elimination Rule}
 
-Suppose that we have a mapping out, $h \colon L_a \to c$, from a list of $a$ to some arbitrary type $c$. This is how we would plug it into the definition of the list:
+Suppose that we have a mapping out from a list of $a$ to some arbitrary type $c$:
+\[h \colon L_a \to c\]
+This is how we would plug it into our definition of the list:
 \[
  \begin{tikzcd}
  1
@@ -297,16 +301,16 @@ recList init step = \as ->
 \end{haskell}
 Given \hask{init} and \hask{step}, it produces a mapping out of a list.
 
-A list is such a basic data type that Haskell has a built-in syntax for it. The type \hask{List a} is written as \hask{[a]}. The \hask{Nil} constructor is an empty pair of square brackets, \hask{[]}, and the \hask{Cons} constructor is an infix colon \hask{:}.
+A list is such a basic data type that Haskell has a built-in syntax for it. The type \hask{(List a)} is written as \hask{[a]}. The \hask{Nil} constructor is an empty pair of square brackets, \hask{[]}, and the \hask{Cons} constructor is an infix colon \hask{(:)}.
 
 We can pattern-match on these constructors. A generic mapping out of a list has the form:
 \begin{haskell}
 h :: [a] -> c
 h []      = -- empty-list case
-h (a: as) = -- case for the head and the tail of a non-empty list
+h (a : as) = -- case for the head and the tail of a non-empty list
 \end{haskell}
 
-Corresponding to the recursor, here's the type signature of the function \hask{foldr} (fold \emph{right}), which you can find in the standard library:
+Corresponding to the list recursor, \hask{recList}, here's the type signature of the function \hask{foldr} (fold \emph{right}), which you can find in the standard library:
 \begin{haskell}
 foldr :: (a -> c -> c) -> c -> [a] -> c
 \end{haskell}
@@ -372,7 +376,7 @@ The only candidate for $\mathit{init}$ is $\text{Nil}_b$, which is to say that $
 
 What remains is to define the arrow:
 \[\mathit{step} \colon a \times L_b \to L_b\]
-We can take:
+We can guess:
 \[ \mathit{step} = \text{Cons}_b \circ (f \times id_{L_b}) \]
 
 This corresponds to the Haskell function:
