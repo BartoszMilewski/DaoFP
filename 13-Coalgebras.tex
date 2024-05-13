@@ -8,13 +8,13 @@ Coalgebras are just algebras in the opposite category. End of chapter!
 
 Well, maybe not... As we've seen before, the category in which we're working is not symmetric with respect to duality. In particular, if we compare the terminal and the initial objects, their properties are not symmetric. Our initial object has no incoming arrows, whereas the terminal one, besides having unique incoming arrows, has lots of outgoing arrows. 
 
-Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---their duals, therefore generated from the terminal object---not to be just their mirror images, but to add their own interesting twists.
+Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---which are their duals, therefore generated from the terminal object---not to be just their mirror images, but to add their own interesting twists.
 
-We've seen that the main application of algebras was in processing recursive data structures: in folding them. Dually, the main application of coalgebras is in generating, or unfolding, of recursive, tree-like, data structures. The unfolding is done using an anamorphism.
+We've seen that the main application of algebras was in processing recursive data structures: in folding them. Dually, the main application of coalgebras is in generating, or unfolding, the recursive, tree-like, data structures. The unfolding is done using an anamorphism.
 
 We use catamorphisms to chop trees, we use anamorphisms to grow them. 
 
-We cannot produce information from nothing so, in general, both a catamorphism and an anamorphism reduce the amount of information that's contained in their input. 
+We cannot produce information from nothing so, in general, both a catamorphism and an anamorphism tend to reduce the amount of information that's contained in their input. 
 
 After you sum a list of integers, it's impossible to recover the original list. 
 
@@ -28,7 +28,7 @@ In Haskell, we define:
 \begin{haskell}
  type Coalgebra f a = a -> f a
 \end{haskell}
-We often think of the carrier as the type of a seed from which we'll grow the data structure, be it a list or a tree. 
+We often think of the carrier as the type of a seed from which we grow the data structure, be it a list or a tree. 
 
 For instance, here's a functor that can be used to create a binary tree, with integers stored at the nodes:
 \begin{haskell}
@@ -37,7 +37,7 @@ data TreeF x = LeafF | NodeF Int x x
 \end{haskell}
 We don't even have to define the instance of \hask{Functor} for it---the \hask{deriving} clause tells the compiler to generate the canonical one for us (together with the \hask{Show} instance to allow conversion to \hask{String}, if we want to display it).
 
-A coalgebra is a function that takes a seed of the carrier type and produces a functor-ful of new seeds. These new seeds can then be used to generate the subtrees, recursively. 
+A coalgebra is a function that takes a seed of the carrier type and produces a functorful of new seeds. These new seeds can then be used to generate the subtrees, recursively. 
 
 Here's a coalgebra for the functor \hask{TreeF} that takes a list of integers as a seed:
 \begin{haskell}
@@ -154,13 +154,13 @@ Here's the interpretation of this formula: Given a seed of type \hask{a}, we fir
  
 As an example, we can apply the anamorphism to the \hask{split} coalgebra we defined earlier: \hask{ana split} takes a list of integers and creates a sorted tree. 
 
-We can then use a catamorphsims to fold this tree into a sorted list. We define an algebra:
+We can then use a catamorphsims to fold this tree into a sorted list. We define the following algebra:
 \begin{haskell}
 toList :: Algebra TreeF [Int]
 toList LeafF = []
 toList (NodeF n ns ms) = ns ++ [n] ++ ms
 \end{haskell}
-that concatenates the left list with the singleton pivot and the right list. To sort a list we combine the anamorphism with the catamorphism:
+It concatenates the left list with the singleton pivot and the right list. To sort a list we combine the anamorphism with the catamorphism:
 \begin{haskell}
 qsort = cata toList . ana split
 \end{haskell}
@@ -190,7 +190,7 @@ Here's a simple coalgebra that uses a single integer \hask{n} as a seed:
 step :: Coalgebra (StreamF Int) Int
 step n = StreamF n (n+1)
 \end{haskell}
-It stores the seed as a payload, and seeds the next budding stream with \hask{n + 1}. 
+It stores the current seed as a payload, and seeds the next budding stream with \hask{n + 1}. 
 
 The anamorphism for this coalgebra, when seeded with zero, generates the stream of all natural numbers.
 \begin{haskell}
@@ -261,7 +261,7 @@ The definition of an anamorphism can be seen as an expression of the universal p
 ana :: Functor f => forall a. Coalgebra f a -> (a -> Fix f)
 ana coa = In . fmap (ana coa) . coa 
 \end{haskell}
-It says that, given any coalgebra, there is a mapping from its carrier to the carrier of the terminal coalgebra, \hask{Fix f}. We know, from the Lambek's lemma, that this mapping is in fact a coalgebra morphism.
+What it tells us is that, given any coalgebra, there is a mapping from its carrier to the carrier of the terminal coalgebra, \hask{Fix f}. We know, from the Lambek's lemma, that this mapping is in fact a coalgebra morphism.
 
 Let's uncurry this definition:
 \begin{haskell}
@@ -368,7 +368,7 @@ a stream of length two, and so on.
 
 This looks promising, but what we need is one object that would combine all these approximations. We need a way to glue the next approximation to the previous one.
 
-Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. This limit has the same elements as the starting object in the diagram. In particular, consider the limit in this diagram:
+Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. This limit has the same elements as the starting object in the diagram. In particular, consider the limit of the single-arrow diagram $D_1$:
 \[
  \begin{tikzcd}
  & Lim D_1
@@ -380,7 +380,7 @@ Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. Th
  \arrow[l, "!"]
  \end{tikzcd}
 \]
-($!$ is the unique morphism targeting the terminal object $1$). This limit has the same elements as $F 1$. Similarly, this limit:
+($!$ is the unique morphism targeting the terminal object $1$). This limit has the same elements as $F 1$. Similarly, the limit of a two-arrow diagram $D_2$:
 \[
  \begin{tikzcd}
  && Lim D_2
@@ -397,7 +397,7 @@ Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. Th
 \]
 has the same elements as $F(F 1)$.
 
-We can continue extending this diagram to infinity. The limit of the infinite chain is the fixed point carrier of the terminal coalgebra.
+We can continue extending this diagram to infinity. It turns out that the limit of this infinite chain is our fixed point carrier of the terminal coalgebra.
 \[
  \begin{tikzcd}
   && t

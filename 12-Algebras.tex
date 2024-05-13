@@ -4,7 +4,7 @@
 
 \chapter{Algebras}
 
-The essence of algebra is the formal manipulation of expressions. But what is an expression, and how do we manipulate it?
+The essence of algebra is the formal manipulation of expressions. But what are expressions, and how do we manipulate them?
 
 The first things to observe about algebraic expressions like $2 (x + y)$ or $a x^2 + b x + c$ is that there are infinitely many of them. There is a finite number of rules for making them, but these rules can be used in infinitely many combinations. This suggests that the rules are used \emph{recursively}. 
 
@@ -26,9 +26,9 @@ Such recursive definitions work perfectly well in a programming language. The pr
 
 From type-theory point of view, we've been able to define recursive types, such as natural numbers or lists, by providing, in each case, specific introduction and elimination rules. What we need is something more general, a procedure for generating arbitrary recursive types from simpler pluggable components. 
 
-There are two orthogonal concerns when it comes to recursive data structures. One is the machinery of recursion. The other is the pluggable components to be used by recursion. 
+There are two orthogonal concerns when it comes to recursive data structures. One is the machinery of recursion. The other is the pluggable components. 
 
-We know how to work recursion: We assume that we know how to construct small trees. We then use the recursive step to plant those trees into nodes to make bigger trees. 
+We know how to work with recursion: We assume that we know how to construct small trees. We then use the recursive step to plant those trees into nodes to make bigger trees. 
 
 Category theory tells us how to formalize this imprecise description.
 
@@ -36,27 +36,27 @@ Category theory tells us how to formalize this imprecise description.
 
 The idea of planting smaller trees into nodes requires that we formalize what it means to have a data structure with holes---a ``container for stuff.'' This is exactly what functors are for. Because we want to use these functors recursively, they have to be \emph{endo}-functors.
 
-For instance, the endofunctor from our earlier example would be defined by the following data structure, where \hask{x} marks the spots:
+For instance, the endofunctor from our earlier example would be defined by the following data structure, where \hask{x}'s mark the spots:
 \begin{haskell}
 data ExprF x = ValF Int 
              | PlusF x x
 \end{haskell}
-Information about all possible shapes of expressions is abstracted into a single functor. 
+Information about all possible shapes of expressions is abstracted into one single functor. 
 
-The other important piece of information is the recipe for evaluating expressions. This, too, can be encoded using the same endofunctor. 
+The other important piece of information when defining an algebra is the recipe for evaluating expressions. This, too, can be encoded using the same endofunctor. 
 
 Thinking recursively, let's assume that we know how to evaluate all subtrees of a larger expression. Then the remaining step is to plug these results into the top level node and evaluate it. 
 
-For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation of the subtrees. It's pretty obvious what we should do in the last step. If the top of the tree is a leaf \hask{ValF} (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers in it. This recipe can be encoded as:
+For instance, suppose that the \hask{x}'s in the functor were replaced by integers---the results of evaluation of the subtrees. It's pretty obvious what we should do in the last step. If the top of our tree is just a leaf \hask{ValF} (which means there were no subtrees to evaluate) we'll just return the integer stored in it. If it's a \hask{PlusF} node, we'll add the two integers in it. This recipe can be encoded as:
 \begin{haskell}
 eval :: ExprF Int -> Int
 eval (ValF n)    = n
 eval (PlusF m n) = m + n
 \end{haskell}
 
-We have made some seemingly obvious assumptions based on our experience. For instance, since the node was called \hask{PlusF} we assumed that we should add the two numbers. But multiplication or subtraction would work equally well.
+We have made some seemingly obvious assumptions based on common sense. For instance, since the node was called \hask{PlusF} we assumed that we should add the two numbers. But multiplication or subtraction would work equally well.
 
-Since the leaf \hask{ValF} contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string, and which uses concatenation instead of addition:
+Since the leaf \hask{ValF} contained an integer, we assumed that the expression should evaluate to an integer. But there is an equally plausible evaluator that pretty-prints the expression by converting it to a string. This evaluator uses concatenation instead of addition:
 \begin{haskell}
 pretty :: ExprF String -> String
 pretty (ValF n)    = show n
@@ -214,7 +214,7 @@ We have thus shown that $h$ is the inverse of $\iota$, which means that $\iota$ 
 \[ F i \cong i \]
 We interpret this identity as stating that $i$ is a fixed point of $F$ (up to isomorphism). The action of $F$ on $i$ ``doesn't change it.''
 
-There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. The least fixed point of an endofunctor $F$ is denoted $\mu F$, so we have:
+There may be many fixed points, but this one is the \emph{least fixed point} because there is an algebra morphism from it to any other fixed point. The least fixed point of an endofunctor $F$ is denoted $\mu F$, so we write:
 \[ i = \mu F \]
 \subsection{Fixed point in Haskell}
 Let's consider how the definition of the fixed point works with our original example given by the endofunctor:
@@ -388,7 +388,7 @@ The list type that we've seen previously is equivalent to a fixed point of the f
 \begin{haskell}
 data ListF a x = NilF | ConsF a x
 \end{haskell}
-An algebra for this functor is a mapping out 
+An algebra for this functor is a mapping out:
 \begin{haskell}
 alg :: ListF a c -> c
 alg NifF = init
@@ -403,19 +403,19 @@ A catamorphism for such an algebra is the list recursor:
 \begin{haskell}
 recList :: c -> ((a, c) -> c) -> (List a -> c)
 \end{haskell}
-where \hask{(List a)} is can be identified with the fixed point \hask{Fix (ListF a)}.
+where \hask{(List a)} can be identified with the fixed point \hask{Fix (ListF a)}.
 
 We've seen before a recursive function that reverses a list. It was implemented by appending elements to the end of a list, which is very inefficient. It's easy to rewrite this function using a catamorphism, but the problem remains. 
 
 Prepending elements, on the other hand, is cheap. A better algorithm would traverse the list, accumulating elements in a first-in-first-out queue, and then pop them one-by-one and prepend them to a new list. 
 
-The queue regimen can be implemented by using composition of closures: each closure is a function that remembers its environment. Here's the algebra whose carrier is a function type:
+The queue regimen can be implemented using composition of closures: each closure is a function that remembers its environment. Here's the algebra whose carrier is a function type:
 \begin{haskell}
 revAlg :: Algebra (ListF a) ([a]->[a])
 revAlg NilF = id
 revAlg (ConsF a f) = \as -> f (a : as)
 \end{haskell}
-At each step, this algebra creates a new function. This function, when executed, will apply the previous function \hask{f} to a list. The list is the result of prepending the current element \hask{a} to the function's argument \hask{as}. The resulting closure remembers the current element \hask{a} and the previous function \hask{f}.
+At each step, this algebra creates a new function. This function, when executed, will apply the previous function \hask{f} to a list, which is the result of prepending the current element \hask{a} to the function's argument \hask{as}. The resulting closure remembers the current element \hask{a} and the previous function \hask{f}.
 
 The catamorphism for this algebra accumulates a queue of such closures. To reverse a list, we apply the result of the catamorphism for this algebra to the empty list:
 \begin{haskell}
@@ -426,7 +426,7 @@ This trick is at the core of the fold-left funcion, \hask{foldl}. Care should be
 
 Lists are so common that their eliminators (called ``folds'') are included in the standard library. But there are infinitely many possible recursive data structures, each generated by its own functor, and we can use the same catamorphism on all of them.
 
-It's worth mentioning that the list construction works in any monoidal category with coproducts. We can replace the list functor with a more general:
+It's worth mentioning that the list construction works in any monoidal category with coproducts. We can replace the list functor with the more general:
 \[ F x = I + a \otimes x \]
 where $I$ is the unit object and $\otimes$ is the tensor product. The solution to the fixed point equation:
 \[ L_a \cong I + a \otimes L_a \]
@@ -517,7 +517,7 @@ Write a test that takes a list of integers, converts it to the \hask{Mu} form, a
 
 In general, there is no guarantee that the initial object in the category of algebras exists. But if it exists, Lambek's lemma tells us that it's a fixed point of the endofunctor for those algebras.  The construction of this fixed point is a little mysterious, since it involves tying the recursive knot. 
 
-Loosely speaking, the fixed point is reached after we apply the functor infinitely many times. Then, applying it once more wouldn't change anything. Infinity plus one is still infinity. This idea can be made precise, if we take it one step at a time. For simplicity, let's consider algebras in the category of sets, which has all the nice properties.
+Loosely speaking, the fixed point is reached after we apply the functor infinitely many times. Then, applying it once more won't change anything. Infinity plus one is still infinity. This idea can be made precise if we take it one step at a time. For simplicity, let's consider algebras in the category of sets, which has all the nice properties.
 
 We've seen, in our examples, that building instances of recursive data structures always starts with the leaves. The leaves are the parts in the definition of the functor that don't depend on the type parameter: the \hask{NilF} of the list, the \hask{ValF} of the tree, the \hask{Nothing} of the \hask{Maybe}, etc. 
 
@@ -525,7 +525,7 @@ We can tease them out if we apply our functor $F$ to the initial object---the em
 
 Indeed, the only inhabitant of the type \hask{Maybe Void} is constructed using \hask{Nothing}. The only inhabitants of the type \hask{ExprF Void} are \hask{ValF n}, where \hask{n} is an \hask{Int}.
 
-In other words, $F 0$ is the ``type of leaves'' for the functor $F$. Leaves are trees of depth one. For the \hask{Maybe} functor there's only one---the type of leaves for this functor is a singleton:
+In other words, $F 0$ is the ``type of leaves'' for the functor $F$. Leaves are trees of depth one. For the \hask{Maybe} functor there's only one. The type of leaves for this functor is a singleton:
 \begin{haskell}
 m1 :: Maybe Void
 m1 = Nothing
@@ -542,7 +542,7 @@ m2' = Just Nothing
 
 We can continue this process, adding deeper and deeper trees at each step. In the $n$-th iteration, the type $F^n 0$ ($n$-fold application of $F$ to the initial object) describes all trees of depth up to $n$. However, for every $n$, there are still infinitely many trees of depth greater than $n$ that are not covered. 
 
-If we knew how to define $F^{\infty} 0$, we would cover all possible trees. The next best thing we could try is to add up all these partial trees and construct an infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. 
+If we knew how to define $F^{\infty} 0$, we would have covered all possible trees. The next best thing that we could try is to add up all those partial trees and construct an infinite sum type. Just like we have defined sums of two types, we can define sums of many types, including infinitely many. 
 
 An infinite sum (a coproduct):
 $$ \sum_{n = 0}^{\infty} F^n 0$$
@@ -603,7 +603,7 @@ But there is a way to get rid of all these duplicates. The trick is to replace t
 \]
 It's almost the same as the sum, but with additional arrows at the base of the cocone. These arrows are the cumulative liftings of the unique arrow $\mbox{!`}$ that goes from the initial object to $F 0$ (we called it \hask{absurd} in Haskell). The effect of these arrows is to collapse the set of infinitely many copies of the same tree down to just one representative. 
 
-To see that, consider for instance a tree of depth $n$. It can be first found as an element of $F^n 0$, that is to say, as an arrow $t \colon 1 \to F^n 0$. It is injected into the colimit $i$ as the composite $i_n \circ t$. 
+To see that, consider for instance a tree of depth $3$. It can be first found as an element of $F^3 0$, that is to say, as an arrow $t \colon 1 \to F^3 0$. It is injected into the colimit $i$ as the composite $i_3 \circ t$. 
 
 \[
  \begin{tikzcd}
@@ -614,48 +614,52 @@ To see that, consider for instance a tree of depth $n$. It can be first found as
  \\
  ...
  \arrow[r]
- & F^n 0 
- \arrow[r,  blue, "F^n (\mbox{!`})"]
- \arrow[d, blue, "i_n"]
- & F^{n+1} 0
- \arrow[dl, blue, "i_{n+1}"]
+ & F^3 0 
+ \arrow[r,  blue, "F^3 (\mbox{!`})"]
+ \arrow[d, blue, "i_3"]
+ & F^4 0
+ \arrow[dl, blue, "i_4"]
  \\
  &  i
   \end{tikzcd}
 \]
-The same shape of a tree is also found in $F^{n+1} 0$, as the composite $t' = F^n (\mbox{!`}) \circ t$. It is injected into the colimit as the composite $i_{n+1} \circ t' = i_{n+1} \circ F^n (\mbox{!`}) \circ t$. 
+The same shape of a tree is also found in $F^4 0$, as the composite $t' = F^3 (\mbox{!`}) \circ t$. It is injected into the colimit as the composite $i_4 \circ t' = i_4 \circ F^3 (\mbox{!`}) \circ t$. 
 
 This time, however, we have the commuting triangle--- the face of the cocone:
-\[i_{n+1} \circ F^n (\mbox{!`}) = i_n \]
+\[i_4 \circ F^3 (\mbox{!`}) = i_3 \]
 which means that:
-\[ i_{n+1} \circ t' =  i_{n+1} \circ F^n (\mbox{!`}) \circ t =  i_n \circ t\]
+\[ i_4 \circ t' =  i_4 \circ F^3 (\mbox{!`}) \circ t =  i_3 \circ t\]
 The two copies of the tree have been identified in the colimit. You can convince yourself that this procedure removes all duplicates.
+
+\subsection{The proof}
 
 We can  prove directly that $i = \text{Colim}\, \Gamma$ is the initial algebra. There is however one assumption that we have to make: the functor $F$ must preserve the colimits of $\omega$-chains. The colimit of $F \Gamma$ must be equal to $F i$.
 \[ \text{Colim} (F \Gamma) \cong F i \]
 Fortunately, this assumption holds in $\mathbf{Set}$\footnote{This is the consequence of the fact that colimits in $\Set$ are built from disjoint unions of sets.}. 
 
-Here's the sketch of the proof: First we'll construct an arrow $i \to F i$ and then an arrow $\iota \colon F i \to i$ in the opposite direction. We'll skip the proof that they are the inverse of each other. Then we'll show the universality of $(i, \iota)$ by constructing a catamorphism to an arbitrary algebra.
+Here's the sketch of the proof: To show the isomorphism, we'll first construct an arrow $i \to F i$ and then an arrow $\iota \colon F i \to i$ in the opposite direction. We'll skip the proof that they are the inverse of each other. Then we'll show the universality of $(i, \iota)$ by constructing a catamorphism to an arbitrary algebra.
 
-To construct the mapping $i \to F i$ we'll use the universality of the colimit. If we can construct a cocone from the chain $\Gamma$ to $\text{Colim} (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $\text{Colim} (F \Gamma)$. The latter, by our assumption that $F$ preserves colimits, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
+All subsequent proofs follow a simple pattern. We start with a universal cocone that defines a colimit. Then we construct another cocone based on the same chain. From universality, there must be a unique arrow from the colimit to the apex of this new cocone.
+
+We use this trick to construct the mapping $i \to F i$. If we can construct a cocone from the chain $\Gamma$ to $\text{Colim} (F \Gamma)$ then, by universality, there must be an arrow from $i$ to $\text{Colim} (F \Gamma)$. The latter, by our assumption that $F$ preserves colimits, is isomorphic to $F i$. So we'll have a mapping $i \to F i$.
 
 To construct this cocone, first notice that $\text{Colim} (F \Gamma$) is, by definition, the apex of a cocone $F \Gamma$. 
 
 \[
  \begin{tikzcd}
  F 0
- \arrow[r, "F \mbox{!`}"]
+ \arrow[r, blue, "F \mbox{!`}"]
  \arrow[ddrr, "j_1"']
  &  F (F 0)
-  \arrow[r, "F(F  \mbox{!`})"]
+  \arrow[r, blue, "F(F  \mbox{!`})"]
  \arrow[ddr, "j_2"]
 & F^3 0
-  \arrow[r, "F^3\mbox{!`}"]
+  \arrow[r, blue, "F^3\mbox{!`}"]
   \arrow[dd, "j_3"]
  & ...
  \arrow[r]
  & F^n 0
-  \arrow[r]
+  \arrow[r, blue]
  \arrow[ddll, "j_n"]
  & ...
  \\
@@ -685,18 +689,18 @@ The spokes of the cocone we are looking for, from $\Gamma$ to $\text{Colim} (F \
  & ...
  \\
  F 0
- \arrow[r, "F \mbox{!`}"]
+ \arrow[r, blue, "F \mbox{!`}"]
  \arrow[ddrr, red, "j_1"']
  &  F (F 0)
-  \arrow[r, "F(F  \mbox{!`})"]
+  \arrow[r, blue, "F(F  \mbox{!`})"]
  \arrow[ddr, red, "j_2"]
 & F^3 0
-  \arrow[r, "F^3\mbox{!`}"]
+  \arrow[r, blue, "F^3\mbox{!`}"]
   \arrow[dd, red, "j_3"]
  & ...
- \arrow[r]
+ \arrow[r, blue]
  & F^n 0
-  \arrow[r]
+  \arrow[r, blue]
  \arrow[ddll, red, "j_n"]
  & ...
  \\
@@ -712,15 +716,15 @@ Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be 
 \[
  \begin{tikzcd}
  & F 0
-  \arrow[r, "F\mbox{!`}"]
+  \arrow[r, blue, "F\mbox{!`}"]
   \arrow[d, red]
 & F (F 0)
-  \arrow[r, "F(F\mbox{!`})"]
+  \arrow[r, blue, "F(F\mbox{!`})"]
   \arrow[d, red]
  & ...
- \arrow[r]
+ \arrow[r, blue]
  & F^{n} 0
-  \arrow[r]
+  \arrow[r, blue]
   \arrow[d, red]
  & ...
  \\
@@ -744,7 +748,6 @@ Next, notice that the chain $F \Gamma$ is a sub-chain of $\Gamma$, so it can be 
  &&i
   \end{tikzcd}
 \]
-
 
 From the universality of the $\text{Colim} (F \Gamma)$ it follows that there is a mapping out 
 \[\text{Colim} (F \Gamma) \to i \]

@@ -285,10 +285,11 @@ What is the presheaf for which $R y$, in the adjunction formula, is the represen
 
 The definition of a limit also involves a natural isomorphism between hom-sets:
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim} D) \]
-The hom-set on the left is in the functor category. Its elements are cones, or natural transformations between the constant functor and the diagram functor. The one on the right is a hom-set in $\mathcal{C}$. 
+The hom-set on the left is in the functor category. Its elements are cones, or natural transformations between the constant functor $\Delta_x$ and the diagram functor $D$. The one on the right is a hom-set in $\mathcal{C}$. 
 
 In a category where all limits exist, we have the adjunction between these two functors:
 \[ \Delta_{(-)} \colon \mathcal{C} \to  [\cat J, \mathcal{C}] \]
+and:
 \[ \text{Lim}{(-)} \colon  [\cat J, \mathcal{C}] \to \mathcal{C} \]
 
 Dually, the colimit is described by the following natural isomorphism:
@@ -346,7 +347,7 @@ An adjunction is also defined as a pair of functors going in opposite directions
 
 The isomorphism that defines an adjunction works for any pair of objects $x$ and $y$
 \[  \mathcal{C} (L x, y) \cong \mathcal{D}( x , R y)\]
-so, in particular, we can replace $y$ with $L x$
+so, in particular, it works if we replace $y$ with $L x$
 \[  \mathcal{C} (L x, L x) \cong \mathcal{D}( x , R (L x))\]
 We can now use the Yoneda trick and pick the identity arrow $id_{L x}$ on the left. The isomorphism maps it to a unique arrow on the right, which we'll call $\eta_x$:
 \[ \eta_x \colon x \to R ( L x) \]
@@ -361,12 +362,12 @@ This is a pair of arrows that are exactly the two injections $\langle \text{Left
 
 We can do a similar trick by replacing $x$ with $R y$:
 \[  \mathcal{C} (L (R y), y) \cong \mathcal{D}( R y , R y)\]
-Corresponding to $id_{R y}$ on the right, we get a family of arrows on the left:
+Corresponding to $id_{R y}$ on the right, we get an arrow on the left:
 \[ \varepsilon_y \colon L (R y) \to y \]
-which form another natural transformation called the \emph{counit} of the adjunction:
+These arrows form another natural transformation called the \emph{counit} of the adjunction:
 \[ \varepsilon \colon L \circ R \to \text{Id}_{\mathcal{C}}  \]
 
-Notice that, if those two natural transformations were invertible, they would witness the equivalence of categories. But this kind of ``half-equivalence'' is even more interesting in the context of category theory. 
+Notice that, if those two natural transformations were invertible, they would witness the equivalence of categories. But even if they're not, this kind of ``half-equivalence'' is still very interesting in the context of category theory. 
 
 As an example, let's evaluate the counit of the product adjunction:
 \[  (\mathcal{C} \times \mathcal{C})( \Delta x,  \langle a, b \rangle ) \cong  \mathcal{C} (x, a \times b)  \]
@@ -424,7 +425,7 @@ or, pictorially:
   \end{tikzcd}
 \]
 
-It turns out that an adjunction can be alternatively defined in terms of the two natural transformations, $\eta$ and $\varepsilon$ satisfying the  triangle identities:
+It turns out that an adjunction can be alternatively defined in terms of the two natural transformations, $\eta$ and $\varepsilon$, satisfying the  triangle identities:
 \begin{align*}
 (\varepsilon \circ L) \cdot (L \circ \eta) = id_L \\
 (R \circ \varepsilon) \cdot (\eta \circ R) = id_R
@@ -593,14 +594,14 @@ A morphism from $\langle d, f \rangle$ to $\langle d', f' \rangle$ is an arrow $
 
 \subsection{Universal arrow}
 
-The universal arrow from $L$ to $c$ is defined as the terminal object in the comma category $L / c$. Let's unpack this definition. The terminal object is a pair $\langle t, \tau \rangle$ with a unique morphism from any object $\langle d, f \rangle$. Such a morphism is an arrow $h \colon d \to t$ that satisfies the commuting condition:
+The universal arrow from $L$ to $c$ is defined as the terminal object in the comma category $L / c$. Let's unpack this definition. The terminal object in $L/c$ is a pair $\langle t, \tau \rangle$ with a unique morphism from any object $\langle d, f \rangle$. Such a morphism is an arrow $h \colon d \to t$ that satisfies the commuting condition:
 \[
  \begin{tikzcd}
  L d
  \arrow[rd, "f"']
- \arrow[rr, "L h"]
+ \arrow[rr, dashed, "L h"]
  && L t
- \arrow[ld, "\tau"]
+ \arrow[ld, red, "\tau"]
  \\
  &c
   \end{tikzcd}
@@ -619,9 +620,9 @@ We'd like to show that $\langle R c, \varepsilon_c \rangle$ is the terminal obje
  \begin{tikzcd}
  L d
  \arrow[rd, "f"']
- \arrow[rr, "L h"]
+ \arrow[rr, dashed, "L h"]
  && L (R c)
- \arrow[ld, "\varepsilon_c"]
+ \arrow[ld, red, "\varepsilon_c"]
  \\
  &c
   \end{tikzcd}
@@ -675,7 +676,7 @@ id_{R c}
 & h
  \end{tikzcd}
 \]
-The upper arrow then gives us the sought after equality $f = \varepsilon_c \circ L h$.
+The upper arrow then gives us the sought after equality $f = (- \circ L h) \varepsilon_c = \varepsilon_c \circ L h$.
 
 \subsection{Adjunction from universal arrows}
 
@@ -689,12 +690,13 @@ These results will help us prove the Freyd's adjoint functor theorem.
 
 \subsection{Left adjoints preserve colimits}
 
-Colimits were defined as universal cocones. For every cocone---that is a natural transformation from the diagram $D \colon \cat J \to \cat C$ to the constant functor $\Delta_x$---there is a unique factorizing morphism from the colimit $\text{Colim}\, D$ to $x$. This condition can be written as a one-to-one correspondence between the set of cocones and a hom-set:
+We defined colimits as universal cocones. For every cocone---that is a natural transformation from the diagram $D \colon \cat J \to \cat C$ to the constant functor $\Delta_x$---there's supposed to be a unique factorizing morphism from the colimit $\text{Colim}\, D$ to $x$. This condition can be written as a one-to-one correspondence between the set of cocones and a particular hom-set:
 \[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim} \, D, x) \]
 The factorizing condition is encoded in the naturality of this isomorphism.
 
-It turns out that the set of cocones, which is itself an object in $\Set$, is a limit of the following $\Set$-valued functor $F \colon \cat J \to \Set$:
+It turns out that the set of cocones, which is an object in $\Set$, is itself a \emph{limit} of the following $\Set$-valued functor $F \colon \cat J \to \Set$:
 \[ F j = \cat C(D j, x) \]
+
 To show this, we'll start with the limit of $F$ and end up with the set of cocones. You may recall that a limit of a $\Set$-valued functor is equal to a set of cones with the apex $1$ (the singleton set). In our case, each such cone describes a selection of morphisms from the corresponding hom-set $\cat C(D j, x)$:
 \[
  \begin{tikzcd}
@@ -735,7 +737,11 @@ The commuting conditions for the cone with the apex $1$ are simultaneously the c
 
 We can therefore replace the original set of cocones with the limit of $\cat C (D-, x)$ to get:
 \[ \text{Lim}\; \cat C (D-, x) \cong \cat C( \text{Colim}\,  D, x) \]
-The limit of a (contravariant) hom-functor acting on a diagram $D$ is isomorphic to the hom-functor acting on a colimit of this diagram. This is usually abbreviated to: The hom-functor preserves colimits. 
+The contravariant hom-functor is sometimes notated as:
+\[ h_x = \cat C(-, x) \]
+In this notation we can write:
+\[ Lim \, (h_x \circ D) \cong h_x (Colim \, D) \]
+The limit of a hom-functor acting on a diagram $D$ is isomorphic to the hom-functor acting on a colimit of this diagram. This is usually abbreviated to: The hom-functor preserves colimits. (With the understanding that the contravariant hom-functor turns colimits into limits.)
 
 A functor that preserves colimits is called \index{co-continuous functor}co-continuous. Thus the contravariant hom-functor is co-continuous.
 
@@ -743,7 +749,7 @@ Now suppose that we have the adjunction $L \dashv R$, where $L \colon \cat C \to
 \[ L (\text{Colim} \, D) \cong \text{Colim} (L \circ D) \]
 for any diagram $D \colon \cat J \to \cat C$ for which the colimit exists.
 
-We'll use the Yoneda lemma to show that the mappings out from both sides to an arbitrary $x$ are isomorphic:
+We'll use the Yoneda lemma to show that the mappings out of both sides to an arbitrary $x$ are isomorphic:
 \[ \cat D( L (\text{Colim} \, D), x) \cong \cat D (\text{Colim} (L \circ D), x) \]
 We apply the adjunction to the left hand side to get:
 \[ \cat D( L (\text{Colim} \, D), x) \cong \cat C (\text{Colim}\, D, R x) \]
@@ -753,6 +759,7 @@ Using the adjunction again, we get:
 \[ \cong \text{Lim}\; \cat D((L \circ D) -, x) \]
 And the second application of preservation of colimits gives us the desired result:
 \[ \cong  \cat D((\text{Colim}\;(L \circ D), x) \]
+Since this is true for any $x$, we get our result.
 
 We can use this result to reformulate our earlier proof of distributivity in a cartesian closed category. We use the fact that the product is the left adjoint of the exponential. Left adjoints preserve colimits. A coproduct is a colimit, therefore:
 \[(b + c) \times a \cong b \times a + c \times a \]
@@ -776,7 +783,7 @@ Indeed, we have:
 
 \section{Freyd's adjoint functor theorem}
 
-In general functors are lossy---the are not invertible. In some cases we can make up for the lost information by replacing it with the ``best guess.'' If we do it in an organized manner, we end up with an adjunction. The question is: given a functor between two categories, what are the conditions under which we can construct its adjoint. 
+In general functors are lossy---the are not invertible. In some cases we can make up the lost information by replacing it with the ``best guess.'' If we do it in an organized manner, we end up with an adjunction. The question is: given a functor between two categories, what are the conditions under which we can construct its adjoint. 
 
 The answer to this question is given by the Freyd's adjoint functor theorem. At first it might seem like this is a technical theorem involving a very abstract construction called the solution set condition. We'll see later that this condition translates directly to a programming technique called defunctionalization. 
 
@@ -853,7 +860,7 @@ The important observation is that this comma category describes a cocone in $\ca
   \end{tikzcd}
 \]
 
-The base of this cocone can be projected back to $\cat D$. There is a projection $\pi_c$ which maps every pair $(d, f)$ in  $L/c$ back to $d$, thus forgetting the arrow $f$. It also maps every morphism in $L/c$ to an arrow in $\cat D$ that gave rise to it. This way $\pi_c$ defines a diagram in $\cat D$. The colimit of this diagram exists, because we have assumed that all colimits exist in $\cat D$. Let's call this colimit $t_c$:
+The base of this cocone can then be projected back to $\cat D$. There is a projection $\pi_c$ which maps every pair $(d, f)$ in  $L/c$ back to $d$, thus forgetting the arrow $f$. It also maps every morphism in $L/c$ to an arrow in $\cat D$ that gave rise to it. This way $\pi_c$ defines a diagram in $\cat D$. The colimit of this diagram exists, because we have assumed that all colimits exist in $\cat D$. Let's call this colimit $t_c$:
 \[ t_c = \text{colim}\; \pi_c \]
 
 \[
@@ -907,7 +914,7 @@ We now have two cocones in $\cat C$ with the same base: the original one with th
 
 \[ \text{colim} \; (L \circ \pi_c) = L ( \text{colim} \; \pi_c) = L t_c\]
 
-By universal construction, we deduce that there must be a unique cocone morphism from the colimit $L t_c$ to $c$. That morphism, which we'll call $\varepsilon_c$, makes the relevant triangles commute. 
+By universal construction, we deduce that there must be a unique cocone morphism from the colimit $L t_c$ to $c$. That morphism, which we'll call $\varepsilon_c$, makes all the relevant triangles commute. 
 
 What remains to be shown is that $\langle t_c, \varepsilon_c \rangle$ is terminal in $L/c$, that is, for any  $\langle d, f \colon L d \to c \rangle$ there is a unique comma-category morphism $h \colon d \to t_c$ that makes the following triangle commute:
 
@@ -915,15 +922,15 @@ What remains to be shown is that $\langle t_c, \varepsilon_c \rangle$ is termina
  \begin{tikzcd}
  L d
  \arrow[rd, "f"']
- \arrow[rr, "L h"]
+ \arrow[rr, dashed, "L h"]
  && L t_c
- \arrow[ld, "\varepsilon_c"]
+ \arrow[ld, red, "\varepsilon_c"]
  \\
  &c
   \end{tikzcd}
 \]
 
-Notice that any such $d$ is automatically part of the diagram produced by $\pi_c$ (it's the result of $\pi_c$ acting on $\langle d, f \rangle$). We know that $t_c$ is the limit of this diagram. So there must be a wire from $d$ to $t_c$ in the limiting cocone. We pick this wire as our $h$. 
+Notice that any such $d$ is automatically part of the diagram produced by $\pi_c$ (it's the result of $\pi_c$ acting on $\langle d, f \rangle$). We know that $t_c$ is the limit of the $\pi_c$ diagram. So there must be a wire from $d$ to $t_c$ in the limiting cocone. We pick this wire as our $h$. 
 
 \[
 \begin{tikzpicture}
@@ -978,17 +985,17 @@ Notice that any such $d$ is automatically part of the diagram produced by $\pi_c
 
 \end{tikzpicture}
 \]
-The commuting condition then follows from $\varepsilon_c$ being a cocone morphism. It is unique such morphism simply because $\cat D$ is a preorder.
+The commuting condition then follows from $\varepsilon_c$ being a morphism between two cocones. It is a unique cocone morphism simply because $\cat D$ is a preorder.
 
 This proves that there is a universal arrow $\langle t_c, \varepsilon_c \rangle$ for every $c$, therefore we have a functor $R$ defined on objects as $R c = t_c$ that is the right adjoint to $L$.
 
 \subsection{Solution set condition}
 
-The problem with the previous proof is that comma categories in most practical cases are large: their objects don't form a set. But maybe we can approximate the comma category by selecting a smaller but representative set of objects and arrows. 
+The problem with the previous proof is that comma categories in most practical cases are large: their objects don't form a set. But maybe we can approximate the comma category by selecting a smaller but representative set of objects and arrows?
 
-To select the objects we'd use a mapping from some indexing set $I$. We define a set of objects $d_i$ where $i \in I$. Since we are trying to approximate the comma category $L/c$, we select objects together with arrows $f_i \colon L d_i \to c$. 
+To select the objects, we'd use a mapping from some indexing set $I$. We define a set of objects $d_i$ where $i \in I$. Since we are trying to approximate the comma category $L/c$, we select objects together with arrows $f_i \colon L d_i \to c$. 
 
-The relevant part of the comma category was encoded in morphism between objects satisfying the commuting condition. We could try to specialize this condition to only apply inside our family of objects, but that would not be enough. We have to find a way to probe all other objects of the comma category. 
+The relevant part of the comma category is encoded in morphism between objects satisfying the commuting condition. We could try to specialize this condition to only apply inside our family of objects, but that would not be enough. We have to find a way to probe all other objects of the comma category. 
 
 To do this, we reinterpret the commuting condition as a recipe for factorizing an arbitrary $f \colon L d \to c$ through some pair $\langle d_i, f_i \rangle$:
 \[
@@ -1018,7 +1025,7 @@ A dual version of the adjoint functor theorem can be used to construct the left 
 
 \subsection{Defunctionalization}
 
-Every programming language lets us define functions, but not all languages support higher level functions (functions taking functions as arguments, or returning functions) or anonymous functions (a.k.a., lambdas). It turns out that, even in such languages, higher order functions can be implemented using the process called defunctionalization. This technique is based on the adjoint functor theorem. Moreover, defunctionalization can be used whenever passing functions around is impractical, for instance in distributed systems.
+Every programming language lets us define functions, but not all languages support higher level functions (functions taking functions as arguments, functions returning functions, or data types constructed from functions) or anonymous functions (a.k.a., lambdas). It turns out that, even in such languages, higher order functions can be implemented using the process called defunctionalization. This technique is based on the adjoint functor theorem. Moreover, defunctionalization can be used whenever passing functions around is impractical, for instance in a distributed system.
 
 The idea behind defunctionalization is that the function type is defined as the right adjoint to the product. 
 \[ \cat C(e \times a, b) \cong \cat C(e, b^a) \]
@@ -1026,7 +1033,7 @@ The adjoint functor theorem can be used to approximate this adjoint.
 
 In general, any finite program can only have a finite number of function definitions. These functions (together with the environments they capture) form the solution set that we can use to construct the function type. In practice, we do it only for a small subset of functions which occur as arguments to, or are returned from, other functions.
 
-A typical example of the usage of higher order functions is in continuation passing style. For instance, here's a function that calculates the sum of the elements of a list. But instead of returning the sum it calls a continuation \hask{k}:
+A typical example of the usage of higher order functions is in continuation passing style. For instance, here's a function that calculates the sum of the elements of a list. But instead of returning the sum it calls a continuation \hask{k} with the result:
 \begin{haskell}
 sumK :: [Int] -> (Int -> r) -> r
 sumK [] k = k 0
@@ -1049,17 +1056,21 @@ sumList as = sumK as (\i -> i)
 
 Anonymous functions are convenient, but nothing prevents us from using named functions. However, if we want to factor out the continuations, we have to be explicit about passing in the environments. 
 
-For instance, we can replace our first lambda with the function \hask{more}, but we have to explicitly pass it the environment of the type \hask{(Int, Int -> r)}:
+For instance, we can replace our first lambda:
+\begin{haskell}
+\s -> k (i + s)
+\end{haskell}
+with the function \hask{more}, but we have to explicitly pass the pair \hask{(i, k)} as the environment of the type \hask{(Int, Int -> r)}:
 \begin{haskell}
 more :: (Int, Int -> r) -> Int -> r
 more (i, k) s = k (i + s)
 \end{haskell}
-The other lambda, the identity, uses an empty environment:
+The other lambda, the identity, uses the empty environment, so it becomes:
 \begin{haskell}
 done :: Int -> Int
 done i = i
 \end{haskell}
-Here's the implementation of our algorithm using named functions:
+Here's the implementation of our algorithm using these two named functions:
 \begin{haskell}
 sumK' :: [Int] -> (Int -> r) -> r
 sumK' [] k = k 0
@@ -1088,25 +1099,44 @@ data Comma a b e = Comma e ((e, a) -> b)
 \end{haskell}
 A morphism in this category between $(e, f)$ and $(e', f')$ is an arrow $h \colon e \to e'$, which satisfies the commuting condition:
 \[ f' \circ h = f \]
-We interpret this morphism as ``reducing'' the environment. The arrow $f'$ is able to produce the same output of the type $b$ using a potentially smaller environment given by $h (e)$. For instance $e$ may contain variables that are irrelevant for computing $b$ from $a$, and $h$ projects them out. 
+We interpret this morphism as ``reducing'' the environment $e$ down to $e'$. The arrow $f'$ is able to produce the same output of the type $b$ using a potentially smaller environment given by $h (e)$. For instance $e$ may contain variables that are irrelevant for computing $b$ from $a$, and $h$ projects them out. 
 
-In fact, we performed this kind of reduction when defining \hask{more} and \hask{done}. In principle, we could have passed \hask{is} to both functions, since it's accessible at the point of call. But we know that they don't need it.
+\[
+ \begin{tikzcd}
+ e \times a
+ \arrow[rd, "f"']
+ \arrow[rr, "h \times a"]
+ && e' \times a
+ \arrow[ld, "f'"]
+ \\
+ &b
+  \end{tikzcd}
+ \hspace{30pt}
+\begin{tikzcd}
+ e
+ \arrow[rr, "h"]
+ && e'
+  \end{tikzcd}
+\]
 
-Formally, we could define the function object $a \to b$ as the colimit of the diagram defined by the comma category. Such a colimit is essentially a giant coproduct of all environments modulo identifications given by comma-category morphisms. These identification do the job of reducing the environment needed by $a \to b$ to the bare minimum. 
+
+In fact, we performed this kind of reduction when defining \hask{more} and \hask{done}. In principle, we could have passed the tail \hask{is} to both functions, since it's accessible at the point of call. But we knew that they didn't need it.
+
+Using the Freyd's theorem, we could define the function object $a \to b$ as the colimit of the diagram defined by the comma category. Such a colimit is essentially a giant coproduct of all environments modulo identifications given by comma-category morphisms. These identification do the job of reducing the environment needed by $a \to b$ to the bare minimum. 
 
 In our example, the continuations we're interested in are functions \hask{Int -> Int}. In fact we are not interested in generating the generic function type \hask{Int -> Int}; just the minimal one that would accommodate our two functions \hask{more} and \hask{done}. We can do it by creating a very small solution set. 
 
-In our case the solution set consists of pairs $(e_i, f_i \colon L_a e_i \to b)$ such that any pair $(e, f \colon L_a e \to b)$ can be factorized through one of the $f_i$'s. More precisely, the only two environments we're interested in are \hask{(Int, Int ->Int)} for \hask{more}, and the empty environment \hask{()} for \hask{done}. 
+In our case the solution set consists of pairs $(e_i, f_i \colon e_i \times a \to b)$ such that any pair $(e, f \colon e \times a \to b)$ can be factorized through one of the $f_i$'s. More precisely, the only two environments we're interested in are \hask{(Int, Int ->Int)} for \hask{more}, and the empty environment \hask{()} for \hask{done}. 
 
 In principle, our solution set should allow for the factorization of every object of the comma category, that is a pair of the type:
 \begin{haskell}
 (e, (e, Int) -> Int)
 \end{haskell}
-but here we are only interested in two specific functions. Also, we are not concerned about the uniqueness of the representation so, instead of using a colimit (as we did for the adjoint functor theorem), we'll just use a coproduct of all the environments of interest. We end up with the following data type that is the sum of the two environments we're interested in:
+but here we are only interested in two specific functions. Also, we are not concerned with the uniqueness of the representation so, instead of using a colimit (as we did for the adjoint functor theorem), we'll just use a coproduct of all the environments of interest. We end up with the following data type that is the sum of the two environments, \hask{()} and \hask{(Int, Int -> Int)}, we're interested in. We end up with the type:
 \begin{haskell}
 data Kont = Done | More Int Kont
 \end{haskell}
-Notice that we have recursively encoded the \hask{Int -> Int} part of the environment (the one we used for \hask{more}) as \hask{Kont}. 
+Notice that we have recursively encoded the \hask{Int->Int} part of the environment as \hask{Kont}. Thus we have also removed the need to use functions as arguments to data constructors.
 
 If you look at this definition carefully, you will discover that it's the definition of a list of \hask{Int}, modulo some renamings. Every call to \hask{More} pushes another integer on the \hask{Kont} stack. This interpretation agrees with our intuition that recursive algorithms require some kind of a runtime stack. 
 
@@ -1116,6 +1146,13 @@ apply :: (Kont, Int) -> Int
 apply (Done, i) = i
 apply (More i k, s) = apply (k, i + s)
 \end{haskell}
+Compare this with our earlier:
+\begin{haskell}
+done i = i
+more (i, k) s = k (i + s)
+\end{haskell}
+
+
 The main algorithm can now be rewritten without any higher order functions or lambdas:
 \begin{haskell}
 sumK'' :: [Int] -> Kont -> Int
@@ -1127,7 +1164,7 @@ sumK'' (i : is) k = sumK'' is (More i k)
 sumList'' is = sumK'' is Done
 \end{haskell}
 
-The main advantage of defunctionalization is that it can be used in distributed environments. Arguments to remote functions, as long as they are data structures and not functions, can be serialized and send along the wire. All that's needed is for the receiver have access to \hask{apply}. 
+The main advantage of defunctionalization is that it can be used in distributed environments. Arguments to remote functions, as long as they are data structures and not functions, can be serialized and send along the wire. All that's needed is for the receiver is have access to \hask{apply}. 
 
 \section{Free/Forgetful Adjunctions}
 The two functors in the adjunction play different roles: the picture of the adjunction is not symmetric. Nowhere is this illustrated better than in the case of the free/forgetful adjunctions. 
@@ -1162,7 +1199,7 @@ A classic example of a free/forgetful adjunction is the construction of the free
 
 
 \subsection{The category of monoids}
-Monoids in a monoidal category $\mathcal{C}$ form their own category $\mathbf{Mon}(\mathcal{C})$. Its objects are monoids, and its arrows are the arrows in $\mathcal{C}$ that preserve the monoidal structure. 
+Monoids in a monoidal category $\mathcal{C}$ form their own category $\mathbf{Mon}(\mathcal{C})$. Its objects are monoids, and its arrows are the arrows of $\mathcal{C}$ that preserve the monoidal structure. 
 
 The following diagram explains what it means for $f$ to be a monoid morphism, going from a monoid $(M_1, \eta_1, \mu_1)$ to a monoid $(M_2, \eta_2, \mu_2)$:
 \[
@@ -1190,7 +1227,7 @@ Remember, the tensor product $\otimes$ is functorial, so it can lift pairs of ar
 
 In particular, the category $\mathbf{Set}$ is monoidal, with cartesian product and the terminal object providing the monoidal structure. 
 
-Monoids in $\mathbf{Set}$ are sets with additional structure. They form their own category $\mathbf{Mon}(\mathbf{Set})$ and there is a forgetful functor $U$ that simply maps the monoid to the set of its elements. When we say that a monoid is a set, we mean the underlying set.
+In particular, monoids in $\mathbf{Set}$ are sets with additional structure. They form their own category $\mathbf{Mon}(\mathbf{Set})$ and there is a forgetful functor $U$ that simply maps the monoid to the set of its elements. When we say that a monoid is a set, we mean the underlying set.
 
 \subsection{Free monoid}
 
@@ -1198,9 +1235,9 @@ We want to construct the free functor
 \[ F \colon \mathbf{Set} \to \mathbf{Mon}(\mathbf{Set})\]
 that is adjoint to the forgetful functor $U$. 
 
-We start with an arbitrary set $X$ and an arbitrary monoid $m$. On the right-hand side of the adjunction we have the set of functions between two sets, $X$ and $U m$. On the left-hand side, we have a set of highly constrained structure-preserving monoid morphisms from $F X$ to $m$. How can these two sets be isomorphic?
+We start with an arbitrary set $X$ and an arbitrary monoid $m$. On the right-hand side of the adjunction we have the set of functions from $X$ to $U m$. On the left-hand side, we have a set of highly constrained structure-preserving monoid morphisms from $F X$ to $m$. How can these two hom-sets be isomorphic?
 
-In  $\mathbf{Mon}(\mathbf{Set})$, monoids are just sets of elements, and a monoid morphism is a function between such sets, satisfying additional constraints: preserving unit and multiplication. 
+In  $\mathbf{Mon}(\mathbf{Set})$, monoids are sets of elements, and monoid morphisms are functions between such sets, satisfying additional constraints: preserving unit and multiplication. 
 
 Arrows in $\mathbf{Set}$, on the other hand, are just functions with no additional constraints. So, in general, there are fewer arrows between monoids than there are between their underlying sets. 
 
@@ -1226,7 +1263,7 @@ m
 
 Here's the idea: if we want to have a one to one matching between arrows, we want $F X$ to be much larger than $X$. This way, there will be many more functions from it to $m$---so many that, even after rejecting the ones that don't preserve the structure, we'll still have enough to match every function $f \colon X \to U m$.
 
-We'll construct the monoid $F X$ starting from the set $X$, and adding more and more elements as we go. We'll call the initial set $X$ the \index{generators of a monoid}\emph{generators} of $F X$. We'll construct a monoid morphism $g \colon F X \to m$ starting from the original function $f$ and extending it to more and more elements.
+We'll construct the monoid $F X$ starting from the set $X$, and adding more and more elements as we go. We'll call the initial set $X$ the \index{generators of a monoid}\emph{generators} of $F X$. We'll construct a monoid morphism $g \colon F X \to m$ starting with the original function $f$ and extending it to act on more and more elements.
 
 On generators, $x \in X$, $g$ works the same as $f$:
 \[ g x = f x \]
@@ -1239,7 +1276,7 @@ We also have to define monoidal multiplication in $F X$. Let's start with a prod
 
 Continuing with this construction, any new multiplication produces a new element of $F X$, except when it can be reduced to an existing element by applying monoid laws. For instance, the new unit $e$ times a generator $a$ must be equal to $a$. But we have made sure that $e$ is mapped to the unit of $m$, so the product $g e \cdot g a$ is automatically equal to $g a$.
 
-Another way of looking at this construction is to think of the set $X$ as an alphabet. The elements of $F X$ are then strings of characters from this alphabet. The generators are single-letter strings, $``a"$, $``b"$, and so on. The unit is an empty string , $``"$. Multiplication is string concatenation, so  $``a"$ times $``b"$ is a new string  $``ab"$. Concatenation is automatically associative and unital, with the empty string as the unit.
+Another way of looking at this construction is to think of the set $X$ as an alphabet. The elements of $F X$ are then strings of characters from this alphabet. The generators are single-letter strings, ``$a$'', ``$b$'', and so on. The unit is an empty string ``''. Multiplication is string concatenation, so  ``$a$'' times ``$b$'' is a new string ``$ab$''. Concatenation is automatically associative and unital, with the empty string as the unit.
 
 The intuition behind free functors is that they generate structure ``freely,'' as in ``with no additional constraints.'' They also do it lazily: instead of performing operations, they just record them. They create generic domain-specific programs that can be executed later by specific interpreters.
 
@@ -1257,7 +1294,7 @@ class Monoid m where
   mappend :: m -> m -> m
   mempty  :: m
 \end{haskell}
-Here, \hask{mappend} is the curried form of the mapping from the product: \hask{(m, m) -> m}. The \hask{mempty} element corresponds to the arrow from the terminal object (unit of the monoidal category), or simply and element of \hask{m}. 
+Here, \hask{mappend} is the curried form of the mapping from the product: \hask{(m, m) -> m}. The \hask{mempty} element corresponds to the arrow from the terminal object (unit of the monoidal category), or simply an element of \hask{m}. 
 
 A free monoid generated by some type \hask{a}, which serves as a set of generators, is represented by a list type \hask{[a]}. An empty list serves as the unit; and monoid multiplication is implemented as list concatenation, traditionally written in infix form:
 \begin{haskell}

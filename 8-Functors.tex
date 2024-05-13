@@ -5,7 +5,7 @@
 \chapter{Functors}
 \section{Categories}
 
-So far we've only seen one category---that of types and functions. So let's quickly gather the essential info about a category.
+So far we've only seen only one category---that of types and functions. So let's quickly gather the essential info about a category.
 
 A category is a collection of objects and arrows that go between them. Every pair of composable arrows can be composed. The composition is associative, and there is an identity arrow looping back on every object.
 
@@ -23,14 +23,14 @@ id x = x
 \end{haskell}
 You can easily convince yourself that such composition is associative, and composing with \hask{id} does nothing to a function.
 
-Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call \index{stick-figure category}stick-figure categories---categories with a small handful of objects and arrows.
+Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another one that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call \index{stick-figure category}stick-figure categories---categories with a small handful of objects and arrows.
 \subsection{Category of sets}
 
 We can also strip a category of all arrows (except for the identity arrows). Such a bare-object category is called a \index{discrete category}\emph{discrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
 
 Sets form their own category called $\mathbf{Set}$\footnote{Again, ignoring ``size'' issues, in particular the non-existence of the set of all sets.}. The objects in that category are sets, and the arrows are functions between sets. Such functions are defined as special kind of relations, which themselves are defined as sets of pairs.
 
-To the lowest approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. There's nothing wrong with that. In fact all of categorical construction we've described so far have their set-theoretical roots. The categorical product is a generalization of the cartesian product of sets, the sum is the disjoint union, and so on. 
+To the lowest approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. There's nothing wrong with that. In fact all of categorical constructions we've described so far have their set-theoretical roots. The categorical product is a generalization of the cartesian product of sets, the sum is the disjoint union, and so on. 
 
 What category theory offers is more precision: the fine distinction between the structure that is absolutely necessary, and the superfluous details. 
 
@@ -67,7 +67,7 @@ A slice category $\cat C/c$ describes how a particular object $c$ is seen from t
 
 An object in the  \index{slice category}\emph{slice category} $\mathcal{C}/c$ (also known as an \index{over category}over-category) is a pair $\langle e, p \rangle$, with $p \colon e \to c$.  
 
-An arrow between two objects $\langle e, p \rangle$ and $\langle e', p' \rangle$ is an arrow $f \colon e \to e'$ of $\cat C$ which makes the following triangle commute:
+An arrow between two objects $\langle e, p \rangle$ and $\langle e', p' \rangle$ is an arrow $f \colon e \to e'$ of $\cat C$, which makes the following triangle commute:
 
 \[
  \begin{tikzcd}
@@ -252,14 +252,14 @@ The \hask{Maybe} type constructor maps \hask{a} to \hask{Maybe a}.
 
 The second part of an endofunctor is the mapping of arrows. Given a function \hask{a -> b}, we want to be able to define a function \hask{List a -> List b}, or \hask{Maybe a -> Maybe b}. This is the ``functoriality'' property of these data types that we have discussed before. Functoriality lets us \index{lifting}\emph{lift} an arbitrary function to a function between transformed types.
 
-Functoriality can be expressed in Haskell using a \index{\hask{class}}\emph{typeclass}. In this case, the typeclass is parameterized by a type constructor \hask{f} (in Haskell we use lower case names for type-constructor variables). We say that \hask{f} is a \hask{Functor} if there is a corresponding mapping of functions called \hask{fmap}:
+Functoriality can be expressed in Haskell using a \index{\hask{typeclass}}\emph{typeclass}. In this case, the typeclass is parameterized by a type constructor \hask{f} (in Haskell we use lower case names for type-constructor variables). We say that \hask{f} is a \hask{Functor} if there is a corresponding mapping of functions called \hask{fmap}:
 \begin{haskell}
 class Functor f where
   fmap :: (a -> b) -> (f a -> f b)
 \end{haskell}
 The compiler knows that \hask{f} is a type constructor because it's applied to types, as in \hask{f a} and \hask{f b}.
 
-To prove to the compiler that a particular type constructor is a \hask{Functor}, we have to provide the implementation of \hask{fmap} for it. This is done by defining an \index{\hask{instance}}\emph{instance} of the typeclass \hask{Functor}. For example:
+To prove to the compiler that a particular type constructor is a \hask{Functor}, we have to provide the implementation of \hask{fmap} for it. This is done by defining an \index{class instance}\index{\hask{instance}}\emph{instance} of the typeclass \hask{Functor}. For example:
 \begin{haskell}
 instance Functor Maybe where
   fmap g Nothing  = Nothing
@@ -294,7 +294,7 @@ This type constructor ignores its second argument.
 
 
 \begin{exercise}
-Show that \hask{(Const c)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but here it's partially applied to the first argument. It is functorial in the second argument.
+Show that \hask{(Const c)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but in the \hask{Functor} instance it's partially applied to the first argument. It is functorial in the second argument.
 \end{exercise}
 
 
@@ -336,7 +336,7 @@ class Contravariant f where
   contramap :: (b -> a) -> (f a -> f b)
 \end{haskell}
 
-It's often convenient to think of functors in terms of producers and consumers. In this picture, a (covariant) functor is a producer. You can turn a producer of \hask{a}'s to a producer of \hask{b}'s by applying (using \hask{fmap}) a function \hask{a->b}. Conversely, to turn a consumer of \hask{a}'s to a consumer of \hask{b}'s you need a function going in the opposite direction, \hask{b->a}. 
+It's often convenient to think of functors in terms of producers and consumers. In this analogy, a (covariant) functor is a producer. You can turn a producer of \hask{a}'s into a producer of \hask{b}'s by applying (using \hask{fmap}) a function \hask{a->b}. Conversely, to turn a consumer of \hask{a}'s to a consumer of \hask{b}'s you need a function going in the opposite direction, \hask{b->a}. 
 
 Example: A predicate is a function returning \hask{True} or \hask{False}:
 \begin{haskell}
@@ -348,7 +348,7 @@ instance Contravariant Predicate where
   contramap f (Predicate h) = Predicate (h . f)
 \end{haskell}
 
-The only non-trivial examples of contravariant functors are variations on the theme of function objects. 
+In practice, the only non-trivial examples of contravariant functors are variations on the theme of function objects. 
 
 One way to tell if a given function type is covariant or contravariant in one of the type arguments is by assigning polarities to the types used in its definition. We say that the return type of a function is in a \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then its polarities get reversed. 
 
@@ -356,7 +356,7 @@ Consider this data type:
 \begin{haskell}
 data Tester a = Tester ((a -> Bool) -> Bool)
 \end{haskell}
-It has \hask{a} in a double-negative, therefore a positive position. This is why it's a covariant \hask{Functor}. It's a producer of \hask{a}'s:
+It has \hask{a} in a double-negative, therefore a positive position. This is why it's a covariant \hask{Functor}. It acts as a producer of \hask{a}'s:
 
 \begin{haskell}
 instance Functor Tester where
@@ -378,7 +378,7 @@ class Profunctor f where
   dimap :: (a' -> a) -> (b -> b') -> (f a b -> f a' b')
 \end{haskell}
 
-You can think of a profunctor as a type that's simultaneously a producer and a consumer. It consumes one type and produces another.
+You may think of a profunctor as a type that's simultaneously a producer and a consumer. It consumes one type and produces another.
 
 The function type, which can be written as an infix operator \hask{(->)}, is an instance of \hask{Profunctor}
 \begin{haskell}

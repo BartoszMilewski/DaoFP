@@ -10,7 +10,7 @@ Lao Tzu says: ``The value comes from what is there, but the use comes from what 
 
 What does the \hask{Maybe} functor, the list functor, and the reader functor have in common? They all have emptiness in their center. 
 
-When monads are explained in the context of programming, it's hard to see the common pattern when you focus on the functors. To understand monads you have to look inside functors and at the junction between functions.
+When monads are explained in the context of programming, it's hard to see the common pattern when you focus on the functors. To understand monads you have to look inside functors and read between the lines of code.
 
 \section{Programming with Side Effects}
 
@@ -22,9 +22,9 @@ A pure function is implemented purely in terms of its arguments and, in case of 
 
 Most real-world programs, though, have to interact with the external world: they read and write files, process network packets, prompt users for data, etc. Most programming languages solve this problem by allowing side effect. A side effect is anything that breaks the totality or the purity of a function. 
 
-Unfortunately, this shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful computations one has to carefully reason about the composition of effects on a case-by-case basis. To make things even harder, most effects are hidden inside the implementation of a function and all the functions it's calling, recursively.
+Unfortunately, this shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful computations one has to carefully reason about the composition of effects on a case-by-case basis. To make things even harder, most effects are hidden not only inside the implementation (as opposed to the interface) of a particular function, but also in the implementation of all the functions that it's calling, recursively.
 
-The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return type of a pure function. Amazingly, this is possible for all relevant effects. 
+The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return types of pure functions. Amazingly, this is possible for all relevant effects. 
 
 The idea is that, instead of a computation of the type \hask{a->b} with side effects, we use a function \hask{ a -> f b}, where the type constructor \hask{f} encodes the appropriate effect. At this point there are no conditions imposed on \hask{f}. It doesn't even have to be a \hask{Functor}, much less a monad. This will come later, when we talk about effect composition.
 
@@ -105,7 +105,7 @@ Imagine performing a quantum experiment that measures the spin of an electron. H
 
 What does it mean for a function to be non-deterministic? It means that it will return different results every time it's called. We can model this behavior using the many-worlds interpretation: we let the function return \emph{all possible results} at once. In practice, we'll settle for a (possibly infinite) list of results:
 
-We replace a non-deterministic computation \hask{ a -> b } with a pure function returning a functor-ful of results---this time it's the list functor:
+We replace a non-deterministic computation \hask{ a -> b } with a pure function returning a functorful of results---this time it's the list functor:
 \begin{haskell}
 a -> [b]
 \end{haskell}
@@ -256,7 +256,7 @@ Conversely, \hask{join} can be implemented in terms of \hask{<=<}:
 \begin{haskell}
 join = id <=< id
 \end{haskell}
-This may not be immediately obvious, until you realize that the rightmost \hask{id} is applided to \hask{m (m a)}, and the leftmost is applied to \hask{m a}. We interpret a Haskell function:
+The latter may not be immediately obvious, until you realize that the rightmost \hask{id} is applided to \hask{m (m a)}, and the leftmost is applied to \hask{m a}. We interpret a Haskell function:
 \begin{haskell}
 m (m a) -> m (m a)
 \end{haskell}
@@ -278,7 +278,7 @@ class Functor m => Monad m where
 
 This is still not the definition you will find in the standard Haskell \hask{Prelude}. Since the fish operator is a generalization of the dot operator, using it is equivalent to point-free programming. It lets us compose arrows without naming intermediate values. Although some consider point-free programs more elegant, most programmers find them difficult to follow. 
 
-But function composition is really done in two steps: We apply the first function, then apply the second function to the result. Explicitly naming the intermediate result is often helpful in understanding of what's going on.
+But function composition is really done in two steps: We apply the first function, then apply the second function to the result. Explicitly naming the intermediate result is often helpful in understanding what's going on.
 
 To do the same with Kleisli arrows, we have to know how to apply the second Kleisli arrow to a named monadic value---the result of the first Kleisli arrow. The function that does that is called \emph{bind} and is written as an infix operator:
 \begin{haskell}
@@ -413,7 +413,7 @@ and the second one modifies it:
 set :: s -> State s ()
 set s = State (\_ -> ((), s))
 \end{haskell}
-A lot of monads come with their own libraries of predefined basic Kleisli arrows
+A lot of monads come with their own libraries of predefined basic Kleisli arrows.
 \subsection{Nondeterminism}
 
 For the list monad, let's consider how we would implement \hask{join}. It must turn a list of lists into a single list. This can be done by concatenating all the inner lists using the library function \hask{concat}. From there, we can derive the implementation of bind.
@@ -550,7 +550,7 @@ Rewrite the \hask{pairs} function using the bind operators and lambdas.
 
 I mentioned before that the \hask{do} notation provides the syntactic sugar that makes working with continuations more natural. One of the most important applications of continuations is in transforming programs to use CPS (continuation passing style). The CPS transformation is common in compiler construction. Another very important application of CPS is in converting recursion to iteration. 
 
-The common problem with deeply recursive programs is that they may blow the runtime stack. A function call usually starts with pushing function arguments, local variables, and the return address on the stack. Thus deeply nested recursive calls may quickly exhaust the (usually fixed-size) runtime stack resulting in a runtime error. This is the main reason why imperative languages prefer looping to recursion, and why most programmers learn about loops before they study recursion. However, even in imperative languages, when it comes to traversing recursive data structure, such as linked lists or trees, recursive algorithms are more natural.
+The common problem with deeply recursive programs is that they may blow the runtime stack. A function call usually starts by pushing function arguments, local variables, and the return address on the stack. Thus deeply nested recursive calls may quickly exhaust the (usually fixed-size) runtime stack resulting in a runtime error. This is the main reason why imperative languages prefer looping to recursion, and why most programmers learn about loops before they study recursion. However, even in imperative languages, when it comes to traversing recursive data structures, such as linked lists or trees, recursive algorithms are more natural.
 
 The problem with using loops, though, is that they require mutation. There is usually some kind of a counter or a pointer that is advanced and checked with each turn of the loop. This is why purely functional languages that shun mutation must use recursion in place of loops. But since looping is more efficient and it doesn't consume the runtime stack, the compiler tries to covert recursive calls to loops. In Haskell all tail-recursive functions are turned into loops. 
 
@@ -623,7 +623,7 @@ This lambda in turn calls \hask{showk} with the right subtree \hask{rgt} and ano
 \end{haskell}
 This innermost lambda that has access to all three strings: left, middle, and right. It concatenates them and calls the outermost continuation \hask{k} with the result.
 
-In each case, the recursive call to \hask{showk} is the last call, and its result is immediately returned. The type of the result is the generic type \hask{r}, which in itself guarantees that we can't perform any operations on it. When we finally run the result of \hask{showk}, we pass it the identity (instantiated for the \hask{String} type):
+In each case, the recursive call to \hask{showk} is the last call, and its result is immediately returned. Moreover, the type of the result is the generic type \hask{r}, which in itself guarantees that we can't perform any operations on it. When we finally run the result of \hask{showk}, we pass it the identity (instantiated for the \hask{String} type):
 \begin{haskell}
 show :: Tree -> String
 show t = runCont (showk t) id
@@ -753,23 +753,23 @@ class Functor m => Monad m where
 \end{haskell}
 We have an endofunctor \hask{m} and two polymorphic functions. 
 
-In category theory, the functor that defines the monad is traditionally denoted by $T$ (probably because monads were initially called ``triples''). The two polymorphic functions become natural transformations. The first one, corresponding to \hask{join}, maps the ``square'' of $T$---or a composition of $T$ with itself---to $T$:
+In category theory, the functor that defines the monad is traditionally denoted by $T$ (probably because monads were initially called ``triples''). The two polymorphic functions become natural transformations. The first one, corresponding to \hask{join}, maps the ``square'' of $T$ (a composition of $T$ with itself) to $T$:
 \[ \mu \colon T \circ T \to T \]
 (Of course, only \emph{endo}-functors can be squared this way.) 
 
 The second, corresponding to \hask{return}, maps the identity functor to $T$:
-\[ \eta \colon Id \to T \]
+\[ \eta \colon \text{Id} \to T \]
 
 Compare this with our earlier definition of a monoid in a monoidal category:
 \begin{align*}
 \mu &\colon m \otimes m \to m \\
 \eta &\colon I \to m
 \end{align*}
-The similarity is striking. This is why we often call the natural transformation $\mu$ \emph{monadic multiplication}. But in what category can the composition of functors be considered a tensor product? 
+The similarity is striking. This is why we often call the natural transformation $\mu$ the \emph{monadic multiplication}. But in what category can the composition of functors be considered a tensor product? 
 
 Enter the category of endofunctors. Objects in this category are endofunctors and arrows are natural transformations. 
 
-But there's more structure to that category. We know that any two endofunctors can be composed. How can we interpret this composition if we want to treat endofunctors as objects? An operation that takes two objects and produces a third object looks like a tensor product.  The only condition we impose on a tensor product is that it's functorial in both arguments. That is, given a pair of arrows:
+But there's more structure to that category. We know that any two endofunctors can be composed. How can we interpret this composition if we want to treat endofunctors as objects? An operation that takes two objects and produces a third object looks like a tensor product.  The only condition imposed on a tensor product is that it's functorial in both arguments. That is, given a pair of arrows:
 \begin{align*}
  \alpha &\colon T \to T' \\
  \beta &\colon S \to S' 
@@ -835,7 +835,9 @@ These are the monad laws in terms of $\mu$ and $\eta$. They can be directly tran
 
 \section{Free Monads}
 
-A monad is an endofunctor $T \colon [\cat C, \cat C]$ equipped with additional structure given by two natural transformations. This kind of statement can be made precise by defining a forgetful functor that ignores the additional structure. In our case, we would take a monad $(T, \eta, \mu)$ and keep only $T$. But in order to define such a functor, we first need to define the category of monads.
+A monad lets us specify a sequence of actions that may produce side effects. Such a sequence tells the computer both what to do and how to do it. But sometimes more flexibility is required: We'd like to separate the ``what'' from the ``how." A free monad lets us produce the sequence without committing to a particular monad for its execution. This is analogous to defining a free monoid (a list), which lets us postpone the choice of the algebra to apply to it.
+
+Free constructions are defined as left adjoints to forgetful functors. So first we have to define what it means to forget to be a monad. Since a monad is an endofunctor equipped with additional structure, we'd like to forget this structure. We take a monad $(T, \eta, \mu)$ and keep only $T$. But in order to define such a mapping as a functor, we first need to define the category of monads.
 
 \subsection{Category of monads}
 
@@ -868,7 +870,7 @@ Preservation of multiplication means that the following diagram must commute:
  \end{tikzcd}
 \]
 
-Another way of looking at $\mathbf{Mon}(\cat C)$ is that it's a category of monoids in $[\cat C, \cat C]$. 
+Another way of looking at $\mathbf{Mon}(\cat C)$ is that it's a category of monoids in the monoidal category $([\cat C, \cat C], \circ, \text{Id})$. 
 
 \subsection{Free monad}
 
@@ -876,7 +878,7 @@ Now that we have a category of monads, we can define the forgetful functor:
 \[ U \colon \mathbf{Mon}(\cat C) \to [\cat C, \cat C] \]
 that maps every triple $(T, \eta, \mu)$ to $T$ and every monad morphism to the underlying natural transformation.
 
-We would like a free monad to be generated by a left adjoint to this forgetful functor. The problem is that this left adjoint doesn't always exist. As usual, this is related to size issues: monads tend to blow things up. The bottom line is that free monads exist for some, but not all, endofunctors. Therefore we can't define a free monad through an adjunction. Fortunately, in most cases of interest a free monad can be defined as a fixed point of an algebra. 
+We would like a free monad to be generated by a left adjoint to this forgetful functor. The problem is that this left adjoint doesn't always exist. As usual, this is related to size issues: monads tend to blow things up. The bottom line is that free monads exist for some, but not all, endofunctors. Therefore we can't define a free monad through an adjunction. Fortunately, in most cases of interest, a free monad can be defined as a fixed point of an algebra. 
 
 The construction is analogous to how we defined a free monoid as an initial algebra for the list functor:
 \begin{haskell}
@@ -884,31 +886,32 @@ data ListF a x = NilF | ConsF a x
 \end{haskell}
 or the more general:
 \[ F_a x = I + a \otimes x \]
-This time, however, the monoidal category in which a monad is defined as a monoid is the category of endofunctors $([\cat C, \cat C], \text{Id}, \circ)$. A free monoid in this category is the initial algebra for the ``list'' functor that maps functors to functors:
+This time, however, the monoidal category in which a monad is defined as a monoid is the category of endofunctors $([\cat C, \cat C], \circ, \text{Id})$. A free monoid in this category is the initial algebra for the higher order ``list'' functor that maps functors to functors:
 \[ \Phi_F G = \text{Id} + F \circ G \]
 
-Here, the coproduct of two functors is defined point-wise. On objects:
+Here, the \index{coproduct of functors}coproduct of two functors is defined point-wise. On objects:
 \[ (F + G) a = F a + G a \]
 and on arrows:
 \[ (F + G) f = F f + G f \]
-(We form a coproduct of two morphisms using the functoriality of the coproduct. We are assuming that $\cat C$ is co-cartesian, that is all coproducts exist.)
+(We form a coproduct of two morphisms using the functoriality of the coproduct. We assume that $\cat C$ is co-cartesian, that is all coproducts exist.)
 
-The initial algebra is the (least) fixed point of this operator, or the solution to the identity:
+The initial algebra is the (least) fixed point of this operator, or the solution to the equation:
 \[ L_F \cong \text{Id} + F \circ L_F \]
-This formula establishes a natural isomorphism between two functors. In particular, from right to left, the mapping out of the sum is equivalent to a pair of natural transformations:
+This formula establishes a natural isomorphism between two functors. In particular, from right to left, $\text{Id} + F \circ L_F \to L_F$, we have a mapping out of the sum, which is equivalent to a pair of natural transformations:
 \begin{align*}
-Id \to L_F
+\text{Id} \to L_F
 \\
 F \circ L_F \to L_F
 \end{align*}
-When translating to Haskell, the components of these transformation become two constructors. We get the following data type parameterized by a functor \hask{f}:
+
+When translating this to Haskell, the components of these transformation become two constructors. We define the following recursive data type parameterized by a functor \hask{f}:
 \begin{haskell}
 data FreeMonad f a where
    Pure :: a -> FreeMonad f a
    Free :: f (FreeMonad f a) -> FreeMonad f a
 \end{haskell}
 
-If we think of the functor \hask{f} as a container of values, the constructor \hask{Free} takes a containerful of \hask{(FreeMonad f a)} and stashes it away. An arbitrary value of the type \hask{FreeMonad f a} is therefore a tree in which every node is a functorful of branches, and each leaf contains a value of the type \hask{a}.
+If we think of the functor \hask{f} as a container of values, the constructor \hask{Free} takes a functorful of \hask{(FreeMonad f a)} and stashes it away. An arbitrary value of the type \hask{FreeMonad f a} is therefore a tree in which every node is a functorful of branches, and each leaf contains a value of the type \hask{a}.
 
 Because this definition is recursive, the \hask{Functor} instance for it is also recursive:
 \begin{haskell}
@@ -916,9 +919,9 @@ instance Functor f => Functor (FreeMonad f) where
   fmap g (Pure a) = Pure (g a)
   fmap g (Free ffa) = Free (fmap (fmap g) ffa)
 \end{haskell}
-The outer \hask{fmap} uses the \hask{Functor} instance of \hask{f}, while the inner \hask{(fmap g)} recurses into the branches.
+Here, the outer \hask{fmap} uses the \hask{Functor} instance of \hask{f}, while the inner \hask{(fmap g)} recurses into the branches.
 
-The monadic unit \hask{eta} is just a thin encapsulation of the identity functor:
+It's easy to show that \hask{FreeMonad} is a \hask{Monad}. The monadic unit \hask{eta} is just a thin encapsulation of the identity functor:
 \begin{haskell}
 eta :: a -> FreeMonad f a
 eta a = Pure a
@@ -944,7 +947,7 @@ We can also define bind directly:
   (Free ffa) >>= k = Free (fmap (>>= k) ffa)
 \end{haskell}
 
-A free monad accumulates monadic actions in a tree-like structure without committing to any particular evaluation strategy. This tree can be ``interpreted'' using an algebra. This time it's an algebra in the category of endofunctors, so its carrier is an endofunctor $G$ and the structure map $\alpha$ is a natural transformation $\Phi_F G \to G$:
+A free monad accumulates monadic actions in a tree-like structure without committing to any particular evaluation strategy. This tree can be ``interpreted'' using an algebra. But this time it's an algebra in the category of endofunctors, so its carrier is an endofunctor $G$ and the structure map $\alpha$ is a natural transformation $\Phi_F G \to G$:
 \[ \alpha \colon \text{Id} + F \circ G \to G\]
 This natural transformation, being a mapping out of a sum, is equivalent to a pair of natural transformations :
 \begin{align*}
@@ -1100,7 +1103,7 @@ showAlg :: MAlg StackF (Const String) a
 
 \section{Monoidal Functors}
 
-We've seen several examples of monoidal cateogries. Such categories are equipped with some kind of binary operation, e.g., a cartesian product, a sum, composition (in the category of endofunctors), etc. They also have a special object that serves as a unit with respect to that binary operation. Unit and associativity laws are satisfied either on the nose (in strict monoidal categories) or up to isomorphism.
+We've seen several examples of monoidal cateogries. Such categories are equipped with some kind of binary operation, e.g., a cartesian product, a sum, composition (in the category of endofunctors), etc. They also have a special object that serves as the unit with respect to that binary operation. Unit and associativity laws are satisfied either on the nose (in strict monoidal categories) or up to isomorphism.
 
 Every time we have more than one instance of some structure, we may ask ourselves the question: is there a whole category of such things? In this case: do monoidal categories form their own category? For this to work we would have to define arrows between monoidal categories.
 
@@ -1185,7 +1188,7 @@ Now consider the following modification, which returns a singleton list that con
 pairWith' :: Int -> [String -> (Int, String)]
 pairWith' a = [\x -> (a, x)]
 \end{haskell}
-As a programmer you'd be very surprised if this didn't work. But what we do here is highly nontrivial: we are smuggling the environment under the list functor. According to our model of lambda calculus, a closure is a morphism from the product of the environment and the function argument: here \hask{(Int, String)}. 
+As a programmer you'd be very surprised if this didn't work. But what we do here is highly nontrivial: we are smuggling the environment \emph{under} the list functor. According to our model of lambda calculus, a closure is a morphism from the product of the environment and the function argument. Here the lambda, which is really a function of \hask{(Int, String)}, is defined inside a list functor, but it captures the value \hask{a} that is defined \emph{outside} the list.
 
 The property that lets us smuggle the environment under a functor is called \index{strength, functorial}\emph{functorial strength} or \emph{tensorial strength} and can be implemented in Haskell as:
 \begin{haskell}
@@ -1194,11 +1197,11 @@ strength (e, as) = fmap (e, ) as
 \end{haskell}
 The notation \hask{(e, )} is called a \index{tuple section}\emph{tuple section} and is equivalent to the partial application of the pair constructor: \hask{(,) e}.
 
-In category theory, strength for an endofunctor $F$ is defined as a natural transformation that let's us smuggle a tensor product into a functor:
+In category theory, strength for an endofunctor $F$ is defined as a natural transformation that smuggles a tensor product into a functor:
 \[ \sigma \colon a \otimes F(b) \to F (a \otimes b) \]
 There are some additional conditions which ensure that it works nicely with the unitors and the associator of the monoidal category in question.
 
-The fact that we were able to implement \hask{strength} for any functor means that, in Haskell, every functor is strong. This is the reason why we don't have to worry about accessing the environment from inside a functor. 
+The fact that we were able to implement \hask{strength} for an arbitrary functor means that, in Haskell, every functor is strong. This is the reason why we don't have to worry about accessing the environment from inside a functor. 
 
 Even more importantly, every monad in Haskell is strong by virtue of being a functor. This is also why every monad is automatically \hask{Monoidal}. 
 \begin{haskell}
@@ -1209,9 +1212,9 @@ instance Monad m => Monoidal m where
     b <- mb
     return (a, b)
 \end{haskell}
-(Warning: to compile this code you'll need to turn a few compiler extensions.) If you desugar this code to use monadic bind and lambdas, you'll notice that the final \hask{return} needs access to both \hask{a} and \hask{b}, which are defined in outer environments. This would be impossible without a monad being strong.
+If you desugar this code to use monadic bind and lambdas, you'll notice that the final \hask{return} needs access to both \hask{a} and \hask{b}, which are defined in outer environments. This would be impossible without a monad being strong.
 
-In category theory, though, not every endofunctor in a monoidal category is strong. For now, the magic incantation is that the category we're working with is self-enriched, and every endofunctor defined in Haskell is enriched. We'll come back to it when we talk about enriched categories. In Haskell strength boils down to the fact that we can always \hask{fmap} a partially applied pair constructor \hask{(a, )}.
+In category theory, though, not every endofunctor in a monoidal category is strong. For now, the magic incantation is that the category we're working with is self-enriched, and every endofunctor defined in Haskell is enriched. We'll come back to it when we talk about enriched categories. In Haskell, strength boils down to the fact that we can always \hask{fmap} a partially applied pair constructor \hask{(a, )}.
 
 \subsection{Applicative functors}
 
@@ -1242,7 +1245,7 @@ class Functor f => Applicative f where
     pure  :: a -> f a
     (<*>) :: f (a -> b) -> f a -> f b
 \end{haskell}
-The application of a functor-ful of functions to a functor-ful of arguments is defined as an infix operator that is customarily called ``splat.''
+The application of a functorful of functions to a functorful of arguments is defined as an infix operator \hask{<*>} that is customarily called ``splat.''
 
 There is also an infix version of \hask{fmap}:
 \begin{haskell}
@@ -1272,7 +1275,7 @@ If you squint at the definition of the splat operator:
 \begin{haskell}
 (<*>) :: f (a -> b) -> (f a -> f b)
 \end{haskell}
-you may see it as mapping a function object to a function object. 
+you may see it as mapping function objects to function objects. 
 
 This becomes clearer if you consider a functor between two categories, both of them closed. You may start with a function object $b^a$ in the source category and apply the functor $F$ to it:
 \[ F (b^a) \]
@@ -1282,9 +1285,9 @@ If we demand that the two ways be isomorphic, we get a definition of a strict \e
 \[ F (b^a) \to (F b)^{F a} \]
 If $F$ is an endofunctor, this translates directly into the definition of the splat operator. 
 
-The full definition of a lax closed functor includes the mapping of the monoidal unit and some coherence conditions. 
+The full definition of a lax closed functor includes the mapping of the monoidal unit and some coherence conditions. All said, an applicative functor is a lax closed functor.
 
-In a closed cartesian category, the exponential is related to the cartesian product through the currying adjunction. It's no surprise then, that in such a category lax monoidal and lax closed endofunctors are the same. 
+In a closed cartesian category, the exponential is related to the cartesian product through the currying adjunction. It's no surprise then, that in such a category lax monoidal and lax closed (applicative) endofunctors are the same. 
 
 We can easily express this in Haskell:
 \begin{haskell}
@@ -1302,7 +1305,7 @@ and \hask{apply} is the uncurried function application:
 apply :: (a -> b, a) -> b
 apply (f, a) = f a
 \end{haskell}
-The other way around we have:
+And the other way around we have:
 \begin{haskell}
 instance Applicative f => Monoidal f where
   unit = pure ()
