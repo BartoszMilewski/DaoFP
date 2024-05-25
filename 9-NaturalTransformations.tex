@@ -1522,17 +1522,17 @@ coyoneda_1 y = \h -> contramap h y
 
 \section{Yoneda Embedding}
 
-In a closed category, we have exponential objects that serve as stand-ins for hom-sets. This is obviously a thing in the category of sets, where hom-sets, being sets, are automatically objects. 
+In a closed category, we have exponential objects that serve as stand-ins for hom-sets. This is obviously a thing in $\Set$, where hom-sets, being sets, are automatically objects in $\Set$. 
 
-But in the category of categories  $\mathbf{Cat}$, hom-sets are \emph{sets} of functors, and it's not immediately obvious that they can be promoted to objects---in this case, categories. But, as we've seen before, they can! Functors between any two categories form a functor \emph{category}.
+On the other hand, in the category of categories  $\mathbf{Cat}$, hom-sets are \emph{sets} of functors, and it's not immediately obvious that they can be promoted to objects in $\mathbf{Cat}$---that is, categories. But, as we've seen before, they can! Functors between any two categories form a functor \emph{category}.
 
 Because of that, it's possible to curry functors just like we curried functions. A functor from a product category can be viewed as a functor returning a functor. In other words, $\mathbf{Cat}$ is a closed (symmetric) monoidal category.
 
 In particular, we can apply currying to the hom-functor $\mathcal{C}(a, b)$. It is a profunctor, or a functor from the product category:
 \[ \mathcal{C}^{op} \times \mathcal{C} \to  \mathbf{Set} \]
-But it's also a contravariant functor in the first argument $a$. And for every $a$ in  $\mathcal{C}^{op}$  it produces a functor $\mathcal{C}(a, -)$, which is an object in the functor category $ [\mathcal{C},  \mathbf{Set}] $. We can write this mapping as:
+But it's also a contravariant functor in the first argument $a$. And for every $a$ in  $\mathcal{C}^{op}$  it produces a covariant functor $\mathcal{C}(a, -)$, which is an object in the functor category $ [\mathcal{C},  \mathbf{Set}] $. We can write this mapping as:
 \[ \mathcal{C}^{op} \to [\mathcal{C},  \mathbf{Set}] \]
-Alternatively, we can focus on $b$ and produce a contravariant functor $\mathcal{C}(-, b)$. This mapping can be written as
+Alternatively, we can fix $b$ and produce a contravariant functor $\mathcal{C}(-, b)$. This mapping can be written as
 \[ \mathcal{C} \to [\mathcal{C}^{op},  \mathbf{Set}] \]
 Both mappings are functorial, which means that, for instance, an arrow in $\mathcal{C}$ is mapped to a natural transformation in $[\mathcal{C}^{op},  \mathbf{Set}]$.
 
@@ -1591,7 +1591,9 @@ This isomorphism maps identity to identity and composition to composition. That'
 
 Because it preserves composition and identity, this isomorphism also preserves \emph{isomorphisms}. So if $x$ is isomorphic to $y$ then the presheaves $ \mathcal{C}(-, x)$ and $ \mathcal{C}(-, y)$ are isomorphic, and vice versa. 
 
-This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. If the hom-sets are naturally isomorphic, than the objects are isomorphic. 
+This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. If the hom-sets are naturally isomorphic, then the objects are isomorphic. 
+
+The Yoneda embedding builds on the idea that there is nothing more to an object than its relationships with other objects. The presheaf $\cat C (-, a)$, like a hologram, encodes the totality of views of $a$ from the perspective of the whole category $\cat C$. The Yoneda embedding tells us that, when we combine all these individual holograms, we get a perfect hologram of the whole category.
 
 \section{Representable Functors}
 
