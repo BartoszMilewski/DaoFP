@@ -234,7 +234,7 @@ type Natural f g = forall a. f a -> g a
 \end{haskell}
 A \index{\hask{type} synonym}\hask{type} declaration introduces an alias, a shorthand, for the right-hand-side.
 
-It turns out that limiting the type of a natural transformation to adhere to parametric polymorphism has far reaching consequences. Such a function automatically satisfies naturality conditions. It's an example of \index{parametricity}parametricity producing so called \index{theorems for free}\emph{theorems for free}. 
+It turns out that limiting the type of a natural transformation to adhere to parametric polymorphism has far-reaching consequences. Such a function automatically satisfies naturality conditions. It's an example of \index{parametricity}parametricity producing so called \index{theorems for free}\emph{theorems for free}. 
 
 We can't express equalities of arrows in Haskell, but we can use naturality to transform programs. In particular, if \hask{alpha} is a natural transformation, we can replace:
 \begin{haskell}
@@ -286,7 +286,7 @@ Incidentally, this is a very inefficient implementation. The actual library func
 
 A useful intuition for understanding natural transformations builds on the idea that functors acts like containers for data. There are two completely orthogonal things that you can do with a container: You can transform the data it contains, without changing the shape of the container. This is what \hask{fmap} does. Or you can transfer the data, without modifying it, to another container. This is what a natural transformation does: It's a procedure for moving ``stuff'' between containers without knowing what kind of ``stuff'' it is. 
 
-In other words, a natural transformations repackages the contents of one container into another container. It does it in a way that is agnostic of the type of the contents, which means it cannot inspect, create, or modify this contents. All it can do is to move it to a new location, or drop it. 
+In other words, a natural transformation repackages the contents of one container into another container. It does it in a way that is agnostic of the type of the contents, which means it cannot inspect, create, or modify the contents. All it can do is to move it to a new location, or drop it. 
 
 Naturality condition enforces the orthogonality of these two operations. It doesn't matter if you first modify the data and then move it to another container; or first move it, and then modify. 
 
@@ -439,7 +439,7 @@ Altogether, we have
 
 But there is another equally plausible candidate: 
 \[ (\beta \circ \alpha)_x = G'(\alpha_x) \circ \beta_{F x}\]
-Fortunately, the are equal due to naturality of $\beta$. 
+Fortunately, they are equal due to naturality of $\beta$. 
 
 \[
  \begin{tikzcd}
@@ -1390,7 +1390,7 @@ We can now apply the Yoneda trick: substitute $a$ for $x$:
 \[ \alpha_a \colon \mathcal{C}(a, a) \to F a \]
 and then pick the identity $id_a$ as the canonical element of $\mathcal{C}(a, a)$. The result is an element $\alpha_a (id_a)$ in the set $F a$. This defines a mapping in one direction, from natural transformations to elements of the set $F a$.
 
-Now the other way around. Given an element $p$ of the set $F a$ we want to construct a natural transformation $\alpha$. First, we assing $p$ to be the action of $\alpha_a$ on $id_a \in \cat C(a, a)$. 
+Now the other way around. Given an element $p$ of the set $F a$ we want to construct a natural transformation $\alpha$. First, we assign $p$ to be the action of $\alpha_a$ on $id_a \in \cat C(a, a)$. 
 
 \[
 \begin{tikzpicture}
@@ -1558,7 +1558,7 @@ But that's not all: every arrow in $\mathcal{C}$ is mapped to a \emph{different}
 
 If that weren't enough, the mapping of hom-sets is also \index{surjection}\emph{surjective}, meaning that every arrow between objects in $[\mathcal{C}^{op},  \mathbf{Set}]$ comes from some arrow in $\mathcal{C}$. We say that the functor is \index{full functor}\emph{full}. 
 
-Altoghether, the embedding is \emph{fully faithful}, that is the mapping of arrows is one-to-one. However, in general, the Yoneda embedding is \emph{not} surjective on objects, hence the word ``embedding.''
+Altogether, the embedding is \emph{fully faithful}, that is the mapping of arrows is one-to-one. However, in general, the Yoneda embedding is \emph{not} surjective on objects, hence the word ``embedding.''
 
 The fact that the embedding is fully faithful is the direct consequence of the Yoneda lemma. Indeed, we know that, for any functor $F \colon \mathcal{C}^{op} \to \mathbf{Set}$, we have a natural isomorphism:
 \[ [\mathcal{C}^{op}, \mathbf{Set}]( \mathcal{C}(-, x), F) \cong F x \]
@@ -1591,7 +1591,7 @@ This isomorphism maps identity to identity and composition to composition. That'
 
 Because it preserves composition and identity, this isomorphism also preserves \emph{isomorphisms}. So if $x$ is isomorphic to $y$ then the presheaves $ \mathcal{C}(-, x)$ and $ \mathcal{C}(-, y)$ are isomorphic, and vice versa. 
 
-This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. If the hom-sets are naturally isomorphic, than the objects are isomorphic. 
+This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. If the hom-sets are naturally isomorphic, then the objects are isomorphic. 
 
 \section{Representable Functors}
 

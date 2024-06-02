@@ -336,7 +336,7 @@ We can apply the adjunction once more:
 \[ \Set \big( \cat C (s ,-), (U\circ F) \cat C (a ,-) \big) \]
 and the Yoneda lemma again:
 \[ \big( (U\circ F) \cat C (a ,-) \big) s \]
-The final observation is that the compostion $U \circ F$ of adjoint functors is a monad in the functor category. Let's call this monad $\Phi$. The result is the following identity that will serve as the foundation for profunctor optics:
+The final observation is that the composition $U \circ F$ of adjoint functors is a monad in the functor category. Let's call this monad $\Phi$. The result is the following identity that will serve as the foundation for profunctor optics:
 \[ \int_{P \colon \cat T} \Set \big((U P) a, (U P) s\big) \cong \big( \Phi \cat C (a ,-) \big) s \]
 The right-hand side is the action of the monad $\Phi = U \circ F$ on the representable functor $\cat C (a, -)$, which is then evaluated at $s$. 
 
@@ -703,7 +703,7 @@ This gives monoidal structure to the category $[\cat N, \cat C]$.
 The existential representation of traversals can be written is terms of the action of this monoidal category on $\cat C$:
 \[ \mathbf{Tr} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, c \bullet a) \times \cat C (c \bullet b, t) \]
 
-The derive the profunctor representation of traversals, we have to generalize Tambara modules to the action of a monoidal category:
+To derive the profunctor representation of traversals, we have to generalize Tambara modules to the action of a monoidal category:
 \[ \alpha_{\langle a, b\rangle, c} \colon P \langle a, b \rangle \to P \langle c \bullet a, c \bullet b \rangle \]
 It turns out that the original derivation of profunctor optics still works for these generalized Tambara modules, and traversals can be written as polymorphic functions:
 \[  \mathbf{Tr}\langle s, t \rangle \langle a, b \rangle 

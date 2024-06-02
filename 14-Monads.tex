@@ -78,7 +78,7 @@ runReader (Reader h) e = h e
 
 \subsection{State}
 
-The most common side effect is related to accessing and potentially modifying some shared state. Unfortunately, shared state is the notorious source of concurrency errors. This is a serious problem in object oriented languages where stateful objects can be transparently shared between many clients. In Java, such objects may be provided with individual mutexes at the cost of impaired performance and the risk of deadlocks.
+The most common side effect is related to accessing and potentially modifying some shared state. Unfortunately, shared state is the notorious source of concurrency errors. This is a serious problem in object-oriented languages where stateful objects can be transparently shared between many clients. In Java, such objects may be provided with individual mutexes at the cost of impaired performance and the risk of deadlocks.
 
 In functional programming we make state manipulations explicit: we pass the state as an additional argument and return the modified state paired with the return value. We replace a stateful computation \hask{ a -> b } with
 \begin{haskell}
@@ -129,7 +129,7 @@ We'll talk about how \hask{IO} actions are created soon.
 
 \subsection{Continuation}
 
-We've seen that, as a consequences of the Yoneda lemma, we can replace a value of type \hask{a} with a function that takes a handler for that value. This handler is called a continuation. Calling a handler is considered a side effect of a computation. In terms of pure functions, we encode it as:
+We've seen that, as a consequence of the Yoneda lemma, we can replace a value of type \hask{a} with a function that takes a handler for that value. This handler is called a continuation. Calling a handler is considered a side effect of a computation. In terms of pure functions, we encode it as:
 \begin{haskell}
 a -> Cont r b
 \end{haskell}
@@ -532,7 +532,7 @@ pairs as bs = do
 \end{haskell}
 Notice that the last line in a \hask{do} block must produce a monadic value---here this is accomplished using \hask{return}.
 
-Most imperative languages lack the abstraction power to generically define a monad and instead they attempt to hard-code some of the more common monads. For instance, they implement exceptions as an alternative to the \hask{Either} monad, or concurrent tasks as an alternative to the continuation monad. Some, like C++, introduce coroutines that mimic Haskell's \hask{do} notation. 
+Most imperative languages lack the abstraction power to generically define a monad, and instead they attempt to hard-code some of the more common monads. For instance, they implement exceptions as an alternative to the \hask{Either} monad, or concurrent tasks as an alternative to the continuation monad. Some, like C++, introduce coroutines that mimic Haskell's \hask{do} notation. 
 
 \begin{exercise}
 Implement the following function that works for any monad:
@@ -904,7 +904,7 @@ This formula establishes a natural isomorphism between two functors. In particul
 F \circ L_F \to L_F
 \end{align*}
 
-When translating this to Haskell, the components of these transformation become two constructors. We define the following recursive data type parameterized by a functor \hask{f}:
+When translating this to Haskell, the components of these transformations become two constructors. We define the following recursive data type parameterized by a functor \hask{f}:
 \begin{haskell}
 data FreeMonad f a where
    Pure :: a -> FreeMonad f a
@@ -1147,7 +1147,7 @@ A \emph{lax monoidal functor} is a functor equipped with a morphism $\phi_i$ and
 \phi_i &\colon j \to F i \\
 \phi_{a b} &\colon F a \oplus F b \to F (a \otimes b)
 \end{align*}
-satisfying the appropriate untiality and associativity conditions.
+satisfying the appropriate unitality and associativity conditions.
 
 Such a functor maps a monoid $(m, \mu, \eta)$ to a monoid $(F m, \mu', \eta')$ with:
 \begin{align*}

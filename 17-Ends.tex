@@ -68,7 +68,7 @@ Show that, if there is a functor from $\mathcal{C}$ to the walking arrow categor
 
 Under a microscope, a profunctor looks like a hom-functor, and the elements of the set $P \langle a, b \rangle$ look like individual arrows. But when we zoom out, we can view a profunctor as a relation between objects. These are not the usual relations; they are \index{proof-relevant relation}\emph{proof-relevant} relations.
 
-To understand this concept better, let's consider a regular functor $F \colon \mathcal{C} \to \mathbf{Set}$ (in other words, a co-presheaf). One way to interpret it is to say that it definines a \index{proof-relevant subset} subset of objects of $\mathcal{C}$, namely those objects that are mapped to non-empty sets. Every element of $F a$ is then treated as a proof that $a$ is a member of this subset. If, on the other hand, $F a$ is an empty set, then $a$ is not a member of the subset.
+To understand this concept better, let's consider a regular functor $F \colon \mathcal{C} \to \mathbf{Set}$ (in other words, a co-presheaf). One way to interpret it is to say that it defines a \index{proof-relevant subset} subset of objects of $\mathcal{C}$, namely those objects that are mapped to non-empty sets. Every element of $F a$ is then treated as a proof that $a$ is a member of this subset. If, on the other hand, $F a$ is an empty set, then $a$ is not a member of the subset.
 
 We can apply the same interpretation to profunctors. If the set $P \langle a, b \rangle$ is empty, we say that $b$ is not related to $a$. If it's not empty, we say that each element of the set $P \langle a, b \rangle$ represents a proof that $b$ is related to $a$. We can then treat a profunctor as a proof-relevant relation. 
 
@@ -857,7 +857,7 @@ A category in which categorical laws are satisfied up to isomorphism is called a
 
 A bicategory $\mathbf{Prof}$ has (small) categories as objects, profunctors as 1-cells, and natural transformations as 2-cells. 
 
-Since profunctors are functors $\mathcal{C}^{op} \times  \mathcal{D} \to \mathbf{Set}$, the standard definition of natural transformations between them applies. It's a family of functions parameterized by objects of $\mathcal{C}^{op} \times  \mathcal{D}$, which are themseves pairs of objects. 
+Since profunctors are functors $\mathcal{C}^{op} \times  \mathcal{D} \to \mathbf{Set}$, the standard definition of natural transformations between them applies. It's a family of functions parameterized by objects of $\mathcal{C}^{op} \times  \mathcal{D}$, which are themselves pairs of objects. 
 
 The naturality condition for a transformation $\alpha_{\langle a, b \rangle}$ between two profunctors $P$ and $Q$ takes the form:
 \[

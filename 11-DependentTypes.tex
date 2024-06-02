@@ -97,7 +97,7 @@ The easiest way to visualize dependent types is to think of them as families of 
 
 The zeroth type would be the unit type \hask{()} representing an empty vector. The type corresponding to \hask{(S Z)} would be \hask{a}; then we'd have a pair \hask{(a, a)}, a triple \hask{(a, a, a)} and so on, with higher and higher powers of \hask{a}.
 
-If we want to talk about the whole family as one big set, we can take the sum of all these types. For instance, the sum of all powers of $a$ is the familiar list type, a.k.a, a free monoid:
+If we want to talk about the whole family as one big set, we can take the sum of all these types. For instance, the sum of all powers of $a$ is the familiar list type, a.k.a., a free monoid:
 \[ \mathit{List} (a) = 1 + a + a \times a + a \times a \times a + ... =  \sum_{n:\mathbb{N}} a^n \]
 
 \subsection{Fibrations}
@@ -360,7 +360,7 @@ The $x$ in this picture is some other bundle over $a$ with the projection $q$. I
 
 All mappings in this picture work on fibers. Some of them rearrange fibers over new bases---that's what a pullback does.  Other mappings modify individual fibers---the mapping $h \colon x \to e'$ works like this.
 
-If you think of bundles as a containers of fibers, the rearrangements of fibers corresponds to natural transformations, and the modifications of fibers correspond to the action of \hask{fmap}.
+If you think of bundles as containers of fibers, the rearrangements of fibers corresponds to natural transformations, and the modifications of fibers correspond to the action of \hask{fmap}.
  
 The universal condition then tells us that $q'$ can be factored into a modification of fibers $h$, followed by the rearrangement of fibers $g$.
 
@@ -1240,7 +1240,7 @@ Let's pick $G$ to be a singleton set $1$, and let $x \colon 1 \to A$ be a fibrat
 
 \subsection{Universal quantification}
 
-The logical interpretation of the dependent product $\Pi_{x : B} \, T(x)$ is a universally quanitified proposition. An element of $\Pi_{x : B} \, T(x)$ is a section---the proof that it's possible to select an element from each member of the family $T(x)$. It means that none of them is empty. In other words, it's a proof of the proposition:
+The logical interpretation of the dependent product $\Pi_{x : B} \, T(x)$ is a universally quantified proposition. An element of $\Pi_{x : B} \, T(x)$ is a section---the proof that it's possible to select an element from each member of the family $T(x)$. It means that none of them is empty. In other words, it's a proof of the proposition:
 \[ \forall_{x : B}\, T(x) \]
 
 \section{Equality}
@@ -1484,7 +1484,7 @@ such that (computation rule):
 \[f (x, x, \mathit{refl}(x)) = t(x)\]
 Notice that the equality in the computation rule is \emph{definitional equality}, not a type.
 
-Equality elimination tells us that it's alway possible to extend the function $t$, which is defined on the diagonal, to the whole 3-d space. 
+Equality elimination tells us that it's always possible to extend the function $t$, which is defined on the diagonal, to the whole 3-d space. 
 
 This is a very strong postulate. One way to understand it is to argue that, within the framework of type theory---which is formulated using the language of introduction and elimination rules, and the rules for manipulating those---it's \emph{impossible} to define a type family $T(x, y, p)$ that would \emph{not} satisfy the equality elimination rule. 
 

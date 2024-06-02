@@ -197,7 +197,7 @@ The anamorphism for this coalgebra, when seeded with zero, generates the stream 
 allNats :: Stream Int
 allNats = ana step 0
 \end{haskell}
-In a non-lazy language this anamorphism would run forever, but in Haskell it's instantaneous. The incremental price is paid only when we want to retrive some of the data, for instance, using these accessors:
+In a non-lazy language this anamorphism would run forever, but in Haskell it's instantaneous. The incremental price is paid only when we want to retrieve some of the data, for instance, using these accessors:
 \begin{haskell}
 head :: Stream a -> a
 head (In (StreamF a _)) = a
@@ -351,12 +351,12 @@ allNats = Nu nuArgs
 
 \section{Terminal Coalgebra as a Limit}
 
-In category theory we are not afraid of infinitities---we make sense of them. 
+In category theory we are not afraid of infinities---we make sense of them. 
 
 At face value, the idea that we could construct a terminal coalgebra by applying the functor $F$ infinitely many times to some object, let's say the terminal object $1$, makes no sense. But the idea is very convincing: Applying $F$ one more time is like adding one to infinity---it's still infinity. So, naively, this is a fixed point of $F$:
 \[ F (F^{\infty} 1) \cong F^{\infty + 1} 1 \cong F^{\infty} 1\]
 
-To turn this loose reasoning into a rigorous proof, we have to tame the infinity, which means we have to define some kind of a limiting procedure. 
+To turn this loose reasoning into a rigorous proof, we have to tame the infinity, which means we have to define some kind of limiting procedure. 
 
 As an example, let's consider the product functor:
 \[F_a x = a \times x \]
