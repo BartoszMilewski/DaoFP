@@ -835,7 +835,7 @@ These are the monad laws in terms of $\mu$ and $\eta$. They can be directly tran
 
 \section{Free Monads}
 
-A monad lets us specify a sequence of actions that may produce side effects. Such a sequence tells the computer both what to do and how to do it. But sometimes more flexibility is required: We'd like to separate the ``what'' from the ``how." A free monad lets us produce the sequence without committing to a particular monad for its execution. This is analogous to defining a free monoid (a list), which lets us postpone the choice of the algebra to apply to it.
+A monad lets us specify a sequence of actions that may produce side effects. Such a sequence tells the computer both what to do and how to do it. But sometimes more flexibility is required: We'd like to separate the ``what'' from the ``how." A free monad lets us produce the sequence without committing to a particular monad for its execution. This is analogous to defining a free monoid (a list), which lets us postpone the choice of the algebra to apply to it; or to creating an AST (abstract syntax tree) before compiling it to executable code.
 
 Free constructions are defined as left adjoints to forgetful functors. So first we have to define what it means to forget to be a monad. Since a monad is an endofunctor equipped with additional structure, we'd like to forget this structure. We take a monad $(T, \eta, \mu)$ and keep only $T$. But in order to define such a mapping as a functor, we first need to define the category of monads.
 
@@ -895,9 +895,9 @@ and on arrows:
 \[ (F + G) f = F f + G f \]
 (We form a coproduct of two morphisms using the functoriality of the coproduct. We assume that $\cat C$ is co-cartesian, that is all coproducts exist.)
 
-The initial algebra is the (least) fixed point of this operator, or the solution to the equation:
+The initial algebra is the (least) fixed point of this operator, or the solution to the recursive equation:
 \[ L_F \cong \text{Id} + F \circ L_F \]
-This formula establishes a natural isomorphism between two functors. In particular, from right to left, $\text{Id} + F \circ L_F \to L_F$, we have a mapping out of the sum, which is equivalent to a pair of natural transformations:
+This formula establishes a natural isomorphism between two functors. Going from right to left, $\text{Id} + F \circ L_F \to L_F$, we have a mapping out of the sum, which is equivalent to a pair of natural transformations:
 \begin{align*}
 \text{Id} \to L_F
 \\

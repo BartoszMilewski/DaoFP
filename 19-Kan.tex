@@ -140,7 +140,9 @@ where $L d$ is both $L (R c)$ and $L (R c')$
 
 Moreover, if $R$ is not surjective on objects, the functor $L$ must somehow be defined on those objects of $\cat D$ that are not in the image of $R$. Again, naturality of the unit and counit will constrain possible choices, as long as there are arrows connecting these objects to the image of $R$. 
 
-Obviously, all these constraints mean that an adjunction can only be defined in very special cases. Kan extensions are even weaker than adjunctions. 
+Obviously, all these constraints mean that an adjunction can only be defined in very special cases. 
+
+Kan extensions are even weaker than adjunctions. 
 
 If adjoint functors work like inverses, Kan extensions work like fractions. 
 
@@ -265,9 +267,9 @@ Universality means that for any such $(G, \alpha)$ there is a unique natural tra
 \cat D
 \\
 \cat B
-    \ar[ur, blue, bend left, "G", "" {name=G, below}]
+    \ar[ur, red, bend left, "G", "" {name=G, below}]
     \ar[ur, blue, bend right, "\text{Ran}_P F"', "" {name=Ran}]
-\arrow[Rightarrow, blue, "\sigma", from=G, to=Ran]
+\arrow[Rightarrow, "\sigma", from=G, to=Ran]
 \end{tikzcd}
 \]
  which factorizes $\alpha$, that is:
@@ -367,6 +369,83 @@ The component of the counit of this adjunction at $F$ is $\varepsilon$.
 This is somewhat reminiscent of the currying adjunction:
 \[ \cat C (a \times b, c) \cong \cat C (a, [b, c]) \]
 in which the product is replaced by functor composition. (Of course, composition can be considered a tensor product only in the category of endofunctors.)
+
+\subsection{Right Kan extension as an end}
+
+Recall the ninja Yoneda lemma:
+\[ F b \cong \int_{c} \mathbf{Set} (\mathcal{B}(b, c), F c) \]
+Here, $F$ is a co-presheaf, that is a functor from $\cat B$ to $\Set$. The right Kan extensions of $F$ along $P$ generalizes this formula:
+\[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \]
+
+This works for a co-presheaf. In general we are interested in $F \colon \cat C \to \cat D$, so we need to replace the hom-set in $\Set$ by a \index{power}power. Thus he right Kan extension is given by the following end (if it exists):
+ \[ (\text{Ran}_P F) b \cong \int_c \cat B (b, P c) \pitchfork F c \]
+ 
+ The proof essentially writes itself: at every step there is only one thing to do. We start with the adjunction:
+  \[ [\cat C, \cat D](G \circ P, F) \cong [\cat B, \cat D](G, \text{Ran}_P F) \]
+and rewrite it using ends:
+ \[ \int_c \cat D \big(G ( P c), F c\big) \cong \int_b \cat D\big(G b, (\text{Ran}_P F) b\big) \]
+We substitute our formula to get:
+ \[ \cong  \int_b \cat D\big(G b,\int_c \cat B (b, P c) \pitchfork F c \big)\]
+We use the continuity of the hom-functor to pull the end to the front:
+\[  \cong  \int_b \int_c \cat D\big(G b, \cat B (b, P c) \pitchfork F c \big) \]
+Then we use the definition of power:
+\[ \int_b \int_c \Set \big(  \cat B (b, P c), \cat D (G b, F c) \big) \]
+and apply the Yoneda lemma:
+\[ \int_c  \cat D \big(G (P c), F c\big) \]
+This result is indeed the left-hand side of the adjunction.
+ 
+If $F$ is a co-presheaf, the power in the formula for the right Kan extension decays to the exponential/hom-set:
+  \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \]
+ 
+ Notice also that, if $P$ has a left adjoint, let's call it $P^{-1}$, that is:
+ \[ \cat B(b, P c) \cong \cat C(P^{-1} b, c) \]
+ we could use the ninja Yoneda lemma to perform the end in:
+ \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \cong \int_c \Set(\cat C(P^{-1} b, c), F c)\]
+to get:
+ \[  (\text{Ran}_P F) b \cong (F \circ P^{-1}) b \]
+ Since the adjunction is a weakening of the idea of an inverse, this result is in agreement with the intuition that the Kan extension \emph{inverts} $P$ and follows it with $F$.
+ 
+ \subsection{Right Kan extension in Haskell}
+The end formula for the right Kan extension can be immediately translated to Haskell:
+ \begin{haskell}
+newtype Ran p f b = Ran (forall c. (b -> p c) -> f c)
+ \end{haskell}
+ 
+ The counit $\varepsilon$ of the right Kan extension is a natural transformation from the composition of \hask{(Ran p f)} after \hask{p} to \hask{f}:
+ \begin{haskell}
+counit :: forall p f c'. Ran p f (p c') -> f c'
+\end{haskell}
+To implement it, we have to produce the value of the type \hask{(f c')} given a polymorphic function 
+ \begin{haskell}
+h :: forall c. (p c' -> p c) -> f c
+\end{haskell}
+We do it by instantiating this function at the type \hask{c = c'} and calling it with the identity on \hask{(p c')}:
+ \begin{haskell}
+counit (Ran h) = h id
+\end{haskell}
+
+The computational power of the right Kan extension comes from its universal property. We start with a functor $G$ equipped with a natural transformation: 
+\[ \alpha \colon G \circ P \to F \]
+This can be expressed as a Haskell data type:
+\begin{haskell}
+type Alpha p f g = forall c. g (p c) -> f c
+\end{haskell}
+Universality tells us that there is a unique natural transformation $\sigma$ from this functor to the corresponding right Kan extension:
+\begin{haskell}
+sigma :: Functor g => Alpha p f g -> forall b. (g b -> Ran p f b)
+sigma alpha gb = Ran (\b_pc -> alpha (fmap b_pc gb))
+\end{haskell}
+that factorizes $\alpha$ through the counit $\varepsilon$:
+\[ \alpha = \varepsilon \cdot (\sigma \circ P) \]
+Recall that whiskering means that we instantiate \hask{sigma} at \hask{b = p c}. It is then followed by \hask{counit}. The factorization of $\alpha$ is thus given by:
+\begin{haskell}
+factorize :: Functor g => Alpha p f g -> forall c. g (p c) -> f c
+factorize alpha = counit . sigma alpha
+\end{haskell}
+
+\begin{exercise}
+Implement the \hask{Functor} instance for \hask{Ran}.
+\end{exercise}
 
 \subsection{Limits as Kan extensions}
  We have previously defined limits as universal cones. The definition of a cone involves two categories: the indexing category $\cat J$ that defines the shape of the diagram, and the target category $\cat C$. A diagram is a functor $D \colon \cat J \to \cat C$ that embeds the shape in the target category. 
@@ -471,45 +550,6 @@ D 1
 This universal condition makes $\text{Lim} D$ the limit of the diagram $D$.
 
 
-\subsection{Right Kan extension as an end}
-
-Recall the ninja Yoneda lemma:
-\[ F b \cong \int_{c} \mathbf{Set} (\mathcal{B}(b, c), F c) \]
-Here, $F$ is a co-presheaf, that is a functor from $\cat B$ to $\Set$. The right Kan extensions of $F$ along $P$ generalizes this formula:
-\[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \]
-
-This works for a co-presheaf. In general we are interested in $F \colon \cat C \to \cat D$, so we need to replace the hom-set in $\Set$ by a \index{power}power. Thus he right Kan extension is given by the following end (if it exists):
- \[ (\text{Ran}_P F) b \cong \int_c \cat B (b, P c) \pitchfork F c \]
- 
- The proof essentially writes itself: at every step there is only one thing to do. We start with the adjunction:
-  \[ [\cat C, \cat D](G \circ P, F) \cong [\cat B, \cat D](G, \text{Ran}_P F) \]
-and rewrite it using ends:
- \[ \int_c \cat D \big(G ( P c), F c\big) \cong \int_b \cat D\big(G b, (\text{Ran}_P F) b\big) \]
-We substitute our formula to get:
- \[ \cong  \int_b \cat D\big(G b,\int_c \cat B (b, P c) \pitchfork F c \big)\]
-We use the continuity of the hom-functor to pull the end to the front:
-\[  \cong  \int_b \int_c \cat D\big(G b, \cat B (b, P c) \pitchfork F c \big) \]
-Then we use the definition of power:
-\[ \int_b \int_c \Set \big(  \cat B (b, P c), \cat D (G b, F c) \big) \]
-and apply the Yoneda lemma:
-\[ \int_c  \cat D \big(G (P c), F c\big) \]
-This result is indeed the left-hand side of the adjunction.
- 
-If $F$ is a co-presheaf, the power in the formula for the right Kan extension decays to the exponential/hom-set:
-  \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \]
-This can be immediately translated to Haskell:
- \begin{haskell}
- newtype Ran p f b = Ran (forall c. (b -> p c) -> f c)
- \end{haskell}
- 
- Notice also that, if $P$ has a left adjoint, let's call it $P^{-1}$, that is:
- \[ \cat B(b, P c) \cong \cat C(P^{-1} b, c) \]
- we could use the ninja Yoneda lemma to perform the end in:
- \[ (\text{Ran}_P F) b \cong \int_c \Set \big( \cat B (b, P c), F c\big) \cong \int_c \Set(\cat C(P^{-1} b, c), F c)\]
-to get:
- \[  (\text{Ran}_P F) b \cong (F \circ P^{-1}) b \]
- Since the adjunction is a weakening of the idea of an inverse, this result is in agreement with the intuition that the Kan extension \emph{inverts} $P$ and follows it with $F$.
- 
  \subsection{Left adjoint as a right Kan extension}
  
  We started by describing Kan extensions as a generalization of adjunctions. Looking at the pictures, if we have a pair of adjoint functors $L \dashv R$, we expect the left functor to be the right Kan extension of the identity along the right functor.
@@ -676,14 +716,25 @@ Alternatively, $\text{Lan}_P F$ can be defined as a functor equipped with a natu
  && \cat D
  \\
  \cat B
-  \arrow[urr, bend right, "\text{Lan}_P F"']
- \arrow[Rightarrow, "\eta",  from=ID]
+  \arrow[urr, blue, bend right, "\text{Lan}_P F"']
+ \arrow[Rightarrow, blue, "\eta",  from=ID]
  \end{tikzcd}
 \]
 The pair $(\text{Lan}_P F, \eta)$ is universal, meaning that, for any other pair $(G, \alpha)$, where 
 \[ \alpha \colon F \to G \circ P\] 
+\[
+ \begin{tikzcd} [row sep=1cm, column sep=1cm]
+ \cat C
+ \arrow[rr, "F", "" {name=ID, below} ]
+ \arrow[d, bend right, "P"']
+ && \cat D
+ \\
+ \cat B
+  \arrow[urr, red, bend right, "G"']
+ \arrow[Rightarrow, red, "\alpha",  from=ID]
+ \end{tikzcd}
+\]
 there is a unique mapping $\sigma \colon \text{Lan}_P F \to G$ 
-
 \[
 \begin{tikzcd}[row sep=2cm, column sep=2cm]
 \cat C  \ar[d, "P"', "" {name=P}]
@@ -692,8 +743,8 @@ there is a unique mapping $\sigma \colon \text{Lan}_P F \to G$
 \cat D
 \\
 \cat B
-    \ar[ur, bend left, "G", "" {name=G, below}]
-    \ar[ur, bend right, "\text{Lan}_P F"', "" {name=Lan}]
+    \ar[ur, red, bend left, "G", "" {name=G, below}]
+    \ar[ur, blue, bend right, "\text{Lan}_P F"', "" {name=Lan}]
 \arrow[Rightarrow, "\sigma", from=Lan, to=G]
 \end{tikzcd}
 \]
@@ -785,6 +836,78 @@ or, using string diagrams:
 This establishes one-to-one mapping between the sets of natural transformations. For every $\alpha$ on the left there is a unique $\sigma$ on the right:
 \[  [\cat C, \cat D] (F, G \circ P) \cong [\cat B, \cat D](\text{Lan}_P F , G)  \]
 
+
+\subsection{Left Kan extension as a coend}
+
+Recall the ninja co-Yoneda lemma. For every co-presheaf $F$, we have:
+\[ F b \cong \int^{c} \mathcal{B}(c, b) \times F c \]
+The left Kan extension generalizes this formula:
+\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B (P c, b) \times F c \]
+For a general functor $F \colon \cat C \to \cat D$, we replace the product with the \index{copower}copower:
+\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B(P c, b) \cdot F c \]
+
+We prove this formula by considering a mapping out to some functor $G$. We represent the set of natural transformations as an end:
+\[\int_b \cat D \big(\int^c \cat B(P c, b) \cdot F c, G b\big) \]
+We pull out the coend, which turns into an end:
+\[\int_b \int_c \cat D \big(\cat B(P c, b) \cdot F c, G b\big) \]
+and plug in the definition of co-power:
+\[\int_b \int_c \cat D \big(\cat B(P c, b), \cat D (F c, G b)\big) \]
+We can now use the Yoneda lemma to integrate over $b$, replacing $b$ with $P c$:
+\[\int_c \cat D (F c, G (P c))\big) \cong  [\cat C, \cat D] (F, G \circ P) \]
+As long as the coend in question exists, it indeed gives us the left adjoint to functor pre-composition:
+\[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
+
+As expected, in $\Set$, the co-power decays to a cartesian product:
+\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B (P c, b) \times F c \]
+
+ If the functor $P$ has a right adjoint, let's call it $P^{-1}$:
+ \[ \cat B(P c , b) \cong \cat C(c, P^{-1} b) \]
+ then we can use the ninja co-Yoneda lemma to get:
+ \[  (\text{Lan}_P F)\, b \cong (F \circ P^{-1}) b \]
+ thus reinforcing the intuition that a Kan extension inverts $P$ and follows it with $F$.
+ 
+\subsection{Left Kan extension in Haskell}
+
+When translating the formula for the left Kan extension to Haskell, we replace the coend with the existential type. Symbolically:
+ \begin{haskell}
+type Lan p f b = exists c. (p c -> b, f c)
+ \end{haskell}
+Currently, this is how we would encode the existential using \hask{GADT}'s:
+ \begin{haskell}
+data Lan p f b where
+   Lan :: (p c -> b) -> f c -> Lan p f b
+ \end{haskell}
+ 
+ The unit of the left Kan extension is a natural transformation from the functor \hask{f} to the composition of \hask{(Lan p f)} after \hask{p}:
+ \begin{haskell}
+unit :: forall p f c'. 
+    f c' -> Lan p f (p c')
+\end{haskell}
+In other words, given a value of the type \hask{(f c')}, we have to come up with some type \hask{c}, a function \hask{p c -> p c'}, and a value of the type \hask{(f c)}. The obvious choice is to pick \hask{c = c'} and use the identity at \hask{(p c')}:
+\begin{haskell}
+unit fc = Lan id fc
+\end{haskell}
+
+The computational power of left Kan extensions lies in their universal property. Given a functor \hask{g} and a natural transformation from \hask{f} to the composition \hask{g} after \hask{p}:
+\begin{haskell}
+type Alpha p f g = forall c. f c -> g (p c)
+\end{haskell}
+there is a unique natural transformation $\sigma$ from the corresponding left Kan extension to \hask{g}:
+\begin{haskell}
+sigma :: Functor g => Alpha p f g -> forall b. (Lan p f b -> g b)
+sigma alpha (Lan pc_b fc) = fmap pc_b (alpha fc)
+\end{haskell}
+that factorizes $\alpha$ through the unit $\eta$:
+\[ \alpha = (\sigma \circ P) \cdot \eta \]
+The whiskering of $\sigma$ means instantiating it at \hask{b = p c}, so the factorization of $\alpha$ is implemented as:
+\begin{haskell}
+factorize :: Functor g => Alpha p f g -> f c -> g (p c)
+factorize alpha = sigma alpha . unit
+\end{haskell}
+ \begin{exercise}
+Implement the \hask{Functor} instance for \hask{Lan}.
+\end{exercise}
+
 \subsection{Colimits as Kan extensions}
 
 Just like limits can be defined as right Kan extensions, colimits can be defined as left Kan extension. 
@@ -838,46 +961,6 @@ The colimit is the universal cocone, which is given by the left Kan extension:
 \[ \text{Colim}\; D = \text{Lan}_! D \]
 
 
-
-\subsection{Left Kan extension as a coend}
-
-Recall the ninja co-Yoneda lemma. For every co-presheaf $F$, we have:
-\[ F b \cong \int^{c} \mathcal{B}(c, b) \times F c \]
-The left Kan extension generalizes this formula:
-\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B (P c, b) \times F c \]
-For a general functor $F \colon \cat C \to \cat D$, we replace the product with the \index{copower}copower:
-\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B(P c, b) \cdot F c \]
-
-We prove this formula by considering a mapping out to some functor $G$. We represent the set of natural transformations as an end:
-\[\int_b \cat D \big(\int^c \cat B(P c, b) \cdot F c, G b\big) \]
-We pull out the coend, which turns into an end:
-\[\int_b \int_c \cat D \big(\cat B(P c, b) \cdot F c, G b\big) \]
-and plug in the definition of co-power:
-\[\int_b \int_c \cat D \big(\cat B(P c, b), \cat D (F c, G b)\big) \]
-We can now use the Yoneda lemma to integrate over $b$, replacing $b$ with $P c$:
-\[\int_c \cat D (F c, G (P c))\big) \cong  [\cat C, \cat D] (F, G \circ P) \]
-As long as the coend in question exists, it indeed gives us the left adjoint to functor pre-composition:
-\[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
-
-As expected, in $\Set$, the co-power decays to a cartesian product:
-\[ (\text{Lan}_P F)\, b \cong \int^{c} \cat B (P c, b) \times F c \]
-
-When translating this formula to Haskell, we replace the coend with the existential type. Symbolically:
- \begin{haskell}
- type Lan p f b = exists c. (p c -> b, f c)
- \end{haskell}
-Currently, this is how we would encode the existential:
- \begin{haskell}
- data Lan p f e where
-   Lan :: (p c -> b) -> f c -> Lan p f b
- \end{haskell}
- 
- If the functor $P$ has a right adjoint, let's call it $P^{-1}$:
- \[ \cat B(P c , b) \cong \cat C(c, P^{-1} b) \]
- then we can use the ninja co-Yoneda lemma to get:
- \[  (\text{Lan}_P F)\, b \cong (F \circ P^{-1}) b \]
- thus reinforcing the intuition that a Kan extension inverts $P$ and follows it with $F$.
- 
 \subsection{Right adjoint as a left Kan extension}
 
 We've seen that, when we have an adjunction $L \vdash R$, the left adjoint is related to the right Kan extension. Dually, if the right adjoint exists, it can be expressed as the left Kan extension of the identity functor:
@@ -993,11 +1076,11 @@ where:
 \item Right Kan extension:
 \[ [\cat C, \cat D](G \circ P, F) \cong [\cat B, \cat D](G, \text{Ran}_P F) \]
  \[ (\text{Ran}_P F) e \cong \int_c \cat B (e, P c) \pitchfork F c \]
-\item Right Kan extension in $\Set$:
-  \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \cat B (e, P c), F c\big) \]
 \item Left Kan extension:
 \[ [\cat B, \cat D](\text{Lan}_P F , G) \cong  [\cat C, \cat D] (F, G \circ P) \]
 \[ (\text{Lan}_P F) e \cong \int^{c} \cat B(P c, e) \cdot F c \]
+\item Right Kan extension in $\Set$:
+  \[ (\text{Ran}_P F) e \cong \int_c \Set \big( \cat B (e, P c), F c\big) \]
 \item Left Kan extension in $\Set$:
 \[ (\text{Lan}_P F) e \cong \int^{c} \cat B (P c, e) \times F c \]
 
