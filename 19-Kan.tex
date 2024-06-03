@@ -206,7 +206,7 @@ The right Kan extension $\text{Ran}_P F$ and the left Kan extension $\text{Lan}_
  \end{tikzcd}
 \]
 
-Just like with adjunctions, the ``undoing'' is not complete. The composition $\text{Ran}_P F \circ P$ doesn't reproduce $F$; instead it's related to it through the natural transformation $\varepsilon$ called the counit. Similiarly, the composition $\text{Lan}_P F \circ P$ is related to $F$ through the unit $\eta$.
+Just like with adjunctions, the ``undoing'' is not complete. The composition $\text{Ran}_P F \circ P$ doesn't reproduce $F$; instead it's related to it through the natural transformation $\varepsilon$ called the counit. Similarly, the composition $\text{Lan}_P F \circ P$ is related to $F$ through the unit $\eta$.
 
 Notice that the more information $F$ discards, the easier it is for Kan extensions to ``invert'' the functor $P$. In as sense, it only has to invert $P$ ``modulo $F$''.
 
@@ -752,7 +752,7 @@ instance Monad (Cont r) where
 \end{haskell}
 This is why \hask{Codensity} has the performance advantages of the continuation passing style. Since it nests continuations ``inside out,'' it can be used to optimize long chains of binds that are produced by \hask{do} blocks. 
 
-This property is especially important when working with free monads, which accumulate binds in tree-like structures. When we finally interpret a free monad, these accumulated binds require traversing the ever growing tree. For every bind, the traversal starts at the root. Compare this with the earlier example of reversing a list, which was optimized by accumulating functions in a FIFO queue. The codensity monad offers the same kind of performance improvement.
+This property is especially important when working with free monads, which accumulate binds in tree-like structures. When we finally interpret a free monad, these accumulated binds require traversing the ever-growing tree. For every bind, the traversal starts at the root. Compare this with the earlier example of reversing a list, which was optimized by accumulating functions in a FIFO queue. The codensity monad offers the same kind of performance improvement.
 
 \begin{exercise}
 Implement the \hask{Functor} instance for \hask{Codensity}.

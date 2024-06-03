@@ -12,7 +12,7 @@ This might come as a surprise, but the Haskell definition of a \hask{Functor} ca
 
 Additional motivation for studying enriched categories comes from the fact that a lot of literature, notably the website nLab, contains descriptions of concepts in most general terms, which often means in terms of enriched categories. Most of the usual constructs can be translated just by changing the vocabulary, replacing hom-sets with hom-objects and $\Set$ with a monoidal category $\cat V$. 
 
-Some enriched concepts, like weighted limits and colimits, turn out to be powerful on their own, to the extent that one might be tempted to replace Mac Lane's adge,``All concepts are Kan extensions'' with ``All concepts are weighted (co-)limits.''
+Some enriched concepts, like weighted limits and colimits, turn out to be powerful on their own, to the extent that one might be tempted to replace Mac Lane's adage,``All concepts are Kan extensions'' with ``All concepts are weighted (co-)limits.''
 
 \subsection{Set-theoretical foundations}
 
@@ -258,7 +258,7 @@ What is a functor between two preorders?
 \end{exercise}
 
 \subsection{Enriched co-presheaves}
-Co-presheaves, that is $\Set$-valued functors, play an important role in category theory, so it's natural to ask what their counterparts are in the enriched setting. The generalization of a co-preshef is a $\cat V$-functor $\cat C \to \cat V$. This is only possible if $\cat V$ can be made into a $\cat V$-category, that is when it's monoidal-closed. 
+Co-presheaves, that is $\Set$-valued functors, play an important role in category theory, so it's natural to ask what their counterparts are in the enriched setting. The generalization of a co-presheaf is a $\cat V$-functor $\cat C \to \cat V$. This is only possible if $\cat V$ can be made into a $\cat V$-category, that is when it's monoidal-closed. 
 
 An enriched co-presheaf maps object of $\cat C$ to objects of $\cat V$ and it maps hom-objects of $\cat C$ to internal homs of $\cat V$:
 \[ F_{a b} \colon \mathcal C (a, b) \to \cat [F a, F b] \]
@@ -443,7 +443,7 @@ The strong version of the Yoneda lemma works with objects of $\mathcal V$ and us
 
 \section{Weighted Limits}
 
-Limits (and colimits) are built around commuting triangles, so they are not immediately translatable to the enriched setting. The problem is that cones are constructed from ``wires,'' that is individual morphisms. You may think of hom-sets as a thick bundles of wires, each wire having zero thickness. When constructing a cone, you are selecting a single wire from a hom-set. We have to replace wires with something thicker.
+Limits (and colimits) are built around commuting triangles, so they are not immediately translatable to the enriched setting. The problem is that cones are constructed from ``wires,'' that is individual morphisms. You may think of hom-sets as a thick bundle of wires, each wire having zero thickness. When constructing a cone, you are selecting a single wire from a hom-set. We have to replace wires with something thicker.
 
 Consider a diagram, that is a functor $D$ from the indexing category $\mathcal J$ to the target category $\mathcal C$. The wires for the cone with the apex $x$ are selected from hom-sets $\mathcal C(x, D j)$, where $j$ is an object of $\mathcal J$. 
 
@@ -507,7 +507,7 @@ Dually, a weighted colimit is defined by the natural isomorphism:
 \[  \mathcal C(\text{colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] (W, \mathcal C(D-, x)) \]
 Here, the colimit is weighed by a functor $W \colon \mathcal J^{op} \to \mathcal V$ from the opposite category.
 
-Weighted (co-)limits, both in ordinary and in enriched categories, play a fundamental role: the can be used to re-formulate a lot of familiar constructions, like (co-)ends, Kan extensions, etc. 
+Weighted (co-)limits, both in ordinary and in enriched categories, play a fundamental role: they can be used to re-formulate a lot of familiar constructions, like (co-)ends, Kan extensions, etc. 
 
 \section{Ends as Weighted Limits}
 
@@ -550,7 +550,7 @@ Hint: Use the mapping in/out with the Yoneda trick and the definition of power a
 
 \section{Kan Extensions}
 
-We've seen how to express limits and colimits as Kan extensions using a functor from the singular category $1$. Weighted limits let us dispose of the singularity, and a judicious choice of the weight lets us express Kan extentions in terms of weighted limits. 
+We've seen how to express limits and colimits as Kan extensions using a functor from the singular category $1$. Weighted limits let us dispose of the singularity, and a judicious choice of the weight lets us express Kan extensions in terms of weighted limits. 
 
 First, let's work out the formula for ordinary, $\Set$-enriched categories. The right Kan extension is defined as:
  \[ (\text{Ran}_P F) e \cong \int_c \cat B (e, P c) \pitchfork F c \]

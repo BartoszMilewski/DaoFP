@@ -502,7 +502,7 @@ is the identity, and so is the second one:
 triangle' :: R r x -> R r x
 triangle' = fmap counit . unit
 \end{haskell}
-Notice that these two functions require the use of functional dependencies to be well defined. Triangle identities cannot be expressed in Haskell, so it's up to the implementor of the adjunction to prove them.
+Notice that these two functions require the use of functional dependencies to be well-defined. Triangle identities cannot be expressed in Haskell, so it's up to the implementor of the adjunction to prove them.
 \begin{exercise}
 Test a few examples of the first triangle identity for the currying adjunction. Here's an example:
 \begin{haskell}
@@ -783,7 +783,7 @@ Indeed, we have:
 
 \section{Freyd's adjoint functor theorem}
 
-In general functors are lossy---the are not invertible. In some cases we can make up the lost information by replacing it with the ``best guess.'' If we do it in an organized manner, we end up with an adjunction. The question is: given a functor between two categories, what are the conditions under which we can construct its adjoint. 
+In general functors are lossy---they are not invertible. In some cases we can make up the lost information by replacing it with the ``best guess.'' If we do it in an organized manner, we end up with an adjunction. The question is: given a functor between two categories, what are the conditions under which we can construct its adjoint. 
 
 The answer to this question is given by the Freyd's adjoint functor theorem. At first it might seem like this is a technical theorem involving a very abstract construction called the solution set condition. We'll see later that this condition translates directly to a programming technique called defunctionalization. 
 
@@ -1122,7 +1122,7 @@ We interpret this morphism as ``reducing'' the environment $e$ down to $e'$. The
 
 In fact, we performed this kind of reduction when defining \hask{more} and \hask{done}. In principle, we could have passed the tail \hask{is} to both functions, since it's accessible at the point of call. But we knew that they didn't need it.
 
-Using the Freyd's theorem, we could define the function object $a \to b$ as the colimit of the diagram defined by the comma category. Such a colimit is essentially a giant coproduct of all environments modulo identifications given by comma-category morphisms. These identification do the job of reducing the environment needed by $a \to b$ to the bare minimum. 
+Using the Freyd's theorem, we could define the function object $a \to b$ as the colimit of the diagram defined by the comma category. Such a colimit is essentially a giant coproduct of all environments modulo identifications given by comma-category morphisms. This identification does the job of reducing the environment needed by $a \to b$ to the bare minimum. 
 
 In our example, the continuations we're interested in are functions \hask{Int -> Int}. In fact we are not interested in generating the generic function type \hask{Int -> Int}; just the minimal one that would accommodate our two functions \hask{more} and \hask{done}. We can do it by creating a very small solution set. 
 
@@ -1164,7 +1164,7 @@ sumK'' (i : is) k = sumK'' is (More i k)
 sumList'' is = sumK'' is Done
 \end{haskell}
 
-The main advantage of defunctionalization is that it can be used in distributed environments. Arguments to remote functions, as long as they are data structures and not functions, can be serialized and send along the wire. All that's needed is for the receiver is have access to \hask{apply}. 
+The main advantage of defunctionalization is that it can be used in distributed environments. Arguments to remote functions, as long as they are data structures and not functions, can be serialized and sent along the wire. All that's needed is for the receiver to have access to \hask{apply}. 
 
 \section{Free/Forgetful Adjunctions}
 The two functors in the adjunction play different roles: the picture of the adjunction is not symmetric. Nowhere is this illustrated better than in the case of the free/forgetful adjunctions. 
