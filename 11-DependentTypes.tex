@@ -87,6 +87,8 @@ zipV (VCons a as) (VCons b bs) = VCons (a, b) (zipV as bs)
 zipV VNil VNil = VNil
 \end{haskell}
 
+Dependent types are especially useful when encoding the shapes of containers. For instance, the shape of a list is encoded in its length. A more advanced example would encode the shape of a tree as a runtime value.  
+
 \begin{exercise}
 Implement the function \hask{tailV} that returns the tail of the non-zero-length vector. Try calling it with \hask{emptyV}.
 \end{exercise}
@@ -413,9 +415,30 @@ Show that a pullback can be defined as a limit of the diagram from a stick-figur
 Show that a pullback in $\mathcal{C}$ with the target $b$ is a product in the slice category $\mathcal{C}/b$. Hint: Define two projections  as morphisms in the slice category. Use universality of the pullback to show the universality of the product.
 \end{exercise}
 
-\subsection{Substitution and weakening}
+\subsection{Substitution}
 
+We have two alternative descriptions of dependent types: one as fibrations and another as type families. It's in the latter framework that the pullback along a morphism $f$ can be interpreted as a substitution. When we have a type family $T y$ parameterized by elements $y \colon B$ and we always define a new type family by substituting $f x$ for $y$.
 
+\[
+ \begin{tikzcd}
+ T (f x)
+ & T y
+ \\
+ x
+ \arrow[u, mapsto, ""]
+ \arrow[r, mapsto, "f"]
+ &y
+ \arrow[u, mapsto, ""]
+  \end{tikzcd}
+\]
+The new type family is thus parameterized by different shapes.
+
+\subsection{Dependent environments}
+When modeling lambda calculus, we used the objects of a cartesian closed category to serve both as types and environments. An empty environment was modeled as the terminal object (unit type), and we were building more complex environments using products. The order in which we multiply types doesn't matter since the product is symmetric (up to isomorphism).
+
+When dealing with dependent types, we have to take into account that the type we are adding to the environment may depend on the values of the types already present in the environment. As before, we start with an empty environment modeled as the terminal object. 
+
+\subsection{Weakening}
 
 \subsection{Base-change functor}
 
