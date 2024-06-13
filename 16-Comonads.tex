@@ -27,7 +27,7 @@ idWithEnv :: (a, e) -> a
 idWithEnv (a, e) = a
 \end{haskell}
 
-This shows that there is a category in which co-Kleisli arrows serve as morphisms. 
+This strongly suggests the idea that there is a category in which co-Kleisli arrows serve as morphisms. 
 
 \begin{exercise}
 Show that the composition of co-Kleisli arrows using \hask{composeWithEnv} is associative.
@@ -42,7 +42,7 @@ class Functor w => Comonad w where
    (=<=) :: (w b -> c) -> (w a -> b) -> (w a -> c)
    extract :: w a -> a
 \end{haskell}
-Here, the composition is written in the form of an infix operator; and the unit of composition is called \hask{extract}, since it extracts a value from the context. 
+Here, the composition is written in the form of an infix operator. The unit of composition is called \hask{extract}, since it extracts a value from the context. 
 
 Let's try it with our example. It is convenient to pass the environment as the first component of the pair. The comonad is then given by the functor that's a partial application of the pair constructor \hask{((,) e)}.
 \begin{haskell}
