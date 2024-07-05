@@ -538,7 +538,10 @@ Continuing with this example, let $E$ be the set of languages fibrated by the co
 
 By the way, this idea of using local patches and an atlas goes back to differential geometry and general relativity, where we often glue together local coordinate systems to describe topologically nontrivial bundles, like M\"{o}bius strips or Klein bottles.
 
-As we'll see soon, in a locally cartesian closed category, the base change functor has both the left and the right adjoints. The left adjoint is called the dependent sum, and the right adjoint is called the dependent product or dependent function. 
+As we'll see soon, in a locally cartesian closed category, the base change functor has both the left and the right adjoints. The left adjoint to $f^*$ is called $f_!$ (sometimes pronounced ``f down-shriek'') and the right adjoint is called $f_*$ (``f down-star''):
+\[ f_! \dashv f^* \dashv f_* \]
+In programming, the left adjoint is called the dependent sum, and the right adjoint is called the dependent product or dependent function:
+\[ \Sigma_f \dashv f^* \dashv \Pi_f \]
 
 \begin{exercise}
 Define the action of the base-change functor on morphisms in $\cat C/a$, that is, given a morphism $h$ construct its counterpart $f^* h$
@@ -804,6 +807,11 @@ We've seen before that, in $\mathbf{Set}$, $f$ defines patches within $B$. Fiber
 \end{tikzpicture}
 \]
 $S$ itself is fibered in two ways: coarsely chopped over $A$ using $f \circ q$ and finely julienned over $B$ using $q$. 
+
+In category theory, the dependent sum, which is the left adjoint to the base change functor $f^*$, is denoted by $f_!$. For a given $f \colon b \to a$, it's a functor:
+\[ f_! \colon \cat C/b \to \cat C/a \]
+Its action on an object $(s, q \colon s \to b)$ is given by post-composition by $f$:
+\[ f_! (s, q)= (s, f \circ q) \]
 
 \subsection{Existential quantification}
 
@@ -1242,6 +1250,9 @@ The adjunction tells us that the elements of the ``thick fiber'' of $\Pi_f E$ co
 
 \end{tikzpicture}
 \]
+
+In category theory, the dependent product, which is the right adjoint to the base change functor $f^*$, is denoted by $f_*$. For a given $f \colon b \to a$, it's a functor:
+\[ f_* \colon \cat C/b \to \cat C/a \]
 
 The following exercises shed some light on the role played by $f$. It can be seen as localizing the sections of $E$ by restricting them to ``neighborhoods'' defined by $f^{-1}$.
 
