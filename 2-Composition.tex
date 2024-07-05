@@ -231,6 +231,284 @@ More importantly, identity arrows will allow us to compare objects. They are an 
 What does $(id_a \circ -)$ do to arrows terminating in $a$? What does $(- \circ id_a)$ do to arrows originating from $a$?
 \end{exercise}
 
+\section{Monomorphisms}
+
+Consider the function \hask{even} that tests whether its input is divisible by two:
+\begin{haskell}
+even :: Int -> Bool
+\end{haskell}
+It's a many-to-one function: all even numbers are mapped to \hask{True} and all odd numbers to \hask{False}. Most nformation about the input is discarded, we are only interested in its evenness, not its actual value. By discarding information we arrive at an abstraction\footnote{to abstract literally means to draw away}. Functions (and later functors) epitomize abstractions.
+
+Contrast this with the function \hask{injectBool}:
+\begin{haskell}
+injectBool :: Bool -> Int
+injectBool b = if b then 1 else 0
+\end{haskell}
+This function doesn't discard information. You can recover its argument from its result. 
+
+Functions that don't discard information are also useful: they can be thought of as injecting their source into their target. You may imagine the type of the source as a \emph{shape} that is being embedded in the target. Here, we are embedding a two-element shape \hask{Bool} into the type of integers. 
+
+\[
+\begin{tikzpicture}
+   \def\Xa{0};
+   \def\Xb{1.8}       
+   \def\Y{0};
+   \def\Yb{-0.85};
+   \def\delta{0.1};
+  
+         \draw(\Xa, \Y) ellipse (0.3 and 0.5);
+	% dots
+        \draw (\Xa, \Y + 0.25) [fill=orange!30] circle (2pt);
+        \draw (\Xa, \Y - 0.25) [fill=blue!50!green!20] circle (2pt);
+        
+        \draw [rounded corners] (\Xb - 0.5, \Y - 1.2) rectangle (\Xb + 0.5, \Y + 1.2) {};
+        \draw(\Xb, \Y) ellipse (0.3 and 0.5);
+	% dots
+        \draw (\Xb, \Y + 0.25) [fill=orange!30] circle (2pt);
+        \draw (\Xb, \Y - 0.25) [fill=blue!50!green!20] circle (2pt);
+        % arrows
+        \draw [->] (\Xa + \delta, \Y - 0.25) -- (\Xb - \delta, \Y - 0.25);
+        \draw [->] (\Xa + \delta, \Y + 0.25) -- (\Xb - \delta, \Y + 0.25);
+        % labels
+        \node at (\Xa, \Yb) {Bool};
+        \node at (\Xb, \Yb) {Int};
+\end{tikzpicture}
+\]
+
+Injective functions, or \index{injections}\emph{injections} are defined to always assign different values to different arguments. In other words, they don't collapse multiple elements into one. 
+
+Here's another, slightly convoluted, way of saying this: An injection maps two elements to one only when the two elements are equal. 
+
+We could translate this definition to the categorical language by replacing ``elements'' with arrows from the terminal object. We would say that $f \colon a \to b$ is an injection if, for any pair of global elements $x_1 \colon 1 \to a$ and $x_2 \colon 1 \to a$, the following implication holds:
+\[ f \circ x_1 = f \circ x_2 \implies x_1 = x_2 \]
+
+\[
+\begin{tikzpicture}
+  \def\X{-2.0}
+  \def\Xa{0};
+  \def\Xmid{1.1};
+  \def\Xb{3};
+  \def\delta{0.1};
+  
+  \def\Ymid{0};
+  \def\Ytip{-0.9};
+  \def\Ybot{-1.5};
+         \draw (\Xa , \Ymid)[fill=orange!30]  ellipse (0.8 and 1.2);
+         \draw (\Xb, \Ymid)[fill=blue!50!green!20]   ellipse (1.4 and 1.8);
+         \draw (\Xb , \Ymid) [fill=orange!30]  ellipse (0.8 and 1.2);
+	% dots
+        \filldraw (\X, \Ymid) circle (1pt);
+        \filldraw (\Xa, \Ymid - 0.5) circle (1pt);
+        \filldraw (\Xa, \Ymid + 0.5) circle (1pt);
+        \filldraw (\Xb, \Ymid - 0.5) circle (1pt);
+        \filldraw (\Xb, \Ymid + 0.5) circle (1pt);
+
+	% arrows 
+	\draw [->] (\X + \delta, \Ymid) --  (\Xa - \delta, \Ymid + 0.5);
+	\draw [->] (\X + \delta, \Ymid)  -- (\Xa - \delta, \Ymid - 0.5);
+	\draw [->] (\Xa + \delta, \Ymid + 0.5) --  (\Xb - \delta, \Ymid + 0.5);
+	\draw [->] (\Xa + \delta, \Ymid - 0.5)  -- (\Xb - \delta, \Ymid - 0.5);
+	
+	% labels
+	\node at (\Xmid, \Ymid) { $f$ };
+	\node at (\X + 0.8, \Ymid + 0.5) { $x_1$ };
+	\node at (\X + 0.8, \Ymid - 0.5) { $x_2$ };
+	\node at (\X, \Ymid - 0.5) {$1$};
+	\node at (\Xa, \Ybot) {$a$};
+	\node at (\Xb, \Ybot - 0.6) {$b$};
+
+\end{tikzpicture}
+\]
+
+The problem with this definition is that not every category has a terminal object. A better definition would replace global elements with arbitrary shapes. Thus the notion of injectivity is generalized to that of monomorphism. 
+
+An arrow $f \colon a \to b$ is  \index{monomorphism}\emph{monomorphic} if, for any choice of an object $c$ and a pair of arrows $g_1 \colon c \to a$ and $g_2 \colon c \to a$ we have the following implication:
+\[ f \circ g_1 = f \circ g_2 \implies g_1 = g_2 \]
+
+To show that an arrow $f \colon a \to b$ is \emph{not} a monomorphism, it's enough to find a counterexample: two different shapes in $a$, such that $f$ maps them to the same shape in $b$. 
+
+Monomorphisms, or ``monos'' for short, are often denoted using special arrows, as in $a \hookrightarrow b$ or $a \rightarrowtail b$. 
+
+In category theory objects are indivisible, so we can only talk about sub-objects using arrows. We say that monomorphism $a \hookrightarrow b$ picks a subobject of $b$ in the shape of $a$.
+
+\begin{exercise}
+Show that any arrow from the terminal object is a monomorphism.
+\end{exercise}
+
+\section{Epimorphisms}
+
+The function \hask{injectBool} is injective (hence a monomorphism), but it only covers a small subset of its target --- just two integers out of infinitely many.
+\begin{haskell}
+injectBool :: Bool -> Int
+injectBool b = if b then 1 else 0
+\end{haskell}
+In contrast, the function \hask{even} covers the whole of \hask{Bool} (it can produce both \hask{True} and \hask{False}). A function that covers the whole of its target is called a \index{surjection}\emph{surjection}.
+
+To generalize injections we used additional mappings-in. To generalize surjections, we'll use mappings-out. The categorical counterpart of a surjection is called an epimorphism.
+
+An arrow $f \colon a \to b$ is an \index{epimorphism}\emph{epimorphism} if for any choice of an object $c$ and a pair of arrows $g_1 \colon b \to c$ and $g_2 \colon b \to c$ we have the following implication:
+\[ g_1 \circ f = g_2 \circ f \implies g_1 = g_2 \]
+Conversely, to show that $f$ is not an epimorphism, it's enough to pick an object $c$ and two different arrows $g_1$ and $g_2$ that agree when precomposed with $f$.
+
+To get some insight into this definition, we have to visualize mappings out. Just as a mapping into an object can be thought of as defining a shape, mapping out of an object can be thought of as defining properties of that object. 
+
+This is clear when dealing with sets, especially if the target set is finite. You may think of an element of the target set as defining a color. All elements of the source that are mapped to that element are ``painted'' a particular color. For instance, the function \hask{even} paints all even integers the \hask{True} color, and all odd ones the \hask{False} color.
+
+In the definition of an epimorphism we have two such mapping, $g_1$ and $g_2$. Suppose that they differ only slightly. Most of the object $b$ is painted alike by both of them.
+
+\[
+\begin{tikzpicture}
+  \def\Xa{0};
+  \def\Xmid{1.2};
+  \def\Xb{3.2};
+  \def\Xc{6};
+  \def\delta{0.1};
+  \def\d{0.3};
+  \def\R{0.8};
+  
+  \def\Y{0};
+  \def\Ybot{-2};
+  
+         \draw(\Xc, \Y) ellipse (0.3 and 0.5);
+         % areas
+        \draw [fill=orange!30] (\Xb - 2 * \R, \Y) 
+        arc[start angle=180, delta angle=-180+30, radius=2 * \R]
+        arc[start angle=0, delta angle=-90, radius=\R]
+         to (\Xb - 2 * \R, \Y);
+         
+         \draw [fill=blue!50!green!20]  (\Xb - 2 * \R, \Y)
+         arc[start angle=-180, delta angle=180+30, radius=2 * \R]
+         arc[start angle=0, end angle=-90, radius=\R] 
+         to (\Xb - 2 * \R, \Y);
+
+	% dots
+        \draw (\Xc, \Y + 0.25) [fill=orange!30] circle (2pt);
+        \draw (\Xc, \Y - 0.25) [fill=blue!50!green!20] circle (2pt);
+
+	% arrows
+	\draw[->, dashed] (\Xb, \Y + 0.6) -- (\Xc - \delta, \Y + 0.25);
+	\draw[->, dashed] (\Xb, \Y - 0.6) -- (\Xc - \delta, \Y - 0.25);
+	% labels
+	\node at (\Xc - 0.8, \Y) { $g_1$ };
+	\node at (\Xb, \Ybot) {$b$};
+	\node at (\Xc, \Y - 0.8) {$c$};
+\end{tikzpicture}
+\hspace{1cm}
+\begin{tikzpicture}
+
+  \def\Xa{0};
+  \def\Xmid{1.2};
+  \def\Xb{3.2};
+  \def\Xc{6};
+  \def\delta{0.1};
+  \def\d{0};
+  \def\R{0.8};
+  
+  \def\Y{0};
+  \def\Ybot{-2};
+  
+         \draw(\Xc, \Y) ellipse (0.3 and 0.5);
+         % areas
+          \draw [fill=orange!30] (\d + \Xb - 2 * \R, \Y) 
+         arc[start angle=180, delta angle=-180-30, radius=2 * \R]
+         arc[start angle=0, delta angle=90, radius=\R]
+         to (\d + \Xb - 2 * \R, \Y);
+         
+         \draw [fill=blue!50!green!20]  (\d + \Xb - 2 * \R, \Y)
+         arc[start angle=-180, delta angle=180-30, radius=2 * \R]
+         arc[start angle=0, end angle=90, radius=\R] 
+         to (\d + \Xb - 2 * \R, \Y);
+         
+	% dots
+        \draw (\Xc, \Y + 0.25) [fill=orange!30] circle (2pt);
+        \draw (\Xc, \Y - 0.25) [fill=blue!50!green!20] circle (2pt);
+        
+	% arrows
+	\draw[->, dashed] (\Xb, \Y + 0.6) -- (\Xc - \delta, \Y + 0.25);
+	\draw[->, dashed] (\Xb, \Y - 0.6) -- (\Xc - \delta, \Y - 0.25);
+	% labels
+	\node at (\Xc - 0.8, \Y) { $g_2$ };
+	\node at (\Xb, \Ybot) {$b$};
+	\node at (\Xc, \Y - 0.8) {$c$};
+\end{tikzpicture}
+\]
+
+If $f$ is \emph{not} and epimorphism, it's possible that its image only covers the part that is painted alike by $g_1$ and $g_2$. The two arrows then agree on painting $a$ when precomposed by $f$, even though they are different on the whole.
+
+
+\[
+\begin{tikzpicture}
+  \def\Xa{0};
+  \def\Xmid{1.2};
+  \def\Xb{3.2};
+  \def\Xc{6};
+  \def\delta{0.1};
+  \def\d{0.2};
+  \def\R{0.8};
+  
+  \def\Y{0};
+  \def\Ymid{-1.2};
+  \def\Ybot{-2};
+  
+         % \draw (\Xa , \Y)  circle ( \R);
+         \draw [fill=blue!50!green!20] (\Xa - \R, \Y)
+         arc[start angle = -180, delta angle = 180, radius = \R]
+         to (\Xa - \R, \Y);
+         \draw [fill=orange!20] (\Xa - \R, \Y)
+         arc[start angle = -180, delta angle = -180, radius = \R]
+         to (\Xa - \R, \Y);
+         
+         \draw(\Xc, \Y) ellipse (0.3 and 0.5);
+         % area right
+          \draw [fill=orange!20] (\d + \Xb - 2 * \R,  \Y) 
+         arc[start angle=180, delta angle=-180-30, radius=2 * \R]
+         arc[start angle=0, delta angle=90, radius=\R]
+         to (\d + \Xb - 2 * \R, \Y);
+         
+         \draw [fill=blue!50!green!20]  (\d + \Xb - 2 * \R, \Y)
+         arc[start angle=-180, delta angle=180-30, radius=2 * \R]
+         arc[start angle=0, end angle=90, radius=\R] 
+         to (\d + \Xb - 2 * \R, \Y);
+	% area left
+        \draw [fill=orange!30, fill opacity=0.5] (\Xb - 2 * \R, \Y) 
+        arc[start angle=180, delta angle=-180+30, radius=2 * \R]
+        arc[start angle=0, delta angle=-90, radius=\R]
+         to (\Xb - 2 * \R, \Y);
+         
+         \draw [fill=blue!60!green!20, fill opacity=0.5]  (\Xb - 2 * \R, \Y)
+         arc[start angle=-180, delta angle=180+30, radius=2 * \R]
+         arc[start angle=0, end angle=-90, radius=\R] 
+         to (\Xb - 2 * \R, \Y);
+
+         \draw (\Xb , \Y)  circle ( \R);
+         
+	% dots
+        \draw (\Xc, \Y + 0.25) [fill=orange!30] circle (2pt);
+        \draw (\Xc, \Y - 0.25) [fill=blue!50!green!20] circle (2pt);
+        
+        %\filldraw (\Xb + \R + 0.7 * \R, \Y + 0.1)  circle (1pt);
+
+	% arrows 
+	\draw [->] (\Xa + \delta, \Y + \R) --  (\Xb - \delta, \Y + \R);
+	\draw [->] (\Xa + \delta, \Y - \R)  -- (\Xb - \delta, \Y - \R);
+	
+	% labels
+	\node at (\Xmid, \Y) { $f$ };
+	\node at (\Xa, \Ymid) {$a$};
+	\node at (\Xb, \Ybot) {$b$};
+	\node at (\Xc, \Y - 0.8) {$c$};
+
+\end{tikzpicture}
+\]
+Of course, this is just an illustration. In an actual category there is no peeking inside objects.
+
+Epimorphisms, or ``epis'' for short, are often denoted by a special arrow $a \twoheadrightarrow b$.
+
+In sets, a function that is both injective and surjective is called a bijection. It provides a one-to-one invertible mapping between elements of two sets. This role is played by isomorphisms in category theory. However, in general it's not true that an arrow that is both mono and epi is an isomorphism.
+
+\begin{exercise}
+Show that any arrow to the terminal object is an epimorphism.
+\end{exercise}
 
 
 \end{document}
