@@ -491,7 +491,7 @@ There is just one problem: how do we define a constant $\mathcal V$-functor $\De
 
 An ordinary constant functor $\Delta_x$ maps all morphisms in $\cat C(a, b)$ to the identity in $\cat D(x, x)$. In the enriched setting, though, $\cat D(x, x)$ is an object with no internal structure. Even if it happened to be the unit $I$, there's no guarantee that for every hom-object $\mathcal C(a, b)$ we could find an arrow to $I$; and even if there was one, it might not be unique. In other words, there is no reason to believe that $I$ is the terminal object.
 
-The solution is to ``smear the singularity'': instead of using the constant functor to select a single wire, we should use some other ``weighting'' functor $W \colon \mathcal J\to \mathcal V$ to select a thicker ``cylinder''. Such a weighted cone with the apex $x$ is an element of the set of natural transformations:
+The solution is to ``smear the singularity'': instead of using the constant functor to select a single wire, we should use some other ``weighting'' functor $W \colon \mathcal J\to \Set$ to select a thicker ``cylinder''. Such a weighted cone with the apex $x$ is an element of the set of natural transformations:
 \[ [\mathcal J, \Set] \left(W, \mathcal C(x, D-)\right) \]
 
 A \emph{weighted limit}, also known as an \index{indexed limit}\emph{indexed limit}, $\text{lim}^W D$, is then defined as the universal weighted cone. It means that for any weighted cone with the apex $x$ there is a unique morphism from $x$ to $\text{lim}^W D$ that factorizes it. The factorization is guaranteed by the naturality of the isomorphism that defines the weighted limit:
@@ -557,19 +557,19 @@ First, let's work out the formula for ordinary, $\Set$-enriched categories. The 
  We'll consider the mapping into it from an arbitrary object $d$. The derivation follows a number of simple steps, mostly by expanding the definitions. 
  
  We start with:
-\[ \cat D(d, (\text{Ran}_P F) e) \]
+\[ \cat D\big(d, (\text{Ran}_P F) e\big) \]
  and substitute the definition of the Kan extension:
- \[ \cat D(d, \int_c \cat B (e, P c) \pitchfork F c) \]
+ \[ \cat D\big(d, \int_c \cat B (e, P c) \pitchfork F c\big) \]
 Using the continuity of the hom-functor, we can pull out the end:
- \[ \int_c \cat D(d,  \cat B (e, P c) \pitchfork F c) \]
+ \[ \int_c \cat D\big(d,  \cat B (e, P c) \pitchfork F c\big) \]
 We then use the definition of the pitchfork:
 \[ \cat D (d, A \pitchfork d') \cong \Set  \big(A, \cat D(d, d')\big) \]
 to get:
- \[ \int_c \cat D(d,  \cat B (e, P c) \pitchfork F c) \cong \int_c \Set( \cat B(e, P c), \cat D(d, F c))\]
+ \[ \int_c \cat D\big(d,  \cat B (e, P c) \pitchfork F c\big) \cong \int_c \Set\big( \cat B(e, P c), \cat D(d, F c)\big)\]
 This can be written as a set of natural transformation:
-\[ [\cat C, \Set] (\cat B(e, P-), \cat D(d, F-)) \]
+\[ [\cat C, \Set] \big(\cat B(e, P-), \cat D(d, F-)\big) \]
 The weighted limit is also defined through the set of natural transformations:
-\[  \mathcal D(d, \text{lim}^W F) \cong [\mathcal C, \Set] (W, \mathcal D(d, F-)) \]
+\[  \mathcal D(d, \text{lim}^W F) \cong [\mathcal C, \Set] \big(W, \mathcal D(d, F-)\big) \]
 leading us to the final result:
 \[ \cat D(d, \text{lim}^{\cat B (e, P-)} F) \]
 Since $d$ was arbitrary, we can use the Yoneda trick to conclude that:
@@ -588,9 +588,9 @@ Derive the formula for the left Kan extension for ordinary categories.
 \item Yoneda lemma:
 \[ \int_x [\mathcal C( c, x), F x] \cong F c \]
 \item Weighted limit:
-\[  \mathcal C(x, \text{lim}^W D) \cong [\mathcal J, \mathcal V] (W, \mathcal C(x, D-)) \]
+\[  \mathcal C(x, \text{lim}^W D) \cong [\mathcal J, \mathcal V] \big(W, \mathcal C(x, D-)\big) \]
 \item Weighted colimit:
-\[  \mathcal C(\text{colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] (W, \mathcal C(D-, x)) \]
+\[  \mathcal C(\text{colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] \big(W, \mathcal C(D-, x)\big) \]
 \item Right Kan extension:
 \[ (\text{Ran}_P F) e = \text{lim}^{\cat B(e, P-)} F  \]
 \item Left Kan extension:
