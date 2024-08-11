@@ -43,7 +43,8 @@
 \newcommand{\Cat}[1]{\mathbf{#1}}%a named category
 \newcommand{\Set}{\Cat{Set}}
 
-\newcommand{\hask}[1]{\mintinline{Haskell}{#1}}
+\DeclareRobustCommand{\hask}[1]{\ifmmode\text{\texttt{#1}}\else\mintinline{Haskell}{#1}\fi}
+%\newcommand{\hask}[1]{\mintinline{Haskell}{#1}}
 \newenvironment{haskell}
   {\VerbatimEnvironment
          \fvset{formatcom=\upshape} % Use upright shape for this environment
