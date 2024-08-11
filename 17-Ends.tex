@@ -954,7 +954,7 @@ In Haskell, we would express this idea using an existential type:
 data LensE s a where
     LensE :: (s -> (c, a), (c, a) -> s) -> LensE s a
 \end{haskell}
-This tells us that there exists some unspecified type \hask{c} such that \hask{s} can be split into, and reconstructed from, a product \hask{(c, a)}. 
+This tells us that there exists some unspecified type \hask{c}, such that \hask{s} can be split into, and reconstructed from, a product \hask{(c, a)}. 
 
 \[
 \begin{tikzpicture}
@@ -1034,7 +1034,7 @@ toSet :: LensE s t a b -> (s -> b -> t)
 toSet (LensE l r) s a = r (fst (l s), a)
 \end{haskell}
 
-The two functions, \hask{s->(c, a)} and \hask{(c, b)-> t} are often called the \emph{forward} and the \emph{backward} pass. 
+The two functions, \hask{s->(c, a)} and \hask{(c, b)->t} are often called the \emph{forward} and the \emph{backward} pass. 
 The forward pass can be used to extract the focus \hask{a}. The backward pass provides the answer to the question: If we wanted the result of the forward pass to be some other \hask{b}, what \hask{t} should we pass to it? 
 
 And sometimes we're just asking: What change \hask{t} should we make to the input if we wanted to change the focus by \hask{b}. The latter point of view is especially useful when using lenses to describe \index{neural networks}neural networks.
@@ -1052,7 +1052,7 @@ The main advantage of using lenses is that they compose. A composition of two le
 
 Suppose that we start with a lens that lets us access the focus \hask{a}  and change it to \hask{b}. This focus is part of a whole described by the source \hask{s} and the target \hask{t}. 
 
-We also have the inner lens that can access the focus of \hask{a'}  inside the whole of \hask{a}, and replace it with \hask{b'} to produce a \hask{b}. 
+We also have the inner lens that can access the focus of \hask{a'}  inside the whole of \hask{a}, and replace it with \hask{b'} to give us a new \hask{b}. 
 
 We can now construct a composite lens that can access \hask{a'} and \hask{b'} inside of \hask{s} and \hask{t}. The trick is to realize that we can take, as the new residue, a product of the two residues:
 \[
@@ -1149,7 +1149,7 @@ toSet l3 x 'z'
 
 \subsection{Category of lenses}
 
-Since lenses can be composed, you might be wondering if there is a category in which lenses define hom-sets. 
+Since lenses can be composed, you might be wondering if there is a category in which lenses are hom-sets. 
 
 Indeed, there is a category $\mathbf{Lens}$ whose objects are pairs of objects in $\mathcal{C}$, and arrows from $\langle s, t\rangle$ to $ \langle a, b \rangle$ are elements of  $\mathcal{L} \langle s, t\rangle \langle a, b \rangle$.
 
