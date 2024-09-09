@@ -28,13 +28,13 @@ Based on the definition of a category, we can come up with all kinds of weird ca
 
 We can also strip a category of all arrows (except for the identity arrows). Such a bare-object category is called a \index{discrete category}\emph{discrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
 
-Sets form their own category called $\mathbf{Set}$\footnote{Again, ignoring ``size'' issues, in particular the non-existence of the set of all sets.}. The objects in that category are sets, and the arrows are functions between sets. Such functions are defined as special kind of relations, which themselves are defined as sets of pairs.
+Sets form their own category called \index{Set, category of sets}$\mathbf{Set}$\footnote{Again, ignoring ``size'' issues, in particular the non-existence of the set of all sets.}. The objects in that category are sets, and the arrows are \index{function}functions between sets. Such functions are defined as special kind of relations, which themselves are defined as sets of pairs.
 
 To the lowest approximation, we can model programming in the category of sets. We often think of types as sets of values, and functions as set-theoretical functions. There's nothing wrong with that. In fact all of categorical constructions we've described so far have their set-theoretical roots. The categorical product is a generalization of the cartesian product of sets, the sum is the disjoint union, and so on. 
 
 What category theory offers is more precision: the fine distinction between the structure that is absolutely necessary, and the superfluous details. 
 
-A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Our functions must have underlying algorithms because they have to be computable by some physical systems, be it computers or a human brains. 
+A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Our functions must have underlying algorithms because they have to be computable by some physical systems, be it computers or a human brains. There are many more set-theoretical functions than there are algorithms. And some algorithms (in Turing-complete languages) may run forever and never produce a result. 
 
 \subsection{Opposite categories}
 In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 

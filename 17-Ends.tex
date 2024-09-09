@@ -546,7 +546,7 @@ We can pick a single element of the set $\int_{x} \mathcal{C}(F x, G x)$ by inst
  \\
   \mathcal{C} ( F a, G a )
  \arrow[dr, "{(F f \, \circ \, -)}"']
- && \mathcal{C} \langle F b, G b \rangle
+ && \mathcal{C} ( F b, G b )
  \arrow[dl, "{(- \, \circ\, G f)}"]
  \\
  &  \mathcal{C} ( F a, G b )
@@ -744,6 +744,7 @@ Implement the associator for \hask{Day}.
 \begin{haskell}
 assoc :: Day f (Day g h) x -> Day (Day f g) h x
 \end{haskell}
+Hint: When constructing the result, you are free to pick an existential type at your convenience, e.g., it could be a pair type.
 \end{exercise}
 
 
@@ -930,7 +931,7 @@ class Profunctor p => PreArrow p where
   (>>>) :: p a x -> p x b -> p a b
   arr   :: (a -> b) -> p a b
 \end{haskell}
-An \hask{Arrow} is a \hask{PreArrow} that is also a Tambara module. We'll talk about Tambara modules in the next chapter.
+An \index{\hask{Arrow}}\hask{Arrow} is a \hask{PreArrow} that is also a Tambara module. We'll talk about Tambara modules in the next chapter.
 
 \section{Existential Lens}
 
@@ -949,7 +950,7 @@ Here, \hask{get} extracts the part \hask{a} from the whole \hask{s}, and \hask{s
 
 Another way of describing a composite object is to say that it can be split into a focus and a residue. The trick is that, although we want to know what type the focus is, we don't care about the type of the residue. All we need to know about the residue is that it can be combined with the focus to recreate the whole object. 
 
-In Haskell, we would express this idea using an existential type:
+In Haskell, we would express this idea using an \index{existential lens}existential type:
 \begin{haskell}
 data LensE s a where
     LensE :: (s -> (c, a), (c, a) -> s) -> LensE s a
@@ -984,8 +985,8 @@ Notice that we don't need to know anything about the type of the residue. We tak
 
 It's impossible to extract a ``naked'' residue, as witnessed by the fact that the following code doesn't compile:
 \begin{haskell}
-getResidue :: Lens s a -> c
-getResidue (Lens (l, r)) = fst . l
+getResidue :: LensE s a -> c
+getResidue (LensE (l, r)) = fst . l
 \end{haskell}
 
 \subsection{Existential lens in category theory}
@@ -1019,7 +1020,7 @@ is a profunctor in $\langle x, y\rangle$.
 
 
 \subsection{Type-changing lens in Haskell}
-In Haskell, we can define a type-changing lens as the following existential type:
+In Haskell, we can define a type-changing lens as the following \index{existential lens}existential type:
 \begin{haskell}
 data LensE s t a b where
   LensE :: (s -> (c, a)) -> ((c, b) -> t) -> LensE s t a b

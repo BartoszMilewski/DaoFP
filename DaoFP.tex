@@ -24,24 +24,27 @@
 \usepackage{float}
 \usepackage{xcolor}
 \usepackage{stix}
-
-\newtheorem{exercise}{Exercise}[section]
-\newcommand{\exinline}[1]{(\refstepcounter{exercise}Exercise~\theexercise\label{#1})}
+\usepackage{microtype}
 
 \usepackage{minted}
 \usepackage{etoolbox}
 
-\usepackage[bookmarksnumbered]{hyperref}
+\usepackage[pdftex, bookmarksnumbered]{hyperref}
+
 \hypersetup{
   colorlinks,
   linkcolor={red!40!black},
   citecolor={red!40!black},
-  urlcolor={blue!40!black}
+  urlcolor={blue!75!black}
 }
 
-\newcommand{\cat}[1]{\mathcal{#1}}%a generic category
-\newcommand{\Cat}[1]{\mathbf{#1}}%a named category
-\newcommand{\Set}{\Cat{Set}}
+\newtheorem{exercise}{Exercise}[section]
+\newcommand{\exinline}[1]{(\refstepcounter{exercise}Exercise~\theexercise\label{#1})}
+
+\newcommand{\cat}[1]{\mathcal{#1}} %a generic category
+\newcommand{\Cat}[1]{\mathbf{#1}} %a named category
+\newcommand{\Set}{\Cat{Set}} %category of sets
+\newcommand{\mathvar}[1]{\mathop{\text{#1}}} %multi-character variable names
 
 \DeclareRobustCommand{\hask}[1]{\ifmmode\text{\texttt{#1}}\else\mintinline{Haskell}{#1}\fi}
 %\newcommand{\hask}[1]{\mintinline{Haskell}{#1}}
@@ -118,6 +121,8 @@ Programming examples are written in Haskell. Although this is not a Haskell manu
 apply :: (a -> b, a) -> b
 apply (f, x) = f x
 \end{haskell}
+
+Haskell code to accompany this book, including solutions to programming exercises, is available on \href{https://github.com/BartoszMilewski/Publications/tree/master/TheDaoOfFP/Haskell}{GitHub}.
 
 \mainmatter
 

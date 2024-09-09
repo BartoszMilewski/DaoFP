@@ -261,13 +261,6 @@ otherWay alpha h = alpha @b . fmap @f h
 \end{haskell}
 The annotations \hask{@a} and \hask{@b} specify the components of the parametrically polymorphic function \hask{alpha}, and the annotations \hask{@f} and \hask{@g} specify the functors for which the ad-hoc polymorphic \hask{fmap} is instantiated.
 
-The following Haskell extensions have to be specified at the top of the file:
-\begin{haskell}
-{-# language RankNTypes #-}
-{-# language TypeApplications #-}
-{-# language ScopedTypeVariables #-}
-\end{haskell}
-
 Here's an example of a useful function that is a natural transformation between the list functor and the \hask{Maybe} functor:
 \begin{haskell}
 safeHead :: Natural [] Maybe
@@ -549,7 +542,7 @@ Do the same with the horizontal composition of \hask{reverse} after \hask{safeHe
 
 \subsection{Whiskering}
 
-Quite often horizontal composition is used with one of the natural transformations being the identity. There is a shorthand notation for such composition. For instance, $\alpha \circ id_F$ is written as $\alpha \circ F$. 
+Quite often horizontal composition is used with one of the natural transformations being the identity. There is a shorthand notation for such composition. For instance, $\beta \circ id_F$ is written as $\beta \circ F$. 
 
 Because of the characteristic shape of the diagram, such composition is called ``whiskering''.
 \[
@@ -562,22 +555,22 @@ Because of the characteristic shape of the diagram, such composition is called `
   \arrow[bend right=50]{r}[name=D1, label=below:$G'$]{} 
  &
 \mathcal{E}
-  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\alpha$] {} (D1)}]{}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\beta$] {} (D1)}]{}
 \end{tikzcd}
 \]
 In components, we have:
-\[ (\alpha \circ F)_x = \alpha_{F x} \]
+\[ (\beta \circ F)_x = \beta_{F x} \]
 
 Let's consider how we would translate this to Haskell. A natural transformation is a polymorphic function. Because of parametricity, it's defined by the same formula for all types. So whiskering on the right doesn't change the formula, it changes the function signature. 
 
-For instance, if this is the declaration of \hask{alpha}:
+For instance, if this is the declaration of \hask{beta}:
 \begin{haskell}
-alpha :: forall x. G x -> G' x
+beta :: forall x. G x -> G' x
 \end{haskell}
 then its whiskered version would be:
 \begin{haskell}
-alpha_f :: forall x. G (F x) -> G' (F x)
-alpha_f = alpha
+beta_f :: forall x. G (F x) -> G' (F x)
+beta_f = beta
 \end{haskell}
 Because of Haskell's type inference, this shift is implicit. When a polymorphic function is called, we don't have to specify which component of the natural transformation is executed--the type checker figures it out by looking at the type of the argument. 
 
@@ -1532,7 +1525,7 @@ In particular, we can apply currying to the hom-functor $\mathcal{C}(a, b)$. It 
 \[ \mathcal{C}^{op} \times \mathcal{C} \to  \mathbf{Set} \]
 But it's also a contravariant functor in the first argument $a$. And for every $a$ in  $\mathcal{C}^{op}$  it produces a covariant functor $\mathcal{C}(a, -)$, which is an object in the functor category $ [\mathcal{C},  \mathbf{Set}] $. We can write this mapping as:
 \[ \mathcal{C}^{op} \to [\mathcal{C},  \mathbf{Set}] \]
-Alternatively, we can fix $b$ and produce a contravariant functor $\mathcal{C}(-, b)$. This mapping can be written as
+Alternatively, we can fix $b$ and produce a contravariant functor $\mathcal{C}(-, b)$. This mapping can be written as:
 \[ \mathcal{C} \to [\mathcal{C}^{op},  \mathbf{Set}] \]
 Both mappings are functorial, which means that, for instance, an arrow in $\mathcal{C}$ is mapped to a natural transformation in $[\mathcal{C}^{op},  \mathbf{Set}]$.
 
@@ -1540,7 +1533,7 @@ These $\mathbf{Set}$-valued functor categories are common enough that they have 
 
 Let's focus our attention on the following reading of the hom-functor:
 \[ \mathcal{Y} \colon \mathcal{C} \to [\mathcal{C}^{op},  \mathbf{Set}] \]
-It takes an object $x$ and maps it to a presheaf 
+It takes an object $x$ and maps it to a presheaf:
 \[ \mathcal Y_x = \mathcal{C}(-, x) \]
 which can be visualized as the totality of views of $x$ from all possible directions.
 
@@ -1548,15 +1541,19 @@ Let's also review its action on arrows. The functor $\mathcal{Y}$ lifts an arrow
 \[ \alpha \colon \mathcal{C}(-, x) \to \mathcal{C}(-, y) \]
 The component of this natural transformation at some $z$ is a function between hom-sets:
 \[ \alpha_z \colon \mathcal{C}(z, x) \to \mathcal{C}(z, y) \]
-which is simply implemented as the post-composition $(f \circ -)$.
+which is simply implemented as the post-composition $(f \circ -)$. Notice that this makes $ \mathcal Y_x$ \emph{covariant} in $x$.
 
-Such a functor $\mathcal{Y}$ can be thought of as creating a model of $\mathcal{C}$ in the presheaf category. But this is no run-of-the-mill model---it's an \emph{embedding} of one category inside another. This particular one is called the \emph{Yoneda embedding} and the functor $\mathcal{Y}$ is called the \index{Yoneda functor}\emph{Yoneda functor}. 
+The functor $\mathcal{Y}$ is called the \index{Yoneda functor}\emph{Yoneda functor}. It's a mixed variance functor (a profunctor), When we fix its second argument it yields a presheaf $\mathcal{Y}_x \colon [\cat C^{op}, \Set]$. When we fix the first argument it produces a co-presheaf $\mathcal{Y}^x \colon [\cat C, \Set]$:
+\[ \mathcal{Y}^x  = \cat C(x, -) \]
+
+
+The Yoneda functor $\mathcal{Y} \colon \cat C \to [\cat C^{op}, \Set]$ can be thought of as creating a model of $\mathcal{C}$ in the presheaf category. But this is no run-of-the-mill model---it's an \emph{embedding} of one category inside another. This particular one is called the \emph{Yoneda embedding} 
 
 First of all, every object of $\mathcal{C}$ is mapped to a \emph{different} object (presheaf) in $[\mathcal{C}^{op},  \mathbf{Set}]$. We say that it's \index{injection}\emph{injective on objects}. 
 
-But that's not all: every arrow in $\mathcal{C}$ is mapped to a \emph{different} arrow. We say that the embedding functor is \index{faithful functor}\emph{faithful}. 
+But that's not all: every arrow in $\mathcal{C}$ is mapped to a \emph{different} arrow. A functor that is injective on arrows is called \index{faithful functor}\emph{faithful}. 
 
-If that weren't enough, the mapping of hom-sets is also \index{surjection}\emph{surjective}, meaning that every arrow between objects in $[\mathcal{C}^{op},  \mathbf{Set}]$ comes from some arrow in $\mathcal{C}$. We say that the functor is \index{full functor}\emph{full}. 
+If that weren't enough, the mapping of hom-sets is also \index{surjection}\emph{surjective}, meaning that every arrow between objects in $[\mathcal{C}^{op},  \mathbf{Set}]$ comes from some arrow in $\mathcal{C}$. A functor that is surjective on arrows is called \index{full functor}\emph{full}. 
 
 Altogether, the embedding is \emph{fully faithful}, that is the mapping of arrows is one-to-one. However, in general, the Yoneda embedding is \emph{not} surjective on objects, hence the word ``embedding.''
 
