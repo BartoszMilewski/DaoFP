@@ -13,3 +13,6 @@ DaoFP.ilg
 *.fls
 *.out
 *.pyg
+
+# Nix
+result
