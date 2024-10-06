@@ -279,22 +279,22 @@ There are some elementary functors that might seem trivial, but they serve as bu
 
 We have the identity endofunctor that maps all objects to themselves, and all arrows to themselves. 
 \begin{haskell}
-data Id a = Id a
+newtype Identity a = Identity a
 \end{haskell}
 \begin{exercise}
-Show that \hask{Id} is a \hask{Functor}. Hint: implement the \hask{Functor} instance for it.
+Show that \hask{Identity} is a \hask{Functor}. Hint: implement the \hask{Functor} instance for it.
 \end{exercise}
 
 
 We also have a constant functor $\Delta_c$ that maps all objects to a single object $c$, and all arrows to the identity arrow on this object. In Haskell, it's a family of functors parameterized by the target object \hask{c}:
 \begin{haskell}
-data Const c a = Const c
+data Constant c a = Constant c
 \end{haskell}
 This type constructor ignores its second argument.
 
 
 \begin{exercise}
-Show that \hask{(Const c)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but in the \hask{Functor} instance it's partially applied to the first argument. It is functorial in the second argument.
+Show that \hask{(Constant c)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but in the \hask{Functor} instance it's partially applied to the first argument. It is functorial in the second argument.
 \end{exercise}
 
 
@@ -340,7 +340,7 @@ It's often convenient to think of functors in terms of producers and consumers. 
 
 Example: A predicate is a function returning \hask{True} or \hask{False}:
 \begin{haskell}
-data Predicate a = Predicate (a -> Bool)
+newtype Predicate a = Predicate (a -> Bool)
 \end{haskell}
 It's easy to see that it's a contravariant functor:
 \begin{haskell}
@@ -354,7 +354,7 @@ One way to tell if a given function type is covariant or contravariant in one of
 
 Consider this data type:
 \begin{haskell}
-data Tester a = Tester ((a -> Bool) -> Bool)
+newtype Tester a = Tester ((a -> Bool) -> Bool)
 \end{haskell}
 It has \hask{a} in a double-negative, therefore a positive position. This is why it's a covariant \hask{Functor}. It acts as a producer of \hask{a}'s:
 
@@ -445,15 +445,11 @@ Just like we can compose functions, we can compose functors. Two functors are co
  
  In Haskell, a functor is a parameterized data type, so the composition of two functors is again a parameterized data type. On objects, we define:
  \begin{haskell}
-data Compose g f a = Compose (g (f a))
+newtype Compose g f a = Compose (g (f a))
 \end{haskell}
 The compiler figures out that \hask{f} and \hask{g} must be type constructors because they are applied to types: \hask{f} is applied to the type parameter \hask{a}, and \hask{g} is applied to the resulting type.
 
-Alternatively, you can tell the compiler that the first two arguments to \hask{Compose} are type constructors. You do this by providing a \index{kind signatures}\emph{kind signature}, which requires a language extension \hask{KindSignatures} that you put at the top of the source file:
-\begin{haskell}
-{-# language KindSignatures #-}
-\end{haskell}
-You should also import the \hask{Data.Kind} library that defines \hask{Type}:
+Alternatively, you can tell the compiler that the first two arguments to \hask{Compose} are type constructors. You do this by providing a \index{kind signatures}\emph{kind signature}. You should also import the \hask{Data.Kind} library that defines \hask{Type}:
 \begin{haskell}
 import Data.Kind
 \end{haskell}

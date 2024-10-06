@@ -305,8 +305,8 @@ a && b
 \]
 Here's the direct Haskell reading of this diagram
 \begin{haskell}
-h :: (c -> a, c -> b) -> (c -> (a, b))
-h (f, g) = \c -> (f c, g c)
+mapIn :: (c -> a, c -> b) -> (c -> (a, b))
+mapIn (f, g) = \c -> (f c, g c)
 \end{haskell}
 And this is the stylized version written in Haskell style as an infix operator \hask{&&&}
 \begin{haskell}

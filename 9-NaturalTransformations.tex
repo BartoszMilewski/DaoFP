@@ -576,31 +576,31 @@ Because of Haskell's type inference, this shift is implicit. When a polymorphic 
 
 The intuition in this case is that we are repackaging the outer container leaving the inner containers intact.
 
-Similarly, $id_H \circ \alpha$ is written as $H \circ \alpha$.
+Similarly, $id_G \circ \alpha$ is written as $G \circ \alpha$.
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{D}
-  \arrow[bend left=50]{r}[name=U, label=above:$G$]{}
-  \arrow[bend right=50]{r}[name=D, label=below:$G'$]{} 
+  \arrow[bend left=50]{r}[name=U, label=above:$F$]{}
+  \arrow[bend right=50]{r}[name=D, label=below:$F'$]{} 
  &
 \mathcal{E}
-\arrow[r, "H"]
+\arrow[r, "G"]
 &
 \mathcal{F}
   \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U) -- node[label=left:$\alpha$] {} (D)}]{}
 \end{tikzcd}
 \]
 In components:
-\[(H \circ \alpha)_x = H (\alpha_x) \]
+\[(G \circ \alpha)_x = G (\alpha_x) \]
 
-In Haskell, the lifting of $\alpha_x$ by $H$ is done using \hask{fmap}, so given:
+In Haskell, the lifting of $\alpha_x$ by $G$ is done using \hask{fmap}, so given:
 \begin{haskell}
-alpha :: forall x. G x -> G' x
+alpha :: forall x. F x -> F' x
 \end{haskell}
 the whiskered version would be:
 \begin{haskell}
-h_alpha :: forall x. H (G x) -> H (G' x)
-h_alpha = fmap alpha
+g_alpha :: forall x. G (F x) -> G (F' x)
+g_alpha = fmap alpha
 \end{haskell}
 Again, Haskell's type inference engine figures out which version of \hask{fmap} to use (here, it's the one from the \hask{Functor} instance of \hask{G}).
 
@@ -617,18 +617,18 @@ Finally, in many applications a natural transformation is whiskered on both side
   \arrow[bend right=50]{r}[name=D1, label=below:$G'$]{} 
  &
 \mathcal{E}
-  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\alpha$] {} (D1)}]{}
+  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\beta$] {} (D1)}]{}
   \arrow[r, "H"]
  &
  \mathcal{F}
 \end{tikzcd}
 \]
 In components, we have:
-\[ (H \circ \alpha \circ F) x = H (\alpha_{F x})\]
+\[ (H \circ \beta \circ F) x = H (\beta_{F x})\]
 and in Haskell:
 \begin{haskell}
-h_alpha_f :: forall x. H (G (F x)) -> H (G' (F x))
-h_alpha_f = fmap alpha
+h_beta_f :: forall x. H (G (F x)) -> H (G' (F x))
+h_beta_f = fmap beta
 \end{haskell}
 
 Here the intuition is that we have a triple layer of containers; and we are rearranging the middle one, leaving the outer container and all the inner containers intact.
@@ -1187,22 +1187,42 @@ B
 & C
 \end{tikzcd}
 \]
-An $x \in A$ is mapped to two elements $f x$ and $g x$ in $B$, but then $q$ maps them back to a single element of $C$. This element represents the bucket. Universality means that $C$ is a copy of $B$ in which the elements that were produced from the same $x$ have been identified.
+An $x \in A$ is mapped to two elements $f x$ and $g x$ in $B$, but then $q$ must map them back to a single element of $C$. This element represents the bucket. 
+
+Universality means that $C$ is a copy of $B$ in which the elements that were produced from the same $x$ have been identified.
 
 Consider an example where $A$ is a set of pairs of integers \hask{(m, n)}, such that either both are even or both are odd.  We want to coequalize two functions that are the two projections \hask{(fst, snd)}. The equalizer set $C$ will have two elements corresponding to two buckets. We'll represent it as \hask{Bool}. The equalizing function \hask{q} selects the bucket:
 \begin{haskell}
 q :: Int -> Bool
 q n = n `mod` 2 == 0 
 \end{haskell}
-Any function \hask{q'} that cannot distinguish between the components of our pairs can be uniquely factorized through the function \hask{h}:
+Any function \hask{q'} that cannot distinguish between the components of our pairs, and is sensitive only to their parity:
+\[ q' \circ \mathvar{fst} = q' \circ \mathvar{snd} \]
+ can be uniquely factorized through the function \hask{h}:
 \begin{haskell}
 h :: (Int -> a) -> Bool -> a
-h q' True  = g' 0
-h q' False = g' 1
+h q' True  = q' 0
+h q' False = q' 1
 \end{haskell}
 
+\[
+\begin{tikzcd}
+(\text{Int}, \text{Int})
+\arrow[r, red, shift left=.75ex, "\text{fst}"]
+\arrow[r, red, shift right=.75ex, "\text{snd}"']
+&
+\text{Int}
+\arrow[r, "q"]
+\arrow[rd, "q'"']
+& \text{Bool}
+\arrow[d, dashed, "h"]
+\\
+&& A
+\end{tikzcd}
+\]
+
 \begin{exercise}
-Run a few tests that show that, in the example above, the factorization \hask{(h g') . q} gives the same result as \hask{g'} given by the following definition:
+Run a few tests that show that the factorization $(h\, q') \circ q$ gives the same result as \hask{q'}, where \hask{q'} given by the following definition:
 \begin{haskell}
 import Data.Bits
 
@@ -1210,16 +1230,6 @@ q' :: Int -> Bool
 q' x = testBit x 0
 \end{haskell}
 
-\end{exercise}
-\begin{exercise}
-What is the coequalizer of the pair \hask{(id, reverse)}, both of the type \hask{String->String}? Test its universality by factorizing the following function:
-\begin{haskell}
-q' :: String -> Maybe Char
-q' s = if even len
-       then Nothing
-       else Just (s !! (len `div` 2))
-  where len = length s
-\end{haskell}
 \end{exercise}
 
 \subsection{The existence of the terminal object}

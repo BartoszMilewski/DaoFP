@@ -219,6 +219,10 @@ On the other hand, recursion is more natural when processing recursively defined
 The two approaches are equivalent, and compilers often convert recursive functions to loops in what is called \emph{tail recursion optimization}.
 
 \begin{exercise}
+Implement a function that turns a \hask{Nat} to an \hask{Int} using a recursor.
+\end{exercise}
+
+\begin{exercise}
 Implement a curried version of addition as a mapping out of $N$ into the function object $N^N$. Hint: use these types in the recursor:
 \begin{haskell}
 init :: Nat -> Nat

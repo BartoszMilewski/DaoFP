@@ -1387,21 +1387,21 @@ Suppose that you want to compare two terms for equality. The first requirement i
 
 For every pair of values there is, in principle, a separate type of proofs of equality. There is a type for $0 = 0$, there is a type for $1=1$, and there is a type for $1 = 0$; the latter hopefully uninhabited. 
 
-Equality type, a.k.a., identity type, is therefore a dependent type: it depends on the two values that we are comparing. It's usually written as $\mathit{Id}_A$, where $A$ is the type of both values, or using an infix notation as $x=_A y$ (equal sign with the subscript $A$). 
+Equality type, a.k.a., identity type, is therefore a dependent type: it depends on the two values that we are comparing. It's usually written as $\text{Id}_A$, where $A$ is the type of both values, or using an infix notation as $x=_A y$ (equal sign with the subscript $A$). 
 
-For instance, the type of equality of two zeros is written as $\mathit{Id}_{\mathbb{N}} (0, 0)$ or:
+For instance, the type of equality of two zeros is written as $\text{Id}_{\mathbb{N}} (0, 0)$ or:
 \[ 0 =_{\mathbb{N}} 0 \]
 Notice: this is not a statement or a term. It's a \emph{type}, like \hask{Int} or \hask{Bool}. You can define a value of this type if you have an introduction rule for it.
 
 \subsection{Introduction rule}
 
 The introduction rule for the equality type is the dependent function: 
-\[ \mathit{refl}_A \colon \Pi_{x : A}  \mathit{Id}_A  (x, x)\]
+\[ \text{refl}_A \colon \Pi_{x : A}  \text{Id}_A  (x, x)\]
 which can be interpreted in the spirit of propositions as types as the proof of the statement:
 \[ \forall _{x:A} \;x = x \]
-This is the familiar reflexivity: it shows that, for all $x$ of type $A$, $x$ is equal to itself. You can apply this function to some concrete value $x$ of type $A$, and it will produce a new value of type $\mathit{Id}_A  (x, x)$.
+This is the familiar reflexivity: it shows that, for all $x$ of type $A$, $x$ is equal to itself. You can apply this function to some concrete value $x$ of type $A$, and it will produce a new value of type $\text{Id}_A  (x, x)$.
 
-We can now prove that $0=0$. We can execute $\mathit{refl}_{\mathbb{N}} (0)$ to get a value of the type $0 =_{\mathbb{N}} 0$. This value is the proof that the type is inhabited, and therefore corresponds to a true proposition.
+We can now prove that $0=0$. We can execute $\text{refl}_{\mathbb{N}} (0)$ to get a value of the type $0 =_{\mathbb{N}} 0$. This value is the proof that the type is inhabited, and therefore corresponds to a true proposition.
 
 This is the only introduction rule for equality, so you might think that all proofs of equality boil down to ``they are equal because they are the same.'' Surprisingly, this is not the case. 
 
@@ -1415,7 +1415,7 @@ Conversely, if we are given a value $p \colon A \times B$, we can extract the tw
 
 In the categorical model of type theory these two rules follow from the universal construction. 
 
-The equality type also has the elimination rule, which we'll discuss shortly, but we don't impose the uniqueness condition. It means that it's possible that there are some equality proofs that were not obtained using $\mathit{refl}$. 
+The equality type also has the elimination rule, which we'll discuss shortly, but we don't impose the uniqueness condition. It means that it's possible that there are some equality proofs that were not obtained using $\text{refl}$. 
 
 This is exactly the weakening of the notion of equality that makes HoTT interesting to mathematicians.
 
@@ -1455,22 +1455,22 @@ Not all dependent mappings out of natural numbers can be decomposed into $\mathi
 
 \subsection{Equality elimination rule}
 
-The elimination rule for equality type is somewhat analogous to the induction principle for natural numbers. There we used $\mathit{init}$ to ground ourselves at the start of the journey, and $\mathit{step}$ to make progress. The elimination rule for equality requires a more powerful grounding, but it doesn't have a $\mathit{step}$. There really is no good analogy for how it works, other than through a leap of faith.
+The elimination rule for equality type, also called the \index{J-rule}J-rule, is somewhat analogous to the induction principle for natural numbers. There we used $\mathit{init}$ to ground ourselves at the start of the journey, and $\mathit{step}$ to make progress. The elimination rule for equality requires a more powerful grounding, but it doesn't have a $\mathit{step}$. There really is no good analogy for how it works, other than through a leap of faith.
 
 The idea is that we want to construct a mapping \emph{out} of the equality type. But since equality type is itself a two-parameter family of types, the mapping out should be a dependent function. The target of this function is another family of types:
 \[T(x, y, p)\]
- that depends on the pair of values that are being compared $x, y \colon A$, and the proof of equality $p \colon \mathit{Id}(x, y)$.
+ that depends on the pair of values that are being compared $x, y \colon A$, and the proof of equality $p \colon \text{Id}(x, y)$.
  
  The function we are trying to construct is:
- \[ f \colon \Pi_{x, y : A} \Pi_{p : \mathit{Id}(x, y)} \, T(x, y, p) \]
+ \[ f \colon \Pi_{x, y : A} \Pi_{p : \text{Id}(x, y)} \, T(x, y, p) \]
 
 It's convenient to think of it as generating a proof that for all points $x$ and $y$, and for every proof that the two are equal, the proposition $T(x, y, p)$ is true. Notice that, potentially, we have a different proposition for \emph{every proof} that the two points are equal.
 
-The least that we can demand from $T(x, y, p)$ is that it should be true when $x$ and $y$ are literally the same, and the equality proof is the obvious $\mathit{refl}$. This requirement can be expressed as a dependent function:
-\[t \colon \Pi_{x : A} \,T\left(x, x, \mathit{refl}(x)\right)\]
+The least that we can demand from $T(x, y, p)$ is that it should be true when $x$ and $y$ are literally the same, and the equality proof is the obvious $\text{refl}$. This requirement can be expressed as a dependent function:
+\[t \colon \Pi_{x : A} \,T\left(x, x, \text{refl}(x)\right)\]
 Notice that we are not even considering proofs of $x = x$, other than those given by reflexivity. Do such proofs exist? We don't know and we don't care.
 
-So this is our grounding, the starting point of a journey that should lead us to defining our $f$ for all pairs of points and all proofs of equality. The intuition is that we are defining $f$ as a function on a plane $(x, y)$, with a third dimension given by $p$. To do that, we're given something that's defined on the diagonal $(x, x)$, with $p$ restricted to $\mathit{refl}$.
+So this is our grounding, the starting point of a journey that should lead us to defining our $f$ for all pairs of points and all proofs of equality. The intuition is that we are defining $f$ as a function on a plane $(x, y)$, with a third dimension given by $p$. To do that, we're given something that's defined on the diagonal $(x, x)$, with $p$ restricted to $\text{refl}$.
 
 \[
 \begin{tikzpicture}
@@ -1494,13 +1494,13 @@ So this is our grounding, the starting point of a journey that should lead us to
 \draw[dashed] (\xl, \ydiag) -- (\xdiag, \ydiag);
 
 \filldraw[black] (\xdiag, \ydiag) circle (1 pt);
-\node[above left] at (\xdiag, \ydiag) {$\mathit{refl}$};
+\node[above left] at (\xdiag, \ydiag) {$\text{refl}$};
 
 \draw[dashed] (\xoff, \yoff) -- (\xoff, \yb);
 \draw[dashed] (\xl, \yoff) -- (\xoff, \yoff);
 
 \filldraw[black] (\xoff, \yoff) circle (1 pt);
-\node[above left] at (\xoff, \yoff) {$p\colon \mathit{Id}(x, y)$};
+\node[above left] at (\xoff, \yoff) {$p\colon \text{Id}(x, y)$};
 
 \node[below] at (\xoff, \yb) {$x$};
 \node[left] at (\xl, \yoff) {$y$};
@@ -1511,11 +1511,11 @@ So this is our grounding, the starting point of a journey that should lead us to
 You would think that we need something more, some kind of a $\mathit{step}$ that would move us from one point to another. But, unlike with natural numbers, there is no \emph{next} point or \emph{next} equality proof to jump to. All we have at our disposal is the function $t$ and nothing else. 
 
 Therefore we postulate that, given a type family $T(x, y, p)$ and a function:
-\[t \colon \Pi_{x : A} \,T\left(x, x, \mathit{refl}(x)\right)\]
+\[t \colon \Pi_{x : A} \,T\left(x, x, \text{refl}(x)\right)\]
 there exists a function:
- \[ f \colon \Pi_{x, y : A} \Pi_{p : \mathit{Id}(x, y)} \, T(x, y, p) \]
+ \[ f \colon \Pi_{x, y : A} \Pi_{p : \text{Id}(x, y)} \, T(x, y, p) \]
 such that (computation rule):
-\[f (x, x, \mathit{refl}(x)) = t(x)\]
+\[f (x, x, \text{refl}(x)) = t(x)\]
 Notice that the equality in the computation rule is \emph{definitional equality}, not a type.
 
 Equality elimination tells us that it's always possible to extend the function $t$, which is defined on the diagonal, to the whole 3-d space. 

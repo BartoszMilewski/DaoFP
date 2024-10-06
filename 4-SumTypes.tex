@@ -255,43 +255,6 @@ In practice, the types \hask{Char} for Unicode characters, \hask{Int} for fixed-
 
 These are not infinite types. Their elements can be enumerated, even if it would take ten thousand years. The type \hask{Integer} is infinite, though.
 
-\subsection{Short Haskell Digression}
-
-Since we are going to write more Haskell code, we have to establish some preliminaries. To define data types using functions, we need to use the language pragma called \hask{GADTs} (it stands for \emph{Generalized Algebraic Data Types}). The pragma has to be put at the top of the source file. For instance:
-
-\begin{haskell}
-{-# language GADTs #-}
-
-data Bool where
-  True  :: () -> Bool
-  False :: () -> Bool
-\end{haskell}
-
-The \hask{Void} data type can be defined as:
-\begin{haskell}
-data Void where
-\end{haskell}
-with the empty \hask{where} clause (no data constructor!).
-
-The function \hask{absurd} works with any type as its target (it's a \emph{polymorphic} function), so it is parameterized by a \emph{type variable}. Unlike concrete types, type variables must start with a lowercase letter. Here, \hask{a} is such a type variable:
-
-\begin{haskell}
-absurd :: Void -> a
-absurd v = undefined
-\end{haskell}
-We use \hask{undefined} to placate the compiler. In this case, we are absolutely sure that the function \hask{absurd} can never be called, because it's impossible to construct an argument of type \hask{Void}.
-
-You may use \hask{undefined} when you're only interested in compiling, as opposed to running, your code. For instance, you may need to plug a function \hask{f} to check if your definitions work together:
-\begin{haskell}
-f :: a -> x
-f = undefined
-\end{haskell}
-
-If you want to experiment with defining your own versions of standard types, like \hask{Either}, you have to tell the compiler to hide the originals that are defined in the standard library called the \hask{Prelude}. Put this line at the top of the file, after the language pragmas:
-\begin{haskell}
-import Prelude hiding (Either, Left, Right)
-\end{haskell}
-
 
 \section{Sum Types}
 

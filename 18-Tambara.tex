@@ -320,7 +320,9 @@ Other optics don't compose so easily, but their functor (and profunctor) represe
 
 \subsection{Tannakian reconstruction with adjunction}
 
-The trick in generalizing the Tannakian reconstruction is to define the end over some specialized functor category $\cat T$ by first applying the forgetful functor to its functors. Let's assume that we have the free/forgetful adjunction $F \dashv U$ between two functor categories $\cat T$ and $[\cat C, \Set]$:
+The trick in generalizing the Tannakian reconstruction is to define the end over some specialized functor category $\cat T$ (we'll later apply it to the Tambara category). 
+
+Let's assume that we have the free/forgetful adjunction $F \dashv U$ between two functor categories $\cat T$ and $[\cat C, \Set]$:
 \[ \cat T (F Q, P) \cong  [\cat C, \Set] ( Q, U P )\]
 where $Q$ is a functor in $[\cat C, \Set]$ and $P$ a functor in $\cat T$.
 
@@ -332,11 +334,11 @@ is the \index{fiber functor}\emph{fiber functor}, so the end formula can be inte
 
 Conceptually, a fiber functor describes an ``infinitesimal neighborhood'' of an object. It maps functors to sets but, more importantly, it maps natural transformations to functions. These functions probe the environment in which the object lives. In particular, natural transformations in $\cat T$ are involved in wedge conditions that define the end. (In calculus, stalks of sheaves play a very similar role.)
 
-As we did before, we first apply the Yoneda lemma to get:
+As we did before, we first apply the Yoneda lemma to the co-presheaves $(U P)$:
 \[ \int_{P \colon \cat T} \Set \Big([\cat C, \Set] \big( \cat C (a ,-), U P\big), [\cat C, \Set] \big( \cat C (s ,-), U P\big)\Big) \]
 We can now use the adjunction:
 \[ \int_{P \colon \cat T} \Set \Big(\cat T \big( F \cat C (a ,-), P\big), \cat T \big( F \cat C (s ,-), P\big)\Big) \]
-We end up with a mapping between two natural transformations in the functor category $\cat T$. We can perform the integration using the corollary to the Yoneda lemma, giving us:
+We end up with a mapping between two natural transformations in the functor category $\cat T$. We can perform the ``integration'' using the corollary to the Yoneda lemma, giving us:
 \[ \cat T\big( F \cat C (s ,-), F \cat C (a ,-) \big) \]
 We can apply the adjunction once more:
 \[ \Set \big( \cat C (s ,-), (U\circ F) \cat C (a ,-) \big) \]
@@ -349,7 +351,7 @@ The right-hand side is the action of the monad $\Phi = U \circ F$ on the represe
 Compare this with the earlier formula for Tannakian reconstruction, especially if we rewrite it in the following form:
 \[ \int_{F \colon [\cat C, \Set]} \Set (F a, F s) \cong \cat C(a, -) s\]
 
-Keep in mind that, in the derivation of optics, we'll replace $a$ and $s$ with pairs of objects $\langle a, b \rangle$ and $\langle s, t \rangle$  from $\cat C^{op} \times \cat C$. In that case our functors will become profunctors.
+Keep in mind that, in the derivation of optics, we'll replace $a$ and $s$ with pairs of objects $\langle a, b \rangle$ and $\langle s, t \rangle$  from $\cat C^{op} \times \cat C$. Our functors will then become profunctors.
 
 \section{Profunctor Lenses}
 
