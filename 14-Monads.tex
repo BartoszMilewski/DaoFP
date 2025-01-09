@@ -884,44 +884,109 @@ The construction is analogous to how we defined a free monoid as an initial alge
 \begin{haskell}
 data ListF a x = NilF | ConsF a x
 \end{haskell}
-or the more general:
+or the more general functor:
 \[ F_a x = I + a \otimes x \]
+in a monoidal category $(\cat C, \otimes, I)$.
+
 This time, however, the monoidal category in which a monad is defined as a monoid is the category of endofunctors $([\cat C, \cat C], \circ, \text{Id})$. A free monoid in this category is the initial algebra for the higher order ``list'' functor that maps functors to functors:
 \[ \Phi_F G = \text{Id} + F \circ G \]
-
 Here, the \index{coproduct of functors}coproduct of two functors is defined point-wise. On objects:
 \[ (F + G) a = F a + G a \]
 and on arrows:
 \[ (F + G) f = F f + G f \]
 (We form a coproduct of two morphisms using the functoriality of the coproduct. We assume that $\cat C$ is co-cartesian, that is all coproducts exist.)
 
+
 The initial algebra is the (least) fixed point of this operator, or the solution to the recursive equation:
 \[ L_F \cong \text{Id} + F \circ L_F \]
-This formula establishes a natural isomorphism between two functors. Going from right to left, $\text{Id} + F \circ L_F \to L_F$, we have a mapping out of the sum, which is equivalent to a pair of natural transformations:
+This formula establishes a natural isomorphism between two functors. 
+
+
+
+\subsection{Free Monad in Haskell}
+
+In category theory, a functor is just a mapping between two categories. In Haskell, if we want to implement anything more advanced than a simple Haskell endofunctor, we have to introduce some new classes. A Haskell functor is a type constructor---that is the mapping of types to types:
+\begin{haskell}
+f :: Type -> Type
+\end{haskell}
+together with an implementation of \hask{fmap}--- that is the mapping of functions to functions. 
+
+A \index{higher order functor}higher order functor maps functors to functors. So it's a type constructor that takes a type constructor and produces another type constructor:
+\begin{haskell}
+hf :: (Type -> Type) -> (Type -> Type)
+\end{haskell}
+It must also map natural transformations to natural transformations. To implement it in Haskell, we define a new type class:
+\begin{haskell}
+class HFunctor (hf :: (Type -> Type) -> Type -> Type) where
+   hmap :: (Functor f, Functor g) => 
+       Natural f g -> Natural (hf f) (hf g)
+\end{haskell}
+
+Our higher order list functor:
+\[ \Phi_F G = \text{Id} + F \circ G \]
+is such an \hask{HFunctor}, which additionally depends on yet another type constructor \hask{f}. Since it's a sum type, it will have two constructors corresponding to two injections:
+\begin{haskell}
+data Phi f g a where
+   IdF :: a -> Phi f g a
+   CompF :: f (g a) -> Phi f g a
+\end{haskell}
+Given a natural transformation \hask{alpha:: Nat g h}, it produces another natural transformation \hask{Nat (Phi f g) (Phi f h)}:
+\begin{haskell}
+instance Functor f => HFunctor (Phi f) where
+   hmap :: (Functor f, Functor g, Functor h) =>
+          Natural g h -> Natural (Phi f g) (Phi f h)
+   hmap alpha (IdF a) = IdF a
+   hmap alpha (CompF fga) = CompF (fmap alpha fga)
+\end{haskell}
+This is just the application of the functoriality of the coproduct and that of functor composition.
+
+We have to separately assert the functoriality of the result of applying \hask{Phi f} to a functor \hask{g}:
+\begin{haskell}
+instance (Functor f, Functor g) => Functor (Phi f g) where
+   fmap h (IdF a) = IdF (h a)
+   fmap h (CompF fga) = CompF (fmap (fmap h) fga)
+\end{haskell}
+
+
+
+The isomorphism that generates the free monad:
+\[ L_F \cong \text{Id} + F \circ L_F \]
+can be seen as a definition of a recursive data type. Going from right to left, we have the natural transformation, which we recognize as the structure map of the initial algebra:
+\[\iota \colon \text{Id} + F \circ L_F \to L_F\]
+It's a mapping out of the sum, so it's equivalent to a pair of natural transformations:
 \begin{align*}
-\text{Id} \to L_F
+\eta &\colon \text{Id} \to L_F
 \\
-F \circ L_F \to L_F
+\varphi &\colon F \circ L_F \to L_F
 \end{align*}
 
-When translating this to Haskell, the components of these transformations become two constructors. We define the following recursive data type parameterized by a functor \hask{f}:
+When translating this to Haskell, the components of these transformations become two constructors. They define the following recursive data type parameterized by a functor \hask{f}:
 \begin{haskell}
 data FreeMonad f a where
    Pure :: a -> FreeMonad f a
    Free :: f (FreeMonad f a) -> FreeMonad f a
 \end{haskell}
 
-If we think of the functor \hask{f} as a container of values, the constructor \hask{Free} takes a functorful of \hask{(FreeMonad f a)} and stashes it away. An arbitrary value of the type \hask{FreeMonad f a} is therefore a tree in which every node is a functorful of branches, and each leaf contains a value of the type \hask{a}.
+If we think of the functor \hask{f} as a container of values, the constructor \hask{Free} takes a functorful of \hask{(FreeMonad f a)} and stashes it away. A value of the type \hask{FreeMonad f a} is therefore a tree in which every node is a functorful of branches, and each leaf contains a value of the type \hask{a}.
 
-Because this definition is recursive, the \hask{Functor} instance for it is also recursive:
+\hask{FreeMonad} is a higher order functor:
+\begin{haskell}
+instance HFunctor FreeMonad where
+   hmap :: (Functor f, Functor g) =>
+      Natural f g -> Natural (FreeMonad f) (FreeMonad g)
+   hmap _ (Pure a) = Pure a
+   hmap alpha (Free ffa) = Free (alpha (fmap (hmap alpha) ffa))
+\end{haskell}
+
+It's result is a \hask{Functor}:
 \begin{haskell}
 instance Functor f => Functor (FreeMonad f) where
   fmap g (Pure a) = Pure (g a)
   fmap g (Free ffa) = Free (fmap (fmap g) ffa)
 \end{haskell}
-Here, the outer \hask{fmap} uses the \hask{Functor} instance of \hask{f}, while the inner \hask{(fmap g)} recurses into the branches.
+Here, the outer \hask{fmap} uses the \hask{Functor} instance of \hask{f}, while the inner, \hask{fmap g}, recurses into the branches.
 
-It's easy to show that \hask{FreeMonad} is a \hask{Monad}. The monadic unit \hask{eta} is just a thin encapsulation of the identity functor:
+By construction, a \hask{FreeMonad} is a \hask{Monad}. The monadic unit \hask{eta} is just a thin encapsulation of the identity functor:
 \begin{haskell}
 eta :: a -> FreeMonad f a
 eta a = Pure a
@@ -961,12 +1026,28 @@ We can translate it to Haskell as a pair of polymorphic functions:
 type MAlg f g a = (a -> g a, f (g a) -> g a)
 \end{haskell}
 
-Since the free monad is the initial algebra, there is a unique mapping---the catamorphism---from it to any other algebra. Recall how we defined a catamorphism for a regular algebra:
+Since the free monad is the initial algebra, there is a unique mapping, the catamorphism, from it to any other algebra. Recall how we defined a catamorphism for a regular algebras:
 \begin{haskell}
 cata :: Functor f => Algebra f a -> Fix f -> a
 cata alg = alg . fmap (cata alg) . out
 \end{haskell}
-The \hask{out} part unwraps the contents of the fixed point. Here we can do this by pattern-matching on the two constructors of the free monad. If it's a leaf, we apply our $\lambda$ to it. If it's a node, we recursively process its contents, and apply our $\rho$ to the result:
+
+An analogous diagram defines a catamorphism for a free monad:
+\[
+ \begin{tikzcd}
+ \text{Id} + F \circ L_F
+ \arrow[rr, "{\text{hmap} (\text{mcata}\, \alpha)}"]
+ \arrow[d, "{\iota = \langle \eta, \varphi \rangle}"]
+ && \text{Id} + F \circ G
+\arrow[d, "{\alpha = \langle \lambda, \rho \rangle}"]
+ \\
+ L_F
+ \arrow[rr, dashed, "\text{mcata}\, \alpha"]
+ && G
+  \end{tikzcd}
+\]
+
+In Haskell, we implement it by pattern-matching on the two constructors of the free monad (this corresponds to inverting the initial algebra $\iota$). If it's a leaf, we apply $\lambda$ to it. If it's a node, we recursively process its contents, and apply $\rho$ to the result:
 \begin{haskell}
 mcata :: Functor f => MAlg f g a -> FreeMonad f a -> g a
 mcata (l, r) (Pure a) = l a
@@ -974,7 +1055,7 @@ mcata (l, r) (Free ffa) =
   r (fmap (mcata (l, r)) ffa)
 \end{haskell}
 
-Many tree-like monads are in fact free monads for simple functors.
+Many tree-like monads are in fact free monads for simple functors. On the other hand, the list monad is not free because its \hask{join} irreversibly smashes the lists together.
 
 \begin{exercise}
 A (non-empty) rose tree is defined as:
@@ -986,16 +1067,11 @@ Implement conversions back and forth between \hask{Rose a} and  \hask{FreeMonad 
 \end{exercise}
 
 \begin{exercise}
-Implement conversions between a binary tree and \hask{FreeMonad Bin a}, where:
+Implement conversions between a non-empty binary tree and \hask{FreeMonad Bin a}, where:
 \begin{haskell}
 data Bin a = Bin a a
 \end{haskell}
 \end{exercise}
-
-\begin{exercise}
-Find a functor whose free monad is equivalent to the list monad \hask{[a]}.
-\end{exercise}
-
 
 \subsection{Stack calculator example}
 As an example, let's consider a stack calculator implemented as an embedded domain-specific language, EDSL. We'll use the free monad to accumulate simple commands written in this language. 
@@ -1020,7 +1096,7 @@ type FreeStack = FreeMonad StackF
 In order to create domain-specific programs we'll define a few helper functions. There is a generic one that lifts a functorful of values to a free monad:
 \begin{haskell} 
 liftF :: (Functor f) => f r -> FreeMonad f r
-liftF fr = Free (fmap (Pure) fr)
+liftF fr = Free (fmap Pure fr)
 \end{haskell}
 We also need a series of ``smart constructors,'' which are Kleisli arrows for our free monad:
 \begin{haskell}
@@ -1051,7 +1127,7 @@ calc = do
 
 In order to execute this program, we need to define an algebra whose carrier is an endofunctor. Since we want to implement a stack-based calculator, we'll use a version of the state functor. Its state is a stack---a list of integers. The state functor is defined as a function type; here it's a function that takes a list and returns a new list coupled with the type parameter \hask{k}:
 \begin{haskell}
-data StackAction k = St ([Int] -> ([Int], k))
+newtype StackAction k = St ([Int] -> ([Int], k))
   deriving Functor
 \end{haskell}
 
