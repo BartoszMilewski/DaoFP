@@ -563,10 +563,10 @@ The composition of these arrows with the constructors $\text{Left}$ and $\text{R
 & a' + b'
  \end{tikzcd}
 \]
-The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon a + b \to a' + b'$.
+The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon a + b \to a' + b'$. The notation for this arrow is:
+\[ a + b \xrightarrow{\langle f, g \rangle} a' + b' \]
 
-This property of the sum is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the sum and get a new sum. We also say that functoriality lets us \index{lifting}\emph{lift} a pair of arrows in order to operate on sums.
-
+This property of lifting a pair of arrows to act on the sum is called the \emph{functoriality} of the sum. You can imagine it as allowing you to transform the two objects \emph{inside} the sum and get a new sum. 
 \begin{exercise}
 Show that functoriality preserves composition. Hint: take two composable arrows, $g \colon b \to b'$ and $g' \colon b' \to b''$ and show that applying $g' \circ g$ gives the same result as first applying $g$ to transform $a + b$ to $a + b'$ and then applying $g'$ to transform $a + b'$ to $a + b''$.
 \end{exercise}

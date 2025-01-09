@@ -443,7 +443,7 @@ The strong version of the Yoneda lemma works with objects of $\mathcal V$ and us
 
 \section{Weighted Limits}
 
-Limits (and colimits) are built around commuting triangles, so they are not immediately translatable to the enriched setting. The problem is that cones are constructed from ``wires,'' that is individual morphisms. You may think of hom-sets as a thick bundle of wires, each wire having zero thickness. When constructing a cone, you are selecting a single wire from a hom-set. We have to replace wires with something thicker.
+Limits (and colimits) are built around commuting triangles, so they are not immediately translatable to the enriched setting. The problem is that cones are constructed from ``wires,'' that is individual morphisms. You may think of hom-sets as a thick bundle of wires, each wire having zero thickness. When constructing a cone, you are selecting a single wire from a given hom-set. We have to replace wires with something thicker.
 
 Consider a diagram, that is a functor $D$ from the indexing category $\mathcal J$ to the target category $\mathcal C$. The wires for the cone with the apex $x$ are selected from hom-sets $\mathcal C(x, D j)$, where $j$ is an object of $\mathcal J$. 
 
@@ -489,9 +489,9 @@ This reformulation gets us closer to the enriched setting, since it rephrases th
 
 There is just one problem: how do we define a constant $\mathcal V$-functor $\Delta_x \colon \cat C \to \cat D$? Its action on objects is obvious:  it maps all objects in $\cat C$ to one object $x$ in $\cat D$. But what should it do to hom-objects? 
 
-An ordinary constant functor $\Delta_x$ maps all morphisms in $\cat C(a, b)$ to the identity in $\cat D(x, x)$. In the enriched setting, though, $\cat D(x, x)$ is an object with no internal structure. Even if it happened to be the unit $I$, there's no guarantee that for every hom-object $\mathcal C(a, b)$ we could find an arrow to $I$; and even if there was one, it might not be unique. In other words, there is no reason to believe that $I$ is the terminal object.
+An ordinary constant functor $\Delta_x$ maps all morphisms in $\cat C(a, b)$ to the identity in $id_x \in \cat D(x, x)$. In the enriched setting, though, $\cat D(x, x)$ is an object with no internal structure. Even if it happened to be the unit $I$, there's no guarantee that for every hom-object $\mathcal C(a, b)$ we could find an arrow to $I$; and even if there was one, it might not be unique. In other words, there is no reason to believe that $I$ is the terminal object.
 
-The solution is to ``smear the singularity'': instead of using the constant functor to select a single wire, we should use some other ``weighting'' functor $W \colon \mathcal J\to \Set$ to select a thicker ``cylinder''. Such a weighted cone with the apex $x$ is an element of the set of natural transformations:
+The solution is to ``smear the singularity'': instead of using the constant functor to select a single wire, we should use some other ``weighting'' functor $W \colon \mathcal J\to \Set$ to select a thicker ``cylinder'' inside a hom-set. Such a weighted cone with the apex $x$ is an element of the set of natural transformations:
 \[ [\mathcal J, \Set] \left(W, \mathcal C(x, D-)\right) \]
 
 A \emph{weighted limit}, also known as an \index{indexed limit}\emph{indexed limit}, $\text{lim}^W D$, is then defined as the universal weighted cone. It means that for any weighted cone with the apex $x$ there is a unique morphism from $x$ to $\text{lim}^W D$ that factorizes it. The factorization is guaranteed by the naturality of the isomorphism that defines the weighted limit:

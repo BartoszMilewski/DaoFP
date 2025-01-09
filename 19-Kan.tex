@@ -73,7 +73,7 @@ We can therefore rewrite the currying adjunction that defines the internal hom i
 \[ \Set (A \times B, C)  \cong \Set \big(A, \Set (B, C)\big) \]
 We can generalize this adjunction to the case where $B$ and $C$ are not sets but objects in some category $\cat C$. The external hom in any category is always a set. But the left-hand side is no longer defined by a product. Instead it defines the action of a set $A$ on an object $b$:
 \[ \cat C (A \cdot b, c) \cong \Set \big( A, \cat C (b, c)\big) \]
-that is called a \emph{co-power}.
+that is called a \index{co-power}\emph{co-power}.
 
 You may think of this action as adding together (taking a coproduct of) $A$ copies of $b$. For instance, if $A$ is a two-element set $\mathbf 2$, we get:
 \[ \cat C (\mathbf 2 \cdot b, c) \cong \Set \big( \mathbf 2, \cat C (b, c)\big) \cong \cat C(b, c) \times \cat C(b, c) \cong \cat C(b + b, c) \]
@@ -91,7 +91,7 @@ Indeed, the mappings to an arbitrary $x$ from both sides are isomorphic due to t
 As expected, in $\Set$, the co-power decays to the cartesian product.
 \[ \Set (A \cdot B, C) \cong \Set \big( A, \Set(B, C)\big) \cong \Set (A \times B, C) \]
 
-Similarly, we can express powering as iterated multiplication. We use the same right-hand side, but this time we use the mapping-in to define the \emph{power}:
+Similarly, we can express powering as iterated multiplication. We use the same right-hand side, but this time we use the mapping-in to define the \index{power}\emph{power}:
 \[ \cat C (b, A \pitchfork c) \cong \Set  \big(A, \cat C(b, c)\big) \]
 You may think of the power as multiplying together $A$ copies of $c$. Indeed, replacing $A$ with $\mathbf 2$ results in:
 \[ \cat C (b, \mathbf 2 \pitchfork c) \cong \Set  \big(\mathbf 2, \cat C(b, c)\big) \cong \cat C(b, c) \times \cat C(b, c) \cong \cat C (b, c \times c)\]
