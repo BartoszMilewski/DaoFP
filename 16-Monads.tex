@@ -1,159 +1,8 @@
 \documentclass[DaoFP]{subfiles}
 \begin{document}
-\setcounter{chapter}{14}
+\setcounter{chapter}{15}
 
 \chapter{Monads}
-
-What do a wheel, a clay pot, and a wooden house have in common? They are all useful because of the emptiness in their center. 
-
-Lao Tzu says: ``The value comes from what is there, but the use comes from what is not there.''
-
-What does the \hask{Maybe} functor, the list functor, and the reader functor have in common? They all have emptiness in their center. 
-
-When monads are explained in the context of programming, it's hard to see the common pattern when you focus on the functors. To understand monads you have to look inside functors and read between the lines of code.
-
-\section{Programming with Side Effects}
-
-So far we've been talking about programming in terms of computations that were modeled mainly on functions between sets (with the exception of non-termination). In programming, such functions are called \emph{total} and \emph{pure}. 
-
-A total function is defined for all values of its arguments. 
-
-A pure function is implemented purely in terms of its arguments and, in case of closures, the captured values---it has no access to, much less the ability to modify the outside world. 
-
-Most real-world programs, though, have to interact with the external world: they read and write files, process network packets, prompt users for data, etc. Most programming languages solve this problem by allowing side effect. A side effect is anything that breaks the totality or the purity of a function. 
-
-Unfortunately, this shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful computations one has to carefully reason about the composition of effects on a case-by-case basis. To make things even harder, most effects are hidden not only inside the implementation (as opposed to the interface) of a particular function, but also in the implementation of all the functions that it's calling, recursively.
-
-The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return types of pure functions. Amazingly, this is possible for all relevant effects. 
-
-The idea is that, instead of a computation of the type \hask{a->b} with side effects, we use a function \hask{ a -> f b}, where the type constructor \hask{f} encodes the appropriate effect. At this point there are no conditions imposed on \hask{f}. It doesn't even have to be a \hask{Functor}, much less a monad. This will come later, when we talk about effect composition.
-
-Below is the list of common effects and their pure-function versions.
-
-\subsection{Partiality}
-In imperative languages, partiality is often encoded using exceptions. When a function is called with the ``wrong'' value for its argument, it throws an exception. In some languages, the type of exception is encoded in the signature of the function using special syntax. 
-
-In Haskell, a partial computation can be implemented by a function returning the result inside the \hask{Maybe} functor. Such a function, when called with the ``wrong'' argument, returns \hask{Nothing}, otherwise is wraps the result in the \hask{Just} constructor.
-
-If we want to encode more information about the type of the failure, we can use the \hask{Either} functor, with the \hask{Left} traditionally passing the error data (often a simple \hask{String}); and \hask{Right} encapsulating the real return, if available.
-
-The caller of a \hask{Maybe}-valued function cannot easily ignore the exceptional condition. In order to extract the value, they have to pattern-match the result and decide how to deal with \hask{Nothing}. This is in contrast to the ``poor-man's \hask{Maybe}'' of some imperative languages where the error condition is encoded using a null pointer.
-
-\subsection{Logging}
-
-Sometimes a computation has to log some values in some external data structure. Logging or auditing is a side effect that's particularly dangerous in concurrent programs, where multiple threads might try to access the same log simultaneously.
-
-The simple solution is for a function to return the computed value paired with the item to be logged. In other words, a logging computation of the type \hask{ a -> b } can be replaced by a pure function:
-\begin{haskell}
-a -> Writer w b
-\end{haskell}
-where the \hask{Writer} functor is a thin encapsulation of the product:
-\begin{haskell}
-newtype Writer w a = Writer (a, w)
-\end{haskell}
-with \hask{w} being the type of the log.
-
-The caller of this function is then responsible for extracting the value to be logged. This is a common trick: make the function provide all the data, and let the caller deal with the effects.
-
-\subsection{Environment}
-
-Some computations need read-only access to some external data stored in the environment. The read-only environment, instead of being secretly accessed by a computation, can be simply passed to a function as an additional argument. If we have a computation \hask{ a -> b } that needs access to some environment \hask{e}, we replace it with a function \hask{ (a, e) -> b }. At first, this doesn't seem to fit the pattern of encoding side effects in the return type. However, such a function can always be curried to the form:
-\begin{haskell}
-a -> (e -> b)
-\end{haskell}
-The return type of this function can be encoded in the reader functor, itself parameterized by the environment type \hask{e}:
-\begin{haskell}
-newtype Reader e a = Reader (e -> a)
-\end{haskell}
-
-This is an example of a delayed side effect. The function:
-\begin{haskell}
-a -> Reader e a
-\end{haskell}
-doesn't want to deal with effects so it delegates the responsibility to the caller. You may think of it as producing a script to be executed at a later time. The function \hask{runReader} plays the role of a very simple interpreter of this script:
-\begin{haskell}
-runReader :: Reader e a -> e -> a
-runReader (Reader h) e = h e
-\end{haskell}
-
-\subsection{State}
-
-The most common side effect is related to accessing and potentially modifying some shared state. Unfortunately, shared state is the notorious source of concurrency errors. This is a serious problem in object-oriented languages where stateful objects can be transparently shared between many clients. In Java, such objects may be provided with individual mutexes at the cost of impaired performance and the risk of deadlocks.
-
-In functional programming we make state manipulations explicit: we pass the state as an additional argument and return the modified state paired with the return value. We replace a stateful computation \hask{ a -> b } with
-\begin{haskell}
-(a, s) -> (b, s)
-\end{haskell}
-where \hask{s} is the type of state. As before, we can curry such a function to get it to the form:
-\begin{haskell}
-a -> (s -> (b, s))
-\end{haskell}
-This return type can be encapsulated in the following functor:
-\begin{haskell}
-newtype State s a = State (s -> (a, s))
-\end{haskell}
-The caller of such a function is supposed to retrieve the result and the modified state by providing the initial state and calling the helper function, the interpreter, \hask{runState}:
-\begin{haskell}
-runState :: State s a -> s -> (a, s)
-runState (State h) s = h s
-\end{haskell}
-Notice that, modulo constructor unpacking, \hask{runState} is bona fide function application. 
-
-\subsection{Nondeterminism}
-
-Imagine performing a quantum experiment that measures the spin of an electron. Half of the time the spin will be up, and half of the time it will be down. The result is non-deterministic. One way to describe it is to use the many-worlds interpretation: when we perform the experiment, the Universe splits into two universes, one for each result.  
-
-What does it mean for a function to be non-deterministic? It means that it will return different results every time it's called. We can model this behavior using the many-worlds interpretation: we let the function return \emph{all possible results} at once. In practice, we'll settle for a (possibly infinite) list of results:
-
-We replace a non-deterministic computation \hask{ a -> b } with a pure function returning a functorful of results---this time it's the list functor:
-\begin{haskell}
-a -> [b]
-\end{haskell}
-Again, it's up to the caller to decide what to do with these results.
-
-\subsection{Input/Output}
-
-This is the trickiest side effect because it involves interacting with the external world. Obviously, we cannot model the whole world inside a computer program. So, in order to keep the program pure, the interaction has to happen outside of it. The trick is to let the program generate a script. This script is then passed to the runtime to be executed. The runtime is the effectful virtual machine that runs the program. 
-
-This script itself sits inside the opaque, predefined \hask{IO} functor. The values hidden in this functor are not accessible to the program: there is no \hask{runIO} function. Instead, the \hask{IO} value produced by the program is executed, at least conceptually, \emph{after} the program is finished. 
-
-In reality, because of Haskell's laziness, the execution of I/O is interleaved with the rest of the program.  Pure functions that comprise the bulk of your program are evaluated on demand---the demand being driven by the execution of the \hask{IO} script. If it weren't for I/O, nothing would ever be evaluated.
-
-The \hask{IO} object that is produced by a Haskell program is called \hask{main} and its type signature is:
-\begin{haskell}
-main :: IO ()
-\end{haskell}
-It's the \hask{IO} functor containing the unit---meaning: there is no useful value other than the input/output script.
-
-We'll talk about how \hask{IO} actions are created soon.
-
-\subsection{Continuation}
-
-We've seen that, as a consequence of the Yoneda lemma, we can replace a value of type \hask{a} with a function that takes a handler for that value. This handler is called a continuation. Calling a handler is considered a side effect of a computation. In terms of pure functions, we encode it as:
-\begin{haskell}
-a -> Cont r b
-\end{haskell}
-where \hask{Cont r} is the following functor:
-\begin{haskell}
-newtype Cont r a = Cont ((a -> r) -> r)
-\end{haskell}
-It's the responsibility of the caller of this function to provide the continuation, a function \hask{k :: a -> r}, and retrieve the result:
-\begin{haskell}
-runCont :: Cont r a -> (a -> r) -> r
-runCont (Cont f) k = f k
-\end{haskell}
-
-This is the \hask{Functor} instance for \hask{Cont r}:
-\begin{haskell}
-instance Functor (Cont r) where
-  -- f :: a -> b
-  -- k :: b -> r
-  fmap f c = Cont (\k -> runCont c (k . f))
-\end{haskell}
-Notice that this is a covariant functor because the type \hask{a} is in a doubly negative position.
-
-In a cartesian closed category, continuations are generated by the endofunctor:
-\[ K_r a = r^{r^a} \]
 
 \section{Composing Effects}
 
@@ -1221,11 +1070,18 @@ Applicative composition using the splat operator doesn't allow for one part of t
 
 On the other hand, monads let us use the very convenient \hask{do} syntax, which is arguably more readable than the applicative syntax. Fortunately, there is a language extension \hask{ApplicativeDo}, which instructs the compiler to selectively use applicative constructs in interpreting \hask{do} blocks, whenever there are no dependencies.
 
-\begin{exercise}
-Verify \hask{Applicative} laws for the zip instance of the list functor.
-\end{exercise}
+As we discussed earlier, every Haskell functor is strong, so every monad in Haskell is strong by virtue of being a functor. This is important, because we want monadic code to have access to the environment. 
 
-
+This is also why every monad is automatically \hask{Monoidal}. 
+\begin{haskell}
+instance Monad m => Monoidal m where
+  unit = return ()
+  ma >*< mb = do
+    a <- ma
+    b <- mb
+    return (a, b)
+\end{haskell}
+If you desugar this code to use monadic bind and lambdas, you'll notice that the final \hask{return} needs access to both \hask{a} and \hask{b}, which are defined in outer environments. This would be impossible without the monad being strong.
 
 
 \end{document}

@@ -63,6 +63,51 @@ and we write it as $g = f^{-1}$ (pronounced $f$ \emph{inverse}). The arrow $ f^{
 
 Such a pair of arrows is called an \emph{isomorphism} and the two objects are called \emph{isomorphic}.
 
+In programming, two isomorphic types have the same external behavior. One type can be implemented in terms of the other and vice versa. One can be replaced by the other without changing the behavior of the system (except, possibly, the performance). 
+
+In Haskell, we often define types in terms of other types. If it's just a matter of replacing one name by another, we use a type synonym. For instance:
+\begin{haskell}
+type MyTemperature = Int
+\end{haskell}
+lets us use \hask{MyTemperature} as a more descriptive name for an integer in a program that deals with weather. These two types are then equal---one can be substituted for another in all contexts, and all functions that accept \hask{Int} arguments can be called with \hask{MyTemperature}.
+
+When we want to define a new type that is \emph{isomorphic} but not equal to an existing type, we can use \index{newtype}\hask{newtype}. For instance, we can define \hask{Temperature} as:
+\begin{haskell}
+newtype Temperature = Temp Int
+\end{haskell}
+Here, \hask{Temperature} is the new type and \hask{Temp} is a \emph{data constructor}. A data constructor is just a function\footnote{Unlike with regular functions, the names of data constructors must start with a capital letter}:
+\begin{haskell}
+Temp :: Int -> Temp
+\end{haskell}
+We can also define its inverse:
+\begin{haskell}
+toInt :: Temperature -> Int
+toInt (Temp i) = i
+\end{haskell}
+thus completing the isomorphism:
+\[
+ \begin{tikzcd}
+ \hask{Int}
+ \arrow[r, bend left, "\hask{Temp}"]
+ & \hask{Temperature}
+ \arrow[l, bend left, "\hask{toInt}"]
+ \end{tikzcd}
+\]
+Since this is a common construction, Haskell provides special syntax that defines both functions at once:
+\begin{haskell}
+newtype Temperature = Temp { toInt :: Int}
+\end{haskell}
+
+Because \hask{Temperature} is a new type, functions that operate on integers will not accept it as an argument. This way the programmer can restrict the way it can be used. We can still use the isomorphism to selectively allow some operations, as in this application of the function \hask{negate :: Int -> Int}. The code that does it is the direct translation of the diagram:
+\[ \hask{Temperature} \xrightarrow{\hask{toInt}} \hask{Int} \xrightarrow{\hask{negate}} \hask{Int} \xrightarrow{\hask{Temp}} \hask{Temperature} \]
+\begin{haskell}
+invert :: Temperature -> Temperature
+invert = Temp . negate . toInt
+\end{haskell}
+
+
+\subsection{Isomorphism and bijections}
+
 What does the existence of an isomorphism tell us about the two objects it connects? 
 
 We have said that objects are described by their interactions with other objects. So let's consider what the two isomorphic objects look like from the perspective of an observer  $x$. Take an arrow $h$ coming from $x$ to $a$.
@@ -114,8 +159,6 @@ We write this isomorphism as:
 \[a \cong b\]
 
 When dealing with objects, we use isomorphism in place of equality.
-
-In programming, two isomorphic types have the same external behavior. One type can be implemented in terms of the other and vice versa. One can be replaced by the other without changing the behavior of the system (except, possibly, the performance). 
 
 In classical logic, if B follows from A and A follows from B then A and B are logically equivalent. We often say that B is true ``if and only if'' A is true. However, unlike previous parallels between logic and type theory, this one is not as straightforward if you consider proofs to be relevant. In fact, it led to the development of a new branch of fundamental mathematics called homotopy type theory, or HoTT for short.
 

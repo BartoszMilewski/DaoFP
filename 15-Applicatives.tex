@@ -4,9 +4,23 @@
 
 \chapter{Applicative Functors}
 
+\section{Parallel composition}
+
+When we translate from the language of category theory to the language of programming, we think of arrows as computations. Since computations take time, this interpretation introduces a new temporal dimension. This is reflected in the language we use. For instance, the result of the composition of two arrows, $g \circ f$, is often pronounced  $g$ \emph{after} $f$. We call it \index{sequential composition}\emph{sequential composition}. We have to first execute $f$ before we can pass its result to $g$. Sequential composition expresses dependency between computations: we can't start executing $g$ before $f$ yields its result.
+
+There are, however, computations that can be, at least in principle, executed in parallel because there is no dependency between them. This only makes sense if the results of parallel computations can be combined, which means we need to work in a monoidal category. Thus the basic building block of parallel composition is the tensor product of two arrows, $f \colon a \to b$ and $g \colon c \to d$:
+\[ a \otimes c \xrightarrow{f \otimes g} b \otimes d \]
+In a bicartesian category, we'll often use the cartesian product or coproduct as the tensor.
+
+---
+
+Maybe
+
+Ziplist
+
 \section{Monoidal Functors}
 
-We've seen several examples of monoidal cateogries. Such categories are equipped with some kind of binary operation, e.g., a cartesian product, a sum, composition (in the category of endofunctors), etc. They also have a special object that serves as the unit with respect to that binary operation. Unit and associativity laws are satisfied either on the nose (in strict monoidal categories) or up to isomorphism.
+We've seen several examples of monoidal categories. Such categories are equipped with some kind of binary operation, e.g., a cartesian product, a sum, composition (in the category of endofunctors), etc. They also have a special object that serves as the unit with respect to that binary operation. Unit and associativity laws are satisfied either on the nose (in strict monoidal categories) or up to isomorphism.
 
 Every time we have more than one instance of some structure, we may ask ourselves the question: is there a whole category of such things? In this case: do monoidal categories form their own category? For this to work we would have to define arrows between monoidal categories.
 
@@ -106,17 +120,6 @@ There are some additional conditions which ensure that it works nicely with the 
 
 The fact that we were able to implement \hask{strength} for an arbitrary functor means that, in Haskell, every functor is strong. This is the reason why we don't have to worry about accessing the environment from inside a functor. 
 
-Even more importantly, every monad in Haskell is strong by virtue of being a functor. This is also why every monad is automatically \hask{Monoidal}. 
-\begin{haskell}
-instance Monad m => Monoidal m where
-  unit = return ()
-  ma >*< mb = do
-    a <- ma
-    b <- mb
-    return (a, b)
-\end{haskell}
-If you desugar this code to use monadic bind and lambdas, you'll notice that the final \hask{return} needs access to both \hask{a} and \hask{b}, which are defined in outer environments. This would be impossible without a monad being strong.
-
 In category theory, though, not every endofunctor in a monoidal category is strong. For now, the magic incantation is that the category we're working with is self-enriched, and every endofunctor defined in Haskell is enriched. We'll come back to it when we talk about enriched categories. In Haskell, strength boils down to the fact that we can always \hask{fmap} a partially applied pair constructor \hask{(a, )}.
 
 \subsection{Applicative functors}
@@ -172,6 +175,10 @@ pure (.) <*> u <*> v <*> w = u <*> (v <*> w) -- Composition
 \begin{exercise}
 Implement $\emph{\hask{liftA3}}$, a function that lifts a 3-argument function using an applicative functor.
 \end{exercise}
+\begin{exercise}
+Verify \hask{Applicative} laws for the zip instance of the list functor.
+\end{exercise}
+
 
 \subsection{Closed functors}
 If you squint at the definition of the splat operator:
