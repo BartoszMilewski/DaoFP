@@ -4,9 +4,13 @@
 
 \chapter{Monads}
 
-\section{Composing Effects}
+When monads are explained in the context of programming, it's hard to see the common pattern while focusing on the functors. To understand monads you have to look inside functors and read between the lines of code. It is sometimes said that monads let us overload the semicolons. That's because in many imperative languages semicolons are used for sequencing operations. In functional languages, monads play the role of sequencing effectful computations.
 
-Now that we know how to make one giant leap using a function that produces both a value and a side effect, the next problem is to figure out how to decompose this leap into smaller human-sized steps. Or, conversely, how to combine such smaller steps into one larger step. 
+\section{Sequential Composition of Effects}
+
+Parallel composition as special case of sequential composition.
+
+---
 
 The way effectful computations are composed in imperative languages is to use regular function composition for the values and let the side effects combine themselves willy-nilly. 
 

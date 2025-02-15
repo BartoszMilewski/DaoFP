@@ -29,6 +29,11 @@ class Applicative f => Alternative f where
   some :: f a -> f [a]  -- one or more
   many :: f a -> f [a]  -- zero or more
 
+instance Alternative Maybe where
+    empty = Nothing
+    Nothing <|> r = r
+    l       <|> _ = l
+
 instance Alternative Parser where
   empty = Parser (\s -> Nothing)
   pa <|> pb = Parser (\s ->
@@ -67,6 +72,14 @@ satisfy pred = Parser sat
         sat (a : as) = if pred a
                        then Just (a, as)
                        else Nothing
+
+digit' :: Parser Char
+digit' = satisfy isDigit
+
+digit :: Parser Char
+digit = Parser (\s -> case s of
+    (c:cs) | isDigit c -> Just (c, cs)
+    _                  -> Nothing)
 
 space :: Parser Char
 space = char ' ' <|> char '\t' 

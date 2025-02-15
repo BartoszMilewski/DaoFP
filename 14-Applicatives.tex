@@ -4,21 +4,423 @@
 
 \chapter{Applicative Functors}
 
+Lao Tzu would say, ``If you execute two things in parallel, it will take half the time.''
+
 \section{Parallel composition}
 
-When we translate from the language of category theory to the language of programming, we think of arrows as computations. Since computations take time, this interpretation introduces a new temporal dimension. This is reflected in the language we use. For instance, the result of the composition of two arrows, $g \circ f$, is often pronounced  $g$ \emph{after} $f$. We call it \index{sequential composition}\emph{sequential composition}. We have to first execute $f$ before we can pass its result to $g$. Sequential composition expresses dependency between computations: we can't start executing $g$ before $f$ yields its result.
+When we translate from the language of category theory to the language of programming, we think of arrows as computations. But computations take time, and this introduces a new temporal dimension. This is reflected in the language we use. For instance, the result of the composition of two arrows, $g \circ f$, is often pronounced  $g$ \emph{after} $f$. The execution of $g$ has to \emph{follow} the execution of $f$ because we need the result of $f$ before we can call $g$. We call it \index{sequential composition}\emph{sequential composition}. It reflects the dependency between computations.
 
-There are, however, computations that can be, at least in principle, executed in parallel because there is no dependency between them. This only makes sense if the results of parallel computations can be combined, which means we need to work in a monoidal category. Thus the basic building block of parallel composition is the tensor product of two arrows, $f \colon a \to b$ and $g \colon c \to d$:
-\[ a \otimes c \xrightarrow{f \otimes g} b \otimes d \]
-In a bicartesian category, we'll often use the cartesian product or coproduct as the tensor.
+There are, however, computations that can be, at least in principle, executed in parallel because there is no dependency between them. This only makes sense if the results of parallel computations can be combined, which means we need to work in a monoidal category. Thus the basic building block of parallel composition is the tensor product of two arrows, $f \colon x \to a$ and $g \colon y \to b$:
+\[ x \otimes y \xrightarrow{f \otimes g} a \otimes b \]
+In a cartesian category, we'll often use the cartesian product as the tensor. In programming, we'll just run two functions and then combine their results.
 
----
+\subsection{Monoidal functors}
 
-Maybe
+The problem arises when we try to combine the results of \emph{effectful} computations. For that we need a way of combining a pair of results \hask{f a} and \hask{f b} together with their effects to produce a single result \hask{f (a, b)}. Of course each type of effects requires a different kind of processing.
 
-Ziplist
+Let's take the example of the partiality effect. We can combine two such effects using:
+\begin{haskell}
+combine :: Maybe a -> Maybe b -> Maybe (a, b)
+combine (Just a) (Just b) = Just (a, b)
+combine _ _ = Nothing
+\end{haskell}
+The result is a success only if both computations were successful. 
 
-\section{Monoidal Functors}
+A computation should also be able to produce an ``ignore me'' result. This would be a computation that returns a unit value (that is the unit with respect to the cartesian product) and an ``ignore me'' side effect. Notice that returning \hask{Nothing} wouldn't work, because it would have the effect of invalidating the result of the other computation. The correct implementation is:
+\begin{haskell}
+ignoreMe :: Maybe ()
+ignoreMe = Just ()
+\end{haskell}
+which, when \hask{combine}'d with any other partial computation is ignored (up to left/right unit law).
+
+In general, a type constructor \hask{f} supports parallel composition if it's an instance of the \hask{Monoidal} class:
+\begin{haskell}
+class Monoidal f where
+  unit  :: f ()
+  (>*<) :: f a -> f b -> f (a, b)
+\end{haskell}
+In particular, the \hask{Maybe} functor is \hask{Monoidal}:
+\begin{haskell}
+instance Monoidal Maybe where
+  unit  = Just ()
+  Just a >*< Just b = Just (a, b)
+  _ >*< _ = Nothing
+\end{haskell}
+Monoidal functors must be compatible with the monoidal structure of the cartesian category, hence they should satisfy the obvious unit and associativity laws.
+
+\subsection{Applicative functors}
+
+Although the class \hask{Monoidal} provides adequate support for parallel composition of effects, it's not very practical. 
+
+To begin with, we need be able to operate on the results of composition, thus we need a \hask{Functor} instance for \hask{f}. This lets us apply a function of the type \hask{(a, b)->c } to an effectful pair \hask{f(a, b)}, without touching the effects. 
+
+Once we know how to run two computations in parallel, we can compose an arbitrary number of computations by taking advantage of associativity. For instance:
+\begin{haskell}
+run3 :: (Functor f, Monoidal f) => 
+  (x -> f a) -> (y -> f b) -> (z -> f c) -> 
+  (x, y, z) -> f (a, b, c)
+run3 f1 f2 f3 (x, y, z) =
+  let fab  = f1 x >*< f2 y
+      fabc = fab >*< f3 z
+  in fmap reassoc fabc
+\end{haskell}
+where we re-associate the triple of results:
+\begin{haskell}
+reassoc :: ((a, b), c) -> (a, b, c)
+reassoc ((a, b), c) = (a, b, c)
+\end{haskell}
+But as we increase the number of computations, things get progressively more awkward. 
+
+Fortunately, there is a more ergonomic approach. In most applications, the results of parallel computations are fed into a function that gathers them before producing the final result. What we need is a way of lifting such a function of multiple arguments---a generalization of the lifting of a single-argument function performed by a \hask{Functor}. 
+
+For instance, to combine the results of two parallel computations, we would use the function:
+\begin{haskell}
+liftA2 :: (a -> b -> c) -> f a -> f b -> f c
+\end{haskell}
+Unfortunately, we would need infinitely many such functions, for all possible counts of arguments. The trick is to replace them with one function that takes advantage of currying.
+
+
+A function of two arguments is a function of one argument returning a function. So, assuming that \hask{f} is a functor, we can start by \hask{fmap}'ping:
+\begin{haskell}
+a -> (b -> c)
+\end{haskell}
+over the first argument \hask{(f a)} to get:
+\begin{haskell}
+f (b -> c)
+\end{haskell}
+Now we need to apply \hask{f (b -> c)} to the second argument \hask{(f b)}. If the functor is \hask{Monoidal}, we can combine the two using the operator \hask{>*< } and get something of the type:
+\begin{haskell}
+f (b -> c, b)
+\end{haskell}
+We can then \hask{fmap} the function application \hask{apply} over it:
+\begin{haskell}
+fmap apply (ff >*< fa)
+\end{haskell}
+where:
+\begin{haskell}
+apply :: (a -> b, a) -> b
+apply (f, a) = f a
+\end{haskell}
+
+Alternatively, we can define the infix operator \hask{<*>} that lets us apply a function to an argument while combining the effects:
+\begin{haskell}
+(<*>) :: f (a -> b) -> f a -> f b
+fs <*> as = fmap apply (fs >*< as)
+\end{haskell}
+This operator is sometimes called the \index{\hask{<*>}}\index{splat}``splat.'' 
+
+Conversely, we can implement the monoidal operator in terms of splat:
+\begin{haskell}
+fa >*< fb = fmap (,) fa <*> fb
+\end{haskell}
+where we used the pair constructor \hask{(,)} as a two-argument function.
+
+The advantage of using \hask{<*>} instead of \hask{>*<} is that it lets us apply a function of any number or arguments by repeatedly peeling off currying levels. 
+
+For instance, we can apply a function of three arguments \hask{g :: a -> b -> c -> d } to three values \hask{fa :: f a }, \hask{fb :: f b }, and \hask{fc :: f c } using:
+\begin{haskell}
+fmap g fa <*> fb <*> fc
+\end{haskell}
+We can even use the infix version \index{\hask{<$>}}\hask{<$>} of \hask{fmap} to make it look more like a function application:
+\begin{haskell}
+g <$> fa <*> fb <*> fc
+\end{haskell}
+where:
+\begin{haskell}
+(<$>) :: Functor f => (a -> b) -> f a -> f b
+(<$>) = fmap
+\end{haskell}
+Both operators bind to the left, so we can look at this notation as a straightforward generalization of function application:
+\begin{haskell}
+g a b c
+\end{haskell}
+except that it also accumulates the effects of the three computations.
+
+To complete the picture, we also need to define what it means to apply an effectful zero-argument function. It just means slapping an ``ignore-me'' effect on top of a single value. We can use the monoidal \hask{unit} to accomplish this:
+\begin{haskell}
+pure :: a -> f a
+pure a = fmap (const a) unit
+\end{haskell}
+Conversely, \hask{unit} can be implemented in terms of \hask{pure}:
+\begin{haskell}
+unit = pure ()
+\end{haskell}
+
+Thus, instead of using \hask{Monoidal}, we can use the equivalent, but more convenient \hask{Applicative}:
+\begin{haskell}
+class Functor f => Applicative f where
+    pure  :: a -> f a
+    (<*>) :: f (a -> b) -> f a -> f b
+\end{haskell}
+
+\section{Applicative Instances}
+
+The most common applicative functors are also monads (the most notable counterexample being the \hask{ZipList}). Often the choice between using the \hask{Applicative} or the \hask{Monad} syntax is the convenience, although in some cases there is a difference in performance---especially if parallel execution is involved.
+
+\subsection{Partiality}
+A \hask{Maybe} function can only be applied to a \hask{Maybe} argument if both are \hask{Just}:
+\begin{haskell}
+instance Applicative Maybe where
+  pure = Just
+  mf <*> ma = 
+    case (mf, ma) of
+      (Just f, Just a) -> Just (f a)
+      _ -> Nothing
+\end{haskell}
+
+We can add information about the reason for failure by defining a version of the \hask{Either} functor:
+\begin{haskell}
+data Validation e a = Failure e  | Success a
+\end{haskell}
+The \hask{Applicative} instance for \hask{Validation} accumulates errors using \hask{mappend}:
+\begin{haskell}
+instance Monoid e => Applicative (Validation e) where
+  pure = Success
+  Failure e1 <*> Failure e2 = Failure (mappend e1 e2)
+  Failure e  <*> Success _ = Failure e
+  Success _  <*> Failure e  = Failure  e
+  Success f  <*> Success x  = Success (f x)
+\end{haskell}
+
+\subsection{Logging}
+
+\begin{haskell}
+newtype Writer w a = Writer { runWriter :: (a, w) }
+  deriving Functor
+\end{haskell}
+
+For a \hask{Writer} functor to support composition we have to be able to combine the logged values, and to have an ``ignore-me'' element. This means the log has to be a monoid:
+\begin{haskell}
+instance Monoid w => Applicative (Writer w) where
+  pure a = Writer (a, mempty)
+  wf <*> wa = let (f, w)  = runWriter wf
+                  (a, w') = runWriter wa
+              in Writer (f a, mappend w w')
+\end{haskell}
+
+\subsection{Environment}
+\begin{haskell}
+newtype Reader e a = Reader { runReader :: e -> a }
+  deriving Functor
+\end{haskell}
+
+Since the environment is immutable, we pass in parallel to both computations. The no-effect \hask{pure} ignores the environment.
+\begin{haskell}
+instance Applicative (Reader e) where
+  pure a = Reader (const a)
+  rf <*> ra = Reader (\e -> (runReader rf e) (runReader ra e))
+\end{haskell}
+
+\subsection{State}
+\begin{haskell}
+newtype State s a = State { runState :: s -> (a, s) }
+  deriving Functor
+\end{haskell}
+
+The \hask{State} applicative exhibits both parallel and sequential composition. The two actions are created in parallel, but they are executed in sequence. The second action uses the state that's modified by the first action:
+\begin{haskell}
+instance Applicative (State s) where
+  pure a = State (\s -> (a, s))
+  sf <*> sa = State (\s ->
+    let (f, s')  = runState sf s
+        (a, s'') = runState sa s' 
+    in (f a, s''))
+\end{haskell}
+
+\subsection{Nondeterminism}
+There are two separate instances of \hask{Applicative} for the list functor. They correspond to two different ways of composing list. The first one zips the two lists element by element; the second produces all possible combinations. In order to have two instances for the same data type, we have to encapsulate one of them in a \hask{newtype}:
+\begin{haskell}
+newtype ZipList a = ZipList { unZip :: [a] }
+  deriving Functor
+\end{haskell}
+The splat operator applies each function to its corresponding argument. It stops at the end of the shorter list. Interestingly, if we want \hask{pure} to act in accord with the unit laws, it has to produce an infinite list:
+\begin{haskell}
+repeat :: a -> [a]
+repeat a = a : repeat a
+\end{haskell}
+This way, when zipped with any finite list, it will not truncate the result.
+\begin{haskell}
+instance Applicative ZipList where
+  pure a = ZipList (repeat a)
+  zf <*> za = ZipList (zipWith ($) (unZip zf) (unZip za))
+\end{haskell}
+The two (possibly infinite) lists are combined by applying the function-application operator \hask{$}.
+\begin{haskell}
+zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith f [] _ = []
+zipWith f _ [] = []
+zipWith f (a : as) (b : bs) = f a b : zipWith f as bs 
+\end{haskell}
+
+The second \hask{Applicative} instance for lists applies all functions to all arguments. To implement the splat operator, we use the Haskell \index{list comprehension}list comprehension syntax:
+\begin{haskell}
+instance Applicative [] where
+  pure a = [a]
+  fs <*> as = [ f a | f <- fs, a <- as ]
+\end{haskell}
+The meaning of \hask{[f a | f <- fs, a <- as]} is: Create a list of \hask{(f a)} where \hask{f} is taken from the list \hask{fs} and \hask{a} is taken from the list \hask{as}.
+
+\subsection{Continuation}
+\begin{haskell}
+newtype Cont r a = Cont { runCont :: (a -> r) -> r }
+  deriving Functor
+\end{haskell}
+
+Let's implement the \hask{<*>} operator for continuations. Acting on a pair of continuations 
+\begin{haskell}
+kf :: Cont r (a -> b)
+ka :: Cont r a
+\end{haskell}
+it should produce a continuation:
+\begin{haskell}
+Cont r b
+\end{haskell}
+The latter takes a handler \hask{k :: b -> r } and is supposed to call it with the result of function application \hask{(f a)}. To make this last call we need to extract both the function and the argument. To extract \hask{a}, we have to run the continuation \hask{ka} and pass it the consumer of \hask{a}'s:
+\begin{haskell}
+runCont ka (\a -> k (f a))))
+\end{haskell}
+To extract \hask{f}, we have to run the continuation \hask{kf} and pass it the consumer of \hask{f}'s:
+\begin{haskell}
+runCont kf (\f -> runCont ka (\a -> k (f a))))
+\end{haskell}
+Altogether we get:
+\begin{haskell}
+instance Applicative (Cont r) where
+  pure a = Cont (\k -> k a)
+  kf <*> ka = Cont (\k -> 
+        runCont kf (\f -> 
+        runCont ka (\a -> k (f a))))
+\end{haskell}
+
+\subsection{Input/Output}
+
+Input/Output operations are usually composed as a monad, but it's also possible to use them with the applicative syntax. Notice that, even though applicatives compose in parallel, the side effects are serialized. This is important, for instance, if you want the prompt to be printed before taking user input:
+\begin{haskell}
+prompt :: String -> IO String
+prompt str = putStrLn str *> getLine
+\end{haskell}
+Here we are composing \hask{putStrLn}, which prints its argument to the terminal, and \hask{getLine}, which waits for the user input. The half-splat operator ignores the value produced by the first argument (which, in this case, is the unit \hask{()}), but keeps the side effect (here, printing the string):
+\begin{haskell}
+(*>) :: Applicative f => f a -> f b -> f b
+u *> v = (\ _ x -> x) <$> u <*> v
+\end{haskell}
+We can now apply a two-argument function:
+\begin{haskell}
+greeting :: String -> String -> String
+greeting s1 s2 = "Hi " ++ s1 ++ " " ++ s2 ++ "!"
+\end{haskell}
+to a pair of \hask{IO} arguments:
+\begin{haskell}
+getNamesAndGreet :: IO String
+getNamesAndGreet = 
+    greeting <$> prompt "First name: " <*> prompt "Last name: "
+\end{haskell}
+
+
+\subsection{Parsers}
+
+Parsing is a highly decomposable activity. There are many domain specific languages that can be parsed using applicative parsers (as opposed to more powerful monadic parsers). 
+
+A parser can be described as a function that takes a string of characters (or tokens). The parsing can fail, so the result is a \hask{Maybe}. A successful parser returns the parsed value together with the unconsumed part of the input string:
+\begin{haskell}
+newtype Parser a = 
+  Parser { parse :: String -> Maybe (a, String) }
+\end{haskell}
+For instance, here's a simple parser that detects a digit:
+\begin{haskell}
+digit :: Parser Char
+digit = Parser (\s -> case s of
+    (c:cs) | isDigit c -> Just (c, cs)
+    _                  -> Nothing)
+\end{haskell}
+The \hask{Applicative} instance for the parser combines partiality with state:
+\begin{haskell}
+instance Applicative Parser where
+  pure a = Parser (\s -> Just (a, s))
+  pf <*> pa = Parser (\s ->
+    case parse pf s of
+      Nothing      -> Nothing
+      Just (f, s') -> case parse pa s' of
+          Nothing       -> Nothing
+          Just (a, s'') -> Just (f a, s''))
+\end{haskell}
+
+Most grammars contain alternatives, for instance, an identifier or a number; an if statement or a loop, etc. This can be captured by the following \index{\hask{Alternative}}subclass of \hask{Applicative}:
+\begin{haskell}
+class Applicative f => Alternative f where
+  empty :: f a
+  (<|>) :: f a -> f a -> f a
+\end{haskell}
+This says that, no matter what the type \hask{a} is, the type \hask{(f a)} is a monoid. 
+
+The \hask{Alternative} instance for a \hask{Parser} tries the first parser and, if it fails, tries the second one. The monoidal unit is a parser that always fails.
+\begin{haskell}
+instance Alternative Parser where
+  empty = Parser (\s -> Nothing)
+  pa <|> pb = Parser (\s ->
+    case parse pa s of
+      Just as -> Just as
+      Nothing -> parse pb s)
+ \end{haskell}
+ This can be simplified if we use the \hask{Alternative} instance for \hask{Maybe}:
+\begin{haskell}
+  pa <|> pb = Parser (\s -> parse pa s <|> parse pb s)
+ \end{haskell}
+ Having the \hask{Applicative} superclass allows us to chain the alternatives. We can use \hask{some} to parse one or more items:
+\begin{haskell}
+some :: f a -> f [a] 
+some pa = (:) <$> pa <*> many pa
+\end{haskell}
+and \hask{many} to parse zero or more items:
+\begin{haskell}
+many :: f a -> f [a]
+many pa = some pa <|> pure []
+\end{haskell}
+
+\begin{exercise}
+Implement the \hask{Alternative} instance for \hask{Maybe}. Hint: If the first argument is a failure, try the second one.
+\end{exercise}
+
+\subsection{Concurrency and Parallelism}
+
+Starting a thread is an I/O operation, so any concurrent or parallel execution is intrinsically effectful. Whether computations are done in parallel or in series depends on how they are composed. Parallelism is implemented using applicative composition. 
+
+An example of an \hask{Applicative} for parallel operations is the functor \hask{Concurrently}. It takes an \hask{IO} action and starts executing it in a separate thread. Applicative composition is then used to combine the results---here, by adding two integers:
+\begin{haskell}
+f :: Concurrently Int
+f = (+) <$> Concurrently (fileChars "1-Types.hs") 
+        <*> Concurrently (fileChars "2-Composition.hs")
+    where fileChars path = length <$> readFile path
+\end{haskell}
+
+\subsection{Do Notation}
+In category theory we compose arrows diagrammatically. We can either join them in series or in parallel, and there is no need to give names the elements of intermediate objects. Such diagrams can be translated directly to programming, resulting in point-free notation for serial composition, and applicative notation for parallel composition. However, it's often convenient to name intermediate results. This can be done using the \hask{do} notation. For instance the concurrency example can be rewritten as:
+\begin{haskell}
+{-# language ApplicativeDo #-}
+f :: Concurrently Int
+f = do
+      m <- Concurrently (fileChars "1-Types.hs")
+      n <- Concurrently (fileChars "2-Composition.hs")
+      pure (m + n)
+  where fileChars path = length <$> readFile path
+\end{haskell}
+
+We'll talk more about the do notation in the chapter on monads. For now, it's important to know that, when you use the language pragma \hask{ApplicativeDo}, the compiler will by default will try to use applicative composition in the translation of do blocks. If that's impossible, it will fall back on monadic composition.
+
+\subsection{Composition of Applicatives}
+
+A nice property of applicative functors is that their functor composition is again an applicative:
+\begin{haskell}
+instance (Applicative f, Applicative g) => 
+  Applicative (Compose g f) where
+    pure :: a -> Compose g f a
+    pure x = Compose (pure (pure x))
+    (<*>) :: Compose g f (a -> b) -> Compose g f a -> Compose g f b
+    Compose gff <*> Compose gfa = Compose (fmap (<*>) gff <*> gfa)
+\end{haskell}
+We'll see later that the same is not true for monads: a composition of two monads is, in general, not a monad.
+
+\section{Monoidal Functors Categorically}
 
 We've seen several examples of monoidal categories. Such categories are equipped with some kind of binary operation, e.g., a cartesian product, a sum, composition (in the category of endofunctors), etc. They also have a special object that serves as the unit with respect to that binary operation. Unit and associativity laws are satisfied either on the nose (in strict monoidal categories) or up to isomorphism.
 
@@ -72,18 +474,7 @@ Such a functor maps a monoid $(m, \mu, \eta)$ to a monoid $(F m, \mu', \eta')$ w
 \mu' &= F \mu \circ \phi_{a b}
 \end{align*}
 
-The simplest example of a lax monoidal functor is an endofunctor that preserves the usual cartesian product. We can define it in Haskell as a typeclass:
-
-\begin{haskell}
-class Monoidal f where
-  unit  :: f ()
-  (>*<) :: f a -> f b -> f (a, b)
-\end{haskell}
-Corresponding to $\phi_{a b}$ we have an infix operator which, according to Haskell conventions, is written in its curried form.
-
-\begin{exercise}
-Implement the \hask{Monoidal} instance for the list functor.
-\end{exercise}
+In Haskell, we recognize the \hask{Monoidal} functor as an example of a lax monoidal endofunctor that preserves the cartesian product.
 
 \subsection{Functorial strength}
 
@@ -122,63 +513,6 @@ The fact that we were able to implement \hask{strength} for an arbitrary functor
 
 In category theory, though, not every endofunctor in a monoidal category is strong. For now, the magic incantation is that the category we're working with is self-enriched, and every endofunctor defined in Haskell is enriched. We'll come back to it when we talk about enriched categories. In Haskell, strength boils down to the fact that we can always \hask{fmap} a partially applied pair constructor \hask{(a, )}.
 
-\subsection{Applicative functors}
-
-In programming, the idea of applicative functors arose from the following question: A functor lets us lift a function of one variable. How can we lift a function of two or more variables? 
-
-By analogy with \hask{fmap}, we'd like to have a function:
-\begin{haskell}
-liftA2 :: (a -> b -> c) -> f a -> f b -> f c
-\end{haskell}
-
-A function of two arguments---here, in its curried form---is a function of one argument returning a function. So, assuming that \hask{f} is a functor, we can \hask{fmap} the first argument of \hask{liftA2}, which has the type:
-\begin{haskell}
-a -> (b -> c)
-\end{haskell}
-over the second argument \hask{(f a)} to get:
-\begin{haskell}
-f (b -> c)
-\end{haskell}
-The problem is, we don't know how to apply \hask{f (b -> c)} to the remaining argument \hask{(f b)}. 
-
-The class of functors that let us do that is called \hask{Applicative}. It turns out that, once we know how to lift a two-argument function, we can lift functions of any number of arguments, except zero. A zero-argument function is just a value, so lifting it means implementing a function:
-\begin{haskell}
-pure :: a -> f a
-\end{haskell}
-Here's the Haskell definition:
-\begin{haskell}
-class Functor f => Applicative f where
-    pure  :: a -> f a
-    (<*>) :: f (a -> b) -> f a -> f b
-\end{haskell}
-The application of a functorful of functions to a functorful of arguments is defined as an infix operator \hask{<*>} that is customarily called ``splat.''
-
-There is also an infix version of \hask{fmap}:
-\begin{haskell}
-(<$>) :: Functor f => (a -> b) -> f a -> f b
-\end{haskell}
-which can be used in this terse implementation of \hask{liftA2}:
-\begin{haskell}
-liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
-liftA2 g as bs = g <$> as <*> bs
-\end{haskell}
-Both operators bind to the left, which makes this syntax mimic regular function application.
-
-An applicative functor must also satisfy a set of laws:
-\begin{haskell}
-pure id <*> v = v                            -- Identity
-pure f <*> pure x = pure (f x)               -- Homomorphism
-u <*> pure y = pure ($ y) <*> u              -- Interchange
-pure (.) <*> u <*> v <*> w = u <*> (v <*> w) -- Composition
-\end{haskell}
-
-\begin{exercise}
-Implement $\emph{\hask{liftA3}}$, a function that lifts a 3-argument function using an applicative functor.
-\end{exercise}
-\begin{exercise}
-Verify \hask{Applicative} laws for the zip instance of the list functor.
-\end{exercise}
-
 
 \subsection{Closed functors}
 If you squint at the definition of the splat operator:
@@ -196,33 +530,5 @@ If we demand that the two ways be isomorphic, we get a definition of a strict \e
 If $F$ is an endofunctor, this translates directly into the definition of the splat operator. 
 
 The full definition of a lax closed functor includes the mapping of the monoidal unit and some coherence conditions. All said, an applicative functor is a lax closed functor.
-
-In a closed cartesian category, the exponential is related to the cartesian product through the currying adjunction. It's no surprise then, that in such a category lax monoidal and lax closed (applicative) endofunctors are the same. 
-
-We can easily express this in Haskell:
-\begin{haskell}
-instance (Functor f, Monoidal f) => Applicative f where
-  pure a = fmap (const a) unit
-  fs <*> as = fmap apply (fs >*< as)
-\end{haskell}
-where \hask{const} is a function that ignores its second argument:
-\begin{haskell}
-const :: a -> b -> a
-const a b = a
-\end{haskell}
-and \hask{apply} is the uncurried function application:
-\begin{haskell}
-apply :: (a -> b, a) -> b
-apply (f, a) = f a
-\end{haskell}
-And the other way around we have:
-\begin{haskell}
-instance Applicative f => Monoidal f where
-  unit = pure ()
-  as >*< bs = (,) <$> as <*> bs
-\end{haskell}
-In the latter, we used the pair constructor \hask{(,)} as a two-argument function.
-
-
 
 \end{document}

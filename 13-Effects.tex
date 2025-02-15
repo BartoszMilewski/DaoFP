@@ -10,8 +10,6 @@ Lao Tzu says: ``The value comes from what is there, but the use comes from what 
 
 What does the \hask{Maybe} functor, the list functor, and the reader functor have in common? They all have emptiness in their center. 
 
-When monads are explained in the context of programming, it's hard to see the common pattern when you focus on the functors. To understand monads you have to look inside functors and read between the lines of code.
-
 \section{Programming with Side Effects}
 
 So far we've been talking about programming in terms of computations that were modeled mainly on functions between sets (with the exception of non-termination). In programming, such functions are called \emph{total} and \emph{pure}. 
@@ -24,11 +22,11 @@ Most real-world programs, though, have to interact with the external world: they
 
 Unfortunately, this shotgun approach adopted by imperative languages makes reasoning about programs extremely hard. When composing effectful computations one has to carefully reason about the composition of effects on a case-by-case basis. To make things even harder, most effects are hidden not only inside the implementation (as opposed to the interface) of a particular function, but also in the implementation of all the functions that it's calling, recursively.
 
-The solution adopted by purely functional languages, like Haskell, is to encode side effects in the return types of pure functions. Amazingly, this is possible for all relevant effects. 
+The solution adopted by purely functional languages, like Haskell, is to encode side effects in the \emph{return types} of pure functions. Amazingly, this is possible for all relevant effects. 
 
-The idea is that, instead of a computation of the type \hask{a->b} with side effects, we use a function \hask{ a -> f b}, where the type constructor \hask{f} encodes the appropriate effect. At this point there are no conditions imposed on \hask{f}. It doesn't even have to be a \hask{Functor}, much less a monad. This will come later, when we talk about effect composition.
+The idea is that, instead of a computation of the type \hask{a->b} with side effects, we use a function \hask{ a -> f b}, where the type constructor \hask{f} encodes the appropriate effect. At this point there are no conditions imposed on \hask{f}. It doesn't even have to be a \hask{Functor}, much less an applicative or a monad. If we were okay with implementing a single monolithic function to produce both a value and a side effect, we'd be done. The caller of this function would just unpack the results and proceed happily. But programming is about the ability to decompose complex actions into their simpler components. 
 
-Below is the list of common effects and their pure-function versions.
+Below is the list of common effects and their pure-function versions. We'll talk about composition in the following chapters.
 
 \subsection{Partiality}
 In imperative languages, partiality is often encoded using exceptions. When a function is called with the ``wrong'' value for its argument, it throws an exception. In some languages, the type of exception is encoded in the signature of the function using special syntax. 
@@ -41,46 +39,50 @@ The caller of a \hask{Maybe}-valued function cannot easily ignore the exceptiona
 
 \subsection{Logging}
 
-Sometimes a computation has to log some values in some external data structure. Logging or auditing is a side effect that's particularly dangerous in concurrent programs, where multiple threads might try to access the same log simultaneously.
+Sometimes a computation has to log some data in an external data structure. Logging or auditing is a side effect that's particularly dangerous in concurrent programs, where multiple threads might try to access the same log simultaneously.
 
-The simple solution is for a function to return the computed value paired with the item to be logged. In other words, a logging computation of the type \hask{ a -> b } can be replaced by a pure function:
+The simple solution is for a function to return the computed value paired with the item to be logged. In other words, a logging computation of the type \hask{ a -> b } can be replaced with a pure function:
 \begin{haskell}
-a -> Writer w b
+a -> (b, w)
 \end{haskell}
-where the \hask{Writer} functor is a thin encapsulation of the product:
-\begin{haskell}
-newtype Writer w a = Writer (a, w)
-\end{haskell}
-with \hask{w} being the type of the log.
-
 The caller of this function is then responsible for extracting the value to be logged. This is a common trick: make the function provide all the data, and let the caller deal with the effects.
+
+For convenience, we'll later define a new type \hask{Writer w a } that is isomorphic to \hask{(a, w)}. This will allow us to make it as an instance of type classes, such as \hask{Functor}, \hask{Applicative}, and \hask{Monad}. 
+
+Remember that isomorphic types can be defined using the \index{record syntax}record syntax, as in:
+\begin{haskell}
+newtype Writer w a = Writer { runWriter :: (a, w) }
+\end{haskell}
+We automatically get a pair of functions that form the isomorphism. One of them is the data constructor:
+\begin{haskell}
+Writer :: (a, w) -> Writer w a
+\end{haskell}
+and the other is its inverse:
+\begin{haskell}
+runWriter :: Writer w a -> (a, w) 
+\end{haskell}
 
 \subsection{Environment}
 
-Some computations need read-only access to some external data stored in the environment. The read-only environment, instead of being secretly accessed by a computation, can be simply passed to a function as an additional argument. If we have a computation \hask{ a -> b } that needs access to some environment \hask{e}, we replace it with a function \hask{ (a, e) -> b }. At first, this doesn't seem to fit the pattern of encoding side effects in the return type. However, such a function can always be curried to the form:
+Some computations need read-only access to some external data stored in the environment. Instead of being secretly accessed by a computation, the read-only environment can be passed to a function as an additional argument. If we have a computation \hask{ a->b } that needs access to some environment \hask{e}, we replace it with a function \hask{ (a, e)->b }. At first, this doesn't seem to fit the pattern of encoding side effects in the return type. However, such a function can always be curried to the form:
 \begin{haskell}
 a -> (e -> b)
 \end{haskell}
-The return type of this function can be encoded in the reader functor, itself parameterized by the environment type \hask{e}:
+If we use the type \hask{Reader e a} that is isomorphic to \hask{e->a}.
 \begin{haskell}
-newtype Reader e a = Reader (e -> a)
+newtype Reader e a = Reader { runReader :: e -> a }
 \end{haskell}
-
-This is an example of a delayed side effect. The function:
+then we can encode the environment side effect by replacing the computation \hask{a->b} with a function:
 \begin{haskell}
-a -> Reader e a
+a -> Reader e b
 \end{haskell}
-doesn't want to deal with effects so it delegates the responsibility to the caller. You may think of it as producing a script to be executed at a later time. The function \hask{runReader} plays the role of a very simple interpreter of this script:
-\begin{haskell}
-runReader :: Reader e a -> e -> a
-runReader (Reader h) e = h e
-\end{haskell}
+It's an example of a delayed side effect. We don't want to deal with effects so we delegate this responsibility to the caller. Our function produces a ``script,'' and the caller executes it using \hask{runReader},  passing it the suitable argument of the type \hask{e}.
 
 \subsection{State}
 
 The most common side effect is related to accessing and potentially modifying some shared state. Unfortunately, shared state is the notorious source of concurrency errors. This is a serious problem in object-oriented languages where stateful objects can be transparently shared between many clients. In Java, such objects may be provided with individual mutexes at the cost of impaired performance and the risk of deadlocks.
 
-In functional programming we make state manipulations explicit: we pass the state as an additional argument and return the modified state paired with the return value. We replace a stateful computation \hask{ a -> b } with
+In functional programming we make state manipulations explicit: we pass the state as an additional argument and return the modified state paired with the return value. We thus replace a stateful computation \hask{ a -> b } with
 \begin{haskell}
 (a, s) -> (b, s)
 \end{haskell}
@@ -88,16 +90,15 @@ where \hask{s} is the type of state. As before, we can curry such a function to 
 \begin{haskell}
 a -> (s -> (b, s))
 \end{haskell}
-This return type can be encapsulated in the following functor:
+This return type can be encapsulated in the new type:
 \begin{haskell}
-newtype State s a = State (s -> (a, s))
+newtype State s a = State { runState :: s -> (a, s) }
 \end{haskell}
-The caller of such a function is supposed to retrieve the result and the modified state by providing the initial state and calling the helper function, the interpreter, \hask{runState}:
+The caller of a function:
 \begin{haskell}
-runState :: State s a -> s -> (a, s)
-runState (State h) s = h s
+a -> State s b
 \end{haskell}
-Notice that, modulo constructor unpacking, \hask{runState} is bona fide function application. 
+is handed a script. This script can then be executed using \hask{runState}, which takes the initial state and produces a modified state paired with the value.
 
 \subsection{Nondeterminism}
 
@@ -125,7 +126,7 @@ main :: IO ()
 \end{haskell}
 It's the \hask{IO} functor containing the unit---meaning: there is no useful value other than the input/output script.
 
-We'll talk about how \hask{IO} actions are created soon.
+Later we'll talk about how \hask{IO} actions are created.
 
 \subsection{Continuation}
 
@@ -133,28 +134,25 @@ We've seen that, as a consequence of the Yoneda lemma, we can replace a value of
 \begin{haskell}
 a -> Cont r b
 \end{haskell}
-where \hask{Cont r} is the following functor:
+where \hask{Cont r} is the data type that encapsulates the promise to provide a value of type \hask{a}:
 \begin{haskell}
-newtype Cont r a = Cont ((a -> r) -> r)
+newtype Cont r a = Cont { runCont :: (a -> r) -> r }
 \end{haskell}
-It's the responsibility of the caller of this function to provide the continuation, a function \hask{k :: a -> r}, and retrieve the result:
+It's the responsibility of the caller of this function to provide the appropriate continuation, that is a function \hask{k :: a -> r}, and retrieve the result:
 \begin{haskell}
 runCont :: Cont r a -> (a -> r) -> r
 runCont (Cont f) k = f k
 \end{haskell}
 
-This is the \hask{Functor} instance for \hask{Cont r}:
-\begin{haskell}
-instance Functor (Cont r) where
-  -- f :: a -> b
-  -- k :: b -> r
-  fmap f c = Cont (\k -> runCont c (k . f))
-\end{haskell}
-Notice that this is a covariant functor because the type \hask{a} is in a doubly negative position.
-
 In a cartesian closed category, continuations are generated by the endofunctor:
 \[ K_r a = r^{r^a} \]
 
+\begin{exercise}
+Implement the \hask{Functor} instance for \hask{Cont r a }. Note: This is a covariant functor because \hask{a} occurs in the double negative position.
+\end{exercise}
 
+\subsection{Composing Effectful Computations}
+
+Now that we know how to implement effectful computations using pure functions, we have to address the problem of composing them. There are two basic strategies to do that: parallel and sequential composition. The former is done using applicative functors and the latter using monads. 
 
 \end{document}
