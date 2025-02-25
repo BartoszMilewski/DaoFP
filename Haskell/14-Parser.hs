@@ -27,6 +27,7 @@ class Applicative f => Alternative f where
   empty :: f a
   (<|>) :: f a -> f a -> f a
   some :: f a -> f [a]  -- one or more
+  some pa = (:) <$> pa <*> many pa
   many :: f a -> f [a]  -- zero or more
 
 instance Alternative Maybe where
@@ -45,6 +46,7 @@ instance Alternative Parser where
   pa <|> pb = Parser (\s -> parse pa s <|> parse pb s)
   -}
   some pa = (:) <$> pa <*> many pa
+  many pa = some pa <|> pure []
   many pa = some pa <|> pure []
 
 -- Basic parsers

@@ -69,6 +69,8 @@ where we re-associate the triple of results:
 reassoc :: ((a, b), c) -> (a, b, c)
 reassoc ((a, b), c) = (a, b, c)
 \end{haskell}
+The \index{\hask{let}}\hask{let} clause is used for introducing local bindings. Here, the local variables \hask{fab} and \hask{fabc} are initialized to the corresponding monoidal products. The \hask{let}/\hask{in} construct is an expression whose value is given by the content of the \hask{in} clause.
+
 But as we increase the number of computations, things get progressively more awkward. 
 
 Fortunately, there is a more ergonomic approach. In most applications, the results of parallel computations are fed into a function that gathers them before producing the final result. What we need is a way of lifting such a function of multiple arguments---a generalization of the lifting of a single-argument function performed by a \hask{Functor}. 
@@ -146,7 +148,7 @@ Conversely, \hask{unit} can be implemented in terms of \hask{pure}:
 unit = pure ()
 \end{haskell}
 
-Thus, instead of using \hask{Monoidal}, we can use the equivalent, but more convenient \hask{Applicative}:
+Thus, in a cartesian closed category, instead of using \hask{Monoidal}, we can use the equivalent, but more convenient \hask{Applicative}:
 \begin{haskell}
 class Functor f => Applicative f where
     pure  :: a -> f a
