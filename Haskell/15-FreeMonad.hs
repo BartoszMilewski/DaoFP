@@ -1,6 +1,6 @@
 import Data.Kind ( Type )
 import Data.Functor.Const
-
+import Control.Monad (ap)
 type Natural f g = forall a. f a -> g a
 
 class HFunctor (hf :: (Type -> Type) -> Type -> Type) where
@@ -44,12 +44,15 @@ mu (Free ffa) = Free (fmap mu ffa)
 
 instance Functor f => Applicative (FreeMonad f) where
    pure = eta
+   (<*>) = ap
+{-
+   (<*>) :: Functor f => FreeMonad f (a -> b) -> FreeMonad f a -> FreeMonad f b
    Pure f  <*> Pure a = Pure (f a)
    Pure f  <*> Free ffa = Free (fmap (fmap f) ffa)
    Free ff <*> fa = Free (fmap (<*> fa) ff)
+-}
 
 instance Functor f => Monad (FreeMonad f) where
-   return = pure
    (Pure a)   >>= k = k a
    (Free ffa) >>= k = Free (fmap (>>= k) ffa)
    -- or, equivalently, using mu:

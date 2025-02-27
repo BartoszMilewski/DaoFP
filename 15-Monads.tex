@@ -676,7 +676,9 @@ instance Monad Ex where
     let x = e1 >>= k
         y = e2 >>= k
     in (Plus x y)
-    
+\end{haskell}
+with:    
+\begin{haskell}
   pure x = Var x 
 \end{haskell}
 
@@ -954,8 +956,11 @@ mu (Free ffa) = Free (fmap mu ffa)
 The \hask{Monad} instance for \hask{FreeMonad f} is therefore:
 \begin{haskell}
 instance Functor f => Monad (FreeMonad f) where
-  pure a = eta a
   m >>= k = mu (fmap k m)
+\end{haskell}
+with:
+\begin{haskell}
+  pure a = eta a
 \end{haskell}
 
 We can also define bind directly:
