@@ -146,6 +146,7 @@ By definition, the initial algebra $(i, \iota)$ has a unique algebra morphism $f
 Let's define two algebras for the following functor:
 \begin{haskell}
 data FloatF x = Num Float | Op x x
+    deriving Functor
 \end{haskell}
 The first algebra:
 \begin{haskell}
@@ -253,14 +254,15 @@ The Haskell standard library contains a more idiomatic definition:
 \begin{haskell}
 newtype Fix f = Fix { unFix :: f (Fix f) }
 \end{haskell}
+This definition reflects the isomorphism: \hask{unFix} being the inverse of the data constructor \hask{Fix}.
 
 To create terms of the type \hask{Fix f} we often use ``smart constructors.'' For instance, with the \hask{ExprF} functor, we would define:
 \begin{haskell}
 val :: Int -> Fix ExprF
-val n = In (ValF n)
+val n = Fix (ValF n)
 
 plus :: Fix ExprF -> Fix ExprF -> Fix ExprF
-plus e1 e2 = In (PlusF e1 e2)
+plus e1 e2 = Fix (PlusF e1 e2)
 \end{haskell}
 and use it to generate expression trees like this one:
 \begin{haskell}
@@ -302,7 +304,7 @@ Let's redraw this diagram using Haskell notation. The catamorphism depends on th
 \arrow[d, "\hask{alg}"]
  \\
  \hask{Fix f}
- \arrow[u, "\hask{out}"]
+ \arrow[u, "\hask{unFix}"]
  \arrow[rrrr, dashed, "\hask{cata alg}"]
  &&&& \hask{a}
   \end{tikzcd}
@@ -310,18 +312,17 @@ Let's redraw this diagram using Haskell notation. The catamorphism depends on th
 By simply following the arrows, we get this recursive definition:
 \begin{haskell}
 cata :: Functor f => Algebra f a -> Fix f -> a
-cata alg = alg . fmap (cata alg) . out
+cata alg = alg . fmap (cata alg) . unFix
 \end{haskell}
 
-Here's what's happening: We apply this definition to some \hask{Fix f}. Every \hask{Fix f} is obtained by applying \hask{In} to a functorful of \hask{Fix f}:
+Here's what's happening: We apply this definition to some \hask{Fix f}. Every \hask{Fix f} is obtained by applying the data constructor \hask{Fix} to a functorful of \hask{Fix f}:
 \begin{haskell}
-data Fix f where
-  In :: f (Fix f) -> Fix f
+Fix :: f (Fix f) -> Fix f
 \end{haskell}
-The function \hask{out} ``strips'' the data constructor \hask{In}:
+The function \hask{unFix} ``strips'' the data constructor \hask{Fix}:
 \begin{haskell}
-out :: Fix f -> f (Fix f)
-out (In x) = x
+unFix :: Fix f -> f (Fix f)
+unFix (Fix x) = x
 \end{haskell}
 
 We can now evaluate the functorful of \hask{Fix f} by \hask{fmap}'ing \hask{cata alg} over it. This is a recursive application. The idea is that the trees inside the functor are smaller than the original tree, so the recursion eventually terminates. It terminates when it hits the leaves. 
@@ -391,7 +392,7 @@ data ListF a x = NilF | ConsF a x
 An algebra for this functor is a mapping out:
 \begin{haskell}
 alg :: ListF a c -> c
-alg NifF = init
+alg NilF = init
 alg (ConsF a c) = step (a, c)
 \end{haskell}
 which is determined by the value \hask{init} and the function \hask{step}:
@@ -454,20 +455,21 @@ Another way of looking at the initial algebra, at least in $\mathbf{Set}$, is to
 
 In a way, this is just another manifestation of the Yoneda lemma: every data structure can be described either by mappings in or mappings out. The mappings in, in this case, are the constructors of the recursive data structure. The mappings out are all the catamorphisms that can be applied to it.
 
-First, let's make the polymorphism in the definition of \hask{cata} explicit:
+First, let's make the polymorphism in the definition of \hask{cata} explicit and use pattern matching instead of \hask{unFix}:
 \begin{haskell}
 cata :: Functor f => forall a. Algebra f a -> Fix f -> a
-cata alg = alg . fmap (cata alg) . out
+cata alg (Fix x) = alg (fmap (cata alg) x)
 \end{haskell}
 and then flip the arguments. We get:
 \begin{haskell}
 cata' :: Functor f => Fix f -> forall a. Algebra f a -> a
-cata' (In x) = \alg -> alg (fmap (flip cata' alg) x)
+cata' (Fix x) = \alg -> alg (fmap (flip cata' alg) x)
 \end{haskell}
-The function \index{\hask{flip}}\hask{flip} reverses the order of arguments to a function:
+The function \hask{flip'} reverses the order of arguments to a function:
 \begin{haskell}
-flip :: (a -> b -> c) -> (b -> a -> c)
-flip f b a = f a b
+    flip' :: (c -> forall a. Algebra f a -> a) -> 
+             (forall a. Algebra f a -> c -> a)
+    flip' g a c = g c a
 \end{haskell}
 This gives us a mapping from \hask{Fix f} to a set of polymorphic functions.
 
@@ -478,11 +480,11 @@ forall a. Algebra f a -> a
 we can reconstruct \hask{Fix f}:
 \begin{haskell}
 uncata :: Functor f => (forall a. Algebra f a -> a) -> Fix f
-uncata alga = alga In
+uncata alga = alga Fix
 \end{haskell}
 In fact, these two functions, \hask{cata'} and \hask{uncata}, are the inverse of each other, establishing the isomorphism between \hask{Fix f} and the type of polymorphic functions:
 \begin{haskell}
-data Mu f = Mu (forall a. Algebra f a -> a)
+newtype Mu f = Mu (forall a. Algebra f a -> a)
 \end{haskell}
 We can now substitute \hask{Mu f} everywhere we used  \hask{Fix f}.
 
@@ -492,7 +494,7 @@ cataMu :: Algebra f a -> (Mu f -> a)
 cataMu alg (Mu h) = h alg
 \end{haskell}
 
-You might be wondering how one can construct terms of the type \hask{Mu f} for, let's say lists. It can be done using recursion:
+You might be wondering how one can construct terms of the type \hask{Mu f} for, let's say, a list. It can be done using recursion:
 \begin{haskell}
 fromList :: forall a. [a] -> Mu (ListF a)
 fromList as = Mu h
@@ -502,11 +504,6 @@ fromList as = Mu h
             go [] = alg NilF
             go (n: ns) = alg (ConsF n (go ns))
 \end{haskell}
-To compile this code you have to use the language pragma:
-\begin{haskell}
-{-# language ScopedTypeVariables #-}
-\end{haskell}
-which puts the type variable \hask{a} in the scope of the \hask{where} clause.
 
 \begin{exercise}
 Write a test that takes a list of integers, converts it to the \hask{Mu} form, and calculates the sum using \hask{cataMu}.

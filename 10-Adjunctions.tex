@@ -475,16 +475,15 @@ class (Functor left, Functor right) =>
     unit   :: x -> right (left x)
     counit :: left (right x) -> x
 \end{haskell}
-The additional two clauses \hask{left -> right} and \hask{right -> left} tell the compiler that, when using an instance of the adjunction, one functor can be derived from the other. This definition requires the following compile extensions:
+The additional two clauses \hask{left -> right} and \hask{right -> left} tell the compiler that, when using an instance of the adjunction, one functor can be derived from the other. This definition requires the following compile extension:
 \begin{haskell}
-{-# language MultiParamTypeClasses #-}
-{-# LANGUAGE FunctionalDependencies #-}
+{-# language FunctionalDependencies #-}
 \end{haskell}
 
 The two functors that form the currying adjunction can be written as:
 \begin{haskell}
-data L r x = L (x, r)    deriving (Functor, Show)
-data R r x = R (r -> x)  deriving Functor
+newtype L r x = L (x, r)    deriving (Functor, Show)
+newtype R r x = R (r -> x)  deriving Functor
 \end{haskell}
 and the \hask{Adjunction} instance for currying is:
 \begin{haskell}
@@ -1079,8 +1078,8 @@ sumK' (i : is) k =
 \end{haskell}
 
 \begin{haskell}
-sumList :: [Int] -> Int
-sumList is = sumK' is done
+sumList' :: [Int] -> Int
+sumList' is = sumK' is done
 \end{haskell}
 
 In fact, if all we are interested in is calculating the sum, we can replace the polymorphic type \hask{r} with \hask{Int} with no other changes.

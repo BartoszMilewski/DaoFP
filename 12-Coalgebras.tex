@@ -26,7 +26,7 @@ A coalgebra for an endofunctor $F$ is a pair consisting of a carrier $a$ and a s
 
 In Haskell, we define:
 \begin{haskell}
- type Coalgebra f a = a -> f a
+type Coalgebra f a = a -> f a
 \end{haskell}
 We often think of the carrier as the type of a seed from which we grow the data structure, be it a list or a tree. 
 
@@ -112,8 +112,7 @@ In the category of sets, the carrier set of the initial algebra is a subset of t
 
 We'll see later that in Haskell the situation is more subtle, because of lazy evaluation. But, at least for functors that have the leaf component---that is, their action on the initial object is non-trivial---Haskell's fixed point type works as a carrier for both the initial algebra and the terminal coalgebra.
 \begin{haskell}
-data Fix f where
-  In :: f (Fix f) -> Fix f
+newtype Fix f = Fix { unFix :: f (Fix f) }
 \end{haskell}
 
 \begin{exercise}
@@ -148,7 +147,7 @@ The terminal coalgebra $(t, \tau)$ is defined by its universal property: there i
  Since the terminal coalgebra (just like the initial algebra) is a fixed point of a functor, the above recursive formula can be translated directly to Haskell as:
  \begin{haskell}
 ana :: Functor f => Coalgebra f a -> a -> Fix f
-ana coa = In . fmap (ana coa) . coa 
+ana coa = Fix . fmap (ana coa) . coa 
 \end{haskell}
 Here's the interpretation of this formula: Given a seed of type \hask{a}, we first act on it with the coalgebra \hask{coa}. This gives us a functorful of seeds. We expand these seeds by recursively applying the anamorphism using \hask{fmap}. We then apply the constructor \hask{In} to get the final result.
  
@@ -200,10 +199,10 @@ allNats = ana step 0
 In a non-lazy language this anamorphism would run forever, but in Haskell it's instantaneous. The incremental price is paid only when we want to retrieve some of the data, for instance, using these accessors:
 \begin{haskell}
 head :: Stream a -> a
-head (In (StreamF a _)) = a
+head (Fix (StreamF a _)) = a
 
 tail :: Stream a -> Stream a
-tail (In (StreamF _ s)) = s
+tail (Fix (StreamF _ s)) = s
 \end{haskell}
 
 
@@ -259,14 +258,14 @@ The ``bottom'' line is that Haskell code should be treated as an illustration of
 The definition of an anamorphism can be seen as an expression of the universal property of the terminal coalgebra. Here it is, with the universal quantification made explicit:
  \begin{haskell}
 ana :: Functor f => forall a. Coalgebra f a -> (a -> Fix f)
-ana coa = In . fmap (ana coa) . coa 
+ana coa = Fix . fmap (ana coa) . coa 
 \end{haskell}
 What it tells us is that, given any coalgebra, there is a mapping from its carrier to the carrier of the terminal coalgebra, \hask{Fix f}. We know, from the Lambek's lemma, that this mapping is in fact a coalgebra morphism.
 
 Let's uncurry this definition:
 \begin{haskell}
 ana :: Functor f => forall a. (a -> f a, a) -> Fix f
-ana (coa, x) = In (fmap (curry ana coa) (coa x))
+ana (coa, x) = Fix (fmap (curry ana coa) (coa x))
 \end{haskell}
 We can use this formula as the alternative definition of the carrier for the terminal coalgebra. We can replace \hask{Fix f} with the type we are defining---let's call it \hask{Nu f}. The type signature:
 \begin{haskell}
@@ -276,11 +275,11 @@ tells us that we can construct an element of \hask{Nu f} from a pair \hask{(a ->
 
 Data types with a polymorphic constructor are called \index{existential types}\emph{existential} types. In pseudo-code (not actual Haskell) we would define \hask{Nu f} as:
 \begin{haskell}
-data Nu f = Nu (exists a. (Coalgebra f a, a))
+newtype Nu f = Nu (exists a. (Coalgebra f a, a))
 \end{haskell}
 Compare this with the definition of the least fixed point of an algebra:
 \begin{haskell}
-data Mu f = Mu (forall a. Algebra f a -> a)
+newtype Mu f = Mu (forall a. Algebra f a -> a)
 \end{haskell}
 
 
