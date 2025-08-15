@@ -349,7 +349,7 @@ The isomorphism that defines an adjunction works for any pair of objects $x$ and
 \[  \mathcal{C} (L x, y) \cong \mathcal{D}( x , R y)\]
 so, in particular, it works if we replace $y$ with $L x$
 \[  \mathcal{C} (L x, L x) \cong \mathcal{D}( x , R (L x))\]
-We can now use the Yoneda trick and pick the identity arrow $id_{L x}$ on the left. The isomorphism maps it to a unique arrow on the right, which we'll call $\eta_x$:
+We can now use the \index{Yoneda trick}Yoneda trick and pick the identity arrow $id_{L x}$ on the left. The isomorphism maps it to a unique arrow on the right, which we'll call $\eta_x$:
 \[ \eta_x \colon x \to R ( L x) \]
 Not only is this mapping defined for every $x$, but it's also natural in $x$. The natural transformation $\eta$ is called the \emph{unit} of the adjunction. If we observe that the $x$ on the left is the action of the identity functor on $x$, we can write:
 \[ \eta \colon \text{Id}_{\mathcal{D}} \to R \circ L \]
@@ -643,7 +643,7 @@ For any arrow $h \colon d \to d'$ the following diagram must commute:
 & \mathcal{D}(d, R c)
  \end{tikzcd}
 \]
-We can use the Yoneda trick by setting $d'$ to $R c$.
+We can use the \index{Yoneda trick}Yoneda trick by setting $d'$ to $R c$.
 
 \[
  \begin{tikzcd}

@@ -522,7 +522,7 @@ At this point mathematicians start worrying about size issues. After all we are 
 We want to take a weighted limit of the diagram defined by $P$. The weight must be a $\mathcal V$-functor $\mathcal C^{op} \otimes \mathcal C \to \cat V$. There is one such functor that's always at our disposal, the hom-functor $\text{Hom}_{\cat C}$. We will use it to define the end as a weighted limit:
 \[  \int_c P\langle c, c\rangle = \text{lim}^{\text{Hom}} P\]
 
-First, let's convince ourselves that this formula works in an ordinary ($\Set$-enriched) category. Since ends are defined by their mapping-in property, let's consider a mapping from an arbitrary object $d$ to the weighted limit and use the standard Yoneda trick to show the isomorphism. By definition, we have:
+First, let's convince ourselves that this formula works in an ordinary ($\Set$-enriched) category. Since ends are defined by their mapping-in property, let's consider a mapping from an arbitrary object $d$ to the weighted limit and use the standard \index{Yoneda trick}Yoneda trick to show the isomorphism. By definition, we have:
 \[ \cat D(d, \text{lim}^{\text{Hom}} P) \cong [\cat C^{op} \times \cat C, \Set](\cat C(-, =), \cat D (d, P(-, =))\]
 We can rewrite the set of natural transformations as an end over pairs of objects $\langle c, c' \rangle$:
 \[ \int_{\langle c, c' \rangle} \Set(\cat C(c, c'), \cat D (d, P\langle c, c' \rangle)) \]
@@ -545,7 +545,7 @@ Show that for ordinary $\Set$-enriched categories the weighted colimit definitio
 Show that, as long as both sides exist, the following identities hold in ordinary ($\Set$-enriched) categories (they can be generalized to the enriched setting):
 \[ \text{lim}^W D \cong \int_{j \colon \cat J} W j \pitchfork D j \]
 \[ \text{colim}^W D \cong \int^{j \colon \cat J} W j \cdot D j \]
-Hint: Use the mapping in/out with the Yoneda trick and the definition of power and copower.
+Hint: Use the mapping in/out with the \index{Yoneda trick}Yoneda trick and the definition of power and copower.
 \end{exercise}
 
 \section{Kan Extensions}
@@ -572,7 +572,7 @@ The weighted limit is also defined through the set of natural transformations:
 \[  \mathcal D(d, \text{lim}^W F) \cong [\mathcal C, \Set] \big(W, \mathcal D(d, F-)\big) \]
 leading us to the final result:
 \[ \cat D(d, \text{lim}^{\cat B (e, P-)} F) \]
-Since $d$ was arbitrary, we can use the Yoneda trick to conclude that:
+Since $d$ was arbitrary, we can use the \index{Yoneda trick}Yoneda trick to conclude that:
 \[ (\text{Ran}_P F) e = \text{lim}^{\cat B(e, P-)} F  \]
 This formula becomes the definition of the right Kan extension in the enriched setting.
 

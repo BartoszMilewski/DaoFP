@@ -282,7 +282,7 @@ Indeed, one direction of the isomorphism is just that: capturing a function and 
 toTannaka :: (a -> b) -> (forall f. Functor f => f a -> f b)
 toTannaka g fa = fmap g fa
 \end{haskell}
-The other direction uses the Yoneda trick:
+The other direction uses the \index{Yoneda trick}Yoneda trick:
 \begin{haskell}
 fromTannaka :: (forall f. Functor f => f a -> f b) -> (a -> b)
 fromTannaka g a = runIdentity (g (Identity a))
