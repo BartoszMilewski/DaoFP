@@ -29,3 +29,12 @@ class (Functor left, Functor right) =>
     counit :: left (right x) -> x
 
 
+triangle :: Adjunction left right => forall x. right x -> right x
+triangle = fmap counit . unit
+
+-- Exercise
+
+triangle' :: Adjunction left right => forall x. left x -> left x
+triangle' = counit . fmap unit
+
+

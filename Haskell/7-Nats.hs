@@ -15,6 +15,10 @@ rec init step = \n ->
     Z     -> init
     (S m) -> step (rec init step m)
 
+plus0 :: Nat -> Nat -> Nat
+plus0 Z n = n
+plus0 (S n) m = S (plus0 n m)
+
 plus :: Nat -> Nat -> Nat
 plus n = rec init step
   where
