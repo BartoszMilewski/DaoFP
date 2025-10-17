@@ -764,9 +764,9 @@ Reading the left diagram bottom-to-top produces a series of mappings:
 \[  Id_{\mathcal{D}} \circ R \xrightarrow{\eta \circ R} R \circ L \circ R \xrightarrow{R \circ \varepsilon} R \circ Id_{\mathcal{C}}  \]
 This must be equal to the right-hand-side, which may be interpreted as the (invisible) identity natural transformation on $R$
 
-In the case when $R$ is an endofunctor, we can translate the first diagram directly to Haskell. The whiskering of the unit of the adjunction $\eta$ by $R$ results in the polymorphic function \hask{unit} being instantiated at \hask{R x}. The whiskering of $\varepsilon$ results in the lifting of \hask{counit} by the functor $R$. The vertical composition translates to function composition:
+In the case when $R$ is an endofunctor, we can translate the first diagram directly to Haskell. The whiskering of the unit of the adjunction $\eta$ by $R$ results in the polymorphic function \hask{unit} being instantiated at \hask{right x}. The whiskering of $\varepsilon$ results in the lifting of \hask{counit} by the functor \hask{right}. The vertical composition translates to function composition:
 \begin{haskell}
-triangle :: forall x. R x -> R x
+triangle :: Adjunction left right => forall x. right x -> right x
 triangle = fmap counit . unit
 \end{haskell}
 

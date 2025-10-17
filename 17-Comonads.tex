@@ -30,7 +30,11 @@ idWithEnv (a, e) = a
 This strongly suggests the idea that there is a category in which co-Kleisli arrows serve as morphisms. 
 
 \begin{exercise}
-Show that the composition of co-Kleisli arrows using \hask{composeWithEnv} is associative.
+Show that the composition of co-Kleisli arrows using \hask{composeWithEnv} is associative. Hint, use the equivalent form:
+\begin{haskell}
+composeWithEnv g f (a, e) = g (f (a, e), e)
+\end{haskell}
+
 \end{exercise}
 
 \section{Comonads in Programming}
@@ -53,19 +57,34 @@ instance Comonad ((,) e) where
 
 As with monads, co-Kleisli composition may be used in point-free style of programming. But we can also use the dual to \hask{join} called \hask{duplicate}:
 \begin{haskell}
-  duplicate :: w a -> w (w a)
+duplicate :: Comonad w => w a -> w (w a)
+duplicate = id =<= id
 \end{haskell}
 or the dual to bind called \hask{extend}:
 \begin{haskell}
-  extend :: (w a -> b) -> w a -> w b
+extend :: Comonad w => (w a -> b) -> w a -> w b
+extend k = id =<= k
 \end{haskell}
+The trick here is to realize that the compiler can instantiate the polymorphic function \hask{id} at \hask{w a} and reinterpreted it as a co-Kleisli arrow from \hask{a} to \hask{w a}.
+
 Here's how we can implement co-Kleisli composition in terms of \hask{duplicate} and \hask{fmap}:
 \begin{haskell}
    g =<= f = g . fmap f . duplicate
 \end{haskell}
+
+In the Haskell standard library, a comonad is defined using alternatively \hask{duplicate} or \hask{extend}:
+\begin{haskell}
+class Functor w => Comonad w where
+  extract :: w a -> a
+  duplicate :: w a -> w (w a)
+  extend :: (w a -> b) -> w a -> w b
+\end{haskell}
+so \hask{Comonad} instances can be defined by implementing either one.
+
 \begin{exercise}
 Implement \hask{duplicate} in terms of \hask{extend} and vice versa.
 \end{exercise}
+
 \subsection{The \hask{Stream} comonad}
 Interesting examples of comonads deal with larger, sometimes infinite, contexts. Here's an infinite stream:
 \begin{haskell}
@@ -114,6 +133,7 @@ Comonads are useful for structuring computations in spatially or temporally exte
 Sometimes it's convenient to perform calculation on continuous streams of data, postponing the sampling until the very last step. Here's an example of a signal that is a function of time (represented by \hask{Double})
 \begin{haskell}
 data Signal a = Sig (Double -> a) Double
+    deriving Functor
 \end{haskell}
 The first component is a continuous stream of \hask{a}'s implemented as a function of time. The second component is the current time.
 

@@ -59,7 +59,7 @@ The first line declares \hask{x} to be an element of \hask{Bool} (secretly a fun
 
 The functions \hask{True} and \hask{False} that we used in the definition of \hask{Bool} are called \index{data constructor}\emph{data constructors}. They can be used to construct specific terms, like in the example above. As a side note, in Haskell, function names start with lower-case letters, except when they are data constructors. 
 
-Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it. We have to be able to define arrows that go out of \hask{Bool}---the \index{mapping out}\emph{mappings ou}t of \hask{Bool}. 
+Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it, how to ``consume'' it. We have to be able to define arrows that go out of \hask{Bool}---the \index{mapping out}\emph{mappings ou}t of \hask{Bool}. 
 
 The first observation is that, if we have an arrow \hask{h} from \hask{Bool} to some concrete type \hask{A} then we automatically get two arrows \hask{x} and \hask{y} from unit to \hask{A}, just by composition. The following two (distorted) triangles commute:
 
