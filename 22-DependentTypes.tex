@@ -36,23 +36,18 @@ data Vec n a where
     VNil  :: Vec Z a
     VCons :: a -> Vec n a -> Vec (S n) a
 \end{haskell}
-The compiler will recognize this definition as dependently typed if you include the following language pragmas:
+The compiler will recognize this definition as dependently typed if you include the following language pragma:
 \begin{haskell}
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
 \end{haskell}
 The first argument to the type constructor is a natural number \hask{n}. Notice: this is a value, not a type. The type checker is able to figure this out from the usage of \hask{n} in the two data constructors. The first one creates a vector of the type \hask{Vec Z a}, and the second creates a vector of the type \hask{Vect (S n) a}, where \hask{Z} and \hask{S} are defined as the constructors of natural numbers:
 \begin{haskell}
 data Nat = Z | S Nat
 \end{haskell}
 
-We can be more explicit about the parameters if we use the pragma:
+We can be more explicit about the parameters if we import the library:
 \begin{haskell}
-{-# LANGUAGE KindSignatures #-}
-\end{haskell}
-and import the library:
-\begin{haskell}
-import Data.Kind
+import Data.Kind (Type)
 \end{haskell}
 We can then specify that \hask{n} is a \hask{Nat}, whereas \hask{a} is a \hask{Type}:
 \begin{haskell}
@@ -815,10 +810,28 @@ Its action on an object $(s, q \colon s \to b)$ is given by post-composition by 
 
 \subsection{Existential quantification}
 
-In the \emph{propositions as types} interpretation, type families correspond to families of propositions. The dependent sum type $\Sigma_{x : B} \, T(x)$ corresponds to the proposition: There exists an $x$ for which $T(x)$ is true:
+In the \emph{propositions as types} interpretation, type families correspond to families of propositions. The dependent sum type $\Sigma_{x : B} \, T(x)$ corresponds to (the proof relevant version of) the proposition: There exists an $x$ for which $T(x)$ is true:
 \[ \exists_{x : B} \, T (x)\]
 
 Indeed, a term of the type $\Sigma_{x : B} \, T(x)$ is a pair of an element $x \colon B$ and an element $y \colon T(x)$---which shows that $T(x)$ is inhabited for some $x$.
+
+\subsection{Dependent sum in Haskell}
+
+Consider a version of the Haskell \hask{filter} function that operates on vectors. It takes a predicate \hask{a -> Bool} and returns a, possibly shorter, vector of the input elements that satisfy it. The problem is that we don't know up front the size of the output vector. The solution is to return an existential type, something like $\exists_{k : \mathbb N} V(k, a)$. Unfortunately, at this time, Haskell doesn't support existential types. There is a proposal that introduces a new syntax, in which this type would be written as \hask{some (k :: Nat) | Vec k a}. Using this syntax, the signature of the filter function would be:
+\begin{haskell}
+filterV :: (a -> Bool) -> Vec n a -> some (k :: Nat) | Vec k a
+\end{haskell}
+
+Currently the workaround is to use the continuation passing style. Instead of returning an existential, we implement \hask{filterV} to take a handler that is polymorphic in \hask{k}:
+\begin{haskell}
+filterV :: (a -> Bool) -> Vec n a -> (forall k. Vec k a -> r) -> r 
+filterV p VNil k = k VNil
+filterV p (VCons a as) k = 
+  if p a 
+     then filterV p as (\bs -> k (VCons a bs))
+     else filterV p as (\bs -> k bs)
+\end{haskell}
+
 
 \section{Dependent Product}
 
@@ -841,6 +854,14 @@ data SNat n where
   SS :: SNat n -> SNat (S n)
 \end{haskell}
 (Note that \hask{replicateV} is a function of two arguments, so it can be either considered a dependent function of a pair, or a regular function returning a dependent function.)
+
+There is a proposal to add dependent products to Haskell with the new keyword \hask{foreach}. It would allow us to get rid of singletons in our implementation of \hask{replicateV}:
+\begin{haskell}
+replicateV :: foreach (n :: Nat) -> a -> Vec n a
+replicateV Z _  = VNil
+replicateV (S n) x = VCons x (replicateV x n)
+\end{haskell}
+
 \subsection{Dependent product of sets}
 Before we describe the categorical model of dependent functions, it's instructive to consider how they work on sets. A dependent function selects one element from each set $T(x)$. 
 
