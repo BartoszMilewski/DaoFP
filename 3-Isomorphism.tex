@@ -98,7 +98,7 @@ Since this is a common construction, Haskell provides special syntax that define
 newtype Temperature = Temp { toInt :: Int}
 \end{haskell}
 
-Because \hask{Temperature} is a new type, functions that operate on integers will not accept it as an argument. This way the programmer can restrict the way it can be used. We can still use the isomorphism to selectively allow some operations, as in this application of the function \hask{negate :: Int -> Int}. The code that does it is the direct translation of the diagram:
+Because \hask{Temperature} is a new type, functions that operate on integers will not accept it as an argument. This way the programmer can restrict the ways it can be used. We can still use the isomorphism to selectively allow some operations, as in this application of the function \hask{negate :: Int -> Int}. The code that does it is the direct translation of the diagram:
 \[ \hask{Temperature} \xrightarrow{\hask{toInt}} \hask{Int} \xrightarrow{\hask{negate}} \hask{Int} \xrightarrow{\hask{Temp}} \hask{Temperature} \]
 \begin{haskell}
 invert :: Temperature -> Temperature
@@ -136,19 +136,19 @@ There is a corresponding arrow coming from $x$ to $b$. It's just the composition
  \arrow[ll, bend left,  "f^{-1}"]
  \end{tikzcd}
 \]
-Similarly, for any arrow probing $b$ there is a corresponding arrow probing $a$. It is given by the action of  $(f^{-1} \circ -)$. 
+Similarly, for any arrow probing $b$ there is a corresponding arrow probing $a$. It is given by the action of  $(f^{-1} \circ -)$ on arrows. 
 
-We can move focus back and forth between $a$ and $b$ using the mappings $(f \circ -)$ and $(f^{-1} \circ -)$.
+We can move focus back and forth between $a$ and $b$ using the arrow mappings $(f \circ -)$ and $(f^{-1} \circ -)$.
 
-We can combine these two mappings (see exercise \ref{ex-yoneda-composition}) to form a round trip. The result is the same as if we applied the composite $((f^{-1} \circ f) \circ -)$. But this is equal to $(id_a \circ  -)$ which, as we know from exercise \ref{ex-yoneda-identity}, leaves the arrows unchanged.
+We can combine these two arrow mappings (see exercise \ref{ex-yoneda-composition}) to form a round trip. The result is the same as if we applied the composite $((f^{-1} \circ f) \circ -)$. But this is equal to $(id_a \circ  -)$ which, as we know from exercise \ref{ex-yoneda-identity}, leaves the arrows unchanged.
 
 Similarly, the round trip induced by $f \circ f^{-1}$ leaves the arrows $x \to b$ unchanged. 
 
-This creates a ``buddy system'' between the two groups of arrows. Imagine each arrow sending a message to its buddy, as determined by $f$ or $f^{-1}$. Each arrow would then receive exactly one message, and that would be a message from its buddy. No arrow would be left behind, and no arrow would receive more than one message. Mathematicians call this kind of buddy system a \emph{bijection} or one-to-one correspondence.
+This creates a ``buddy system'' between the two groups of arrows. Mathematicians call this kind of buddy system a \emph{bijection} or one-to-one correspondence.
 
 Therefore, arrow by arrow, the two objects $a$ and $b$ look exactly the same from the perspective of $x$. Arrow-wise, there is no difference between the two objects. 
 
-Two isomorphic objects have exactly the same properties.
+We can say that two isomorphic objects have exactly the same properties.
 
 In particular, if you replace $x$ with the terminal object $1$, you'll see that the two objects have the same elements. For every element $x \colon 1 \to a$ there is a corresponding element $y \colon 1 \to b$, namely $y = f \circ x$, and vice versa. There is a bijection between the elements of isomorphic objects.
 
@@ -160,7 +160,7 @@ We write this isomorphism as:
 
 When dealing with objects, we use isomorphism in place of equality.
 
-In classical logic, if B follows from A and A follows from B then A and B are logically equivalent. We often say that B is true ``if and only if'' A is true. However, unlike previous parallels between logic and type theory, this one is not as straightforward if you consider proofs to be relevant. In fact, it led to the development of a new branch of fundamental mathematics called homotopy type theory, or HoTT for short.
+In classical logic, if B follows from A and A follows from B then A and B are logically equivalent. We often say that B is true ``if and only if'' A is true. However, unlike previous parallels between logic and type theory, this one is not as straightforward if you consider proofs to be relevant. In fact, this led to the development of a new branch of fundamental mathematics called homotopy type theory, or HoTT for short.
 
 \begin{exercise}
 Make an argument that there is a bijection between arrows that are \emph{outgoing} from two isomorphic objects. Draw the corresponding diagrams.
@@ -316,7 +316,7 @@ When two objects $a$ and $b$ are isomorphic, any isomorphism $f$ induces a one-t
 The function $(f \circ -)$ maps every arrow $h \colon x \to a$ to an arrow $f \circ h \colon x \to b$. It's inverse $(f^{-1} \circ -)$ maps every arrow $h' \colon x \to b$ to an arrow $(f^{-1} \circ h')$.
 
 
-Suppose that we don't know if the objects are isomorphic, but we know that there is an invertible mapping, $\alpha_x$, between sets of arrows impinging on $a$ and $b$ from every object $x$. In other words, for every $x$, $\alpha_x$ is a bijection of arrows. 
+Suppose that we don't know if the objects are isomorphic, but we know that, for any object $x$,  there is an invertible mapping $\alpha_x$ between sets of arrows impinging on $a$ from $x$ and the set of arrows impinging on $b$ from the same $x$. In other words, for every $x$, $\alpha_x$ is a bijection of arrows. 
 \[
  \begin{tikzcd}
  \node(x) at (0, 2) {x};
@@ -341,7 +341,7 @@ Suppose that we don't know if the objects are isomorphic, but we know that there
  \draw[->, red, dashed] (aa) -- node[above]{\alpha_x} (bb);
  \end{tikzcd}
 \]
-Before, the bijection of arrows was generated by the isomorphism $f$. Now, the bijection of arrows is given to us by $\alpha_x$. Does it mean that the two objects are isomorphic? Can we construct the isomorphism $f$ from the family of mappings $\alpha_x$? The answer is ``yes'', as long as the family $\alpha_x$ satisfies the naturality condition.
+Before, we've seen bijections of arrows generated by an isomorphism $f$. Now, the bijection of arrows is given to us by $\alpha_x$. Does it mean that the two objects are isomorphic? Can we construct the isomorphism $f$ from the family of mappings $\alpha_x$? The answer is ``yes'', as long as the family $\alpha_x$ satisfies the naturality condition.
 
 Here's the action of $\alpha_x$ on a particular arrow $h$. 
 \[
@@ -370,7 +370,7 @@ Here's the same situation from the point of view of another observer $y$:
 \]
 Notice that $y$ is using a different mapping $\alpha_y$ from the same family. 
 
-These two mappings, $\alpha_x$ and $\alpha_y$, become entangled whenever there is a morphism $g \colon y \to x$. In that case, pre-composition with $g$ allows us to switch perspective from $x$ to $y$ (notice the direction)
+These two mappings, $\alpha_x$ and $\alpha_y$, become entangled whenever there is a morphism $g \colon y \to x$. In that case, pre-composition with $g$ allows us to switch perspective from $x$ to $y$ (notice the direction):
 
 \[
  \begin{tikzcd}
@@ -408,9 +408,9 @@ When acting on some arrow $h \colon x \to a$, we want this diagram to commute:
 &(\alpha_x h) \circ g = \alpha_y (h \circ g)
  \end{tikzcd}
 \]
-This way we know that replacing all $\alpha$'s with $(f \circ -)$ will work. But does such $f$ exist? Can we reconstruct $f$ from the $\alpha$'s? The answer is yes, and we'll use the Yoneda trick to accomplish that.
+This way we know that replacing all $\alpha$'s with the hypothetical $(f \circ -)$ will work. But does such $f$ exist? Can we reconstruct $f$ from the $\alpha$'s? The answer is yes, and we'll use the Yoneda trick to accomplish that.
 
-Since $\alpha_x$ is defined for any object $x$, it is also defined for $a$ itself. By definition, $\alpha_a$ takes a morphism $a \to a$ to a morphism $a \to b$. We know for sure that there is at least one morphism $a \to a$, namely the identity $id_a$. It turns out that the isomorphism $f$ we are seeking is given by:
+Since $\alpha_x$ is defined for any object $x$, it is also defined for $x = a$. By definition, $\alpha_a$ takes a morphism $a \to a$ to a morphism $a \to b$. We know for sure that there is at least one morphism $a \to a$, namely the identity $id_a$. It turns out that the isomorphism $f$ we are seeking is given by:
 \[f = \alpha_a (id_a)\]
 or, pictorially:
 \[
@@ -440,8 +440,6 @@ as illustrated in the following diagram:
   && b
  \end{tikzcd}
 \]
-
-
 Since both the source and the target of $h$ is $a$, this equality must also be true for $h = id_a$
 \[\alpha_y (id_a \circ g) = (\alpha_a (id_a)) \circ g \]
 But $id_a \circ g$ is equal to $g$ and $\alpha_a(id_a)$ is our $f$, so we get:
@@ -452,7 +450,7 @@ Notice that, even though $\alpha_x$ was defined individually for every $x$ and e
 \subsection{Reversing the Arrows}
 As Lao Tzu would say, the duality between the observer and the observed cannot be complete unless the observer is allowed to switch roles with the observed. 
 
-Again, we want to show that two objects $a$ and $b$ are isomorphic, but this time we want to treat them as observers. An arrow $h \colon a \to x$ probes an arbitrary object $x$ from the perspective of $a$. Previously, when we knew that the two objects were isomorphic, we were able to switch perspective to $b$ using $(- \circ f^{-1})$. This time we have at our disposal a transformation $\beta_x$ instead. It establishes the bijection between arrows impinging on $x$.
+Again, we want to show that two objects $a$ and $b$ are isomorphic, but this time we want to treat them as observers. An arrow $h \colon a \to x$ probes an arbitrary object $x$ from the perspective of $a$. Previously, when we knew that the two objects were isomorphic, we were able to switch perspective to $b$ by using the arrow mapping $(- \circ f^{-1})$. This time we have at our disposal a transformation $\beta_x$ instead:
 \[
  \begin{tikzcd}
  x
@@ -463,8 +461,7 @@ Again, we want to show that two objects $a$ and $b$ are isomorphic, but this tim
   \arrow[llu, red, "\beta_x h"']
   \end{tikzcd}
 \]
-If we want to observe another object, $y$, we will use $\beta_y$ to switch perspectives between $a$ and $b$, and so on. 
-
+ It establishes the bijection between the sets of arrows impinging on $x$:
 \[
  \begin{tikzcd}
  \node(x) at (0, 2) {x};
@@ -489,6 +486,9 @@ If we want to observe another object, $y$, we will use $\beta_y$ to switch persp
  \draw[->, red, dashed] (aa) -- node[above]{\beta_x} (bb);
  \end{tikzcd}
 \]
+
+Similarly, if we want to observe another object $y$, we will use $\beta_y$ to switch perspectives between $a$ and $b$, and so on. 
+
 
 
 If the two objects $x$ and $y$ are connected by an arrow $g \colon x \to y$ then we also have an option of switching focus using $(g \circ -)$. If we want to do both: switch perspective and switch focus, there are two ways of doing it. Naturality demands that the results be equal:

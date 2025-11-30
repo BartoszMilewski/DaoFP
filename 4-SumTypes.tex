@@ -50,7 +50,7 @@ data Bool where
   False :: Bool
 \end{haskell}
 
-We can now define a term of the type \hask{Bool}, for instance
+We can now define a term, or a value, of the type \hask{Bool}, for instance
 \begin{haskell}
 x :: Bool
 x = True
@@ -116,6 +116,7 @@ h :: Bool -> A
 h b = if b then x else y
 \end{haskell}
 Here, \hask{b} is a term of the type \hask{Bool}. 
+\subsection{Type theory interpretation}
 
 In general, a data type is created using \index{introduction rule}\emph{introduction} rules and deconstructed using \index{elimination rule}\emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and another using \hask{False}. The \hask{if}, \hask{then}, \hask{else} construct defines the elimination rule. 
 
@@ -232,7 +233,7 @@ These patterns will also work for types with four, five, and more data construct
 data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 
-There is a giant enumeration of Unicode characters called \hask{Char}. Their constructors are given special names: you write the character itself between two apostrophes, e.g.,
+There is a giant enumeration of Unicode characters called \hask{Char}. Their constructors are given special names: you write the character itself between a pair of apostrophes, e.g.,
 \begin{haskell}
 c :: Char
 c = 'a'
@@ -537,7 +538,7 @@ This code can also be displayed in diagrammatical form. Here's the diagram for t
  \end{tikzcd}
 \]
 \subsection{Functoriality}
-Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the foci of the arrows that define the product. But what happens when we move the sources of those arrows? 
+Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the focus of the arrows that define the coproduct. But what happens when we move the sources of those arrows? 
 
 Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
 \begin{align*}f &\colon a \to a' \\

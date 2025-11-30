@@ -10,7 +10,7 @@ data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 But if we combine two digits into a single data structure, a two-digit decimal number, we'll be able to encode a hundred numbers. Or, as Lao Tzu would say, with just four digits you can encode ten thousand numbers.
 
-A data type that combines two types in this manner is called a product, or a \index{cartesian product}\emph{cartesian} product. Its defining quality is the elimination rule: there are two arrows coming from $a \times b$; one called ``$\text{fst}$'' goes to $a$, and another called ``$\text{snd}$'' goes to $b$. They are called (cartesian) \index{cartesian projections}\emph{projections}. They let us retrieve $a$ and $b$ from the product $a \times b$.
+A data type that combines two types in this manner is called a product, or a \index{cartesian product}\emph{cartesian}\footnote{Named after René Descartes, 1596-1650} product. Its defining quality is the elimination rule: there are two arrows coming from $a \times b$; one called ``$\text{fst}$'' goes to $a$, and another called ``$\text{snd}$'' goes to $b$. They are called (cartesian) \index{cartesian projections}\emph{projections}. They let us retrieve $a$ and $b$ from the product $a \times b$.
 
 \[
  \begin{tikzcd}
@@ -73,6 +73,33 @@ We should never lose sight of the purpose of programming: to decompose complex p
 \subsection{Logic}
 
 In logic, a product type corresponds to logical conjunction. In order to prove $A \times B$ ($A$ and $B$), you need to provide the proofs of \emph{both} $A$ and $B$. These are the arrows targeting $A$ and $B$. The elimination rule says that if you have a proof of $A \times B$, then you automatically get the proof of $A$ (through $\text{fst}$) and the proof of $B$ (through $\text{snd}$).
+
+\subsection{Type theory}
+In type theory we postulate that given any pair of types $A$ and $B$ we can construct a new type $A \times B$. This defines the \emph{type constructor} for the product.
+
+The introduction rule takes two terms, $x \colon A$ and $y \colon B$, and constructs the term $(x, y) \colon A \times B$. This corresponds to the \emph{data constructor} for the product.
+
+There are two elimination rules. Given a term $z \colon A \times B$ we can extract a term of the type $A$ using $\text{fst}$, and  the term of type $B$ using $\text{snd}$\footnote{These projections are often called $\pi_1$ and $\pi_2$}.
+
+The computation rule tells us that applying an eliminator to a term created using the introduction rule reproduces the corresponding argument. That is  $\text{fst} (x, y) = x$ and  $\text{snd} (x, y) = y$. In programming we call this \index{beta reduction}\emph{beta reduction}.
+
+The computation rule can be illustrated in our categorical diagram by the two commuting triangles:
+\[
+ \begin{tikzcd}
+ & 1
+\arrow[d, dashed, "{(x, y)}"]
+ \arrow[ddl, bend right, "x"']
+ \arrow[ddr, bend left, "y"]
+\\
+&A \times B
+ \arrow[dl,  "\text{fst}"]
+ \arrow[dr,   "\text{snd}"']
+\\
+A && B
+ \end{tikzcd}
+\]
+
+Finally, the uniqueness property tells us that introduction \emph{after} elimination reproduces the original. That is, given any $p \colon A \times B$, we have $(\text{fst}\,p, \text{snd}\, p ) = p$. In programming we call this \index{eta reduction}\emph{eta reduction}.
 
 \subsection{Tuples and Records}
 
@@ -322,7 +349,7 @@ a \times b &\cong b \times a
 \end{align*}
 and is functorial. 
 
-A category in which an operation with these properties is defined is called \emph{symmetric monoidal}\footnote{Strictly speaking, a product of two objects is defined up to isomorphism, whereas the product in a monoidal category must be defined on the nose. But we can get a monoidal category by making a choice of a product}. We've seen a similar structure before, when working with sums and the initial object. 
+A category in which an operation with these properties is defined is called \emph{symmetric monoidal}\footnote{Strictly speaking, a product of two objects is defined up to isomorphism, whereas the product in a monoidal category must be defined on the nose. We can get a monoidal category by making a specific choice of a product (assuming the Axiom of Choice).}. We've seen a similar structure before, when working with sums and the initial object. 
 
 A category can have multiple monoidal structures at the same time. When you don't want to name your monoidal structure, you replace the plus sign or the product sign with a tensor sign, and the neutral element with the letter $I$. The rules of a symmetric monoidal category can then be written as:
 \begin{align*}

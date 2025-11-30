@@ -317,7 +317,7 @@ Let's look at the components of these transformations at some object $x$
 These are just two arrows in $\mathcal{D}$ that are composable. So we can define a composite natural transformation $\gamma$ as follows:
 \[ \gamma \colon F \to H\]
 \[ \gamma_x = \beta_x \circ \alpha_x \]
- This is called the \emph{vertical composition} of natural transformations. You'll see it written using a dot $\gamma = \beta \cdot \alpha$ or a simple juxtaposition $\gamma = \beta \alpha$.
+ This is called the \index{vertical composition}\emph{vertical composition} of natural transformations. You'll see it written using a dot $\gamma = \beta \cdot \alpha$ or a simple juxtaposition $\gamma = \beta \alpha$.
  
 Naturality condition for $\gamma$ can be shown by pasting together (vertically) two naturality squares for $\alpha$ and $\beta$:
 \[
@@ -405,7 +405,7 @@ Pictorially:
   \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\beta$] {} (D1)}]{}
 \end{tikzcd}
 \]
-The \emph{horizontal composition} $\beta \circ \alpha$ maps $G \circ F$ to $G' \circ F'$.
+The \index{horizontal composition}\emph{horizontal composition} $\beta \circ \alpha$ maps $G \circ F$ to $G' \circ F'$.
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
@@ -544,7 +544,7 @@ Do the same with the horizontal composition of \hask{reverse} after \hask{safeHe
 
 Quite often horizontal composition is used with one of the natural transformations being the identity. There is a shorthand notation for such composition. For instance, $\beta \circ id_F$ is written as $\beta \circ F$. 
 
-Because of the characteristic shape of the diagram, such composition is called ``whiskering''.
+Because of the characteristic shape of the diagram, such composition is called \index{whiskering}\emph{whiskering}.
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
@@ -655,7 +655,7 @@ We can combine vertical composition with horizontal composition, as seen in the 
   \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(M1) -- node[label=left:$\beta'$] {} (D1)}]{}
 \end{tikzcd}
 \]
-The interchange law states that the order of composition doesn't matter: we can first do vertical compositions and then the horizontal one, or first do the horizontal compositions and then the vertical one.
+The \index{interchange law}\emph{interchange law} states that the order of composition doesn't matter: we can first do vertical compositions and then the horizontal one, or first do the horizontal compositions and then the vertical one.
 
 
 \section{Universal Constructions Revisited}
@@ -713,7 +713,7 @@ The definition of a sum requires the selection of two objects to be summed; and 
 & c
  \end{tikzcd}
 \]
-This diagram can be further decomposed into two simpler shapes called \emph{cospans}:
+This diagram can be further decomposed into two simpler shapes called \index{cospan}\emph{cospans}:
 \[
  \begin{tikzcd}
  a
@@ -817,7 +817,7 @@ Indeed, it can be shown that the naturality condition for this isomorphism trans
 
 An analogous argument can be made about the universal construction for the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
 \[ \alpha \colon \Delta_x \to D \]
-Such a natural transformation is a pair of arrows that form a \emph{span}:
+Such a natural transformation is a pair of arrows that form a \index{span}\emph{span}:
 \[
  \begin{tikzcd}
  &x
@@ -1087,7 +1087,7 @@ Show that the limit of a \index{walking arrow, limit}``walking arrow'' category,
 
 A lot of high-school math involves learning how to solve equations or systems of equations. An equation equates the outcomes of two different ways of producing something. If we are allowed to subtract things, we usually shove everything to one side and simplify the problem to the one of calculating the zeros of some expression. In geometry, the same idea is expressed as the intersection of two geometric objects.
 
-In category theory all these patterns are embodied in a single construction called an equalizer. An equalizer is a limit of a diagram whose pattern is given by a stick-figure category with two parallel arrows:
+In category theory all these patterns are embodied in a single construction called an equalizer. An \index{equalizer}\emph{equalizer} is a limit of a diagram whose pattern is given by a stick-figure category with two parallel arrows:
 \[
 \begin{tikzcd}
 i \arrow[r, shift left=0.75ex]
@@ -1158,7 +1158,7 @@ In this case $a$ is an element of $A$ such that $f a = g a$. That's just a way o
 
 What's dual to the idea of equating or intersecting? It's the process of discovering commonalities and organizing things into buckets. For instance, we can distribute integers into even and odd buckets. In category theory, this process of bucketizing is described by coequalizers.
 
-A coequalizer is the colimit of the same diagram that we used to define the equalizer:
+A \index{coequalizer}\emph{coequalizer} is the colimit of the same diagram that we used to define the equalizer:
 \[
 \begin{tikzcd}
 a 
@@ -1606,12 +1606,12 @@ The Yoneda embedding builds on the idea that there is nothing more to an object 
 
 Objects in a  co-presheaf category are functors that assign sets to objects in $\mathcal{C}$. Some of these functors work by picking a reference object $a$ and assigning,  to all objects $x$, their hom-sets  $\mathcal{C}(a, x)$:
 \[ F x = \cat C(a, x) \]
-Such functors, and all the functors isomorphic to those, are called \emph{representable}. The whole functor is ``represented'' by a single object $a$. 
+Such functors, and all the functors isomorphic to those, are called \index{representable functor}\emph{representable}. The whole functor is ``represented'' by a single object $a$. 
 
 In a closed category, the functor which assigns  to every object $x$ the set of elements of the exponential object $x^a$ is represented by $a$. This is because the set of elements of $x^a$ is isomorphic to $\mathcal{C}(a, x)$:
 \[\mathcal{C}(1, x^a) \cong \mathcal{C}(1 \times a, x) \cong \mathcal{C} (a, x)\]
 
-Seen this way, the representing object $a$ is like a logarithm of a functor. 
+Seen this way, the representing object $a$ is like a \index{logarithm}logarithm of a functor. 
 
 The analogy goes deeper: just like a logarithm of a product is a sum of logarithms, a representing object for a product data type is a sum. For instance, the functor that squares its argument using a product, $F x = x \times x$, is represented by $2$, which is the sum $1 + 1$. Indeed, we've seen before that $x \times x \cong x^2$.
 
