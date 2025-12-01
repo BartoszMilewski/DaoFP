@@ -109,7 +109,7 @@ Conversely, we could implement \hask{join} in terms of \hask{<=<}:
 \begin{haskell}
 join = id <=< id
 \end{haskell}
-The latter definition may not be immediately obvious, until you realize that the rightmost \hask{id} is applided to \hask{m (m a)}, and the leftmost one is applied to \hask{m a}. We re-interpret a Haskell function:
+The latter definition may not be immediately obvious, until you realize that the rightmost \hask{id} is applied to \hask{m (m a)}, and the leftmost one is applied to \hask{m a}. We re-interpret a Haskell function:
 \begin{haskell}
 m (m a) -> m (m a)
 \end{haskell}
@@ -186,7 +186,7 @@ You'll notice that the final \hask{return} needs access to both \hask{a} and \ha
 As we discussed earlier, every Haskell functor is strong, so every monad in Haskell is strong by virtue of being a functor. This is important, because we want monadic code to have access to the environment. 
 
 
-Iin a cartesian \emph{closed} category, every monad\footnote{Again, the correct incantation is ``every enriched monad''}, being \hask{Monoidal}, is automatically \hask{Applicative}. We can show it directly by implementing \hask{ap}, which has the same type signature as the splat operator:
+In a cartesian \emph{closed} category, every monad\footnote{Again, the correct incantation is ``every enriched monad''}, being \hask{Monoidal}, is automatically \hask{Applicative}. We can show it directly by implementing \hask{ap}, which has the same type signature as the splat operator:
 \begin{haskell}
 ap :: (Monad m) => m (a -> b) -> m a -> m b
 ap fs as = fs >>= 
