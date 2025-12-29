@@ -91,7 +91,7 @@ We've seen that product was defined using its mapping-in property. Function appl
 
 There are several ways of looking at this definition. One is to see it as an example of currying. 
 
-So far we've been only considering functions of one argument. This is not a real limitation, since we can always implement a function of two arguments as a (single-argument) function from a product. The $f$ in the definition of the function object is such a function:
+So far we've been only considering functions of one argument. This is not a real limitation, since we can always implement a function of two arguments as a (single-argument) function that takes a product. The $f$ in the definition of the function object is such a function:
 \begin{haskell}
 f :: (c, a) -> b
 \end{haskell}
@@ -110,7 +110,7 @@ curry   :: ((c, a) -> b)   -> (c -> (a -> b))
 uncurry :: (c -> (a -> b)) -> ((c, a) -> b)
 \end{haskell}
 In other words, the $h$ in the definition of the function object can be written as 
-\[ h = curry\, f \]
+\[ h = \text{curry}\, f \]
 
 Of course, written this way, the types of \hask{curry} and \hask{uncurry} correspond to function objects rather than arrows. This distinction is usually glossed over because there is a one-to-one correspondence between the \emph{elements} of the exponential and the \emph{arrows} that define them. This is easy to see when we replace the arbitrary object $c$ with the terminal object. We get:
 
@@ -161,11 +161,11 @@ pairWithTen = pair 10 -- partial application of pair
 
 \subsection{Relation to lambda calculus}
 
-Another way of looking at the definition of the function object is to interpret $c$ as the type of the environment in which $f$ is defined. In that case it's customary to call the environment $\Gamma$. The arrow is interpreted as an expression that uses the variables defined in $\Gamma$. 
+Another way of looking at the definition of the function object is to interpret the argument type to $h$ as the type of the environment in which $f$ is defined. In that case it's customary to call the environment $\Gamma$. The arrow is interpreted as an expression that uses the variables defined in $\Gamma$. 
 
 Consider a simple example, the expression:
 \[a x^2 + b x + c\]
-You may think of it as being parameterized by a triple of real numbers $(a, b, c)$ and a variable $x$, taken to be, let's say, a complex number. The triple is an element of a product $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$. This product is the environment $\Gamma$ for our expression. 
+You may think of it as being parameterized by a triple of real numbers $(a, b, c)$ and a variable $x$, taken to be, let's say, a complex number. The triple is an element of a product $\mathbb{R} \times \mathbb{R} \times \mathbb{R}$. We consider this product to be the environment $\Gamma$ for our expression. 
 
 The variable $x$ is an element of $\mathbb{C}$. The expression is an arrow from the product $\Gamma \times \mathbb{C}$ to the result type (here, also $\mathbb{C}$)
 \[f \colon \Gamma \times \mathbb{C} \to \mathbb{C} \]
@@ -190,9 +190,9 @@ or, in Haskell, with the \index{backslash}backslash replacing $\lambda$,
 \x -> a * x^2 + b * x + c
 \end{haskell}
 
-The arrow $h \colon \Gamma \to \mathbb{C}^{\mathbb{C}}$ is uniquely determined by the arrow $f$. This mapping produces a function that we call $\lambda x . f$.
+The arrow $h \colon \Gamma \to \mathbb{C}^{\mathbb{C}}$ is uniquely determined by the arrow $f$.
 
-In general, the defining diagram for the function object becomes:
+In general, the defining diagram for the function object is:
 \[
  \begin{tikzcd}
  \Gamma \times a
@@ -226,6 +226,43 @@ The corresponding arrow $h$ takes the environment and produces a closure of the 
 h :: (Double, Double, Double) -> (C -> C)
 h (a, b, c) = \x -> (a :+ 0) * x * x + (b :+ 0) * x + (c :+ 0)
 \end{haskell}
+
+\subsection{Type theory}
+
+In type theory, the function type constructor takes two arbitrary types, $A$ and $B$ and produces the type $A \to B$.  
+
+The introduction rule is called the \index{lambda abstraction}\emph{lambda abstraction}. We assume that a term $t(x) \colon B$ is defined in an environment in which $x \colon A$. Then $\lambda x . t (x)$ constructs a term of the type $A \to B$.
+
+The elimination rule is function application. Given $x \colon A$ and $f \colon A \to B$, the function application $f x$ yields the term of type $B$. 
+
+The evaluation rule, a.k.a. beta reduction, tells us that the elimination (function application) ``cancels'' the introduction (lambda abstraction): 
+\[ \big(\lambda x . t (x)\big) y = t (y)\]
+In other words, the only thing you can do with a function is to apply it to an argument. You \emph{evaluate} it -- hence the name of this rule.
+
+More precisely, $t(y)$ is the result of the substitution of $y$ for $x$, often denoted $t [ y/x ]$.
+\[ \big(\lambda x . t [x]\big) y = t [y/x] \]
+
+In Haskell, beta reduction can be used in \index{equational reasoning}\emph{equational reasoning}. Symbolically (not actual Haskell), we would write:
+\begin{haskell}
+(\x -> t[x]) y = t[y/x]
+\end{haskell}
+where \hask{t[x]} is a term dependent on \hask{x}, and \hask{t[y/x]} is the same term, in which all occurrences of the variable \hask{x} were replaced by the term \hask{y}\footnote{Care has to be taken to make sure that the names of free variables in in \hask{t} and \hask{y} don't collide. This sometimes requires the renaming of parameters, a process called \index{alpha conversion}\emph{alpha conversion}.}. 
+
+Lambda abstractions can be iterated. A lambda of two variables is interpreted as a lambda returning a lambda:
+\[ (\lambda x y. \,t)\, x' y' = \Big( \big(\lambda x. (\lambda y . \, t)\big) x' \Big) y' \]
+
+The uniqueness rule, a.k.a. eta conversion, deals with introduction after elimination. Given a function $f \colon A \to B$, abstraction after application cancel each other:
+\[ \lambda x . f x = f \] 
+
+\begin{exercise}
+Use equational reasoning to show that:
+\begin{haskell}
+(\ f g x -> f x (g x)) (\a b -> a) (\c d -> c) z
+\end{haskell}
+reduces to \hask{z}. Or, in math notation:
+\[ \big(\lambda f g \,x . f x (g x)\big) ( \lambda a b . a)\, (\lambda c d . c) \, z = z\]
+Hint: In the first step, substitute $(\lambda a b . a)$ for $f$.
+\end{exercise}
 
 \subsection{Modus ponens}
 
@@ -272,7 +309,7 @@ Note that the function we are returning is a closure. It captures \hask{f} and \
 
 The function we have implemented closely follows the diagram, but it's not written in the usual Haskell style. Haskell programmers prefer to curry functions of multiple arguments. Also, if possible, they prefer to eliminate lambdas. 
 
-Here's the version of the same function taken from the Haskell standard library, where it goes under the name (lower-case) \hask{either}:
+Here's the version of the same function taken from the Haskell standard library, where it goes under the name of (lower-case) \hask{either}:
 \begin{haskell}
 either :: (a -> c) -> (b -> c) -> Either a b -> c
 either f _ (Left x)     =  f x
@@ -322,7 +359,7 @@ which also closely follows the reading of the diagram.
 
 \subsection{Functoriality revisited}
 
-Both sum and product are functorial, which means that we can apply functions to their contents. We are ready to translate those diagrams into code. 
+Both sum and product are functorial, which means that we can apply functions to their contents. We are ready to translate those diagrams to code. 
 
 This is the functoriality of the sum type:
 
@@ -383,46 +420,48 @@ Or it could be expanded to
 bimap :: (a -> a') -> (b -> b') -> (a, b) -> (a', b')
 bimap f g (a, b) = (f a, g b)
 \end{haskell}
-In both cases we call this higher-order function \hask{bimap} since, in Haskell, both the sum and the product are instances of a more general class called \hask{Bifunctor}.
+In both cases we call this higher-order function \hask{bimap} since, in Haskell, both the sum and the product are instances of the more general class called \hask{Bifunctor}.
 
 \section{Functoriality of the Function Type}
 
-The function type, or the exponential, is also functorial, but with a twist. We are interested in a mapping from $b^a$ to $b'^{a'}$, where the primed objects are related to the non-primed ones through some arrows---to be determined. 
+The function type, or the exponential, is also functorial, but with a twist. We are interested in a mapping from $b^a$ to $d^{c}$, where the objects on the right are related to the ones on the left through some arrows---to be determined. 
 
 The exponential is defined by its mapping-in property, so if we're looking for
-\[k \colon b^a \to b'^{a'} \]
-we should draw the diagram that has $k$ as a mapping into $b'^{a'}$. We get this diagram from the original definition by substituting $b^a$ for $c$ and primed objects for the non-primed ones:
+\[k \colon b^a \to d^{c} \]
+we should draw the diagram that has $k$ as a mapping into $d^{c}$. We get this diagram from the original definition by substituting $b^a$ for $c$:
 
 \[
  \begin{tikzcd}
- b^a \times a'
+ b^a \times c
  \arrow[d, dashed, "k \times id_a"']
  \arrow[rd, "g"]
  \\
- b'^{a'} \times a'
+ d^{c} \times c
  \arrow[r, "\varepsilon"']
-& b'
+& d
  \end{tikzcd}
 \]
 The question is: can we find an arrow $g$ to complete this diagram? 
-\[g \colon b^a \times a' \to b'\]
+\[g \colon b^a \times c \to d\]
 If we find such a $g$, it will uniquely define our $k$.
 
-The way to think about this problem is to consider how we would implement $g$. It takes the product $b^a \times a'$ as its argument. Think of it as a pair: an element of the function object from $a$ to $b$ and an element of $a'$. The only thing we can do with the function object is to apply it to something. But $b^a$ requires an argument of type $a$, and all we have at our disposal is $a'$. We can't do anything unless somebody gives us an arrow $a' \to a$. This arrow applied to $a'$ will generate the argument for $b^a$. However, the result of the application is of type $b$, and $g$ is supposed to produce a $b'$. Again, we'll need an arrow $b \to b'$ to complete our assignment. 
+The way to think about this problem is to consider how we would implement $g$. It takes the product $b^a \times c$ as its argument. Think of it as a pair: an element of the function object $a \to b$ and an element of $c$. The only thing we can do with the function object is to apply it to something. But $b^a$ requires an argument of type $a$, and all we have at our disposal is $c$. We can't do anything unless somebody gives us an arrow $c \to a$. This arrow applied to $c$ will generate the argument for $b^a$. 
 
-This may sound complicated, but the bottom line is that we require two arrows between the primed and non-primed objects. The twist is that the first arrow goes from $a'$ to $a$, which feels backward from the usual functoriality considerations. In order to map $b^a$ to $b'^{a'}$ we need a pair of arrows:
+However, the result of the application is of type $b$, and $g$ is supposed to produce a $d$. Again, we'll need an arrow $b \to d$ to complete our assignment. 
+
+This may sound complicated, but the bottom line is that we require two arrows. The twist is that the first arrow goes from $c$ to $a$, which feels backward from the usual functoriality considerations. In order to map $b^a$ to $d^{c}$ we need a pair of arrows:
 \begin{align*}
-f &\colon a' \to a \\
-g &\colon b \to b' 
+f &\colon c \to a \\
+g &\colon b \to d 
 \end{align*}
 
-This is somewhat easier to explain in Haskell. Our goal is to implement a function \hask{a' -> b'}, given a function \hask{h :: a -> b}. 
+This is somewhat easier to explain in Haskell. Our goal is to implement a function \hask{c -> d}, given a function \hask{h :: a -> b}. 
 
-This new function takes an argument of the type \hask{a'} so, before we can pass it to \hask{h}, we need to convert \hask{a'} to \hask{a}. That's why we need a function \hask{f :: a' -> a}. 
+This new function takes an argument of the type \hask{c} so, before we can pass it to \hask{h}, we need to convert \hask{c} to \hask{a}. That's why we need a function \hask{f :: c -> a}. 
 
-Since \hask{h} produces a \hask{b}, and we want to return a \hask{b'}, we need another function \hask{g :: b -> b'}. All this fits nicely into one higher-order function:
+Since \hask{h} produces a \hask{b}, and we want to return a \hask{d}, we need another function \hask{g :: b -> d}. All this fits nicely into one higher-order function:
 \begin{haskell}
-dimap :: (a' -> a) -> (b -> b') -> (a -> b) -> (a' -> b')
+dimap :: (c -> a) -> (b -> d) -> (a -> b) -> (c -> d)
 dimap f g h = g . h . f
 \end{haskell}
 Similar to \hask{bimap} being an interface to the typeclass \hask{Bifunctor}, \hask{dimap} is a member of the typeclass \hask{Profunctor}.
@@ -466,7 +505,6 @@ g &\colon c\times a \to (b + c) \times a
 & (b + c) \times a
  \end{tikzcd}
 \]
-
 We write it in Haskell as:
 \begin{haskell}
 dist = either f g
@@ -495,7 +533,6 @@ f'' &\colon b \times a \to  a
 b + c && a
  \end{tikzcd}
 \]
-
 In Haskell:
 \begin{haskell}
     f = f' &&& f''

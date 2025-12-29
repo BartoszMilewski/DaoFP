@@ -77,7 +77,7 @@ newtype Temperature = Temp Int
 \end{haskell}
 Here, \hask{Temperature} is the new type and \hask{Temp} is a \emph{data constructor}. A data constructor is just a function\footnote{Unlike with regular functions, the names of data constructors must start with a capital letter}:
 \begin{haskell}
-Temp :: Int -> Temp
+Temp :: Int -> Temperature
 \end{haskell}
 We can also define its inverse:
 \begin{haskell}

@@ -75,14 +75,13 @@ We should never lose sight of the purpose of programming: to decompose complex p
 In logic, a product type corresponds to logical conjunction. In order to prove $A \times B$ ($A$ and $B$), you need to provide the proofs of \emph{both} $A$ and $B$. These are the arrows targeting $A$ and $B$. The elimination rule says that if you have a proof of $A \times B$, then you automatically get the proof of $A$ (through $\text{fst}$) and the proof of $B$ (through $\text{snd}$).
 
 \subsection{Type theory}
-In type theory we postulate that given any pair of types $A$ and $B$ we can construct a new type $A \times B$. This defines the \emph{type constructor} for the product.
+In type theory we postulate that, given any pair of types $A$ and $B$, we can construct a new type $A \times B$. This defines the \emph{type constructor} for the product.
 
-The introduction rule takes two terms, $x \colon A$ and $y \colon B$, and constructs the term $(x, y) \colon A \times B$. This corresponds to the \emph{data constructor} for the product.
+The introduction rule takes two terms, $x \colon A$ and $y \colon B$, and constructs the term $(x, y) \colon A \times B$. The notation $(,)$ corresponds to the \emph{data constructor} for the product.
 
 There are two elimination rules. Given a term $z \colon A \times B$ we can extract a term of the type $A$ using $\text{fst}$, and  the term of type $B$ using $\text{snd}$\footnote{These projections are often called $\pi_1$ and $\pi_2$}.
 
-The computation rule tells us that applying an eliminator to a term created using the introduction rule reproduces the corresponding argument. That is  $\text{fst} (x, y) = x$ and  $\text{snd} (x, y) = y$. In programming we call this \index{beta reduction}\emph{beta reduction}.
-
+The computation rule tells us that applying an eliminator to a term created using the introduction rule reproduces the corresponding argument. That is  $\text{fst} (x, y) = x$ and  $\text{snd} (x, y) = y$.
 The computation rule can be illustrated in our categorical diagram by the two commuting triangles:
 \[
  \begin{tikzcd}
@@ -99,7 +98,24 @@ A && B
  \end{tikzcd}
 \]
 
-Finally, the uniqueness property tells us that introduction \emph{after} elimination reproduces the original. That is, given any $p \colon A \times B$, we have $(\text{fst}\,p, \text{snd}\, p ) = p$. In programming we call this \index{eta reduction}\emph{eta reduction}.
+Finally, the uniqueness property tells us that introduction \emph{after} elimination reproduces the original. That is, given any $p \colon A \times B$, we have $(\text{fst}\,p, \text{snd}\, p ) = p$.
+
+\subsection{Type theory patterns}
+
+The type-theoretical description of products follows a very general pattern for constructing new types. It starts by defining a type constructor. We've seen type constructors that take zero or more types as arguments. Later we'll see that it's also possible to have type constructors that take values as arguments. These are called \emph{dependent types}.
+
+Introduction and elimination rules tell us how to construct and eliminate terms of the new type. 
+\[ \text{building blocks} \xrightarrow{intro} \text{term of type T} \]
+\[ \text{term of type T} \xrightarrow{elim} \text{building blocks} \]
+
+Computation rules tell us that elimination after introduction produces the same building blocks that were used in the construction. Every term of the type $T$ remembers its creation story.
+\[ \text{building blocks} \xrightarrow{intro} \text{term of type T} \xrightarrow{elim} \text{building blocks} \]
+In programming, the application of a computation rule is called \index{beta-reduction}\emph{beta-reduction}, or \index{$\beta$-reduction}$\beta$-reduction.
+
+
+Optional uniqueness rules close the cycle by asserting that all terms of the new type are in fact the result of applying introduction rules to their constituents. 
+\[ \text{term of type T} \xrightarrow{elim} \text{building blocks} \xrightarrow{intro} \text{term of type T} \]
+In programming, the application of a uniqueness rule is called \index{eta-conversion}\emph{eta-conversion}  (\index{$eta$-conversion}$\eta$-conversion).
 
 \subsection{Tuples and Records}
 

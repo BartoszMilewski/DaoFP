@@ -40,7 +40,7 @@ bimap' :: (a -> a') -> (b -> b') -> (a, b) -> (a', b')
 bimap' f g (a, b) = (f a, g b)
 
 -- Functoriality of function type
-dimap :: (a' -> a) -> (b -> b') -> (a -> b) -> (a' -> b')
+dimap :: (c -> a) -> (b -> d) -> (a -> b) -> (c -> d)
 dimap f g h = g . h . f
 
 -- Distributivity

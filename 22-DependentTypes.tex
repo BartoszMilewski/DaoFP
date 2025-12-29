@@ -1334,7 +1334,7 @@ equal Z Z = True
 \end{haskell}
 tells us that wherever we see the expression \hask{equal Z Z} we can replace it with \hask{True} and vice versa. 
 
-This is the principle of substituting equals for equals, which is the basis for \emph{equational reasoning} in Haskell. We can't encode proofs of equality directly in Haskell, but we can use equational reasoning to reason about Haskell programs. This is one of the main advantages of pure functional programming. You can't perform such substitutions in imperative languages, because of side effects.
+This is the principle of substituting equals for equals, which is the basis for \index{equational reasoning}\emph{equational reasoning} in Haskell. We can't encode proofs of equality directly in Haskell, but we can use equational reasoning to reason about Haskell programs. This is one of the main advantages of pure functional programming. You can't perform such substitutions in imperative languages, because of side effects.
 
 If we want to prove that $1+1$ is $2$, we have to first define addition. The definition can either be recursive in the first or in the second argument. This one recurses in the second argument:
 \begin{haskell}

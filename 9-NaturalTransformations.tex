@@ -311,7 +311,7 @@ Indeed, suppose that we have a natural transformation $\alpha$ between two funct
 \]
 
 
-Let's look at the components of these transformations at some object $x$
+Let's look at the components of these transformations at some object $x$ in $\cat C$:
 \[ \alpha_x \colon F \, x \to G \, x \]
 \[ \beta_x \colon G \, x \to H \, x \]
 These are just two arrows in $\mathcal{D}$ that are composable. So we can define a composite natural transformation $\gamma$ as follows:
@@ -421,13 +421,13 @@ The \index{horizontal composition}\emph{horizontal composition} $\beta \circ \al
 Let's pick an object $x$ in $\mathcal{C}$ and try to define the component of the composite $(\beta \circ \alpha)$ at $x$. It should be a morphism in $\cat E$:
 \[ (\beta \circ \alpha)_x \colon G ( F x) \to G' ( F' x) \]
 
-We can use $\alpha$ to map $x$ to an arrow 
+We can use $\alpha$ to map $x$ to an arrow:
 \[ \alpha_x \colon F x \to F' x \]
-We can lift this arrow using $G$
+We can lift this arrow using $G$:
 \[ G (\alpha_x) \colon G (F x) \to G (F' x) \]
-To get from there to $G' (F' x)$ we can use the appropriate component of $\beta$
+To get from there to $G' (F' x)$ we can use the appropriate component of $\beta$:
 \[ \beta_{F' x} \colon G (F' x) \to G' (F' x) \]
-Altogether, we have
+Altogether, we have:
 \[ (\beta \circ \alpha)_x = \beta_{F' x} \circ G (\alpha_x) \]
 
 But there is another equally plausible candidate: 
@@ -461,7 +461,7 @@ Fortunately, they are equal due to naturality of $\beta$.
 \]
 The proof of naturality of $\beta \circ \alpha$ is left as an exercise to a dedicated reader.
 
-We can translate this directly to Haskell. We start with two natural transformations:
+We can translate this construction directly to Haskell. We start with two natural transformations:
 \begin{haskell}
 alpha :: forall x. F x -> F' x
 beta  :: forall x. G x -> G' x
@@ -668,7 +668,7 @@ The old-school approach to defining such data types is to explore their internal
 
 In category theory we take the opposite approach. We are not interested in what's inside the object or how it's implemented. We are interested in the purpose of the object, how it can be used, and how it interacts with other objects. We are looking at objects from the utilitarian point of view.
 
-Both approaches have their advantages. The categorical approach came later, because you need to study a lot of examples before clear patterns emerge. But once you see the patterns, you discover unexpected connections between things, like the duality between sums and products.
+Both approaches have their advantages. The categorical approach came later, because you need to study a lot of examples before clear patterns emerge. But once you see the patterns, you can't unsee them. You discover unexpected connections between things, like the duality between sums and products.
 
 Defining particular objects through their connections requires looking at possibly infinite numbers of objects with which they interact. 
 
@@ -680,7 +680,7 @@ Why are natural transformations so important? It's because most categorical cons
 
 Being able to compress a lot of facts into small elegant formulas helps us see new patterns. We'll see, for instance, that natural isomorphisms between hom-sets pop up all over category theory and eventually lead to the idea of an adjunction.
 
-But first we'll study several examples in greater detail to get some understanding of the terse language of category theory. We'll try, for instance, to decode the statement that the sum, or the coproduct of two objects, is defined by the following natural isomorphism:
+But first let's study several examples in greater detail to get some understanding of the terse language of category theory. We'll try, for instance, to decode the statement that the sum, or the coproduct of two objects, can be tersely defined by the following natural isomorphism:
 
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}(a + b, x) \]
 
@@ -688,7 +688,7 @@ But first we'll study several examples in greater detail to get some understandi
 
 \subsection{Picking objects}
 
-Even such a simple task as pointing at an object has a special interpretation in category theory. We have already seen that pointing at an element of a set is equivalent to selecting a function from the singleton set to it. Similarly, picking an object in a category is equivalent to selecting a functor from the single-object category. Alternatively, it can be done using a constant functor from another category. 
+Even such a simple task as pointing at an object has a special interpretation in category theory. We have already seen that pointing at an element of a set $S$ is equivalent to selecting a function from the singleton set to $S$. Similarly, picking an object in a category is equivalent to selecting a functor from the single-object category. Alternatively, it can be done using a constant functor from another category. 
 
 Quite often we want to pick a pair of objects. That, too, can be accomplished by selecting a functor from a two-object stick-figure category. Similarly, picking an arrow is equivalent to selecting a functor from the ``walking arrow'' category, and so on.
 
@@ -799,10 +799,10 @@ Of all the cospans that you can build on the pair $a$ and $b$, the one with the 
 
 We are now in the position to translate this condition to a statement about natural transformations and hom-sets. The arrow $h$ is an element of the hom-set 
 \[ \mathcal{C}(a + b, x)\]
-A cospan over $x$ is a natural transformation, that is an element of the hom-set in the functor category:
+A cospan over $x$ is a natural transformation. In other words, it's an element of the hom-set in the functor category:
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
 
-Both are hom-sets in their respective categories. And both are just sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. 
+Both are hom-sets in their respective categories, $\cat C$ and $[\mathbf{2}, \mathcal{C}]$. Both are just sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. 
 
 Paraphrasing Sigmund Freud, ``Sometimes a set is just a set.''
 
@@ -815,7 +815,7 @@ Indeed, it can be shown that the naturality condition for this isomorphism trans
 
 \subsection{Product as a universal span}
 
-An analogous argument can be made about the universal construction for the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
+An analogous argument can be made for the universal construction for the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
 \[ \alpha \colon \Delta_x \to D \]
 Such a natural transformation is a pair of arrows that form a \index{span}\emph{span}:
 \[
@@ -872,7 +872,7 @@ The $f$ in the diagram above is an element of the left-hand side, and $h$ is the
 \[ \alpha_x \colon \mathcal{C}(x \times a, b) \to \mathcal{C}(x, b^a) \]
 In Haskell, we call it \hask{curry}. Its inverse, $\alpha^{-1}$ is known as \hask{uncurry}.
 
-Unlike in the previous examples, here both hom-sets are in the same category, and it's easy to analyze the isomorphism in more detail. In particular, we'd like to see how the commuting condition:
+Unlike in the previous examples, here both hom-sets are in the same category, and it's easy to analyze the isomorphism in more detail. In particular, we'd like to see how the commuting triangle condition:
 \[  f = \varepsilon_{a b} \circ (h \times id_a) \]
 arises from naturality.
 
@@ -899,16 +899,16 @@ Since we recognize $\alpha^{-1}$ as \hask{uncurry}, and $\varepsilon$ as functio
 apply :: (a -> b, a) -> b
 apply = uncurry id
 \end{haskell}
-This my be surprising at first, until you realize that the currying of \hask{(a->b,a)->b} leads to \hask{(a->b)->(a->b)}.
+This my be surprising at first, until you realize that the currying of the function \hask{(a->b,a)->b} leads to \hask{(a->b)->(a->b)}.
 
-We can also encode the two sides of the main isomorphism as Haskell functors:
+We can also encode the two sides of the main isomorphism of hom-sets as Haskell functors:
 \begin{haskell}
 data LeftFunctor  a b x = LF ((x, a) -> b)
 \end{haskell}
 \begin{haskell}
 data RightFunctor a b x = RF (x -> (a -> b))
 \end{haskell}
-They are both contravariant functors in the type variable \hask{x}.
+They are both contravariant functors in the type variable \hask{x}. First we have:
 \begin{haskell}
 instance Contravariant (LeftFunctor a b) where
   contramap g (LF f) = LF (f . bimap g id)
@@ -954,7 +954,7 @@ Using the two formulas for the lifting of $g \colon x \to y$, here's the natural
  \end{tikzcd}
 \]
 
-Let's now apply the \index{Yoneda trick}Yoneda trick to it and replace $y$ with $b^a$. This also allows us to substitute $g$---which now goes for $x$ to $b^a$---with $h$. 
+Let's now apply the \index{Yoneda trick}Yoneda trick to it and replace $y$ with $b^a$. This also allows us to replace $g$ (which now goes for $x$ to $b^a$) with $h$. 
 
 \[
  \begin{tikzcd}
@@ -976,9 +976,9 @@ We know that the hom-set $\mathcal{C}(b^a, b^a)$ contains at least the identity 
 
 Reversing the arrow on the left, we know that $\alpha^{-1}$ acting on identity produces $\varepsilon_{a b}$ in the upper left corner (that's the \hask{uncurry id} trick). 
 
-Pre-composition with $h$ acting on identity produces $h$ in the lower right corner. 
+At the bottom, the pre-composition with $h$ acting on identity produces $h$ in the lower right corner. 
 
-$\alpha^{-1}$ acting on $h$ produces $f$ in the upper right corner. 
+Finally, $\alpha^{-1}$ acting on $h$ produces $f$ in the upper right corner. 
 
 \[
  \begin{tikzcd}[
@@ -1006,7 +1006,7 @@ the one that we set out to derive.
 
 \section{Limits and Colimits}
 
-In the previous section we defined the sum and the product using natural transformations. These were transformations between diagrams defined as functors from a very simple stick-figure category $\mathbf{2}$, one of the functors being the constant functor. 
+In the previous section we defined the sum and the product using natural transformations. These were transformations between diagrams defined as functors from a very simple stick-figure category $\mathbf{2}$; one of the functors being the constant functor. 
 
 Nothing prevents us from replacing the category $\mathbf{2}$ with something more complex. For instance, we could try categories that have non-trivial arrows between objects, or categories with infinitely many objects. 
 
@@ -1057,7 +1057,7 @@ D 1
  \end{tikzcd}
  \]
 
-Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_x$ shrinks all vertices to one, so naturality squares shrink to triangles. Naturality means that all triangles with $x$ in their apex must now commute. 
+Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_x$ shrinks all vertices to one, so naturality squares shrink down to triangles. Naturality means that all triangles with $x$ in their apex must now commute. 
 
 The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}D$. Universality means that it satisfies the following isomorphism, natural in $x$:
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
