@@ -28,7 +28,7 @@ plus n = rec init step
 plus' :: Nat -> Nat -> Nat
 plus' n m = case m of
   Z -> n
-  (S k) -> S (plus' k n)
+  (S k) -> S (plus' n k)
 
 -- Exercises
 

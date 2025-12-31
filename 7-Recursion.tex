@@ -219,9 +219,9 @@ In practice, programmers prefer to implement recursion directly---an approach th
 \begin{haskell}
 plus n m = case m of
   Z -> n
-  (S k) -> S (plus k n)
+  (S k) -> S (plus n k)
 \end{haskell}
-It can be read as: If \hask{m} is zero then the result is \hask{n}. Otherwise, if \hask{m} is a successor of some \hask{k}, then the result is the successor of  \hask{k + n}. This is exactly the same as saying that \hask{init = n} and \hask{step = S}.
+It can be read as: If \hask{m} is zero then the result is \hask{n}. Otherwise, if \hask{m} is a successor of some \hask{k}, then the result is the successor of  \hask{n + k}. This is exactly the same as saying that \hask{init = n} and \hask{step = S}.
 
 In imperative languages recursion is often replaced by iteration. Conceptually, iteration seems to be easier to understand, as it corresponds to sequential decomposition. The steps in the sequence usually follow some natural order. This is in contrast with recursive decomposition, where we assume that we have done all the work up to the $n$'th step, and we combine that result with the next consecutive step. 
 
