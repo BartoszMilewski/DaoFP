@@ -1014,7 +1014,7 @@ There is a whole vocabulary built around such constructions.
 
 We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can replace $\mathbf{2}$ with an arbitrary indexing category $\cat J$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \cat J \to \mathcal{C}$. It picks objects in $\mathcal{C}$, but it also picks arrows between them.
 
-As the second functor we'll still use the constant functor $\Delta_x \colon \cat J \to \mathcal{C}$.
+As the source functor we'll still use the constant functor $\Delta_x \colon \cat J \to \mathcal{C}$.
 
 A  natural transformation, that is an element of the hom-set
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \]
@@ -1064,7 +1064,7 @@ The universal cone, if it exists, is called the \emph{limit} of the diagram $D$,
 For each cone with the apex $x$ there is a unique mapping from $x$ into the limit $ \text{Lim}D$.
 
 A limit of a $\Set$-valued functor has a particularly simple characterization. It's a set of cones with the singleton set at the apex. Indeed, elements of the limit, that is functions from the singleton set to it, are in one-to-one correspondence with such cones:
-\[ [\cat J, \mathcal{C}](\Delta_1, D)  \cong \mathcal{C}(1, \text{Lim}D) \]
+\[ [\cat J, \Set](\Delta_1, D)  \cong \Set(1, \text{Lim}D) \]
 
 
 Dually, the universal cocone is called a \emph{colimit}, and is described by the following natural isomorphism:
@@ -1191,14 +1191,14 @@ An $x \in A$ is mapped to two elements $f x$ and $g x$ in $B$, but then $q$ must
 
 Universality means that $C$ is a copy of $B$ in which the elements that were produced from the same $x$ have been identified.
 
-Consider an example where $A$ is a set of pairs of integers \hask{(m, n)}, such that either both are even or both are odd.  We want to coequalize two functions that are the two projections \hask{(fst, snd)}. The equalizer set $C$ will have two elements corresponding to two buckets. We'll represent it as \hask{Bool}. The equalizing function \hask{q} selects the bucket:
+Consider an example where $A$ is a set of pairs of integers \hask{(m, n)}, such that either both are even or both are odd.  We want to coequalize two functions that are the two projections \hask{(fst, snd)}. The coequalizer set $C$ will have two elements corresponding to two buckets. We'll represent it as \hask{Bool}. The coequalizing function \hask{q} selects the bucket:
 \begin{haskell}
 q :: Int -> Bool
 q n = n `mod` 2 == 0 
 \end{haskell}
 Any function \hask{q'} that cannot distinguish between the components of our pairs, and is sensitive only to their parity:
 \[ q' \circ \mathvar{fst} = q' \circ \mathvar{snd} \]
- can be uniquely factorized through the function \hask{h}:
+ can be uniquely factorized through the function \hask{h} (which depends on \hask{q'}):
 \begin{haskell}
 h :: (Int -> a) -> Bool -> a
 h q' True  = q' 0
@@ -1215,7 +1215,7 @@ h q' False = q' 1
 \arrow[r, "q"]
 \arrow[rd, "q'"']
 & \text{Bool}
-\arrow[d, dashed, "h"]
+\arrow[d, dashed, "h \, q'"]
 \\
 && A
 \end{tikzcd}

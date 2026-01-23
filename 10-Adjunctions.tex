@@ -433,13 +433,13 @@ It turns out that an adjunction can be alternatively defined in terms of the two
 
 From those, the mapping of hom-sets can be easily recovered. For instance, let's start with an arrow $f \colon x \to R y$, which is an element of $\mathcal{D}( x , R y)$. We can lift it to 
 \[L f \colon L x \to L (R y)\]
-We can then use $\eta$ to collapse the composite $L \circ R$ to identity. The result is an arrow $L x \to y$, which is an element of $ \mathcal{C} (L x, y)$.
+We can then use $\varepsilon$ to collapse the composite $L \circ R$ to identity. The result is an arrow $L x \to y$, which is an element of $ \mathcal{C} (L x, y)$.
 
 
 The definition of the adjunction using unit and counit is more general in the sense that it can be translated to an arbitrary 2-category setting. 
 
 \begin{exercise}
-Given an arrow $g \colon L x \to y$ implement an arrow $x \to R y$ using $\varepsilon$ and the fact that $R$ is a functor. Hint: Start with the object $x$ and see how you can get from there to $R y$ with one stopover.
+Given an arrow $g \colon L x \to y$ implement an arrow $x \to R y$ using $\eta$ and the fact that $R$ is a functor. Hint: Start with the object $x$ and see how you can get from there to $R y$ with one stopover.
 \end{exercise}
 
 \subsection{The unit and counit of the currying adjunction}
@@ -693,7 +693,7 @@ We defined colimits as universal cocones. For every cocone---that is a natural t
 \[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim} \, D, x) \]
 The factorizing condition is encoded in the naturality of this isomorphism.
 
-It turns out that the set of cocones, which is an object in $\Set$, is itself a \emph{limit} of the following $\Set$-valued functor $F \colon \cat J \to \Set$:
+It turns out that the set of cocones, which is an object in $\Set$, is itself a \emph{limit} of the following $\Set$-valued functor $F \colon \cat J^{op} \to \Set$:
 \[ F j = \cat C(D j, x) \]
 
 To show this, we'll start with the limit of $F$ and end up with the set of cocones. You may recall that a limit of a $\Set$-valued functor is equal to a set of cones with the apex $1$ (the singleton set). In our case, each such cone describes a selection of morphisms from the corresponding hom-set $\cat C(D j, x)$:
@@ -706,12 +706,12 @@ To show this, we'll start with the limit of $F$ and end up with the set of cocon
  \\
 \\
 \cat C( D j_1, x)
-\arrow[rr, red]
-\arrow[rd, red]
 && \cat C( D j_2, x)
-\arrow[dl, red]
+\arrow[ll, red]
 \\
 & \cat C( D j_3, x)
+\arrow[lu, red]
+\arrow[ru, red]
  \end{tikzcd}
 \]
 Each of these morphisms has as target the same object $x$, so they form the sides of a cocone with the apex $x$. 
@@ -720,10 +720,10 @@ Each of these morphisms has as target the same object $x$, so they form the side
  D j_1
  \arrow[rr, red]
  \arrow[dr, red]
- \arrow[dddr, ""']
- && D j_2
+ \arrow[dddr, bend right, ""']
+&& D j_2
 \arrow[dl, red]
- \arrow[dddl, ""]
+ \arrow[dddl, bend left,  ""]
  \\
  & D j_3
  \arrow[dd, ""]
@@ -739,7 +739,7 @@ We can therefore replace the original set of cocones with the limit of $\cat C (
 The contravariant hom-functor is sometimes notated as:
 \[ h_x = \cat C(-, x) \]
 In this notation we can write:
-\[ Lim \, (h_x \circ D) \cong h_x (Colim \, D) \]
+\[ \text{Lim} \, (h_x \circ D) \cong h_x (\text{Colim} \, D) \]
 The limit of a hom-functor acting on a diagram $D$ is isomorphic to the hom-functor acting on a colimit of this diagram. This is usually abbreviated to: The hom-functor preserves colimits. (With the understanding that the contravariant hom-functor turns colimits into limits.)
 
 A functor that preserves colimits is called \index{co-continuous functor}co-continuous. Thus the contravariant hom-functor is co-continuous.
@@ -1066,7 +1066,7 @@ more (i, k) s = k (i + s)
 \end{haskell}
 The other lambda, the identity, uses the empty environment, so it becomes:
 \begin{haskell}
-done :: Int -> Int
+done :: r -> r
 done i = i
 \end{haskell}
 Here's the implementation of our algorithm using these two named functions:
@@ -1084,20 +1084,20 @@ sumList' is = sumK' is done
 
 In fact, if all we are interested in is calculating the sum, we can replace the polymorphic type \hask{r} with \hask{Int} with no other changes.
 
-This implementation still uses higher order functions. In order to eliminate them, we have to analyze what it means to pass a function as an argument. Such a function can only be used in one way: it can be applied to its arguments. This property of a function type is expressed as the counit of the currying adjunction:
+This implementation still uses higher order functions. In order to eliminate them, we have to analyze what it means to pass a function as an argument. Such a function can only be used in one way: it can be applied to its arguments. This property of the function type is expressed in the counit of the currying adjunction:
 \[ \varepsilon \colon b^a \times a \to b \]
 or, in Haskell, as a higher-order function:
 \begin{haskell}
 apply :: (a -> b, a) -> b
 \end{haskell}
-This time we are interested in constructing the counit from first principles. We've seen that this can be accomplished using the comma category. In our case, an object of the comma category for the product functor $L_a = (-) \times a$ is a pair 
+This time we are interested in constructing the counit from first principles. We've seen that this can be accomplished using the comma category. In our case, an object of the comma category for the product functor $L_a = (-) \times a$ is a pair:
 \[(e, f \colon (e \times a) \to b) \]
 or, in Haskell:
 \begin{haskell}
 data Comma a b e = Comma e ((e, a) -> b)
 \end{haskell}
 A morphism in this category between $(e, f)$ and $(e', f')$ is an arrow $h \colon e \to e'$, which satisfies the commuting condition:
-\[ f' \circ h = f \]
+\[ f' \circ (h \times a) = f \]
 We interpret this morphism as ``reducing'' the environment $e$ down to $e'$. The arrow $f'$ is able to produce the same output of the type $b$ using a potentially smaller environment given by $h (e)$. For instance $e$ may contain variables that are irrelevant for computing $b$ from $a$, and $h$ projects them out. 
 
 \[
@@ -1121,7 +1121,7 @@ We interpret this morphism as ``reducing'' the environment $e$ down to $e'$. The
 
 In fact, we performed this kind of reduction when defining \hask{more} and \hask{done}. In principle, we could have passed the tail \hask{is} to both functions, since it's accessible at the point of call. But we knew that they didn't need it.
 
-Using the Freyd's theorem, we could define the function object $a \to b$ as the colimit of the diagram defined by the comma category. Such a colimit is essentially a giant coproduct of all environments modulo identifications given by comma-category morphisms. This identification does the job of reducing the environment needed by $a \to b$ to the bare minimum. 
+Using the Freyd's theorem, we could define the function object $a \to b$ as the colimit of the diagram defined using the comma category. Such a colimit is essentially a giant coproduct of all environments modulo identifications given by comma-category morphisms. This identification does the job of reducing the environment needed by $a \to b$ to the bare minimum. 
 
 In our example, the continuations we're interested in are functions \hask{Int -> Int}. In fact we are not interested in generating the generic function type \hask{Int -> Int}; just the minimal one that would accommodate our two functions \hask{more} and \hask{done}. We can do it by creating a very small solution set. 
 
@@ -1164,6 +1164,16 @@ sumList'' is = sumK'' is Done
 \end{haskell}
 
 The main advantage of defunctionalization is that it can be used in distributed environments. Arguments to remote functions, as long as they are data structures and not functions, can be serialized and sent along the wire. All that's needed is for the receiver to have access to \hask{apply}. 
+\begin{exercise}
+Perform the defunctionalization of a binary tree traversal that returns the maximum of all leaves. Start with this CPS version:
+\begin{haskell}
+maxTreeK :: Tree Int -> (Int -> r) -> r
+maxTreeK (Leaf n) k = k n
+maxTreeK (Node t1 t2) k = maxTreeK t1    -- traverse left
+  (\n1 -> maxTreeK t2                    -- traverse right
+    (\n2 -> k (max n1 n2)))              -- combine
+\end{haskell}
+\end{exercise}
 
 \section{Free/Forgetful Adjunctions}
 The two functors in the adjunction play different roles: the picture of the adjunction is not symmetric. Nowhere is this illustrated better than in the case of the free/forgetful adjunctions. 
