@@ -451,9 +451,8 @@ where the last step uses the formula for the sum of the geometric series. Admitt
 
 \section{Initial Algebra from Universality}
 
-Another way of looking at the initial algebra, at least in $\mathbf{Set}$, is to view it as a collection of catamorphisms that, as a whole, hint at the existence of an underlying object. Instead of seeing $\mu F$ as a set of trees, we can look at it as a set of functions from algebras to their carriers. 
+Another way of looking at the initial algebra, at least in $\mathbf{Set}$, is to view it as a collection of catamorphisms that, as a whole, hint at the existence of an underlying object. Instead of seeing $\mu F$ as a set of trees, we can look at it as a set of functions from algebras to their carriers. It's called the \index{Church encoding}Church encoding of the initial algebra.
 
-In a way, this is just another manifestation of the Yoneda lemma: every data structure can be described either by mappings in or mappings out. The mappings in, in this case, are the constructors of the recursive data structure. The mappings out are all the catamorphisms that can be applied to it.
 
 First, let's make the polymorphism in the definition of \hask{cata} explicit and use pattern matching instead of \hask{unFix}:
 \begin{haskell}
@@ -463,7 +462,7 @@ cata alg (Fix x) = alg (fmap (cata alg) x)
 and then flip the arguments. We get:
 \begin{haskell}
 cata' :: Functor f => Fix f -> forall a. Algebra f a -> a
-cata' (Fix x) = \alg -> alg (fmap (flip cata' alg) x)
+cata' (Fix x) = \alg -> alg (fmap (flip' cata' alg) x)
 \end{haskell}
 The function \hask{flip'} reverses the order of arguments to a function:
 \begin{haskell}

@@ -1,9 +1,16 @@
 {-# language UndecidableInstances #-}
-import Prelude hiding (Monad, (>>=), return)
+import Prelude hiding (Monad, (>>=), (>>), return)
 
 class Functor m => Monad' m where
   (<=<) :: (b -> m c) -> (a -> m b) -> (a -> m c)
   return' :: a -> m a
+
+-- Strictly speaking the Functor superclass
+-- for Monad' is not necessary
+fmap' :: Monad' m => (a -> b) -> m a -> m b
+fmap' f ma = ((return' . f) <=< const ma) ()
+-- (return' . f) :: a -> m b 
+-- const ma      :: () -> m a
 
 instance Monad' Maybe where
   g <=< f = \a -> case f a of
@@ -53,6 +60,10 @@ instance Monad m => Monoidal m where
     ma >*< mb = ma >>= 
          (\a -> mb >>= 
              \b -> return (a, b))
+
+-- Ignore the result (but not the effect!)
+(>>) :: Monad m => m a -> m b -> m b
+ma >> mb = ma >>= \_ -> mb 
 
 -- Applicative splat 
 
