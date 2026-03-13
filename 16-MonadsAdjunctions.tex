@@ -1040,7 +1040,7 @@ Here it is translated to Haskell:
 mu :: R s (L s (R s (L s a))) -> R s (L s a)
 mu = fmap counit
 \end{haskell}
-Whiskering on the right doesn't do anything other than select a component of the natural transformation. This is done automatically by Haskell's type inference engine. Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap}---here, it's equivalent to precomposition.
+Whiskering on the right doesn't do anything other than select a component of the natural transformation. This is done automatically by Haskell's type inference engine. Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap}---here, it's equivalent to postcomposition.
 
 Compare this with the implementation of \hask{join}:
 \begin{haskell}
