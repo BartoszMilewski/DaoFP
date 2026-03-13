@@ -657,6 +657,99 @@ We can combine vertical composition with horizontal composition, as seen in the 
 \]
 The \index{interchange law}\emph{interchange law} states that the order of composition doesn't matter: we can first do vertical compositions and then the horizontal one, or first do the horizontal compositions and then the vertical one.
 
+\section{Representable Functors}
+
+Objects in a  co-presheaf category are functors that assign sets to objects in $\mathcal{C}$. Some of these functors work by picking a reference object $a$ and assigning,  to all objects $x$, their hom-sets  $\mathcal{C}(a, x)$:
+\[ F x = \cat C(a, x) \]
+Such functors, and all the functors isomorphic to those, are called \index{representable functor}\emph{representable}. The whole functor is ``represented'' by a single object $a$. 
+
+In a closed category, the functor which assigns  to every object $x$ the set of elements of the exponential object $x^a$ is represented by $a$. This is because the set of elements of $x^a$ is isomorphic to $\mathcal{C}(a, x)$:
+\[\mathcal{C}(1, x^a) \cong \mathcal{C}(1 \times a, x) \cong \mathcal{C} (a, x)\]
+
+Seen this way, the representing object $a$ is like a \index{logarithm}logarithm of a functor. 
+
+The analogy goes deeper: just like a logarithm of a product is a sum of logarithms, a representing object for a product data type is a sum. For instance, the functor that squares its argument using a product, $F x = x \times x$, is represented by $2$, which is the sum $1 + 1$. Indeed, we've seen before that $x \times x \cong x^2$.
+
+Representable functors play a very special role in the category of $ \mathbf{Set}$-valued functors. Notice that the Yoneda embedding maps all objects of $\mathcal{C}$ to representable presheaves. It maps an object $x$ to a presheaf represented by $x$: 
+
+\[  \mathcal{Y} \colon x \mapsto \mathcal{C}(-, x) \]
+
+We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded inside the presheaf category as representable functors. The question is, what else is there in the presheaf category ``in between'' representable functors?
+
+Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
+
+\begin{exercise}
+Describe limits and colimits as representing objects. What are the functors they represent?
+\end{exercise}
+\begin{exercise}
+Consider a \emph{singleton functor} $F \colon \cat C \to \Set$ that assigns to each object $c$ a singleton set $\{c\}$ that contains just that object (that is, a different singleton for every object). Define the action of $F$ on arrows. Show that $F$ being representable is equivalent to $\cat C$ having an initial object.
+\end{exercise}
+
+\subsection{The guessing game}
+
+The idea that objects can be described by the way they interact with other objects is sometimes illustrated by playing an imaginary guessing game. One category theorist picks a secret object in a category, and the other has to guess which object it is (up to isomorphism, of course). 
+
+The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond each time with a set: the set of arrows from the probing object $a$ to the secret object $x$. This, of course, is the hom-set $\mathcal{C}(a, x)$. 
+
+The totality of these answers, as long as the opponent is not cheating, will define a presheaf $F \colon \mathcal{C}^{op} \to \mathbf{Set}$, and the object they are hiding is its representing object. 
+
+But how do we know that the second category theorist in not cheating? To test that, we ask questions about arrows. For every arrow we select, they should give us a function between two sets---the sets they gave us for its endpoints. We can then check if all identity arrows are mapped to identity functions, and whether compositions of arrows map to compositions of functions. In other words, we'll be able to verify that $F$ is indeed a functor. 
+
+However, a clever enough opponent may still fool us. The presheaf they are revealing to us may describe a fantastic object---a figment of their imagination---and we won't be able to tell. It turns out that such fantastic beasts are often as interesting as the real ones. 
+
+\subsection{Representable functors in programming}
+
+In Haskell, we define a class of representable functors using two functions that witness the isomorphism: 
+\[ F x = \cat C(a, x) \]
+The first one, \hask{tabulate}, turns a function into a lookup table; and the second, \hask{index}, uses the representing type \hask{Key} to index into it.
+
+\begin{haskell}
+class Representable f where
+  type Key f :: Type
+  tabulate :: (Key f -> x) -> f x
+  index    :: f x -> (Key f -> x)
+\end{haskell}
+
+Algebraic data types that use sums are not representable (there is no formula for taking a logarithm of a sum). For instance, the list type is defined as a sum, so it's not representable. However, an infinite stream is. 
+
+Conceptually, a stream is like an infinite tuple, which is technically a product. Such a stream is represented by the type of natural numbers. In other words, an infinite stream is equivalent to a mapping out of natural numbers. 
+\begin{haskell}
+data Stream a = Stm a (Stream a)
+\end{haskell}
+Here's the instance definition:
+\begin{haskell}
+instance Representable Stream where
+  type Key Stream = Nat
+  tabulate g = tab Z
+    where
+      tab n = Stm (g n) (tab (S n))
+  index stm = \n -> ind n stm
+    where
+      ind Z (Stm a _) = a
+      ind (S n) (Stm _ as) = ind n as
+\end{haskell}
+Representable types are useful for implementing \index{memoization} memoization of functions.
+
+\begin{exercise}
+Implement the \hask{Representable} instance for \hask{Pair}:
+\begin{haskell}
+data Pair x = Pair x x
+\end{haskell}
+\end{exercise}
+
+\begin{exercise}
+Is the constant functor that maps everything to the terminal object representable? Hint: what's the logarithm of 1?
+
+In Haskell, such a functor could be implemented as:
+\begin{haskell}
+data Unit a = U
+\end{haskell}
+Implement the instance of \hask{Representable} for it.
+\end{exercise}
+
+\begin{exercise}
+The list functor is not representable. But can it be considered a sum or representables?
+\end{exercise}
 
 \section{Universal Constructions Revisited}
 
@@ -1601,100 +1694,6 @@ Because it preserves composition and identity, this isomorphism also preserves \
 This is exactly the result that we've been using all along to prove numerous isomorphisms in previous chapters. If the hom-sets are naturally isomorphic, then the objects are isomorphic. 
 
 The Yoneda embedding builds on the idea that there is nothing more to an object than its relationships with other objects. The presheaf $\cat C (-, a)$, like a hologram, encodes the totality of views of $a$ from the perspective of the whole category $\cat C$. The Yoneda embedding tells us that, when we combine all these individual holograms, we get a perfect hologram of the whole category.
-
-\section{Representable Functors}
-
-Objects in a  co-presheaf category are functors that assign sets to objects in $\mathcal{C}$. Some of these functors work by picking a reference object $a$ and assigning,  to all objects $x$, their hom-sets  $\mathcal{C}(a, x)$:
-\[ F x = \cat C(a, x) \]
-Such functors, and all the functors isomorphic to those, are called \index{representable functor}\emph{representable}. The whole functor is ``represented'' by a single object $a$. 
-
-In a closed category, the functor which assigns  to every object $x$ the set of elements of the exponential object $x^a$ is represented by $a$. This is because the set of elements of $x^a$ is isomorphic to $\mathcal{C}(a, x)$:
-\[\mathcal{C}(1, x^a) \cong \mathcal{C}(1 \times a, x) \cong \mathcal{C} (a, x)\]
-
-Seen this way, the representing object $a$ is like a \index{logarithm}logarithm of a functor. 
-
-The analogy goes deeper: just like a logarithm of a product is a sum of logarithms, a representing object for a product data type is a sum. For instance, the functor that squares its argument using a product, $F x = x \times x$, is represented by $2$, which is the sum $1 + 1$. Indeed, we've seen before that $x \times x \cong x^2$.
-
-Representable functors play a very special role in the category of $ \mathbf{Set}$-valued functors. Notice that the Yoneda embedding maps all objects of $\mathcal{C}$ to representable presheaves. It maps an object $x$ to a presheaf represented by $x$: 
-
-\[  \mathcal{Y} \colon x \mapsto \mathcal{C}(-, x) \]
-
-We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded inside the presheaf category as representable functors. The question is, what else is there in the presheaf category ``in between'' representable functors?
-
-Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
-
-\begin{exercise}
-Describe limits and colimits as representing objects. What are the functors they represent?
-\end{exercise}
-\begin{exercise}
-Consider a \emph{singleton functor} $F \colon \cat C \to \Set$ that assigns to each object $c$ a singleton set $\{c\}$ that contains just that object (that is, a different singleton for every object). Define the action of $F$ on arrows. Show that $F$ being representable is equivalent to $\cat C$ having an initial object.
-\end{exercise}
-
-\subsection{The guessing game}
-
-The idea that objects can be described by the way they interact with other objects is sometimes illustrated by playing an imaginary guessing game. One category theorist picks a secret object in a category, and the other has to guess which object it is (up to isomorphism, of course). 
-
-The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond each time with a set: the set of arrows from the probing object $a$ to the secret object $x$. This, of course, is the hom-set $\mathcal{C}(a, x)$. 
-
-The totality of these answers, as long as the opponent is not cheating, will define a presheaf $F \colon \mathcal{C}^{op} \to \mathbf{Set}$, and the object they are hiding is its representing object. 
-
-But how do we know that the second category theorist in not cheating? To test that, we ask questions about arrows. For every arrow we select, they should give us a function between two sets---the sets they gave us for its endpoints. We can then check if all identity arrows are mapped to identity functions, and whether compositions of arrows map to compositions of functions. In other words, we'll be able to verify that $F$ is indeed a functor. 
-
-However, a clever enough opponent may still fool us. The presheaf they are revealing to us may describe a fantastic object---a figment of their imagination---and we won't be able to tell. It turns out that such fantastic beasts are often as interesting as the real ones. 
-
-\subsection{Representable functors in programming}
-
-In Haskell, we define a class of representable functors using two functions that witness the isomorphism: 
-\[ F x = \cat C(a, x) \]
-The first one, \hask{tabulate}, turns a function into a lookup table; and the second, \hask{index}, uses the representing type \hask{Key} to index into it.
-
-\begin{haskell}
-class Representable f where
-  type Key f :: Type
-  tabulate :: (Key f -> x) -> f x
-  index    :: f x -> (Key f -> x)
-\end{haskell}
-
-Algebraic data types that use sums are not representable (there is no formula for taking a logarithm of a sum). For instance, the list type is defined as a sum, so it's not representable. However, an infinite stream is. 
-
-Conceptually, a stream is like an infinite tuple, which is technically a product. Such a stream is represented by the type of natural numbers. In other words, an infinite stream is equivalent to a mapping out of natural numbers. 
-\begin{haskell}
-data Stream a = Stm a (Stream a)
-\end{haskell}
-Here's the instance definition:
-\begin{haskell}
-instance Representable Stream where
-  type Key Stream = Nat
-  tabulate g = tab Z
-    where
-      tab n = Stm (g n) (tab (S n))
-  index stm = \n -> ind n stm
-    where
-      ind Z (Stm a _) = a
-      ind (S n) (Stm _ as) = ind n as
-\end{haskell}
-Representable types are useful for implementing \index{memoization} memoization of functions.
-
-\begin{exercise}
-Implement the \hask{Representable} instance for \hask{Pair}:
-\begin{haskell}
-data Pair x = Pair x x
-\end{haskell}
-\end{exercise}
-
-\begin{exercise}
-Is the constant functor that maps everything to the terminal object representable? Hint: what's the logarithm of 1?
-
-In Haskell, such a functor could be implemented as:
-\begin{haskell}
-data Unit a = U
-\end{haskell}
-Implement the instance of \hask{Representable} for it.
-\end{exercise}
-
-\begin{exercise}
-The list functor is not representable. But can it be considered a sum or representables?
-\end{exercise}
 
 \section{2-category  $\mathbf{Cat}$ }
 
