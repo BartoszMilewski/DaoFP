@@ -846,9 +846,9 @@ There may be many cospans sharing the same three objects---meaning: there may be
 
 \subsection{Functoriality of cospans}
 
-Let's consider what happens when we start varying the object $x$ in a cospan. We have a mapping $F$ that takes $x$ to the set of cospans over $x$:
-\[ F x = [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
-This mapping turns out to be functorial in $x$.
+Let's consider what happens when we start varying the object $x$ in a cospan. For every $D \colon \mathbf{2} \to \mathcal{C}$, we have a mapping $F_D \colon \cat C \to \Set$ that takes an object $x$ to the set of cospans over $x$:
+\[ F_D x = [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
+This mapping can be made functorial in $x$.
 
 To see that, consider an arrow $m \colon x \to y$. The lifting of this arrow is a mapping between two sets of natural transformations:
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_x) \to [\mathbf{2}, \mathcal{C}](D, \Delta_{y}) \] 
@@ -865,7 +865,7 @@ Similarly, the element of the right-hand side is a natural transformation:
 \[ \nu \colon D \to \Delta_{y} \]
 Its component at $1$ is an arrow
 \[ \nu_1 \colon a \to y \]
-We can get from $\mu_1$ to $\nu_1$ simply by post-composing it with $m \colon x \to y$. So the lifting of $m$ is a component-by-component post-compositon $(m \circ -)$:
+We can get from $\mu_1$ to $\nu_1$ simply by post-composing it with $m \colon x \to y$. So the lifting of $m$ can be defined as a component-by-component post-compositon $(m \circ -)$:
 \begin{align*}
 \nu_1 = m \circ \mu_1 \\
 \nu_2 = m \circ \mu_2 \\
@@ -906,6 +906,10 @@ Moreover, if we vary the object $x$, the two sides behave like functors from  $\
 
 Indeed, it can be shown that the naturality condition for this isomorphism translates into commuting conditions for the triangles in the definition of the sum. So the definition of the sum can be replaced by a single equation.
 
+Notice also that the same equation can be interpreted as the statement that, for any diagram $D \colon \mathbf{2} \to \mathcal{C}$, the functor:
+\[ F_D x = [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
+is representable, and its representing object is $a + b$.
+
 \subsection{Product as a universal span}
 
 An analogous argument can be made for the universal construction for the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
@@ -942,6 +946,16 @@ a = D\, 1 && b = D \, 2
  \end{tikzcd}
 \]
 
+We can show that that the mapping:
+\[ H_D x = [\mathbf{2}, \mathcal{C}](\Delta_x, D) \]
+can be interpreted as a contravariant functor $H_D \colon \cat C^{op} \to \Set$. If this functor is representable, its representing object is $a \times b$:
+\[ H_D x \cong \mathcal{C}(x, a \times b) \]
+
+
+\begin{exercise}
+Define the action of $H_D$ on morphisms in order to interpret it as a contravariant functor.
+\end{exercise}
+
 \subsection{Exponentials}
 
 The exponentials, or function objects, are defined by this commuting diagram:
@@ -969,7 +983,9 @@ Unlike in the previous examples, here both hom-sets are in the same category, an
 \[  f = \varepsilon_{a b} \circ (h \times id_a) \]
 arises from naturality.
 
-The standard \index{Yoneda trick}Yoneda trick is to make a substitution for $x$ that would reduce one of the hom-sets to an endo-hom-set, that is a hom-set whose source is the same the target. This will allow us to pick a canonical element of that hom-set, that is the identity arrow.
+\subsection{Commuting condition from naturality}
+
+The standard \index{Yoneda trick}Yoneda trick is to take the defining diagram and make a substitution for $x$ that would reduce one of the hom-sets to an endo-hom-set, that is a hom-set whose source is the same the target. This will allow us to pick a canonical element of that hom-set, that is the identity arrow.
 
 In our case, substituting $b^a$ for $x$ will allow us to pick $h = id_{(b^a)}$.
 \[
@@ -986,6 +1002,7 @@ In our case, substituting $b^a$ for $x$ will allow us to pick $h = id_{(b^a)}$.
 The commuting condition in this case tells us that $f = \varepsilon_{a b}$. In other words, we get the formula for $\varepsilon_{a b}$ in terms of $\alpha$:
 \[ \varepsilon_{a b} = \alpha_{x}^{-1} (id_{x}) \]
 where $x$ is equal to $b^a$.
+
 
 Since we recognize $\alpha^{-1}$ as \hask{uncurry}, and $\varepsilon$ as function application, we can write it in Haskell as:
 \begin{haskell}
@@ -1097,6 +1114,16 @@ So the selection of $id_{(b^a)}$ in the lower left corner fixes the other three 
 \[ \varepsilon_{a b} \circ (h \times id_a) = f \]
 the one that we set out to derive.
 
+\subsection{Exponential as a representing object}
+
+We can interpret the mapping of an object $x$ to the set $\cat C(x \times a, b)$ as a contravariant functor $H_{a b} \colon \cat C^{op} \to \Set$. If this functor is representable, its representing object is the exponential $b^a$:
+
+\[ H_{a b} x \cong \mathcal{C}(x, b^a)\]
+
+\begin{exercise}
+Define the action of $H_{a b}$ on morphism in order to interpret it as a contravariant functor.
+\end{exercise}
+
 \section{Limits and Colimits}
 
 In the previous section we defined the sum and the product using natural transformations. These were transformations between diagrams defined as functors from a very simple stick-figure category $\mathbf{2}$; one of the functors being the constant functor. 
@@ -1109,7 +1136,7 @@ We used objects in the category $\mathbf{2}$ for indexing objects in the categor
 
 As the source functor we'll still use the constant functor $\Delta_x \colon \cat J \to \mathcal{C}$.
 
-A  natural transformation, that is an element of the hom-set
+A  natural transformation $\nu$, that is an element of the hom-set:
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \]
 is now called a \emph{cone}. Its dual, an element of
 \[ [\cat J, \mathcal{C}](D, \Delta_x)  \]
@@ -1119,9 +1146,9 @@ Diagramatically, cones and cocones look like this:
 \[
  \begin{tikzcd}
   & x
-\arrow[ddr, "g"]
- \arrow[ddl, "f"']
- \arrow[ddd, "h"]
+ \arrow[ddl, "\nu_1"']
+ \arrow[ddd, "\nu_3"]
+\arrow[ddr, "\nu_2"]
  \\
 \\
 D 1 
@@ -1137,13 +1164,13 @@ D 1
  D 1
  \arrow[rr, red]
  \arrow[dr, red]
- \arrow[dddr, "f"']
+ \arrow[dddr, "\nu_1"']
  && D 2
 \arrow[dl, red]
- \arrow[dddl, "g"]
+ \arrow[dddl, "\nu_2"]
  \\
  & D 3
- \arrow[dd, "h"]
+ \arrow[dd, "\nu_3"]
  \\
  \\
  & x
@@ -1164,7 +1191,7 @@ Dually, the universal cocone is called a \emph{colimit}, and is described by the
 \[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}D, x) \]
 
 
-We can now say that a product is a limit (and a sum, a colimit) of a diagram from the indexing category $\mathbf{2}$.
+We can now say that the product is a limit (and the sum, a colimit) of a diagram from the indexing category $\mathbf{2}$.
 
 Limits and colimits distill the essence of a pattern. 
 
@@ -1175,6 +1202,71 @@ There are many interesting limits and colimits, and we'll see some when we discu
 \begin{exercise}
 Show that the limit of a \index{walking arrow, limit}``walking arrow'' category, that is a two-object category with an arrow connecting the two objects, has the same elements as the first object in the diagram (``elements'' are the arrows from the terminal object).
 \end{exercise}
+
+\subsection{Limits and colimits as representing objects}
+
+Cones over a diagram $D$ form a category. A morphism in the cone category is an arrow that connects two apexes (here $h \colon x \to y$), which makes all triangles commute (see, for instance, the blue triangle below).
+\[
+ \begin{tikzcd}
+  x
+ \arrow[rr, dashed, bend left, blue, "h"]
+ \arrow[dd]
+ \arrow[dddr, blue, "\nu_3"' near start]
+\arrow[ddrr ]
+ && y
+ \arrow[ddll]
+ \arrow[dddl, blue, "\mu_3" near start]
+ \arrow[dd]
+\\
+\\
+D 1 
+\arrow[rr, red]
+\arrow[rd, red]
+&& D 2
+\arrow[dl, red]
+\\
+& D 3
+ \end{tikzcd}
+ \]
+ A limit is just a terminal cone in the category of cones over $D$.
+ 
+ The mapping that assigns a set of cones to an apex defines a contravariant functor $H_D \colon \cat C^{op} \to \Set$:
+ \[ H_D x = [\cat J, \mathcal{C}](\Delta_x, D) \]
+An element of this set is a cone---a natural transformation $\nu$, whose components $\nu_i$ form the sides of the cone. 
+
+Functoriality means that we can lift any morphism $h \colon x \to y$ to a function between sets of cones:
+ \[ H_D h \colon H_D y \to H_D x \]
+ In other words, given a cone $\mu \in [\cat J, \mathcal{C}](\Delta_y, D)$, we can construct a cone $\nu \in [\cat J, \mathcal{C}](\Delta_x, D)$. We define the sides of this cone, the components of the natural transformation $\nu$, by precomposition with $h$:
+ \[ \nu_i = \mu_i \circ h \]
+ \[
+ \begin{tikzcd}
+  x
+ \arrow[rr, dashed, bend left, blue, "h"']
+ \arrow[dd, blue,  "\nu_1"']
+\arrow[ddrr, "\nu_2"' near start]
+ && y
+ \arrow[ddll, blue, "\mu_1"' near start]
+ \arrow[dd, "\mu_2"']
+\\
+\\
+D 1 
+\arrow[rr, red, "f"]
+&& D 2
+ \end{tikzcd}
+ \]
+ 
+The commuting conditions for the cone $\nu$ follow from the commuting conditions for the cone $\mu$. For instance, if we precompose the equation $f \circ \mu_1 = \mu_2$ with $h$, we get $f \circ \mu_1 \circ h = \mu_2 \circ h$, which gives us $f \circ \nu_1 = \nu_2$.
+
+We can now define the limit as the representing object for our functor $H_D$:
+
+\[ H_D x  \cong \mathcal{C}(x, \text{Lim}D) \]
+
+
+Similarly, we can define a covariant functor:
+\[ F_D x =  [\cat J, \mathcal{C}](D, \Delta_x)  \]
+that assigns a set of cocones to an object $x$. The representing object for this functor is the colimit:
+\[ F_D x  \cong \mathcal{C}( \text{Colim}D, x) \]
+
 
 \subsection{Equalizers}
 
@@ -1707,6 +1799,12 @@ But why not have arrows going all the way? Enter \index{infinity categories}infi
 
 \section{Useful Formulas}
 \begin{itemize}
+\item Exponential:
+\[\mathcal{C}(x \times a, b) \cong \mathcal{C}(x, b^a)\]
+\item Limit:
+\[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
+\item Colimit:
+\[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}D, x) \]
 \item Yoneda lemma for covariant functors:
 \[ [\mathcal{C}, \mathbf{Set}]( \mathcal{C}(a, -), F) \cong F a \]
 \item Yoneda lemma for contravariant functors:
