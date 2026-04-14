@@ -10,7 +10,7 @@ In the rarified air of category theory we encounter patterns that are so far rem
 
 An arrow from $a$ to $b$ is relatively easy to visualize. We have a very familiar model for it: a function that consumes elements of $a$ and produces elements of $b$. A hom-set is a collection of such arrows. 
 
-A functor is an arrow between categories. It consumes objects and arrows from one category and produces objects and arrows from another. We can think of it a recipe for building such objects (and arrows) from materials provided by the source category. In particular, we  often think of an endofunctor as a container of building materials.
+A functor is an arrow between categories. It consumes objects and arrows from one category and produces objects and arrows in another. We can think of it a recipe for building such objects and arrows from the materials provided by the source category. In particular, we  often think of an endofunctor as a container of building materials.
 
 A profunctor maps a pair of objects $\langle a, b \rangle$ to a set $P\langle a, b \rangle$ and a pair of arrows:
 \[ \langle f \colon s \to a, g \colon b \to t \rangle \]
@@ -25,7 +25,7 @@ We can, therefore, think of an arbitrary profunctor as generalizing the hom-func
 
 There is, however one big difference between an element of the hom-set $ \mathcal{C}(a, b)$ and an element of the set $P\langle a, b \rangle$. Elements of hom-sets are arrows, and arrows can be composed. It's not immediately obvious how to compose profunctors. 
 
-Granted, the lifting of arrows by a profunctor can be seen as generalizing composition---just not between profuctors, but between hom-sets and profunctors. For instance, we can ``precompose'' $P \langle a, b \rangle$ with an arrow $f \colon s \to a$ to obtain $P \langle s, b \rangle$:
+Granted, the lifting of arrows by a profunctor can be seen as generalizing composition---just not between profuctors, but rather between hom-sets and profunctors. For instance, we can ``precompose'' $P \langle a, b \rangle$ with an arrow $f \colon s \to a$ to obtain $P \langle s, b \rangle$:
 \[ P\langle f, id_b \rangle \colon P \langle a, b \rangle \to P \langle s, b \rangle \]
 Similarly, we can ``postcompose'' it with $g \colon b \to t$:
 \[ P \langle id_a, g \rangle \colon P \langle a, b \rangle \to P \langle a, t \rangle \]
@@ -68,13 +68,15 @@ Show that, if there is a functor from $\mathcal{C}$ to the walking arrow categor
 
 Under a microscope, a profunctor looks like a hom-functor, and the elements of the set $P \langle a, b \rangle$ look like individual arrows. But when we zoom out, we can view a profunctor as a relation between objects. These are not the usual relations; they are \index{proof-relevant relation}\emph{proof-relevant} relations.
 
-To understand this concept better, let's consider a regular functor $F \colon \mathcal{C} \to \mathbf{Set}$ (in other words, a co-presheaf). One way to interpret it is to say that it defines a \index{proof-relevant subset} subset of objects of $\mathcal{C}$, namely those objects that are mapped to non-empty sets. Every element of $F a$ is then treated as a proof that $a$ is a member of this subset. If, on the other hand, $F a$ is an empty set, then $a$ is not a member of the subset.
+To understand this concept better, let's consider a regular functor $F \colon \mathcal{C} \to \mathbf{Set}$ (in other words, a co-presheaf). One way to interpret it is to say that it defines a \index{proof-relevant subset} subset of objects of $\mathcal{C}$, namely those objects that are mapped to non-empty sets. Every element of $F a$ is then treated as a proof that $a$ is a member of this subset. If, on the other hand, $F a$ is empty, then $a$ is not a member of the subset. 
+
+This is in fact a proof-relevant version of defining a subset of a set $S$ using a \index{characteristic function}characteristic function, $\chi \colon S \to \text{Bool}$, which returns $\text{True}$ when an element is in the subset and $\text{False}$ otherwise.
 
 We can apply the same interpretation to profunctors. If the set $P \langle a, b \rangle$ is empty, we say that $b$ is not related to $a$. If it's not empty, we say that each element of the set $P \langle a, b \rangle$ represents a proof that $b$ is related to $a$. We can then treat a profunctor as a proof-relevant relation. 
 
 Notice that we don't assume anything about this relation. It doesn't have to be reflexive, as it's possible for $P \langle a, a \rangle$ to be empty (in fact, $P \langle a, a \rangle$ makes sense only for endo-profunctors). It doesn't have to be symmetric either.
 
-Since the hom-functor is an example of an (endo-) profunctor, this interpretation lets us view the hom-functor in a new light: as a built-in proof-relevant relation between objects in a category. If there's an arrow between two objects, they are related. Notice that this relation is reflexive, since $\mathcal{C}(a, a)$ is never empty: at the very least, it contains the identity morphism. 
+Since the hom-functor is an example of an (endo-) profunctor, this interpretation lets us view the hom-functor in a new light: as a built-in proof-relevant relation between objects in a category. If there's an arrow between two objects, they are related. Notice that this relation is reflexive, since $\mathcal{C}(a, a)$ is never empty---at the very least, it contains the identity morphism. 
 
 Moreover, as we've seen before, hom-functors interact with profunctors. If $a$ is related to $b$ through $P$, and the hom-sets $\mathcal{C}(s, a)$ and $\mathcal{D}(b, t)$ are non-empty, then automatically $s$ is related to $t$ through $P$. Profunctors are therefore proof-relevant relations that are compatible with the structure of the categories in which they operate.
 
@@ -125,7 +127,7 @@ instance (Profunctor p, Profunctor q) => Profunctor (Procompose p q)
     dimap l r (Procompose qax pxb) = 
                Procompose (dimap l id qax) (dimap id r pxb)
 \end{haskell}
-This is just saying that you can extend the composite profunctor by extending the first one to the left and the second one to the right.
+This is just saying that you can extend the composite profunctor by extending the first one on its left and the second one on its right.
 
 The fact that this definition of profunctor composition happens to work in Haskell is due to parametricity. The language constraints the types of profunctors in a way that makes this work. In general, though, taking a simple sum over intermediate objects would result in over-counting, so in category theory we have to compensate for that.
 
@@ -148,11 +150,11 @@ We can either extend $Q$ on the right, by lifting $Q \langle id, f \rangle$, and
 In order to avoid the double-counting, we have to tweak our definition of a sum type when applied to profunctors. The resulting construction is called a coend. 
 
 First, let's re-formulate the problem. We are trying to sum over all objects $x$ in the product:
-\[ P \langle a, x \rangle \times Q \langle x, b \rangle \]
+\[ Q \langle a, x \rangle \times P \langle x, b \rangle \]
 The double-counting happens because we can open up the gap between the two profunctors, as long as there is a morphism that we can fit between them. So we are really looking at a more general product:
-\[ P \langle a, x \rangle \times Q \langle y, b \rangle \]
+\[ Q \langle a, x \rangle \times P \langle y, b \rangle \]
 The important observation is that, if we fix the endpoints $a$ and $b$, this product is a profunctor in $\langle y, x \rangle$. This is easily seen after a little rearrangement (up to isomorphism):
-\[ Q \langle y, b \rangle \times P \langle a, x \rangle \]
+\[ P \langle y, b \rangle \times Q \langle a, x \rangle \]
 We are interested in the sum of the diagonal parts of this profunctor, that is when $x$ is equal to $y$. 
 
 So let's see how we would go about defining the sum of all diagonal entries of a general profunctor $P$. In fact, this construction works for any functor $P \colon \cat C^{op} \times \cat C \to D$, not just for $\Set$-valued profunctors. 
@@ -282,7 +284,7 @@ Granted, the standard naturality condition deals with pairs of functors. Here, t
 
 We reinterpret the cowedge condition as a special case of the more general \index{extranatural transformation}\emph{extranatural} transformation. An extranatural transformation is a family of arrows:
 \[ \alpha_{c d} \colon P \langle c, c \rangle \to Q \langle d, d \rangle \]
-between two functors of the form:
+between two profunctors of the form:
 \[ P \colon \cat C^{op} \times \cat C \to \cat E \]
 \[ Q \colon \cat D^{op} \times \cat D \to \cat E \]
 Extranaturality in $c$ means that the following diagram commutes for any morphism $f \colon c \to c'$:
@@ -322,11 +324,11 @@ We can now reformulate the definition of the coend as a pair $(c, i)$ where $c$ 
 
 Universality means that for any object $d$ equipped with the extranatural transformation $\alpha \colon P \to \Delta_d$ there is a unique morphism $h \colon c \to d$ that factorizes all the components of $\alpha$ through the components of $i$:
 \[ \alpha_x = h \circ i_x \]
-We call this object $c$ the coend, and write it as:
-\[ c = \int^x P\langle x, x \rangle \]
+This object $c$, together with $i$, is our coend:
+\[ c = \int^{x \colon \cat C} P\langle x, x \rangle \]
 
 \begin{exercise}
-Verify that that, for the extranatural transformation $P \to \Delta_d$, the first extranaturality diamond is equivalent to the cowedge condition, and the second is trivially satisfied.
+Verify that, for the extranatural transformation $P \to \Delta_d$, the first extranaturality diamond is equivalent to the cowedge condition, and the second is trivially satisfied.
 \end{exercise}
 
 \subsection{Profunctor composition using coends}
@@ -399,7 +401,7 @@ For any   $f \colon x \to y$, our definition of a coend for such a profunctor re
  \end{tikzcd}
 \]
 After shrinking the identity arrows, the original co-wedge becomes a co-cone, and the universal condition turns into the definition of a colimit. This justifies the use the coend notation for colimits:
-\[ \int^x F x = \text{colim} F \]
+\[ \int^x F x = \text{Colim} F \]
 The functor $F$ defines a diagram in the target category. The pattern is the whole source category.
 
 We can gain useful intuition if we consider a discrete category, in which a profunctor is a (possibly infinite) matrix and a coend is the sum (coproduct) if its diagonal elements. A profunctor that is constant along one axis corresponds to a matrix whose rows are identical (each given by a ``vector'' $F x$). The sum of the diagonal elements of such a matrix is equal to the sum of all components of the vector $F x$.
@@ -593,7 +595,7 @@ The universal condition that defines an end becomes the definition of a universa
  \end{tikzcd}
 \]
 We can thus use the end notation for limits:
-\[ \int_x F x = \text{lim} F \]
+\[ \int_x F x = \text{Lim} F \]
 
 \begin{exercise}
 A product is a limit of a functor from a two-object category $\Cat 2$. Show that it can be defined as an end. Hint: There are no non-identity morphisms in $\Cat 2$.
@@ -601,7 +603,7 @@ A product is a limit of a functor from a two-object category $\Cat 2$. Show that
 
 \section{Continuity of the Hom-Functor}
 
-In category theory, a functor $F$ is called \index{continuous functor}\emph{continuous} if it preserves limits (and co-continuous, if it preserves colimits). It means that, if you have a diagram in the source category, it doesn't matter if you first use $F$ to map the diagram and then take the limit in the target category, or take the limit in the source category and then use $F$ to map this limit. 
+In category theory, a functor $F$ is called \index{continuous functor}\emph{continuous} if it preserves limits (and \index{co-continuous functor}co-continuous, if it preserves colimits). It means that, if you have a diagram in the source category, it doesn't matter if you first use $F$ to map the diagram and then take the limit in the target category, or take the limit in the source category and then use $F$ to map this limit. 
 
 The hom-functor is an example of a functor that is continuous in its second argument. Since a product is the simplest example of a limit, this means, in particular, that:
 \[ \mathcal{C}(x, a \times b) \cong \mathcal{C}(x, a) \times \mathcal{C}(x, b) \]
@@ -636,14 +638,14 @@ Expressing the set of natural transformations as an end we get:
 Similarly, we have the Yoneda lemma for a contravariant functor (a presheaf) $G$:
 \[ \int_{x \colon \mathcal{C}} \mathbf{Set} (\mathcal{C}(x, a), G x) \cong G a \]
 
-These versions of the Yoneda lemma, expressed in terms of ends, are often half-jokingly called ninja-Yoneda lemmas. The fact that the ``integration variable'' is explicit makes them somewhat easier to use in complex formulas.
+These versions of the Yoneda lemma, expressed in terms of ends, are often half-jokingly called \index{ninja-Yoneda lemma}ninja-Yoneda lemmas. The fact that the ``integration variable'' is explicit makes them somewhat easier to use in complex formulas.
 
-There is also a dual set of ninja co-Yoneda lemmas that use coends instead. For a covariant functor, we have:
+There is also a dual set of \index{ninja-co-Yoneda lemma}ninja co-Yoneda lemmas that use coends instead. For a covariant functor, we have:
 \[ \int^{x \colon \mathcal{C}} \mathcal{C}(x, a) \times F x \cong F a \]
 and for the contravariant one we have:
 \[ \int^{x \colon \mathcal{C}} \mathcal{C}(a, x) \times G x \cong G a \]
 
-Physicists might notice the similarity of these formulas to integrals involving the Dirac delta function---strictly speaking, a distribution. This is why profunctors are sometimes called \index{distributors}distributors, following the adage that ``distributors are to functors as distributions are to functions.'' Engineers might notice the similarity of the hom-functor to the impulse function.
+Physicists might notice the similarity of these formulas to integrals involving the Dirac delta function (strictly speaking, a distribution). This is why profunctors are sometimes called \index{distributors}distributors, following the adage that ``distributors are to functors as distributions are to functions.'' Engineers might notice the similarity of the hom-functor to the impulse function.
 
 This intuition is often expressed by saying that we can perform the ``integration over $x$'' in this formula, resulting in replacing $x$ with $a$ in the integrand $G x$. 
 
@@ -653,7 +655,7 @@ In fact, a lot of linear algebra translates directly to the theory of $\Set$-val
 
 Yet another name for profunctors, especially in Australia, is \index{bimodule}``bimodules.'' This is because the lifting of morphisms by a profunctor is somewhat similar to the left and right actions on sets. 
 
-We'll now proceed with the proof of the co-Yoneda lemma, which is quite instructive, as it uses a few common tricks. Most importantly, we rely on the corollary of the Yoneda lemma, which says that, if all the mappings out from two objects to an arbitrary object are isomorphic, then the two objects are themselves isomorphic. In our case, we'll consider the mappings-out to an arbitrary set $S$ and show that:
+We'll now proceed with the proof of the co-Yoneda lemma, which is quite instructive, as it uses a few common tricks. Most importantly, we rely on the corollary of the Yoneda lemma, which says that, if all the mappings out from two objects to an arbitrary object are isomorphic, then the two objects are themselves isomorphic. In our case, we'll consider two mappings-out to an arbitrary set $S$ and show that:
 \[ \mathbf{Set} \left(\int^{x \colon \mathcal{C}} \mathcal{C}(x, a) \times F x, S \right) \cong 
     \Set (F a, S)\]
 Using the co-continuity of the hom-functor, we can pull out the integral sign, replacing the coend with an end:
@@ -662,7 +664,7 @@ Since the category of sets is cartesian closed, we can curry the product:
 \[ \int_{x \colon \mathcal{C}} \mathbf{Set} \left( \mathcal{C}(x, a) , S^{F x} \right) \]
 We can now use the Yoneda lemma to ``integrate over $x$.'' The result is $S^{F a}$. Finally, in $\mathbf{Set}$, the exponential object is isomorphic to the hom-set:
 \[S^{F a} \cong \mathbf{Set}(F a, S)\]
-Since $S$ was arbitrary, we conclude that:
+Since $S$ was arbitrary, we conclude that the two objects are isomorphic:
 \[ \int^{x \colon \mathcal{C}} \mathcal{C}(x, a) \times F x \cong F a \]
 
 \begin{exercise}
@@ -671,7 +673,9 @@ Prove the contravariant version of the co-Yoneda lemma.
 
 \subsection{Yoneda lemma in Haskell}
 
-We've already seen the Yoneda lemma implemented in Haskell. We can now rewrite it in terms of an end. We start by defining a profunctor that will go under the end. Its type constructor takes a functor \hask{f} and a type \hask{a} and generates a profunctor that's contravariant in \hask{x} and covariant in \hask{y}:
+We've already seen the Yoneda lemma implemented in Haskell. We can now rewrite it in terms of an end. We start by defining a profunctor that will go under the end:
+\[ \mathbf{Set} (\mathcal{C}(a, x), F y) \]
+Its type constructor takes a functor \hask{f} and a type \hask{a} and generates a profunctor that's contravariant in \hask{x} and covariant in \hask{y}:
 \begin{haskell}
 data Yo f a x y = Yo ((a -> x) -> f y)
 \end{haskell}
@@ -688,7 +692,7 @@ Similarly, the co-Yoneda lemma uses a coend over the following profunctor:
 \begin{haskell}
 data CoY f a x y = CoY (x -> a) (f y)
 \end{haskell}
-The isomorphism is witnessed by a pair of functions. The first one says that if you have a function \hask{x -> a} and a functorful of \hask{x} then you can make a functorful of \hask{a} using the \hask{fmap}:
+The isomorphism is witnessed by a pair of functions. The first one says that if you have a function \hask{x -> a} and a functorful of \hask{x} then you can make a functorful of \hask{a} simply by using the \hask{fmap}:
 \begin{haskell}
 coyoneda :: Functor f => Coend (CoY f a) -> f a
 coyoneda (Coend (CoY g fa)) = fmap g fa
@@ -712,7 +716,7 @@ Notice that the sum of the arguments to the two functions is equal to $x$. We co
 Informally, if we could define subtraction as the right adjoint to coproduct, we'd write:
 \[ \int^{a, b} \cat C (a + b, x) \times F a \times G b \cong \int^{a, b} \cat C (a, b - x) \times F a \times G b \cong \int^b F (b - x) \times G b\]
 
-There is nothing special about coproduct so, in general, Day convolution is defined in any monoidal category with a tensor product:
+There is nothing special about coproduct so, in general, a Day convolution is defined in any monoidal category with a tensor product:
 \[ (F \star G) x = \int^{a, b} \cat C (a \otimes b, x) \times F a \times G b \]
 
 In fact, Day convolution for a monoidal category $(\cat C, \otimes, I)$ endows the category of co-presheaves $[\cat C, \Set]$ with a monoidal structure. Simply said, if you can multiply objects in $\cat C$, you can multiply set-valued functors on $\cat C$.
@@ -733,7 +737,7 @@ data Day f g x where
   Day :: ((a, b) -> x) -> f a -> g b -> Day f g x
 \end{haskell}
 
-If we think of functors as containers of values, Day convolution tells us how to combine two different containers into one---given a function that combines two different values into one. 
+If we think of functors as containers of values, Day convolution tells us how to combine two different containers into one, when given a function that combines two different values into one. 
 
 \begin{exercise}
 Define the \hask{Functor} instance for \hask{Day}.
@@ -853,7 +857,7 @@ Define the \hask{Functor} instance for the free applicative.
 
 \section{The Bicategory of Profunctors}
 
-Since we know how to compose profunctors using coends, the question arises: is there a category in which they serve as morphisms? The answer is yes, as long as we relax the rules a bit. The problem is that the categorical laws for profunctor composition are nor satisfied ``on the nose,'' but only up to isomorphism. 
+Since we know how to compose profunctors using coends, the question arises: is there a category in which they can be seen as morphisms? The answer is yes, as long as we relax the rules a bit. The problem is that the categorical laws for profunctor composition are nor satisfied ``on the nose,'' but only up to isomorphism. 
 
 For instance, we can try to show associativity of profunctor composition. We start with:
 \[ ((P \diamond Q) \diamond R) \langle s, t \rangle = \int^b \left( \int^a P \langle s, a \rangle \times Q \langle a, b \rangle \right) \times R \langle b,  t \rangle \]

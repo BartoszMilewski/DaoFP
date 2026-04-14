@@ -1591,12 +1591,12 @@ On arrows, it lifts an arrow $f \colon a \to b$ using $T$. The fact that the arr
  T (T a)
  \arrow[r, "T( T f)"]
  \arrow[d, "\mu_a"]
- & T (T B)
+ & T (T b)
 \arrow[d, "\mu_b"]
  \\
  T a
  \arrow[r, "T f"]
- & T B
+ & T b
   \end{tikzcd}
 \]
 
@@ -1604,7 +1604,7 @@ Finally, we have to show that the unit and the counit of the monad $U^T \circ F^
 
 The units are the same by construction.
 
-The monad multiplication of $U^T \circ F^T$ is given by the whiskering $U^T \circ \varepsilon \circ F^T$ of the unit of the adjunction. In components, this means instantiating $\varepsilon$ at $(T a, \mu_a)$, which gives us $\mu_a$ (the action of $U^T$ on arrows is trivial). This is indeed the original monad multiplication.
+The monad multiplication of $U^T \circ F^T$ is given by the whiskering $U^T \circ \varepsilon \circ F^T$ of the counit of the adjunction. In components, this means instantiating $\varepsilon$ at $(T a, \mu_a)$, which gives us $\mu_a$ (the action of $U^T$ on arrows is trivial). This is indeed the original monad multiplication.
 
 We have thus shown that, for any monad $T$ we can define the Eilenberg-Moore category and a pair of adjoint functors that factorize this monad.
 

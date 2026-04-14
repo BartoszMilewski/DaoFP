@@ -234,7 +234,7 @@ We still have to prove that $\lambda^{-1}$ is the left inverse of $\text{snd}$. 
  It obviously commutes for $h = id$. It also commutes for $h = \lambda^{-1}  \circ  \text{snd}$, because we have:
  \[  \text{snd} \circ \lambda^{-1}  \circ  \text{snd} = \text{snd} \]
  Since $h$ is supposed to be unique, we conclude that:
-\[ \lambda^{-1}  \circ  \text{snd} = id \]
+\[ \lambda^{-1}  \circ  \text{snd} = \text{id} \]
 This kind of reasoning with universal constructions is pretty standard.
 
 Here are some other isomorphisms written in Haskell (without proofs of having the inverse). This is associativity:
@@ -412,19 +412,20 @@ The rules that define a monoid are reminiscent of the rules of a category. The d
 
 A category with a single object is called a monoid. The combining operation is the composition of arrows and the unit is the identity arrow. 
 
-This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
+This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. We call such monoids \index{internal monoid}\emph{internal}. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
 
 However, in a category, rather than looking at individual elements, we prefer to define operations in bulk. So we start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
 \[ \mu \colon m \times m \to m \]
 The unit element can be defined as an arrow from the terminal object $1$:
 \[ \eta \colon 1 \to m \]
 
-We can translate this description directly to Haskell by defining a \index{type class}class of types equipped with two methods, traditionally called \hask{mappend} and \hask{mempty}:
+We could translate this description directly to Haskell by defining a \index{type class}class of types equipped with two methods, traditionally called \hask{mappend} and \hask{mempty}:
 \begin{haskell}
 class Monoid m where
   mappend :: (m, m) -> m
   mempty  :: () -> m
 \end{haskell}
+We'll see the actual Haskell library definition shortly.
 
 The two arrows $\mu$ and $\eta$ have to satisfy monoid laws but, again, we have to formulate them in bulk, without any recourse to elements.
 
@@ -475,7 +476,7 @@ To formulate the law of associativity, we have to start with a triple product an
 
 Notice that we didn't have to assume a lot about the categorical product that we used with the objects $m$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in an arbitrary monoidal category. It doesn't even have to be symmetric. All we have to assume is that: there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
 
-Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category. 
+Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category. We can \emph{internalize} a monoid inside a monoidal category.
 
 A \index{monoid}\emph{monoid} in a monoidal category is an object $m$ equipped with two morphisms:
 \[ \mu \colon m \otimes m \to m \]
@@ -514,5 +515,52 @@ satisfying the unit and associativity laws:
  \end{tikzcd}
 \]
 We used the functoriality of $\otimes$ to lift pairs of arrows, as in $\eta \otimes id_m$, $\mu \otimes id_m$, etc.
+
+\subsection{Monoids in Haskell}
+
+Notwithstanding its simplicity, a monoid has several moving parts. It has the unit, the binary operation, and the three laws. 
+
+If we strip it to just the binary operation with no unit and no associativity, we get the primordial structure called a \index{magma}\emph{magma}. A magma with associativity is called a \index{semigroup}\emph{semigroup}. Since in Haskell we have no way to express the laws, we cannot distinguish between a magma and a semigroup. So we define one class with a binary infix operator \hask{<>}:
+\begin{haskell}
+class Semigroup a where
+    (<>) :: a -> a -> a
+\end{haskell}
+
+We can now define a monoid as a semigroup with unit (and unit laws). In Haskell, we express this dependency by requiring that \hask{Semigroup} be a \index{superclass}\emph{superclass} of \hask{Monoid}:
+\begin{haskell}
+class Semigroup a => Monoid a where
+    mempty :: a
+\end{haskell}
+This way \hask{Monoid} inherits the binary operation \hask{<>} from \hask{Semigroup}, and adds to it the unit element \hask{mempty}.
+
+An interesting example of a monoid is provided by endomorphisms, that is morphisms whose source and target are the same:
+\begin{haskell}
+newtype Endo a = Endo (a -> a)
+\end{haskell}
+The binary operation is given by composition:
+\begin{haskell}
+instance Semigroup (Endo a) where
+  (Endo f) <> (Endo g) = Endo (f . g)
+\end{haskell}
+The unit of composition is the identity morphism, so we have:
+\begin{haskell}
+instance Monoid (Endo a) where
+  mempty = Endo id
+\end{haskell}
+
+\begin{exercise}
+Define the \hask{Monoid} instance for booleans using AND as the binary operation. To distinguish it from other monoids over \hask{Bool}, use the \hask{newtype} trick:
+\begin{haskell}
+newtype All = All Bool
+\end{haskell}
+\end{exercise}
+
+\begin{exercise}
+Define the \hask{Monoid} instance for booleans using OR as the binary operation. Use a different  \hask{newtype}:
+\begin{haskell}
+newtype Any = Any Bool
+\end{haskell}
+\end{exercise}
+
 
 \end{document}

@@ -188,14 +188,12 @@ This is a diagram that shows a pair of categories, two functors between them, an
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
-  \arrow[bend left=50]{r}[name=U, label=above:$F$]{}
-  \arrow[bend right=50]{r}[name=D, label=below:$G$]{} 
- &
+  \arrow[bend left=50, r, "F", ""{name=U, below}]
+  \arrow[bend right=50, r, "G"', ""{name=D, above}]
+&
 \mathcal{D}
-  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U) -- node[label=left:$\alpha$] {} (D)}]{}
-\end{tikzcd}
-\]
-
+\arrow[Rightarrow, from=U, to=D, "\alpha", shorten <=5pt, shorten >=5pt]
+\end{tikzcd}\]
 
 Since for every arrow in $\mathcal{C}$ there is a corresponding naturality square, we can say that a natural transformation maps objects to arrows, and arrows to commuting squares.
 
@@ -300,16 +298,15 @@ Indeed, suppose that we have a natural transformation $\alpha$ between two funct
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
-  \arrow[bend left=60]{rr}[name=U, label=above:$F$]{}
-  \arrow[]{rr}[name=M, label={[xshift=15pt, yshift=-5pt]:$G$}]{} 
-  \arrow[bend right=60]{rr}[name=D, label=below:$H$]{} 
- &&
+  \arrow[bend left=60, rr, "F", ""{name=U, below}]
+  \arrow[rr, "G"{xshift=-12pt}, ""{name=Mbot, below}, ""{name=Mtop, above}]
+  \arrow[bend right=60, rr, "H"', ""{name=D, above}]
+&&
 \mathcal{D}
-  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(U) -- node[label=left:$\alpha$] {} (M)}]{}
-  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(M) -- node[label=left:$\beta$] {} (D)}]{}
+  \arrow[Rightarrow, from=U, to=Mbot, "\alpha", shorten >=5pt]
+  \arrow[Rightarrow, from=Mtop, to=D, "\beta", shorten <=5pt]
 \end{tikzcd}
 \]
-
 
 Let's look at the components of these transformations at some object $x$ in $\cat C$:
 \[ \alpha_x \colon F \, x \to G \, x \]
@@ -678,9 +675,6 @@ We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded 
 
 Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
 
-\begin{exercise}
-Describe limits and colimits as representing objects. What are the functors they represent?
-\end{exercise}
 \begin{exercise}
 Consider a \emph{singleton functor} $F \colon \cat C \to \Set$ that assigns to each object $c$ a singleton set $\{c\}$ that contains just that object (that is, a different singleton for every object). Define the action of $F$ on arrows. Show that $F$ being representable is equivalent to $\cat C$ having an initial object.
 \end{exercise}
