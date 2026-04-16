@@ -358,7 +358,7 @@ Coends introduce a new level of abstraction in dealing with profunctors. Calcula
 \begin{exercise}
 Define a \hask{Profunctor} instance for the pair of profunctors:
 \begin{haskell}
-newtype ProPair q p a b x y = ProPair (q a y, p x b)
+newtype ProPair q p a b y x = ProPair (q a x, p y b)
 \end{haskell}
 Hint: Keep the first four parameters fixed:
 \begin{haskell}
