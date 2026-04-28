@@ -20,7 +20,9 @@ data Tree = Leaf String
 
 tree :: Tree
 tree = Node (Leaf "leaf ") "root " (Node (Leaf "l1 ") "right " (Leaf "l2 "))
+
 show1 :: Tree -> String
+show1 (Leaf s) = s
 show1 (Node lft s rgt) =
   let ls = show1 lft
       rs = show1 rgt

@@ -546,6 +546,7 @@ data Tree = Leaf String
 To concatenate all these strings we use the traversal that first recurses into the left subtree, and then into the right subtree:
 \begin{haskell}
 show :: Tree -> String
+show (Leaf s) = s
 show (Node lft s rgt) =
   let ls = show lft
       rs = show rgt
