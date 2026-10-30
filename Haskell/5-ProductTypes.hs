@@ -54,7 +54,7 @@ newtype Any = Any Bool
 
 instance Semigroup Any where
   (Any a) <> (Any b) = Any (a || b)
-  _ <> _ = Any True
+  -- _ <> _ = Any True
 
 instance Monoid Any where
   mempty = Any False

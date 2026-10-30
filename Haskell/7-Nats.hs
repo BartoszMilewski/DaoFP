@@ -1,3 +1,5 @@
+import Prelude hiding (init)
+
 data Nat where
   Z :: Nat
   S :: Nat -> Nat

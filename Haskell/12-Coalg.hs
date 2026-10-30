@@ -42,6 +42,7 @@ allNats = ana step 0
 hylo :: Functor f => Algebra f b -> Coalgebra f a -> a -> b
 hylo alg coa = alg . fmap (hylo alg coa) . coa 
 
+qsort' :: [Int] -> [Int]
 qsort' = hylo toList split
 
 add :: Algebra (StreamF Int) Int
@@ -78,4 +79,5 @@ tail (Nu (unf, s)) =
 nuArgs :: (Int -> StreamF Int Int, Int)
 nuArgs =  (\n -> StreamF n (n+1) , 0)
 
+allNats' :: Nu (StreamF Int)
 allNats' = Nu nuArgs

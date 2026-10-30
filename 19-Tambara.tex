@@ -594,7 +594,7 @@ You can easily convince yourself that all coherency laws translate directly to t
 
 \subsection{Prisms}
 
-From the programming point of view there are two obvious monoidal structures to explore: the product and the sum. We've seen that the product gives rise to lenses. The sum, or the coproduct, gives rise to prisms. 
+From the programming point of view there are two obvious monoidal structures to explore: the product and the sum. We've seen that the product gives rise to lenses. The sum, or the coproduct, gives rise to \index{prism}prisms. 
 
 We get the existential representation simply by replacing the product by the sum in the definition of a lens:
 \[ \mathcal{P}\langle s, t\rangle \langle a, b \rangle = \int^{c} \mathcal{C}(s, c + a) \times  \mathcal{C}(c + b, t) \]
@@ -659,7 +659,7 @@ toPrismP (Prism from to) = dimap from to . alpha'
 
 Again, profunctor prisms compose using function composition.
 \subsection{Traversals}
-A traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list that delivers the replacements must match the number of nodes, otherwise bad things happen. 
+A \index{traversal}traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list that delivers the replacements must match the number of nodes, otherwise bad things happen. 
 
 A type-safe implementation of a traversal would require us to keep track of the sizes of lists. In other words, it would require dependent types.
 

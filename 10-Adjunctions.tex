@@ -611,7 +611,7 @@ Such a one-to-one mapping between elements of two hom-sets hints at the underlyi
 
 \subsection{Universal arrows from adjunctions}
 
-Let's first convince ourselves that, when the functor $L$ has a right adjoint $R$, then for every $c$ there exists a universal arrow from $L$ to $c$. Indeed, this arrow is given by the pair $\langle R c, \varepsilon_c \rangle$, where $\varepsilon$ is the counit of the adjunction. First of all, the component of the counit has the right signature for the object in the comma category $L/c$:
+Let's first convince ourselves that, when the functor $L$ has a right adjoint $R$, then for every $c$ there exists a universal arrow from $L$ to $c$. Indeed, this arrow is given by the pair $\langle R c, \varepsilon_c \rangle$, where $\varepsilon$ is the counit of the adjunction. First of all, the component of the counit has the correct signature for the object in the comma category $L/c$:
 \[ \varepsilon_c \colon L (R c) \to c \]
 
 We'd like to show that $\langle R c, \varepsilon_c \rangle$ is the terminal object in $L/c$. That is, for any object $\langle d, f \colon L d \to c \rangle$ there is a unique $h \colon d \to R c$ such that $f = \varepsilon_c \circ L h$:

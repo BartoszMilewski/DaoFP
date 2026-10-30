@@ -15,7 +15,7 @@ sigma alpha gb = Ran (\b_pe -> alpha $ fmap b_pe gb)
 factorize :: Functor g => Alpha p f g -> forall e. g (p e) -> f e
 factorize alpha = counit . sigma alpha
 
--- By eqiational reasoning, this is equivalent to
+-- By equational reasoning, this is equivalent to
 factorize' :: Functor g => Alpha p f g -> forall e. g (p e) -> f e
 factorize' alpha = alpha
 

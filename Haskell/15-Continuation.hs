@@ -11,6 +11,7 @@ instance Applicative (Cont r) where
     pure a = Cont (\k -> k a)
     (<*>) = ap
 
+sum2 :: [Integer] -> Integer
 sum2 = go 0 
   where go n [] = n
         go n (i : is) = go (n + i) is

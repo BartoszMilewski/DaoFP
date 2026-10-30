@@ -1,5 +1,5 @@
 import Control.Monad (ap)
-data Id a = MakeId { getId :: a }
+newtype Id a = MakeId { getId :: a }
     deriving Functor
 
 instance Applicative Id where

@@ -1,8 +1,6 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
 
 import Data.Kind (Type)
-import GHC.Plugins (Var(varName))
 
 data Nat = Z | S Nat
 

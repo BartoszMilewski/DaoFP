@@ -15,3 +15,4 @@ DaoFP.ilg
 *.out
 *.pyg
 /Haskell/.vscode
+Haskell/CHANGELOG.md

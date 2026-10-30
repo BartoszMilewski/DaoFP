@@ -36,5 +36,3 @@ triangle = fmap counit . unit
 
 triangle' :: Adjunction left right => forall x. left x -> left x
 triangle' = counit . fmap unit
-
-

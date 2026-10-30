@@ -771,8 +771,12 @@ triangle = fmap counit . unit
 \end{haskell}
 
 \begin{exercise}
-Draw the string diagrams for the second triangle identity and translate them to Haskell.
+Draw string diagrams for the second triangle identity and translate them to Haskell.
 \end{exercise}
+
+\subsection{Universal arrows}
+
+
 
 \section{Monads from Adjunctions}
 
@@ -1481,7 +1485,7 @@ where \hask{mma} is of the nested type \hask{Ex (Ex Char)}.
 
 In category theory these two conditions define a monad algebra. 
 
-We say that $(a, \alpha \colon T a \to a)$ is a \emph{monad algebra} for the monad $(T, \mu, \eta)$ if the following diagrams commute:
+We say that $(a, \alpha \colon T a \to a)$ is a \index{monad algebra}\emph{monad algebra} for the monad $(T, \mu, \eta)$ if the following diagrams commute:
 \[
  \begin{tikzcd}
  a

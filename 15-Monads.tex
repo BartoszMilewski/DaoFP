@@ -169,6 +169,8 @@ liftM :: Monad m => (a -> b) -> (m a -> m b)
 liftM f ma = ma >>= (return . f)
 \end{haskell}
 
+In fact, there is an alternative to defining a monad that does not relay on an endofunctor and its powers. It's called the \index{extension system}\emph{extension system}, and it  defines binding axiomatically as an operation on arrows. This approach is closer to Haskell.
+
 \subsection{Monad as Applicative}
 
 In a cartesian category every monad is lax monoidal. Indeed, if you know how to compose effectful computations sequentially, you know how to compose them in parallel. If the result of the first computation is not used as the input to the second computation, they can be done in parallel. The effects, on the other hand, are always composed sequentially. 

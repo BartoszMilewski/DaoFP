@@ -65,7 +65,7 @@ rtol :: Functor h =>
 \end{haskell}
 \end{exercise}
 
-\subsection{Powering and co-powering}
+\subsection{Powering and copowering}
 
 In the category of sets, the internal hom (the function object, or the exponential) is isomorphic to the external hom (the set of morphisms between two objects):
 \[ C^B \cong Set(B, C) \]
@@ -73,13 +73,13 @@ We can therefore rewrite the currying adjunction that defines the internal hom i
 \[ \Set (A \times B, C)  \cong \Set \big(A, \Set (B, C)\big) \]
 We can generalize this adjunction to the case where $B$ and $C$ are not sets but objects in some category $\cat C$. The external hom in any category is always a set. But the left-hand side is no longer defined by a product. Instead it defines the action of a set $A$ on an object $b$:
 \[ \cat C (A \cdot b, c) \cong \Set \big( A, \cat C (b, c)\big) \]
-that is called a \index{co-power}\emph{co-power}.
+that is called a \index{copower}\emph{copower}.
 
 You may think of this action as adding together (taking a coproduct of) $A$ copies of $b$. For instance, if $A$ is a two-element set $\mathbf 2$, we get:
 \[ \cat C (\mathbf 2 \cdot b, c) \cong \Set \big( \mathbf 2, \cat C (b, c)\big) \cong \cat C(b, c) \times \cat C(b, c) \cong \cat C(b + b, c) \]
 In other words, 
 \[ \mathbf 2 \cdot b \cong b + b \]
-In this sense a co-power defines multiplication in terms of iterated addition, the way we learned it in school. 
+In this sense a copower defines multiplication in terms of iterated addition, the way we learned it in school. 
 
 If we multiply $b$ by the hom-set $\cat C (b, c)$ and take the coend over $b$'s, the result is isomorphic to $c$:
 \[ \cat \int^b C(b, c) \cdot b \cong c \]
@@ -88,7 +88,7 @@ Indeed, the mappings to an arbitrary $x$ from both sides are isomorphic due to t
 
 
 
-As expected, in $\Set$, the co-power decays to the cartesian product.
+As expected, in $\Set$, the copower decays to the cartesian product.
 \[ \Set (A \cdot B, C) \cong \Set \big( A, \Set(B, C)\big) \cong \Set (A \times B, C) \]
 
 Similarly, we can express powering as iterated multiplication. We use the same right-hand side, but this time we use the mapping-in to define the \index{power}\emph{power}:
@@ -915,14 +915,14 @@ As long as the coend in question exists, we can prove this formula by considerin
 \[\int_b \cat C \big(\int^e \cat B(P e, b) \cdot F e, G b\big) \]
 Using cocontinuity, we pull out the coend, turning it into an end:
 \[\int_b \int_e \cat C \big(\cat B(P e, b) \cdot F e, G b\big) \]
-and we plug in the definition of co-power:
+and we plug in the definition of copower:
 \[\int_b \int_e \cat C \big(\cat B(P e, b), \cat C (F e, G b)\big) \]
 We can now use the Yoneda lemma to integrate over $b$, replacing $b$ with $P e$:
 \[\int_e \cat C (F e, G (P e))\big) \cong  [\cat E, \cat C] (F, G \circ P) \]
 This indeed gives us the left adjoint to functor pre-composition:
 \[ [\cat B, \cat C](\text{Lan}_P F , G) \cong  [\cat E, \cat C] (F, G \circ P) \]
 
-In $\Set$, the co-power decays to a cartesian product, so we get a simpler formula:
+In $\Set$, the copower decays to a cartesian product, so we get a simpler formula:
 \[ (\text{Lan}_P F)\, b \cong \int^{e} \cat B (P e, b) \times F e \]
 
  Notice that, if the functor $P$ has a right adjoint, let's call it $P^{-1}$:
@@ -1032,11 +1032,14 @@ We've seen that, when we have an adjunction $L \vdash R$, the left adjoint is re
 \[ R \cong \text{Lan}_L \text{Id} \]
 Conversely, if the left Kan extension of identity exists and it preserves the functor $L$:
 \[ L \circ \text{Lan}_L \text{Id} \cong \text{Lan}_L L \]
-than $\text{Lan}_L \text{Id}$ is the right adjoint of $L$. The left Kan extension of $L$ along itself is called the \index{density comonad} density comonad.
+than $\text{Lan}_L \text{Id}$ is the right adjoint of $L$. 
+
+In general, the left Kan extension of $F$ along itself is called the \index{density comonad} \emph{density comonad}. The term originates in topology, but it was adopted in category theory, where a functor $F$ is called \index{dense functor}\emph{dense} if it's left Kan extension exists and is isomorphic to identity. The coend formula:
+\[ (\text{Lan}_F F) d = \int^e \cat B (F e, d) \times F e \]
+can be interpreted as the totality of arrows from the image of $F$ to the object $d$. If the image of $F$ is ``dense enough,'' these arrows determine $d$ up to isomorphism. 
 
 
-
-The unit of Kan extension is the same as the unit of the adjunction:
+The unit of Kan extension is the same as the unit of the corresponding adjunction:
 \[
  \begin{tikzcd} [row sep=1cm, column sep=1cm]
  \cat C
@@ -1087,13 +1090,13 @@ Indeed, using the coend formula for the left Kan extension we get:
 \[ (\text{Lan}_{\otimes} (F \bar{ \otimes } G)) c \cong \int^{\langle a, b\rangle} \cat C ( a \otimes b, c) \cdot (F \bar{ \otimes } G)\langle a, b\rangle\]
 
 \[ \cong \int^{\langle a, b\rangle} \cat C ( a \otimes b, c) \cdot (F a \times G  b) \]
-Since the two functors are $\Set$-valued, the co-power decays into the cartesian product:
+Since the two functors are $\Set$-valued, the copower decays into the cartesian product:
 \[ \cong \int^{\langle a, b\rangle} \cat C ( a \otimes b, c) \times F a \times G  b \]
 and reproduces the formula for Day convolution.
 
 \section{Useful Formulas}
 \begin{itemize}
-\item Co-power:
+\item Copower:
 \[ \cat C (A \cdot b, c) \cong \Set \big( A, \cat C (b, c)\big) \]
 \item Power:
 \[ \cat C (b, A \pitchfork c) \cong \Set  \big(A, \cat C(b, c)\big) \]
