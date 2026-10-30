@@ -525,9 +525,9 @@ To show this, let's check the wedge condition. Plugging in our profunctor, we ge
  \arrow[rd, "\pi_b"]
  \\
   \mathcal{C} ( F a, G a )
- \arrow[dr, "{(Ff \, \circ \, -)}"']
- && \mathcal{C} \langle F b, G b \rangle
- \arrow[dl, "{(- \, \circ\, Gf)}"]
+ \arrow[dr, "{(G f \, \circ \, -)}"']
+ && \mathcal{C} ( F b, G b )
+ \arrow[dl, "{(- \, \circ\, F f)}"]
  \\
  &  \mathcal{C} ( F a, G b )
  \end{tikzcd}
@@ -547,15 +547,15 @@ We can pick a single element of the set $\int_{x} \mathcal{C}(F x, G x)$ by inst
  \arrow[rd, "\pi_b"]
  \\
   \mathcal{C} ( F a, G a )
- \arrow[dr, "{(F f \, \circ \, -)}"']
+ \arrow[dr, "{(G f \, \circ \, -)}"']
  && \mathcal{C} ( F b, G b )
- \arrow[dl, "{(- \, \circ\, G f)}"]
+ \arrow[dl, "{(- \, \circ\, F f)}"]
  \\
  &  \mathcal{C} ( F a, G b )
  \end{tikzcd}
 \]
 We pick the component $\alpha_a$ from the hom-set $\mathcal{C} ( F a, G a )$ and the component $\alpha_b$ from $\mathcal{C} ( F b, G b )$. The wedge condition then boils down to:
-\[ F f \circ \alpha_a = \alpha_b \circ G f \]
+\[ G f \circ \alpha_a = \alpha_b \circ F f \]
 for any $f \colon a \to b$. This is exactly the naturality condition. So any element $\alpha$ of this end is automatically a natural transformation.
 
 The set of natural transformations, or the hom-set in the functor category, is thus given by the end:

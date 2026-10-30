@@ -556,12 +556,12 @@ toLensP (LensE from to) = dimap from to . alpha
 Because profunctor lenses are just functions, we can compose them as such:
 \begin{haskell}
 lens1 :: LensP s t x y 
--- p s t -> p x y
+-- p x y -> p s t
 lens2 :: LensP x y a b 
--- p x y -> p a b
+-- p a b -> p x y
 lens3 :: LensP s t a b 
--- p s t -> p a b
-lens3 = lens2 . lens1
+-- p a b -> p s t
+lens3 = lens1 . lens2
 \end{haskell}
 
 The converse mapping from a profunctor representation to the set/get representation of the lens is also possible. For that we need to guess the profunctor that we can feed into \hask{LensP}. It turns out that the get/set representation of the lens is such a profunctor, when we fix the pair of types \hask{a} and \hask{b}. We define:
@@ -705,9 +705,11 @@ To derive a profunctor representation for traversals, we should look more closel
 \[ c \bullet a = \sum_m c_m \times a^m \]
 These actions can be composed by expanding the formula using distributivity laws:
 \[ c \bullet (c' \bullet a) = \sum_m c_m \times (\sum_n c'_n \times a^n)^m \]
-If the target category is $\Set$, this is equivalent to the following Day convolution (for non-$\Set$ categories, one could use the enriched version of the Day convolution):
+If the target category is $\Set$, this is equivalent to the action of $c'$ substituted into $c$, the way we compose power series:
+\[ (c \circ c')_k = \sum_m c_m \times (c'^{\star m})_k \]
+Here $c'^{\star m}$ is the $m$-fold Day convolution of $c'$ with itself (for non-$\Set$ categories, one could use the enriched version of the Day convolution), where:
 \[ (c \star c')_k = \int^{m, n} \cat N (m + n, k) \times c_m \times c'_n \]
-This gives monoidal structure to the category $[\cat N, \cat C]$. 
+and $c'^{\star 0} = \cat N (0, -)$. Notice that the Day convolution alone multiplies the results, $(c \star c') \bullet a \cong (c \bullet a) \times (c' \bullet a)$, rather than composing the actions. Substitution gives monoidal structure to the category $[\cat N, \cat C]$. 
 
 The existential representation of traversals can be written is terms of the action of this monoidal category on $\cat C$:
 \[ \mathbf{Tr} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, c \bullet a) \times \cat C (c \bullet b, t) \]

@@ -141,8 +141,8 @@ This is the \hask{Comonad} instance for the continuous stream:
 \begin{haskell}
 instance Comonad Signal where
   extract (Sig f x) = f x
-  duplicate (Sig f x) = Sig (\y -> Sig f (x - y)) x
-  extend g (Sig f x) = Sig (\y -> g (Sig f (x - y))) x
+  duplicate (Sig f x) = Sig (\y -> Sig f y) x
+  extend g (Sig f x) = Sig (\y -> g (Sig f y)) x
 \end{haskell}
 Here, \hask{extend} convolves the filter 
 \begin{haskell}
