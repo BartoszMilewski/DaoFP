@@ -23,10 +23,10 @@ id x = x
 \end{haskell}
 You can easily convince yourself that such composition is associative, and composing with \hask{id} does nothing to a function.
 
-Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another one that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are example of what I call \index{stick-figure category}stick-figure categories---categories with a small handful of objects and arrows.
+Based on the definition of a category, we can come up with all kinds of weird categories. For instance, there is a category that has no objects and no arrows. It satisfies all the condition of a category vacuously. There's another one that contains a single object and a single arrow (can you guess what arrow it is?). There's one with two unconnected objects, and one where the two objects are connected by a single arrow (plus two identity arrows), and so on. These are examples of what I call \index{stick-figure category}stick-figure categories\footnote{after Grothendieck, who calls them ``dessins d'enfants.''}---categories with a small handful of objects and arrows.
 \subsection{Category of sets}
 
-We can also strip a category of all arrows (except for the identity arrows). Such a bare-object category is called a \index{discrete category}\emph{discrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
+We can also strip a category of all its arrows (except for the identity arrows). Such a bare-object category is called a \index{discrete category}\emph{discrete} category or a set\footnote{Ignoring ``size'' issues.}. Since we associate arrows with structure, a set is a category with no structure. 
 
 Sets form their own category called \index{Set, category of sets}$\mathbf{Set}$\footnote{Again, ignoring ``size'' issues, in particular the non-existence of the set of all sets.}. The objects in that category are sets, and the arrows are \index{function}functions between sets. Such functions are defined as special kind of relations, which themselves are defined as sets of pairs.
 
@@ -34,12 +34,12 @@ To the lowest approximation, we can model programming in the category of sets. W
 
 What category theory offers is more precision: the fine distinction between the structure that is absolutely necessary, and the superfluous details. 
 
-A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Our functions must have underlying algorithms because they have to be computable by some physical systems, be it computers or a human brains. There are many more set-theoretical functions than there are algorithms. And some algorithms (in Turing-complete languages) may run forever and never produce a result. 
+A set-theoretical function, for instance, doesn't fit the definition of a function we work with as programmers. Our functions must have underlying algorithms because they have to be computable by some physical systems, be it computers or human brains. There are many more set-theoretical functions than there are algorithms. And some algorithms (in Turing-complete languages) may run forever and never produce a result. 
 
 \subsection{Opposite categories}
 In programming, the focus is on the category of types and functions, but we can use this category as a starting point to construct other categories. 
  
-One such category is called the \emph{opposite} category. This is the category in which all the original arrows are inverted: what is called the source of an arrow in the original category is now called its target, and vice versa. 
+One such category is called the \index{opposite category}\emph{opposite} category. This is the category in which all the original arrows are inverted: what is called the source of an arrow in the original category is now called its target, and vice versa. 
 
 The opposite of a category $\mathcal{C}$ is called $\mathcal{C}^{op}$. We've had a glimpse of this category when we discussed duality. The objects of $\mathcal{C}^{op}$ are the same as those of $\mathcal{C}$. 
 
@@ -65,7 +65,7 @@ In a neatly organized universe, objects are always objects and arrows are always
 
 A slice category $\cat C/c$ describes how a particular object $c$ is seen from the perspective of its category $\cat C$. It's the totality of arrows pointing at $c$. But to specify an arrow we need to specify both of its ends. Since one of these ends is fixed to be $c$, we only have to specify the other.
 
-An object in the  \index{slice category}\emph{slice category} $\mathcal{C}/c$ (also known as an \index{over category}over-category) is a pair $\langle e, p \rangle$, with $p \colon e \to c$.  
+An object in the  \index{slice category}\emph{slice category} $\mathcal{C}/c$ (also known as the \index{over category}over-category) is a pair $\langle e, p \rangle$, with $p \colon e \to c$.  
 
 An arrow between two objects $\langle e, p \rangle$ and $\langle e', p' \rangle$ is an arrow $f \colon e \to e'$ of $\cat C$, which makes the following triangle commute:
 
@@ -83,7 +83,7 @@ An arrow between two objects $\langle e, p \rangle$ and $\langle e', p' \rangle$
 
 \subsection{Coslice categories}
 
-There is a dual notion of a \index{coslice category}coslice category $c / \mathcal{C}$, also known as an \index{under-category}under-category. It's a category of arrows emanating from a fixed object $c$. Objects in this category are pairs $\langle a, i \colon c \to a \rangle$. Morphisms in $c / \mathcal{C}$ are arrows that make the relevant  triangles commute.
+There is a dual notion of a \index{coslice category}coslice category $c / \mathcal{C}$, also known as an \index{under-category}under-category. It's a category of arrows emanating from a fixed object $c$. Objects in this category are pairs $\langle a, i \colon c \to a \rangle$. Morphisms in $c / \mathcal{C}$ are the arrows that make the relevant  triangles commute.
 \[
  \begin{tikzcd}
 & c
@@ -124,14 +124,14 @@ This is less obvious in the case of function objects. You can visualize a functi
 
 Even though it's not practical to memoize functions that take, say, natural numbers as arguments; we can still conceptualize them as (infinite, or even uncountable) lookup tables.
 
-If you can think of a data type as a container of values, it makes sense to apply a function to transform all these values, and create a transformed container. When this is possible, we say that the data type is \emph{functorial}. 
+If you can think of a data type as a container of values, you should be able to apply a function to transform all these values, and create a transformed container. When this is possible, we say that the data type is \emph{functorial}. 
 
 Again, function types require some more suspension of disbelief. You visualize a function object as a lookup table, keyed by some type. If you want to use another, related type as your key, you need a function that translates the new key to the original key. This is why functoriality of the function object has one of the arrows reversed:
 \begin{haskell}
 dimap :: (a' -> a) -> (b -> b') -> (a -> b) -> (a' -> b')
 dimap f g h = g . h . f
 \end{haskell}
-You are applying the transformation to a function \hask{h :: a -> b} that has a ``receptor'' that responds to values of type \hask{a}, and you want to use it to process input of type \hask{a'}. This is only possible if you have a converter from \hask{a'} to \hask{a}, namely \hask{f :: a' -> a}.
+You are applying the transformation to a function \hask{h :: a -> b} that has a ``receptor'' for the values of type \hask{a}, but you'd like to feed it the input of type \hask{a'}. This is only possible if you have a converter from \hask{a'} to \hask{a}, namely a function \hask{f :: a' -> a}.
 
 
 The idea of a data type ``containing'' values of another type can be also expressed by saying that one data type is paremeterized by another. For instance, the type \hask{List a} is parameterized by the type \hask{a}. 
@@ -266,14 +266,8 @@ instance Functor Maybe where
   fmap g (Just a) = Just (g a)
 \end{haskell}
 
-A functor must also satisfy some laws: it must preserve composition and identity. These laws cannot be expressed in Haskell, but should be checked by the programmer. We have previously seen a definition of \hask{badMap} that didn't satisfy the identity laws, yet it would be accepted by the compiler. It would define an ``unlawful'' instance of \hask{Functor} for the list type constructor \hask{[]}.
+A functor must also satisfy some laws: it must preserve composition and identity. These laws cannot be expressed in Haskell, but should be checked by the programmer. We have previously seen the definition of \hask{badMap} that didn't satisfy the identity laws, yet it would be accepted by the compiler. It would define an ``unlawful'' instance of \hask{Functor} for the list type constructor \hask{[]}.
 
-\begin{exercise}
-Show that \hask{WithInt} is a functor
-\begin{haskell}
-data WithInt a = WithInt a Int
-\end{haskell}
-\end{exercise}
 
 There are some elementary functors that might seem trivial, but they serve as building blocks for other functors. 
 
@@ -281,17 +275,23 @@ We have the identity endofunctor that maps all objects to themselves, and all ar
 \begin{haskell}
 newtype Identity a = Identity a
 \end{haskell}
-\begin{exercise}
-Show that \hask{Identity} is a \hask{Functor}. Hint: implement the \hask{Functor} instance for it.
-\end{exercise}
 
 
-We also have a constant functor $\Delta_c$ that maps all objects to a single object $c$, and all arrows to the identity arrow on this object. In Haskell, it's a family of functors parameterized by the target object \hask{c}:
+We also have a constant functor $\Delta_c$ that maps all objects to a single object $c$, and all arrows to the identity arrow on this object. In Haskell, it's a family of functors parameterized by the target type \hask{c}:
 \begin{haskell}
 data Constant c a = Constant c
 \end{haskell}
 This type constructor ignores its second argument.
 
+\begin{exercise}
+Show that \hask{WithInt} is a functor
+\begin{haskell}
+data WithInt a = WithInt a Int
+\end{haskell}
+\end{exercise}
+\begin{exercise}
+Show that \hask{Identity} is a \hask{Functor}. Hint: implement the \hask{Functor} instance for it.
+\end{exercise}
 
 \begin{exercise}
 Show that \hask{(Constant c)} is a \hask{Functor}. Hint: The type constructor takes two arguments, but in the \hask{Functor} instance it's partially applied to the first argument. It is functorial in the second argument.
@@ -328,7 +328,7 @@ data MoreThanA a b = More a (Maybe b)
 
 \subsection{Contravariant functors}
 
-Functors from the opposite category $\mathcal{C}^{op}$ are called \emph{contravariant}. They have the property of lifting arrows that go in the opposite direction. Regular functors are sometimes called \index{covariant functor}\emph{covariant}.
+Functors from the opposite category $\mathcal{C}^{op}$ are called \index{contravariant functor}\emph{contravariant}. They have the property of lifting arrows that go in the opposite direction. Regular functors are sometimes called \index{covariant functor}\emph{covariant}.
 
 In Haskell, contravariant functors form the typeclass \hask{Contravariant}:
 \begin{haskell}
@@ -350,7 +350,7 @@ instance Contravariant Predicate where
 
 In practice, the only non-trivial examples of contravariant functors are variations on the theme of function objects. 
 
-One way to tell if a given function type is covariant or contravariant in one of the type arguments is by assigning polarities to the types used in its definition. We say that the return type of a function is in a \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then its polarities get reversed. 
+One way to tell if a given function type is covariant or contravariant in one of the type arguments is by assigning \emph{polarities} to the types used in its definition. We say that the return type of a function is in the \emph{positive} position, so it's covariant; and the argument type is in the \emph{negative} position, so it's contravariant. But if you put the whole function object in the negative position of another function, then its polarities get reversed. 
 
 Consider this data type:
 \begin{haskell}
@@ -364,7 +364,7 @@ instance Functor Tester where
     where g' h = g (h . f)
 \end{haskell}
 
-Notice that parentheses are important here. A similar function \hask{a -> Bool -> Bool} has \hask{a} in a \emph{negative} position. That's because it's a function of \hask{a} returning a function \hask{(Bool -> Bool)}. Equivalently, you may uncurry it to get a function that takes a pair: \hask{(a, Bool) -> Bool}. Either way, \hask{a} ends up in the negative position.
+Notice that parentheses are important here. A similar function \hask{a -> Bool -> Bool} has \hask{a} in a \emph{negative} position. That's because it's a function of \hask{a} returning a function \hask{(Bool -> Bool)}. Equivalently, you may uncurry it to get a function that takes a pair: \hask{(a, Bool) -> Bool}. Either way, \hask{a} ends up in a negative position.
 
 \subsection{Profunctors}
 

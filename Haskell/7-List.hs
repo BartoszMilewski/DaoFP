@@ -46,6 +46,7 @@ badMap :: (a -> b) -> [a] -> [b]
 badMap f [] = []
 badMap f (a : as) = badMap f as
 
+test' :: [Integer]
 test' = badMap id [1, 2, 3]
 
 -- Exercises
@@ -64,4 +65,5 @@ second :: [a] -> Maybe a
 second [] = Nothing
 second (a : as) = h as
 
+test :: Maybe Integer
 test = third [1, 2, 3, 4]

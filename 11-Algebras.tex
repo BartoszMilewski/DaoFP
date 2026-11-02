@@ -451,9 +451,8 @@ where the last step uses the formula for the sum of the geometric series. Admitt
 
 \section{Initial Algebra from Universality}
 
-Another way of looking at the initial algebra, at least in $\mathbf{Set}$, is to view it as a collection of catamorphisms that, as a whole, hint at the existence of an underlying object. Instead of seeing $\mu F$ as a set of trees, we can look at it as a set of functions from algebras to their carriers. 
+Another way of looking at the initial algebra, at least in $\mathbf{Set}$, is to view it as a collection of catamorphisms that, as a whole, hint at the existence of an underlying object. Instead of seeing $\mu F$ as a set of trees, we can look at it as a set of functions from algebras to their carriers. It's called the \index{Church encoding}Church encoding of the initial algebra.
 
-In a way, this is just another manifestation of the Yoneda lemma: every data structure can be described either by mappings in or mappings out. The mappings in, in this case, are the constructors of the recursive data structure. The mappings out are all the catamorphisms that can be applied to it.
 
 First, let's make the polymorphism in the definition of \hask{cata} explicit and use pattern matching instead of \hask{unFix}:
 \begin{haskell}
@@ -463,7 +462,7 @@ cata alg (Fix x) = alg (fmap (cata alg) x)
 and then flip the arguments. We get:
 \begin{haskell}
 cata' :: Functor f => Fix f -> forall a. Algebra f a -> a
-cata' (Fix x) = \alg -> alg (fmap (flip cata' alg) x)
+cata' (Fix x) = \alg -> alg (fmap (flip' cata' alg) x)
 \end{haskell}
 The function \hask{flip'} reverses the order of arguments to a function:
 \begin{haskell}
@@ -632,7 +631,7 @@ The two copies of the tree have been identified in the colimit. You can convince
 
 We can  prove directly that $i = \text{Colim}\, \Gamma$ is the initial algebra. There is however one assumption that we have to make: the functor $F$ must preserve the colimits of $\omega$-chains. The colimit of $F \Gamma$ must be equal to $F i$.
 \[ \text{Colim} (F \Gamma) \cong F i \]
-Fortunately, this assumption holds in $\mathbf{Set}$\footnote{This is the consequence of the fact that colimits in $\Set$ are built from disjoint unions of sets.}. 
+Fortunately, this assumption holds in $\mathbf{Set}$ for all the functors we use in programming, the polynomial functors with finite arities\footnote{This is the consequence of the fact that, in $\Set$, colimits of $\omega$-chains commute with sums and finite products. It's not true for every functor: the powerset functor, for instance, has no initial algebra at all.}. 
 
 Here's the sketch of the proof: To show the isomorphism, we'll first construct an arrow $i \to F i$ and then an arrow $\iota \colon F i \to i$ in the opposite direction. We'll skip the proof that they are the inverse of each other. Then we'll show the universality of $(i, \iota)$ by constructing a catamorphism to an arbitrary algebra.
 

@@ -443,9 +443,20 @@ The strong version of the Yoneda lemma works with objects of $\mathcal V$ and us
 
 \section{Weighted Limits}
 
-Limits (and colimits) are built around commuting triangles, so they are not immediately translatable to the enriched setting. The problem is that cones are constructed from ``wires,'' that is individual morphisms. You may think of hom-sets as a thick bundle of wires, each wire having zero thickness. When constructing a cone, you are selecting a single wire from a given hom-set. We have to replace wires with something thicker.
+Recall that a limit was defined as a representing objects of a functor on the left hand side of the following isomorphism:
+\[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
+where $D \colon \cat J \to \cat C$ was the diagram functor. Let's see if we can generalize this definition to the enriched setting.
 
-Consider a diagram, that is a functor $D$ from the indexing category $\mathcal J$ to the target category $\mathcal C$. The wires for the cone with the apex $x$ are selected from hom-sets $\mathcal C(x, D j)$, where $j$ is an object of $\mathcal J$. 
+Let's assume that both $\cat J$ and $\cat C$ are categories enriched over $\cat V$. This makes $D$ a $\cat V$-enriched functor. The right hand side becomes the hom-object, and the left hand side becomes the object of natural transformations. 
+
+There is just one problem: What is the enriched analog of the constant functor? Its action on objects is simple: all objects in $\cat J$ are mapped to $x$. But how do we define its action on hom-objects? 
+
+An ordinary constant functor $\Delta_x$ maps all morphisms in $\cat J(a, b)$ to the identity morphism $id_x \in \cat C(x, x)$. In the enriched setting, though, $\cat C(x, x)$ is an object with no internal structure. Even if it happened to be the unit $I$, there's no guarantee that for every hom-object $\mathcal J(a, b)$ we could find an arrow to $I$; and even if there was one, it might not be unique. In other words, there is no reason to believe that $I$ is the terminal object in $\cat V$.
+
+
+Here's another perspective: Limits (and colimits) are built around commuting triangles. Cones are constructed from ``wires,'' that is, individual morphisms. You may think of a hom-set as a bundle of wires, each wire having zero thickness. 
+
+In particular, the wires for the cone with the apex $x$ are selected from the hom-sets $\mathcal C(x, D j)$, where $j$ is an object of $\mathcal J$. 
 
 \[
  \begin{tikzcd}
@@ -476,38 +487,46 @@ D j
 & D l
  \end{tikzcd}
  \]
-This selection of a $j$'th wire can be described as a function from the singleton set $1$:
+This selection of a $j$'th wire can be written as a function from the singleton set $1$:
 \[ \gamma_j \colon 1 \to \mathcal C(x, D j) \]
-We can try to gather these functions into a natural transformation:
+We can gather these functions into a natural transformation:
 \[ \gamma \colon \Delta_1 \to \mathcal C(x, D -) \]
-where $\Delta_1$ is a constant functor mapping all objects of $\mathcal J$ to the singleton set. Naturality conditions ensure that the triangles forming the sides of the cone commute. 
+where $\Delta_1 \colon \cat J \to \Set$ is a constant functor mapping all objects in $\cat J$ to the singleton set $1$. Naturality conditions ensure that the triangles forming the sides of the cone commute. 
 
-The set of all cones  with the apex $x$ is then given by the set of natural transformations:
+Thus the set of all cones  with the apex $x$ is given by the set of natural transformations:
 \[ [\mathcal J, \Set] (\Delta_1, \mathcal C(x, D-)) \]
+Earlier we have defined the same set of cones as:
+\[ [\cat J, \mathcal{C}](\Delta_x, D) \]
+We can now rewrite the definition of a limit using this new representation:
+\[ [\mathcal J, \Set] (\Delta_1, \mathcal C(x, D-))  \cong \mathcal{C}(x, \text{Lim}D) \]
 
-This reformulation gets us closer to the enriched setting, since it rephrases the problem in terms of hom-sets rather than individual morphisms. We could start by considering both $\mathcal J$ and $\mathcal C$ to be enriched over $\mathcal V$, in which case $D$ would be a $\mathcal V$-functor. 
 
-There is just one problem: how do we define a constant $\mathcal V$-functor $\Delta_x \colon \cat C \to \cat D$? Its action on objects is obvious:  it maps all objects in $\cat C$ to one object $x$ in $\cat D$. But what should it do to hom-objects? 
+This reformulation gets us closer to the enriched setting, since it rephrases the problem in terms of hom-sets rather than individual morphisms. We can re-interpret both $\mathcal J$ and $\mathcal C$ to be enriched over $\mathcal V$, in which case $D$ is a $\mathcal V$-functor. 
 
-An ordinary constant functor $\Delta_x$ maps all morphisms in $\cat C(a, b)$ to the identity in $id_x \in \cat D(x, x)$. In the enriched setting, though, $\cat D(x, x)$ is an object with no internal structure. Even if it happened to be the unit $I$, there's no guarantee that for every hom-object $\mathcal C(a, b)$ we could find an arrow to $I$; and even if there was one, it might not be unique. In other words, there is no reason to believe that $I$ is the terminal object.
+We still have a problem with the constant functor. We are looking for an enriched functor to replace $\Delta_1$. It turns out we can use any functor  $W \colon \cat J \to \cat V$ and call it a weight. Instead of selecting a singular wire, like $\Delta_1$ did, this functor ``smears the singularity''---it replaces the wire with a thicker ``cylinder.'' 
 
-The solution is to ``smear the singularity'': instead of using the constant functor to select a single wire, we should use some other ``weighting'' functor $W \colon \mathcal J\to \Set$ to select a thicker ``cylinder'' inside a hom-set. Such a weighted cone with the apex $x$ is an element of the set of natural transformations:
-\[ [\mathcal J, \Set] \left(W, \mathcal C(x, D-)\right) \]
+For $W$ to be an enriched functor, its target $\cat V$ has to be an enriched category---in this case self-enriched. $\cat V$ must therefore be a monoidal \emph{closed} category.
 
-A \emph{weighted limit}, also known as an \index{indexed limit}\emph{indexed limit}, $\text{lim}^W D$, is then defined as the universal weighted cone. It means that for any weighted cone with the apex $x$ there is a unique morphism from $x$ to $\text{lim}^W D$ that factorizes it. The factorization is guaranteed by the naturality of the isomorphism that defines the weighted limit:
-\[  \mathcal C(x, \text{lim}^W D) \cong [\mathcal J, \Set] (W, \mathcal C(x, D-)) \]
+It can be shown that the mapping that uses $W$ instead of $\Delta_1$:
+\[  H_W x = [\mathcal J, \cat V] (W, \mathcal C(x, D-)) \]
+is itself a $\cat V$-enriched contravariant functor $H_W \colon \cat C^{op} \to \cat V$. 
 
-The regular, non-weighted limit is often called a \index{limit, conical}\emph{conical} limit, and it corresponds to using the constant functor as the weight. 
+A \index{weighted limit}\emph{weighted limit}, also known as an \index{indexed limit}\emph{indexed limit}, $\text{Lim}^W D$, is defined as the representing object for this functor:
+\[  [\mathcal J, \cat V] (W, \mathcal C(x, D-)) \cong \cat C (x, \text{Lim}^W D ) \]
 
-This definition can be translated almost verbatim to the enriched setting by replacing $\Set$ with $\mathcal V$:
-\[  \mathcal C(x, \text{lim}^W D) \cong [\mathcal J, \mathcal V] (W, \mathcal C(x, D-)) \]
-Of course, the meaning of the symbols in this formula is changed. Both sides are now objects in $\mathcal V$. The left-hand side is the hom-object in $\mathcal C$, and the right-hand side is the object of natural transformations between two $\mathcal V$-functors.
+Both sides of this natural isomorphism are objects in $\mathcal V$. Tthe left-hand side is the object of natural transformations between two $\mathcal V$-functors, and the right-hand side is the hom-object in $\mathcal C$.
 
 Dually, a weighted colimit is defined by the natural isomorphism:
-\[  \mathcal C(\text{colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] (W, \mathcal C(D-, x)) \]
+\[   [\mathcal J^{op}, \mathcal V] (W, \mathcal C(D-, x))  \cong \mathcal C(\text{Colim}^W D, x) \]
 Here, the colimit is weighed by a functor $W \colon \mathcal J^{op} \to \mathcal V$ from the opposite category.
 
 Weighted (co-)limits, both in ordinary and in enriched categories, play a fundamental role: they can be used to re-formulate a lot of familiar constructions, like (co-)ends, Kan extensions, etc. 
+
+\begin{exercise}
+Show that naturality conditions for the following transformation:
+\[ \gamma \colon \Delta_1 \to \mathcal C(x, D -) \]
+correspond to commutation condition for the sides of the cone defined by $D$.
+\end{exercise}
 
 \section{Ends as Weighted Limits}
 
@@ -520,10 +539,10 @@ We'll use this functor as a diagram in $\cat D$.
 At this point mathematicians start worrying about size issues. After all we are embedding a whole category---squared---as a single diagram in $\cat D$. To avoid the size problems, we'll just assume that $\cat C$ is small; that is, its objects form a set. 
 
 We want to take a weighted limit of the diagram defined by $P$. The weight must be a $\mathcal V$-functor $\mathcal C^{op} \otimes \mathcal C \to \cat V$. There is one such functor that's always at our disposal, the hom-functor $\text{Hom}_{\cat C}$. We will use it to define the end as a weighted limit:
-\[  \int_c P\langle c, c\rangle = \text{lim}^{\text{Hom}} P\]
+\[  \int_c P\langle c, c\rangle = \text{Lim}^{\text{Hom}} P\]
 
 First, let's convince ourselves that this formula works in an ordinary ($\Set$-enriched) category. Since ends are defined by their mapping-in property, let's consider a mapping from an arbitrary object $d$ to the weighted limit and use the standard \index{Yoneda trick}Yoneda trick to show the isomorphism. By definition, we have:
-\[ \cat D(d, \text{lim}^{\text{Hom}} P) \cong [\cat C^{op} \times \cat C, \Set](\cat C(-, =), \cat D (d, P(-, =))\]
+\[ \cat D(d, \text{Lim}^{\text{Hom}} P) \cong [\cat C^{op} \times \cat C, \Set](\cat C(-, =), \cat D (d, P(-, =))\]
 We can rewrite the set of natural transformations as an end over pairs of objects $\langle c, c' \rangle$:
 \[ \int_{\langle c, c' \rangle} \Set(\cat C(c, c'), \cat D (d, P\langle c, c' \rangle)) \]
 Using the Fubini theorem, this is equivalent to the iterated end:
@@ -531,11 +550,11 @@ Using the Fubini theorem, this is equivalent to the iterated end:
 We can now apply the ninja-Yoneda lemma to perform the integration over $c'$. The result is:
 \[ \int_c \cat D(d, P\langle c, c \rangle) \cong \cat D(d, \int_c P \langle c, c \rangle) \]
 where we used continuity to push the end under the hom-functor. Since $d$ was arbitrary, we conclude that, for ordinary categories:
-\[ \text{lim}^{\text{Hom}} P \cong  \int_c P\langle c, c\rangle \]
+\[ \text{Lim}^{\text{Hom}} P \cong  \int_c P\langle c, c\rangle \]
 This justifies our use of the weighed limit to define the end in the enriched case.
 
 An analogous formula works for the coend, except that we use the colimit with the hom-functor in the opposite category $\text{Hom}_{\cat C^{op}}$ as the weight:
-\[  \int^c P\langle c, c\rangle = \text{colim}^{\text{Hom}_{\cat C^{op}}} P\]
+\[  \int^c P\langle c, c\rangle = \text{Colim}^{\text{Hom}_{\cat C^{op}}} P\]
 
 \begin{exercise}
 Show that for ordinary $\Set$-enriched categories the weighted colimit definition of a coend reproduces the earlier definition. Hint: use the mapping out property of the coend.
@@ -543,8 +562,8 @@ Show that for ordinary $\Set$-enriched categories the weighted colimit definitio
 
 \begin{exercise}
 Show that, as long as both sides exist, the following identities hold in ordinary ($\Set$-enriched) categories (they can be generalized to the enriched setting):
-\[ \text{lim}^W D \cong \int_{j \colon \cat J} W j \pitchfork D j \]
-\[ \text{colim}^W D \cong \int^{j \colon \cat J} W j \cdot D j \]
+\[ \text{Lim}^W D \cong \int_{j \colon \cat J} W j \pitchfork D j \]
+\[ \text{Colim}^W D \cong \int^{j \colon \cat J} W j \cdot D j \]
 Hint: Use the mapping in/out with the \index{Yoneda trick}Yoneda trick and the definition of power and copower.
 \end{exercise}
 
@@ -569,15 +588,15 @@ to get:
 This can be written as a set of natural transformation:
 \[ [\cat C, \Set] \big(\cat B(e, P-), \cat D(d, F-)\big) \]
 The weighted limit is also defined through the set of natural transformations:
-\[  \mathcal D(d, \text{lim}^W F) \cong [\mathcal C, \Set] \big(W, \mathcal D(d, F-)\big) \]
+\[  \mathcal D(d, \text{Lim}^W F) \cong [\mathcal C, \Set] \big(W, \mathcal D(d, F-)\big) \]
 leading us to the final result:
-\[ \cat D(d, \text{lim}^{\cat B (e, P-)} F) \]
+\[ \cat D(d, \text{Lim}^{\cat B (e, P-)} F) \]
 Since $d$ was arbitrary, we can use the \index{Yoneda trick}Yoneda trick to conclude that:
-\[ (\text{Ran}_P F) e = \text{lim}^{\cat B(e, P-)} F  \]
+\[ (\text{Ran}_P F) e = \text{Lim}^{\cat B(e, P-)} F  \]
 This formula becomes the definition of the right Kan extension in the enriched setting.
 
 Similarly, the left Kan extension can be defined as a weighted colimit:
-\[ (\text{Lan}_P F) e = \text{colim}^{\cat B(P-, e)} F \]
+\[ (\text{Lan}_P F) e = \text{Colim}^{\cat B(P-, e)} F \]
 
 \begin{exercise}
 Derive the formula for the left Kan extension for ordinary categories.
@@ -588,13 +607,13 @@ Derive the formula for the left Kan extension for ordinary categories.
 \item Yoneda lemma:
 \[ \int_x [\mathcal C( c, x), F x] \cong F c \]
 \item Weighted limit:
-\[  \mathcal C(x, \text{lim}^W D) \cong [\mathcal J, \mathcal V] \big(W, \mathcal C(x, D-)\big) \]
+\[  \mathcal C(x, \text{Lim}^W D) \cong [\mathcal J, \mathcal V] \big(W, \mathcal C(x, D-)\big) \]
 \item Weighted colimit:
-\[  \mathcal C(\text{colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] \big(W, \mathcal C(D-, x)\big) \]
+\[  \mathcal C(\text{Colim}^W D, x) \cong [\mathcal J^{op}, \mathcal V] \big(W, \mathcal C(D-, x)\big) \]
 \item Right Kan extension:
-\[ (\text{Ran}_P F) e = \text{lim}^{\cat B(e, P-)} F  \]
+\[ (\text{Ran}_P F) e = \text{Lim}^{\cat B(e, P-)} F  \]
 \item Left Kan extension:
-\[ (\text{Lan}_P F) e = \text{colim}^{\cat B(P-, e)} F \]
+\[ (\text{Lan}_P F) e = \text{Colim}^{\cat B(P-, e)} F \]
 \end{itemize}
 
 \end{document}

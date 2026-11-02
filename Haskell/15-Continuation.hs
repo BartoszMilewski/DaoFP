@@ -11,6 +11,7 @@ instance Applicative (Cont r) where
     pure a = Cont (\k -> k a)
     (<*>) = ap
 
+sum2 :: [Integer] -> Integer
 sum2 = go 0 
   where go n [] = n
         go n (i : is) = go (n + i) is
@@ -20,7 +21,9 @@ data Tree = Leaf String
 
 tree :: Tree
 tree = Node (Leaf "leaf ") "root " (Node (Leaf "l1 ") "right " (Leaf "l2 "))
+
 show1 :: Tree -> String
+show1 (Leaf s) = s
 show1 (Node lft s rgt) =
   let ls = show1 lft
       rs = show1 rgt

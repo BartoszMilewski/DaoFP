@@ -1,6 +1,5 @@
 import Data.Kind (Type)
 import Prelude hiding (reverse)
-import GHC.CmmToAsm.AArch64.Instr (x0)
 
 data Natural' :: (Type -> Type) -> (Type -> Type) -> Type where
   Natural' :: (forall a. f a -> g a) -> Natural' f g
@@ -51,6 +50,7 @@ beta = undefined
 beta_alpha :: forall x. G (F x) -> G' (F' x)
 beta_alpha = beta . fmap alpha
 
+beta_alpha' :: forall x. G (F x) -> G' (F' x)
 beta_alpha' = fmap alpha . beta
 
 -- Whiskering

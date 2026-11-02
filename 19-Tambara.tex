@@ -74,7 +74,7 @@ Such functions are called \index{equivariant function}\emph{equivariant}. We oft
 
 \subsection{Cayley's theorem}
 
-In group theory, Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element $g$ has an inverse $g^{-1}$. Permutations are bijective functions that map a set to itself. They \emph{permute} the elements of a set.
+In group theory, \index{Cayley's theorem}Cayley's theorem states that every group is isomorphic to a (subgroup of the) group of permutations. A \index{group}\emph{group} is just a monoid in which every element $g$ has an inverse $g^{-1}$. Permutations are bijective functions that map a set to itself. They \emph{permute} the elements of a set.
 
 In category theory, Cayley's theorem is practically built into the definition of a monoid and its representations. 
 
@@ -556,12 +556,12 @@ toLensP (LensE from to) = dimap from to . alpha
 Because profunctor lenses are just functions, we can compose them as such:
 \begin{haskell}
 lens1 :: LensP s t x y 
--- p s t -> p x y
+-- p x y -> p s t
 lens2 :: LensP x y a b 
--- p x y -> p a b
+-- p a b -> p x y
 lens3 :: LensP s t a b 
--- p s t -> p a b
-lens3 = lens2 . lens1
+-- p a b -> p s t
+lens3 = lens1 . lens2
 \end{haskell}
 
 The converse mapping from a profunctor representation to the set/get representation of the lens is also possible. For that we need to guess the profunctor that we can feed into \hask{LensP}. It turns out that the get/set representation of the lens is such a profunctor, when we fix the pair of types \hask{a} and \hask{b}. We define:
@@ -594,7 +594,7 @@ You can easily convince yourself that all coherency laws translate directly to t
 
 \subsection{Prisms}
 
-From the programming point of view there are two obvious monoidal structures to explore: the product and the sum. We've seen that the product gives rise to lenses. The sum, or the coproduct, gives rise to prisms. 
+From the programming point of view there are two obvious monoidal structures to explore: the product and the sum. We've seen that the product gives rise to lenses. The sum, or the coproduct, gives rise to \index{prism}prisms. 
 
 We get the existential representation simply by replacing the product by the sum in the definition of a lens:
 \[ \mathcal{P}\langle s, t\rangle \langle a, b \rangle = \int^{c} \mathcal{C}(s, c + a) \times  \mathcal{C}(c + b, t) \]
@@ -659,7 +659,7 @@ toPrismP (Prism from to) = dimap from to . alpha'
 
 Again, profunctor prisms compose using function composition.
 \subsection{Traversals}
-A traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list that delivers the replacements must match the number of nodes, otherwise bad things happen. 
+A \index{traversal}traversal is a type of optic that focuses on multiple foci at once. Imagine, for instance, that you have a tree that can have zero or more leaves of type \hask{a}. A traversal should be able to get you a list of those nodes. It should also let you replace these nodes with a new list. And here's the problem: the length of the list that delivers the replacements must match the number of nodes, otherwise bad things happen. 
 
 A type-safe implementation of a traversal would require us to keep track of the sizes of lists. In other words, it would require dependent types.
 
@@ -705,9 +705,11 @@ To derive a profunctor representation for traversals, we should look more closel
 \[ c \bullet a = \sum_m c_m \times a^m \]
 These actions can be composed by expanding the formula using distributivity laws:
 \[ c \bullet (c' \bullet a) = \sum_m c_m \times (\sum_n c'_n \times a^n)^m \]
-If the target category is $\Set$, this is equivalent to the following Day convolution (for non-$\Set$ categories, one could use the enriched version of the Day convolution):
+If the target category is $\Set$, this is equivalent to the action of $c'$ substituted into $c$, the way we compose power series:
+\[ (c \circ c')_k = \sum_m c_m \times (c'^{\star m})_k \]
+Here $c'^{\star m}$ is the $m$-fold Day convolution of $c'$ with itself (for non-$\Set$ categories, one could use the enriched version of the Day convolution), where:
 \[ (c \star c')_k = \int^{m, n} \cat N (m + n, k) \times c_m \times c'_n \]
-This gives monoidal structure to the category $[\cat N, \cat C]$. 
+and $c'^{\star 0} = \cat N (0, -)$. Notice that the Day convolution alone multiplies the results, $(c \star c') \bullet a \cong (c \bullet a) \times (c' \bullet a)$, rather than composing the actions. Substitution gives monoidal structure to the category $[\cat N, \cat C]$. 
 
 The existential representation of traversals can be written is terms of the action of this monoidal category on $\cat C$:
 \[ \mathbf{Tr} \langle s, t\rangle \langle a, b \rangle = \int^{c \colon [\cat N, \cat C]} \cat C (s, c \bullet a) \times \cat C (c \bullet b, t) \]

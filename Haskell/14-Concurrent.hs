@@ -1,7 +1,6 @@
 {-# language ApplicativeDo #-}
 import Control.Concurrent.Async
     ( Concurrently(Concurrently, runConcurrently) )
-import Control.Applicative
 -- To install parallel libraries:
 -- cabal install --lib parallel
 -- compile with:

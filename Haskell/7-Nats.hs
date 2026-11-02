@@ -1,3 +1,5 @@
+import Prelude hiding (init)
+
 data Nat where
   Z :: Nat
   S :: Nat -> Nat
@@ -15,6 +17,10 @@ rec init step = \n ->
     Z     -> init
     (S m) -> step (rec init step m)
 
+plus0 :: Nat -> Nat -> Nat
+plus0 Z n = n
+plus0 (S n) m = S (plus0 n m)
+
 plus :: Nat -> Nat -> Nat
 plus n = rec init step
   where
@@ -24,7 +30,7 @@ plus n = rec init step
 plus' :: Nat -> Nat -> Nat
 plus' n m = case m of
   Z -> n
-  (S k) -> S (plus' k n)
+  (S k) -> S (plus' n k)
 
 -- Exercises
 

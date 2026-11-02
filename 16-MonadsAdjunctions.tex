@@ -764,15 +764,19 @@ Reading the left diagram bottom-to-top produces a series of mappings:
 \[  Id_{\mathcal{D}} \circ R \xrightarrow{\eta \circ R} R \circ L \circ R \xrightarrow{R \circ \varepsilon} R \circ Id_{\mathcal{C}}  \]
 This must be equal to the right-hand-side, which may be interpreted as the (invisible) identity natural transformation on $R$
 
-In the case when $R$ is an endofunctor, we can translate the first diagram directly to Haskell. The whiskering of the unit of the adjunction $\eta$ by $R$ results in the polymorphic function \hask{unit} being instantiated at \hask{R x}. The whiskering of $\varepsilon$ results in the lifting of \hask{counit} by the functor $R$. The vertical composition translates to function composition:
+In the case when $R$ is an endofunctor, we can translate the first diagram directly to Haskell. The whiskering of the unit of the adjunction $\eta$ by $R$ results in the polymorphic function \hask{unit} being instantiated at \hask{right x}. The whiskering of $\varepsilon$ results in the lifting of \hask{counit} by the functor \hask{right}. The vertical composition translates to function composition:
 \begin{haskell}
-triangle :: forall x. R x -> R x
+triangle :: Adjunction left right => forall x. right x -> right x
 triangle = fmap counit . unit
 \end{haskell}
 
 \begin{exercise}
-Draw the string diagrams for the second triangle identity and translate them to Haskell.
+Draw string diagrams for the second triangle identity and translate them to Haskell.
 \end{exercise}
+
+\subsection{Universal arrows}
+
+
 
 \section{Monads from Adjunctions}
 
@@ -1040,7 +1044,7 @@ Here it is translated to Haskell:
 mu :: R s (L s (R s (L s a))) -> R s (L s a)
 mu = fmap counit
 \end{haskell}
-Whiskering on the right doesn't do anything other than select a component of the natural transformation. This is done automatically by Haskell's type inference engine. Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap}---here, it's equivalent to precomposition.
+Whiskering on the right doesn't do anything other than select a component of the natural transformation. This is done automatically by Haskell's type inference engine. Whiskering on the left is done by lifting the component of the natural transformation. Again, type inference picks the correct implementation of \hask{fmap}---here, it's equivalent to postcomposition.
 
 Compare this with the implementation of \hask{join}:
 \begin{haskell}
@@ -1481,7 +1485,7 @@ where \hask{mma} is of the nested type \hask{Ex (Ex Char)}.
 
 In category theory these two conditions define a monad algebra. 
 
-We say that $(a, \alpha \colon T a \to a)$ is a \emph{monad algebra} for the monad $(T, \mu, \eta)$ if the following diagrams commute:
+We say that $(a, \alpha \colon T a \to a)$ is a \index{monad algebra}\emph{monad algebra} for the monad $(T, \mu, \eta)$ if the following diagrams commute:
 \[
  \begin{tikzcd}
  a
@@ -1591,12 +1595,12 @@ On arrows, it lifts an arrow $f \colon a \to b$ using $T$. The fact that the arr
  T (T a)
  \arrow[r, "T( T f)"]
  \arrow[d, "\mu_a"]
- & T (T B)
+ & T (T b)
 \arrow[d, "\mu_b"]
  \\
  T a
  \arrow[r, "T f"]
- & T B
+ & T b
   \end{tikzcd}
 \]
 
@@ -1604,7 +1608,7 @@ Finally, we have to show that the unit and the counit of the monad $U^T \circ F^
 
 The units are the same by construction.
 
-The monad multiplication of $U^T \circ F^T$ is given by the whiskering $U^T \circ \varepsilon \circ F^T$ of the unit of the adjunction. In components, this means instantiating $\varepsilon$ at $(T a, \mu_a)$, which gives us $\mu_a$ (the action of $U^T$ on arrows is trivial). This is indeed the original monad multiplication.
+The monad multiplication of $U^T \circ F^T$ is given by the whiskering $U^T \circ \varepsilon \circ F^T$ of the counit of the adjunction. In components, this means instantiating $\varepsilon$ at $(T a, \mu_a)$, which gives us $\mu_a$ (the action of $U^T$ on arrows is trivial). This is indeed the original monad multiplication.
 
 We have thus shown that, for any monad $T$ we can define the Eilenberg-Moore category and a pair of adjoint functors that factorize this monad.
 

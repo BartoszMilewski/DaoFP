@@ -28,7 +28,9 @@ There may be more than one arrow between two types, so we need to name them. For
 
 One way to interpret this is to say that the function $ f$ takes an argument of type $a$ and produces a result of type $b$. Or that $ f$ is a proof that if $a$ is true then $b$ is also true.
 
-Note: The connection between type theory, lambda calculus (which is the foundation of programming), logic, and category theory is known as the Curry-Howard-Lambek correspondence.
+
+
+Note: The connection between type theory, lambda calculus (which is the foundation of programming), logic, and category theory is known as the Curry-Howard-Lambek correspondence or \emph{propositions as types}.
 
 \section{Yin and Yang}
 
@@ -55,15 +57,15 @@ The initial object is the source of everything. As a type it's known in Haskell 
  \end{tikzcd}
 \]
 
-Thus \hask{Void} begets \hask{Void} and everything else.
+As Nietzsche would say, ``The void stares back at you.''
 
-The terminal object unites everything. As a type it's known as Unit. It symbolizes the ultimate order.
+The terminal object unites everything. As a type it's known as Unit.
 
 In logic, the terminal object signifies the ultimate truth, symbolized by $T$ or $ \top$. The fact that there's an arrow to it from any object means that $ \top$ is true no matter what your assumptions are. 
 
 Dually, the initial object signifies logical falsehood, contradiction, or a counterfactual. It's written as  False and symbolized by an upside down T, $ \bot$. The fact that there is an arrow from it to any object means that you can prove anything starting from false premises. 
 
-In English, there is a special grammatical construct for counterfactual implications. When we say, ``If wishes were horses, beggars would ride,'' we mean that the equality between wishes and horses implies that beggars be able to ride. But we know that the premise is false.
+In English, there is a special grammatical construct for counterfactual implications. When we say, ``If wishes were horses, beggars would ride,'' we mean that the equality between wishes and horses implies that beggars should be able to ride. But we know that the premise is false.
 
 A programming language lets us communicate with each other and with computers. Some languages are easier for the computer to understand, others are closer to the theory. We will use Haskell as a compromise.
 
@@ -81,7 +83,6 @@ function & morphism (arrow) & implication \\
 \hask{Void} & initial object, $0$ & False $\bot$ \\
 \hask{()} & terminal object, $1$ & True $\top$ \\
 \hline
-
 \end{tabular}
 \end{center}
 
@@ -101,7 +102,7 @@ In category theory we say that $ x$ is a \emph{global element} of $a$ if it's an
 
 \[ 1 \xrightarrow x a \]
 
-We'll often simply call it an element (omitting ``global'').
+We'll often simply call it an element (omitting ``global''). The terminal object is the archetypal element. Mathematicians often call such archetypes \emph{walking} things\footnote{It is said that this expression comes from calling somebody a ``walking eyebrows,'' when they have no other redeeming qualities, other than big eyebrows.}. Here, $1$ would be a ``walking element.'' 
 
 In type theory, $ x \colon A$ means that $x$ is of type $A$.
 
@@ -119,7 +120,61 @@ Since we have mandated there be no arrows from any other object to \hask{Void}, 
 
 The terminal object has just one element, since there is a unique arrow coming from it to itself, $ 1 \to 1$. This is why we sometimes call it a singleton. 
 
-Note: In category theory there is no prohibition against the initial object having incoming arrows from other objects. However, in cartesian closed categories that we're studying here, this is not allowed.
+Note: In category theory there is no prohibition against the initial object having incoming arrows as well. However, in cartesian closed categories that we're studying here, this is not allowed.
+
+\subsection{The Foundations}
+
+Programming is engineering and as such it necessarily involves some mathematics. But unlike other branches of engineering, it can actually be used to encode mathematics from first principles. But where does mathematics start?
+
+There is no consensus among mathematicians about what constitutes the foundations of mathematics. The interpretation of programs as mathematical objects depends on this choice.
+
+The traditional approach is to start with set theory. Types are interpreted as sets of elements. The declaration \hask{x :: A} can be interpreted in set-theoretical language as ``$x$ is an element of the set $A$'':
+\[x \in A\]
+The problem with this interpretation is that it introduces spurious degrees of freedom. In set theory, $x \in A$ is a predicate, which can be true or false. In programming, this would allow us to write nonsensical code, like:
+\begin{haskell} 
+if x :: A then ...
+\end{haskell}
+
+The alternative foundation of mathematics is based on \index{Martin-Löf}Martin-Löf type theory. In it, 
+\[x \colon A \] 
+is a \index{judgment}\emph{judgment} -- a statement of fact. You cannot define a value without specifying its type, and the type is permanently affixed to it. 
+
+There are rules for building new types, and rules for constructing values of these types. 
+
+Let's see how they work for the two types we've introduced so far.
+
+The set-theoretical interpretation of \hask{Void} is an empty set denoted by $\emptyset$. The interpretation of the unit type \hask{()} is a singleton set $1$. 
+
+In type theory we postulate the existence of the corresponding types $\mathbb 0$ and $\mathbb 1$. 
+
+To make sure that the type $\mathbb 0$ is not inhabited, we provide no rule for constructing values of this type. It has no data constructor or, as it's called in type theory, no \index{introduction rule}\emph{introduction rule}. 
+
+But if that wasn't enough, we also provide an impossible to satisfy elimination rule. The \index{elimination rule}\emph{elimination rule} tells us what we can do with an input of the type in question. Since we are guaranteed that nobody can create an element of $\mathbb 0$, we are free to promise \emph{anything} if somebody comes up with one (they can't!). Give me an element $x \colon \mathbb 0$ and I'll give you back any value of any type. In category theory, this corresponds to the arrow $\mbox{!`}$ we've seen before. 
+
+The $\mathbb 1$ type has a single data constructor, corresponding to the Haskell value \hask{()}, which in type theory is often depicted as $\star$. The introduction rule is simply:
+\[\star \colon \mathbb 1\]
+The construction of $\star$ requires no assumptions. It can be created by fiat whenever the need arises. 
+
+The elimination rule states that any function $\mathbb 1 \to A$ is fully determined by its value at $\star$. In category theory this is the definition of the global element of $A$. It makes perfect sense if $\star$ is the only element of $\mathbb 1$. 
+
+Another way of stating that $\mathbb 1$ has only one element is to say that any two elements of $\mathbb 1$ must be equal. In type theory we say that $\mathbb 1$ is \index{contractible}\emph{contractible}.
+
+\begin{center}
+\begin{tabular} {|c | c | c | c | c |}
+\hline
+Programming & Category theory & Logic & Set Theory & Type Theory \\
+\hline
+type & object & proposition & set & Type \\
+function & morphism (arrow) & implication & function & function\\
+\hask{Void} & initial object, $0$ & False $\bot$ & empty, $\emptyset$ & $\mathbb 0$\\
+\hask{()} & terminal object, $1$ & True $\top$ & singleton, 1 & $\mathbb 1$ \\
+\hline
+\end{tabular}
+\end{center}
+
+Type theory and category theory are the product of highly refined abstractions. Since every level of abstraction strips a layer of intuition, the final product is sometimes called abstract nonsense. The only way to navigate such vast halls of abstraction is to keep in mind where those abstractions come from, or how they can be modeled in more familiar surroundings, be it computer programs, logic, or set theory. When studying an elephant, it makes sense to occasionally focus on its trunk, legs, or ears, 
+
+Learning category theory is a little like reading a novel that has many hidden layers of meaning.
 
 \section{The Object of Arrows}
 
@@ -133,9 +188,9 @@ meaning that \hask{f} is of the type ``function from \hask{a} to \hask{b}''. Her
 
 If we want function types to be treated the same way as other types, we need an \emph{object} that would represent a set of arrows from \hask{a} to \hask{b}.
 
-To fully define this object, we would have to describe its relation to other objects, in particular to \hask{a} and \hask{b}. We don't have the tools to do that yet, but we'll get there. 
+To fully define this object, we would have to describe its relation to other objects, in particular to \hask{a} and \hask{b}. We don't have the tools to do that yet, but we'll get there eventually. 
 
-For now, let's keep in mind the following distinction: On the one hand we have arrows which connect two objects \hask{a} and \hask{b}. These arrows form a set. On the other hand we have an \emph{object of arrows} from  \hask{a} to \hask{b}. An ``element'' of this object is defined as an arrow from the terminal object \hask{()} to the object we call \hask{a->b}. 
+For now, let's keep in mind the following distinction: On the one hand we have arrows which connect two objects \hask{a} and \hask{b}. These arrows form a set. On the other hand we have an \emph{object of arrows} from  \hask{a} to \hask{b}. A \emph{global element} of this object is defined as an arrow from the terminal object \hask{()} to the object we call \hask{a->b}. 
 
 The notation we use in programming tends to blur this distinction. This is why in category theory we call the object of arrows an \emph{exponential} and write it as $ b^a$ (the source object is in the exponent). So the statement:
 \begin{haskell}

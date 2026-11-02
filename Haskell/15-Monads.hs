@@ -1,5 +1,4 @@
 import Prelude hiding (Monad, (>>=), return, Applicative, pure, (<*>))
-import GHC.Core.Coercion.Axiom (fsFromRole)
 
 class Functor f => Applicative f where
   pure  :: a -> f a
@@ -44,6 +43,25 @@ instance Monad (Reader e) where
 instance Applicative (Reader e) where
     pure a = Reader (const a)
     (<*>) = ap
+
+-- Exercise
+newtype E e a = E { runE :: e -> Maybe a }
+
+-- use the fact that Maybe is a functor
+
+instance Functor (E e) where
+  fmap f (E ema) = E (fmap f . ema)
+
+instance Monad (E a) where
+  ea >>= k = E (\e -> 
+    case runE ea e of
+      Nothing -> Nothing
+      Just a  -> runE (k a) e
+    )
+
+instance Applicative (E e) where
+  pure a = E (\e -> Just a)
+  (<*>) = ap
 
 newtype State s a = State { runState :: s -> (a, s) }
     deriving Functor

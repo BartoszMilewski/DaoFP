@@ -188,14 +188,12 @@ This is a diagram that shows a pair of categories, two functors between them, an
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
-  \arrow[bend left=50]{r}[name=U, label=above:$F$]{}
-  \arrow[bend right=50]{r}[name=D, label=below:$G$]{} 
- &
+  \arrow[bend left=50, r, "F", ""{name=U, below}]
+  \arrow[bend right=50, r, "G"', ""{name=D, above}]
+&
 \mathcal{D}
-  \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U) -- node[label=left:$\alpha$] {} (D)}]{}
-\end{tikzcd}
-\]
-
+\arrow[Rightarrow, from=U, to=D, "\alpha", shorten <=5pt, shorten >=5pt]
+\end{tikzcd}\]
 
 Since for every arrow in $\mathcal{C}$ there is a corresponding naturality square, we can say that a natural transformation maps objects to arrows, and arrows to commuting squares.
 
@@ -300,24 +298,23 @@ Indeed, suppose that we have a natural transformation $\alpha$ between two funct
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
-  \arrow[bend left=60]{rr}[name=U, label=above:$F$]{}
-  \arrow[]{rr}[name=M, label={[xshift=15pt, yshift=-5pt]:$G$}]{} 
-  \arrow[bend right=60]{rr}[name=D, label=below:$H$]{} 
- &&
+  \arrow[bend left=60, rr, "F", ""{name=U, below}]
+  \arrow[rr, "G"{xshift=-12pt}, ""{name=Mbot, below}, ""{name=Mtop, above}]
+  \arrow[bend right=60, rr, "H"', ""{name=D, above}]
+&&
 \mathcal{D}
-  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(U) -- node[label=left:$\alpha$] {} (M)}]{}
-  \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(M) -- node[label=left:$\beta$] {} (D)}]{}
+  \arrow[Rightarrow, from=U, to=Mbot, "\alpha", shorten >=5pt]
+  \arrow[Rightarrow, from=Mtop, to=D, "\beta", shorten <=5pt]
 \end{tikzcd}
 \]
 
-
-Let's look at the components of these transformations at some object $x$
+Let's look at the components of these transformations at some object $x$ in $\cat C$:
 \[ \alpha_x \colon F \, x \to G \, x \]
 \[ \beta_x \colon G \, x \to H \, x \]
 These are just two arrows in $\mathcal{D}$ that are composable. So we can define a composite natural transformation $\gamma$ as follows:
 \[ \gamma \colon F \to H\]
 \[ \gamma_x = \beta_x \circ \alpha_x \]
- This is called the \emph{vertical composition} of natural transformations. You'll see it written using a dot $\gamma = \beta \cdot \alpha$ or a simple juxtaposition $\gamma = \beta \alpha$.
+ This is called the \index{vertical composition}\emph{vertical composition} of natural transformations. You'll see it written using a dot $\gamma = \beta \cdot \alpha$ or a simple juxtaposition $\gamma = \beta \alpha$.
  
 Naturality condition for $\gamma$ can be shown by pasting together (vertically) two naturality squares for $\alpha$ and $\beta$:
 \[
@@ -405,7 +402,7 @@ Pictorially:
   \arrow[shorten <=10pt,shorten >=10pt,Rightarrow,to path={(U1) -- node[label=left:$\beta$] {} (D1)}]{}
 \end{tikzcd}
 \]
-The \emph{horizontal composition} $\beta \circ \alpha$ maps $G \circ F$ to $G' \circ F'$.
+The \index{horizontal composition}\emph{horizontal composition} $\beta \circ \alpha$ maps $G \circ F$ to $G' \circ F'$.
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
@@ -421,13 +418,13 @@ The \emph{horizontal composition} $\beta \circ \alpha$ maps $G \circ F$ to $G' \
 Let's pick an object $x$ in $\mathcal{C}$ and try to define the component of the composite $(\beta \circ \alpha)$ at $x$. It should be a morphism in $\cat E$:
 \[ (\beta \circ \alpha)_x \colon G ( F x) \to G' ( F' x) \]
 
-We can use $\alpha$ to map $x$ to an arrow 
+We can use $\alpha$ to map $x$ to an arrow:
 \[ \alpha_x \colon F x \to F' x \]
-We can lift this arrow using $G$
+We can lift this arrow using $G$:
 \[ G (\alpha_x) \colon G (F x) \to G (F' x) \]
-To get from there to $G' (F' x)$ we can use the appropriate component of $\beta$
+To get from there to $G' (F' x)$ we can use the appropriate component of $\beta$:
 \[ \beta_{F' x} \colon G (F' x) \to G' (F' x) \]
-Altogether, we have
+Altogether, we have:
 \[ (\beta \circ \alpha)_x = \beta_{F' x} \circ G (\alpha_x) \]
 
 But there is another equally plausible candidate: 
@@ -461,7 +458,7 @@ Fortunately, they are equal due to naturality of $\beta$.
 \]
 The proof of naturality of $\beta \circ \alpha$ is left as an exercise to a dedicated reader.
 
-We can translate this directly to Haskell. We start with two natural transformations:
+We can translate this construction directly to Haskell. We start with two natural transformations:
 \begin{haskell}
 alpha :: forall x. F x -> F' x
 beta  :: forall x. G x -> G' x
@@ -544,7 +541,7 @@ Do the same with the horizontal composition of \hask{reverse} after \hask{safeHe
 
 Quite often horizontal composition is used with one of the natural transformations being the identity. There is a shorthand notation for such composition. For instance, $\beta \circ id_F$ is written as $\beta \circ F$. 
 
-Because of the characteristic shape of the diagram, such composition is called ``whiskering''.
+Because of the characteristic shape of the diagram, such composition is called \index{whiskering}\emph{whiskering}.
 \[
 \begin{tikzcd}[column sep=huge]
 \mathcal{C}
@@ -655,8 +652,98 @@ We can combine vertical composition with horizontal composition, as seen in the 
   \arrow[shorten <=8pt, shorten >=8pt,Rightarrow, to path={(M1) -- node[label=left:$\beta'$] {} (D1)}]{}
 \end{tikzcd}
 \]
-The interchange law states that the order of composition doesn't matter: we can first do vertical compositions and then the horizontal one, or first do the horizontal compositions and then the vertical one.
+The \index{interchange law}\emph{interchange law} states that the order of composition doesn't matter: we can first do vertical compositions and then the horizontal one, or first do the horizontal compositions and then the vertical one.
 
+\section{Representable Functors}
+
+Objects in a  co-presheaf category are functors that assign sets to objects in $\mathcal{C}$. Some of these functors work by picking a reference object $a$ and assigning,  to all objects $x$, their hom-sets  $\mathcal{C}(a, x)$:
+\[ F x = \cat C(a, x) \]
+Such functors, and all the functors isomorphic to those, are called \index{representable functor}\emph{representable}. The whole functor is ``represented'' by a single object $a$. 
+
+In a closed category, the functor which assigns  to every object $x$ the set of elements of the exponential object $x^a$ is represented by $a$. This is because the set of elements of $x^a$ is isomorphic to $\mathcal{C}(a, x)$:
+\[\mathcal{C}(1, x^a) \cong \mathcal{C}(1 \times a, x) \cong \mathcal{C} (a, x)\]
+
+Seen this way, the representing object $a$ is like a \index{logarithm}logarithm of a functor. 
+
+The analogy goes deeper: just like a logarithm of a product is a sum of logarithms, a representing object for a product data type is a sum. For instance, the functor that squares its argument using a product, $F x = x \times x$, is represented by $2$, which is the sum $1 + 1$. Indeed, we've seen before that $x \times x \cong x^2$.
+
+Representable functors play a very special role in the category of $ \mathbf{Set}$-valued functors. Notice that the Yoneda embedding maps all objects of $\mathcal{C}$ to representable presheaves. It maps an object $x$ to a presheaf represented by $x$: 
+
+\[  \mathcal{Y} \colon x \mapsto \mathcal{C}(-, x) \]
+
+We can find the entire category  $\mathcal{C}$, objects and morphisms, embedded inside the presheaf category as representable functors. The question is, what else is there in the presheaf category ``in between'' representable functors?
+
+Just like rational numbers are dense among real numbers, so representables are ``dense'' among (co-) presheaves. Every real number may be approximated by rational numbers. Every presheaf is a colimit of representables (and every co-presheaf, a limit). We'll come back to this topic when we talk about (co-) ends.
+
+\begin{exercise}
+Consider a \emph{singleton functor} $F \colon \cat C \to \Set$ that assigns to each object $c$ a singleton set $\{c\}$ that contains just that object (that is, a different singleton for every object). Define the action of $F$ on arrows. Show that $F$ being representable is equivalent to $\cat C$ having an initial object.
+\end{exercise}
+
+\subsection{The guessing game}
+
+The idea that objects can be described by the way they interact with other objects is sometimes illustrated by playing an imaginary guessing game. One category theorist picks a secret object in a category, and the other has to guess which object it is (up to isomorphism, of course). 
+
+The guesser is allowed to point at objects, and use them as ``probes'' into the secret object. The opponent is supposed to respond each time with a set: the set of arrows from the probing object $a$ to the secret object $x$. This, of course, is the hom-set $\mathcal{C}(a, x)$. 
+
+The totality of these answers, as long as the opponent is not cheating, will define a presheaf $F \colon \mathcal{C}^{op} \to \mathbf{Set}$, and the object they are hiding is its representing object. 
+
+But how do we know that the second category theorist in not cheating? To test that, we ask questions about arrows. For every arrow we select, they should give us a function between two sets---the sets they gave us for its endpoints. We can then check if all identity arrows are mapped to identity functions, and whether compositions of arrows map to compositions of functions. In other words, we'll be able to verify that $F$ is indeed a functor. 
+
+However, a clever enough opponent may still fool us. The presheaf they are revealing to us may describe a fantastic object---a figment of their imagination---and we won't be able to tell. It turns out that such fantastic beasts are often as interesting as the real ones. 
+
+\subsection{Representable functors in programming}
+
+In Haskell, we define a class of representable functors using two functions that witness the isomorphism: 
+\[ F x = \cat C(a, x) \]
+The first one, \hask{tabulate}, turns a function into a lookup table; and the second, \hask{index}, uses the representing type \hask{Key} to index into it.
+
+\begin{haskell}
+class Representable f where
+  type Key f :: Type
+  tabulate :: (Key f -> x) -> f x
+  index    :: f x -> (Key f -> x)
+\end{haskell}
+
+Algebraic data types that use sums are not representable (there is no formula for taking a logarithm of a sum). For instance, the list type is defined as a sum, so it's not representable. However, an infinite stream is. 
+
+Conceptually, a stream is like an infinite tuple, which is technically a product. Such a stream is represented by the type of natural numbers. In other words, an infinite stream is equivalent to a mapping out of natural numbers. 
+\begin{haskell}
+data Stream a = Stm a (Stream a)
+\end{haskell}
+Here's the instance definition:
+\begin{haskell}
+instance Representable Stream where
+  type Key Stream = Nat
+  tabulate g = tab Z
+    where
+      tab n = Stm (g n) (tab (S n))
+  index stm = \n -> ind n stm
+    where
+      ind Z (Stm a _) = a
+      ind (S n) (Stm _ as) = ind n as
+\end{haskell}
+Representable types are useful for implementing \index{memoization} memoization of functions.
+
+\begin{exercise}
+Implement the \hask{Representable} instance for \hask{Pair}:
+\begin{haskell}
+data Pair x = Pair x x
+\end{haskell}
+\end{exercise}
+
+\begin{exercise}
+Is the constant functor that maps everything to the terminal object representable? Hint: what's the logarithm of 1?
+
+In Haskell, such a functor could be implemented as:
+\begin{haskell}
+data Unit a = U
+\end{haskell}
+Implement the instance of \hask{Representable} for it.
+\end{exercise}
+
+\begin{exercise}
+The list functor is not representable. But can it be considered a sum or representables?
+\end{exercise}
 
 \section{Universal Constructions Revisited}
 
@@ -668,7 +755,7 @@ The old-school approach to defining such data types is to explore their internal
 
 In category theory we take the opposite approach. We are not interested in what's inside the object or how it's implemented. We are interested in the purpose of the object, how it can be used, and how it interacts with other objects. We are looking at objects from the utilitarian point of view.
 
-Both approaches have their advantages. The categorical approach came later, because you need to study a lot of examples before clear patterns emerge. But once you see the patterns, you discover unexpected connections between things, like the duality between sums and products.
+Both approaches have their advantages. The categorical approach came later, because you need to study a lot of examples before clear patterns emerge. But once you see the patterns, you can't unsee them. You discover unexpected connections between things, like the duality between sums and products.
 
 Defining particular objects through their connections requires looking at possibly infinite numbers of objects with which they interact. 
 
@@ -680,7 +767,7 @@ Why are natural transformations so important? It's because most categorical cons
 
 Being able to compress a lot of facts into small elegant formulas helps us see new patterns. We'll see, for instance, that natural isomorphisms between hom-sets pop up all over category theory and eventually lead to the idea of an adjunction.
 
-But first we'll study several examples in greater detail to get some understanding of the terse language of category theory. We'll try, for instance, to decode the statement that the sum, or the coproduct of two objects, is defined by the following natural isomorphism:
+But first let's study several examples in greater detail to get some understanding of the terse language of category theory. We'll try, for instance, to decode the statement that the sum, or the coproduct of two objects, can be tersely defined by the following natural isomorphism:
 
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}(a + b, x) \]
 
@@ -688,7 +775,7 @@ But first we'll study several examples in greater detail to get some understandi
 
 \subsection{Picking objects}
 
-Even such a simple task as pointing at an object has a special interpretation in category theory. We have already seen that pointing at an element of a set is equivalent to selecting a function from the singleton set to it. Similarly, picking an object in a category is equivalent to selecting a functor from the single-object category. Alternatively, it can be done using a constant functor from another category. 
+Even such a simple task as pointing at an object has a special interpretation in category theory. We have already seen that pointing at an element of a set $S$ is equivalent to selecting a function from the singleton set to $S$. Similarly, picking an object in a category is equivalent to selecting a functor from the single-object category. Alternatively, it can be done using a constant functor from another category. 
 
 Quite often we want to pick a pair of objects. That, too, can be accomplished by selecting a functor from a two-object stick-figure category. Similarly, picking an arrow is equivalent to selecting a functor from the ``walking arrow'' category, and so on.
 
@@ -713,7 +800,7 @@ The definition of a sum requires the selection of two objects to be summed; and 
 & c
  \end{tikzcd}
 \]
-This diagram can be further decomposed into two simpler shapes called \emph{cospans}:
+This diagram can be further decomposed into two simpler shapes called \index{cospan}\emph{cospans}:
 \[
  \begin{tikzcd}
  a
@@ -753,9 +840,9 @@ There may be many cospans sharing the same three objects---meaning: there may be
 
 \subsection{Functoriality of cospans}
 
-Let's consider what happens when we start varying the object $x$ in a cospan. We have a mapping $F$ that takes $x$ to the set of cospans over $x$:
-\[ F x = [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
-This mapping turns out to be functorial in $x$.
+Let's consider what happens when we start varying the object $x$ in a cospan. For every $D \colon \mathbf{2} \to \mathcal{C}$, we have a mapping $F_D \colon \cat C \to \Set$ that takes an object $x$ to the set of cospans over $x$:
+\[ F_D x = [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
+This mapping can be made functorial in $x$.
 
 To see that, consider an arrow $m \colon x \to y$. The lifting of this arrow is a mapping between two sets of natural transformations:
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_x) \to [\mathbf{2}, \mathcal{C}](D, \Delta_{y}) \] 
@@ -772,7 +859,7 @@ Similarly, the element of the right-hand side is a natural transformation:
 \[ \nu \colon D \to \Delta_{y} \]
 Its component at $1$ is an arrow
 \[ \nu_1 \colon a \to y \]
-We can get from $\mu_1$ to $\nu_1$ simply by post-composing it with $m \colon x \to y$. So the lifting of $m$ is a component-by-component post-compositon $(m \circ -)$:
+We can get from $\mu_1$ to $\nu_1$ simply by post-composing it with $m \colon x \to y$. So the lifting of $m$ can be defined as a component-by-component post-compositon $(m \circ -)$:
 \begin{align*}
 \nu_1 = m \circ \mu_1 \\
 \nu_2 = m \circ \mu_2 \\
@@ -799,10 +886,10 @@ Of all the cospans that you can build on the pair $a$ and $b$, the one with the 
 
 We are now in the position to translate this condition to a statement about natural transformations and hom-sets. The arrow $h$ is an element of the hom-set 
 \[ \mathcal{C}(a + b, x)\]
-A cospan over $x$ is a natural transformation, that is an element of the hom-set in the functor category:
+A cospan over $x$ is a natural transformation. In other words, it's an element of the hom-set in the functor category:
 \[ [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
 
-Both are hom-sets in their respective categories. And both are just sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. 
+Both are hom-sets in their respective categories, $\cat C$ and $[\mathbf{2}, \mathcal{C}]$. Both are just sets, that is objects in the category $\mathbf{Set}$. This category forms a bridge between the functor category $[\mathbf{2}, \mathcal{C}]$ and a ``regular'' category $\mathcal{C}$, even though, conceptually, they seem to be at very different levels of abstraction. 
 
 Paraphrasing Sigmund Freud, ``Sometimes a set is just a set.''
 
@@ -813,11 +900,15 @@ Moreover, if we vary the object $x$, the two sides behave like functors from  $\
 
 Indeed, it can be shown that the naturality condition for this isomorphism translates into commuting conditions for the triangles in the definition of the sum. So the definition of the sum can be replaced by a single equation.
 
+Notice also that the same equation can be interpreted as the statement that, for any diagram $D \colon \mathbf{2} \to \mathcal{C}$, the functor:
+\[ F_D x = [\mathbf{2}, \mathcal{C}](D, \Delta_x) \]
+is representable, and its representing object is $a + b$.
+
 \subsection{Product as a universal span}
 
-An analogous argument can be made about the universal construction for the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
+An analogous argument can be made for the universal construction for the product. Again, we start with the stick-figure category $\mathbf{2}$ and the functor $D$. But this time we use a natural transformation going in the opposite direction
 \[ \alpha \colon \Delta_x \to D \]
-Such a natural transformation is a pair of arrows that form a \emph{span}:
+Such a natural transformation is a pair of arrows that form a \index{span}\emph{span}:
 \[
  \begin{tikzcd}
  &x
@@ -849,6 +940,16 @@ a = D\, 1 && b = D \, 2
  \end{tikzcd}
 \]
 
+We can show that that the mapping:
+\[ H_D x = [\mathbf{2}, \mathcal{C}](\Delta_x, D) \]
+can be interpreted as a contravariant functor $H_D \colon \cat C^{op} \to \Set$. If this functor is representable, its representing object is $a \times b$:
+\[ H_D x \cong \mathcal{C}(x, a \times b) \]
+
+
+\begin{exercise}
+Define the action of $H_D$ on morphisms in order to interpret it as a contravariant functor.
+\end{exercise}
+
 \subsection{Exponentials}
 
 The exponentials, or function objects, are defined by this commuting diagram:
@@ -872,11 +973,13 @@ The $f$ in the diagram above is an element of the left-hand side, and $h$ is the
 \[ \alpha_x \colon \mathcal{C}(x \times a, b) \to \mathcal{C}(x, b^a) \]
 In Haskell, we call it \hask{curry}. Its inverse, $\alpha^{-1}$ is known as \hask{uncurry}.
 
-Unlike in the previous examples, here both hom-sets are in the same category, and it's easy to analyze the isomorphism in more detail. In particular, we'd like to see how the commuting condition:
+Unlike in the previous examples, here both hom-sets are in the same category, and it's easy to analyze the isomorphism in more detail. In particular, we'd like to see how the commuting triangle condition:
 \[  f = \varepsilon_{a b} \circ (h \times id_a) \]
 arises from naturality.
 
-The standard \index{Yoneda trick}Yoneda trick is to make a substitution for $x$ that would reduce one of the hom-sets to an endo-hom-set, that is a hom-set whose source is the same the target. This will allow us to pick a canonical element of that hom-set, that is the identity arrow.
+\subsection{Commuting condition from naturality}
+
+The standard \index{Yoneda trick}Yoneda trick is to take the defining diagram and make a substitution for $x$ that would reduce one of the hom-sets to an endo-hom-set, that is a hom-set whose source is the same the target. This will allow us to pick a canonical element of that hom-set, that is the identity arrow.
 
 In our case, substituting $b^a$ for $x$ will allow us to pick $h = id_{(b^a)}$.
 \[
@@ -894,21 +997,22 @@ The commuting condition in this case tells us that $f = \varepsilon_{a b}$. In o
 \[ \varepsilon_{a b} = \alpha_{x}^{-1} (id_{x}) \]
 where $x$ is equal to $b^a$.
 
+
 Since we recognize $\alpha^{-1}$ as \hask{uncurry}, and $\varepsilon$ as function application, we can write it in Haskell as:
 \begin{haskell}
 apply :: (a -> b, a) -> b
 apply = uncurry id
 \end{haskell}
-This my be surprising at first, until you realize that the currying of \hask{(a->b,a)->b} leads to \hask{(a->b)->(a->b)}.
+This my be surprising at first, until you realize that the currying of the function \hask{(a->b,a)->b} leads to \hask{(a->b)->(a->b)}.
 
-We can also encode the two sides of the main isomorphism as Haskell functors:
+We can also encode the two sides of the main isomorphism of hom-sets as Haskell functors:
 \begin{haskell}
 data LeftFunctor  a b x = LF ((x, a) -> b)
 \end{haskell}
 \begin{haskell}
 data RightFunctor a b x = RF (x -> (a -> b))
 \end{haskell}
-They are both contravariant functors in the type variable \hask{x}.
+They are both contravariant functors in the type variable \hask{x}. First we have:
 \begin{haskell}
 instance Contravariant (LeftFunctor a b) where
   contramap g (LF f) = LF (f . bimap g id)
@@ -954,7 +1058,7 @@ Using the two formulas for the lifting of $g \colon x \to y$, here's the natural
  \end{tikzcd}
 \]
 
-Let's now apply the \index{Yoneda trick}Yoneda trick to it and replace $y$ with $b^a$. This also allows us to substitute $g$---which now goes for $x$ to $b^a$---with $h$. 
+Let's now apply the \index{Yoneda trick}Yoneda trick to it and replace $y$ with $b^a$. This also allows us to replace $g$ (which now goes for $x$ to $b^a$) with $h$. 
 
 \[
  \begin{tikzcd}
@@ -976,9 +1080,9 @@ We know that the hom-set $\mathcal{C}(b^a, b^a)$ contains at least the identity 
 
 Reversing the arrow on the left, we know that $\alpha^{-1}$ acting on identity produces $\varepsilon_{a b}$ in the upper left corner (that's the \hask{uncurry id} trick). 
 
-Pre-composition with $h$ acting on identity produces $h$ in the lower right corner. 
+At the bottom, the pre-composition with $h$ acting on identity produces $h$ in the lower right corner. 
 
-$\alpha^{-1}$ acting on $h$ produces $f$ in the upper right corner. 
+Finally, $\alpha^{-1}$ acting on $h$ produces $f$ in the upper right corner. 
 
 \[
  \begin{tikzcd}[
@@ -1004,9 +1108,19 @@ So the selection of $id_{(b^a)}$ in the lower left corner fixes the other three 
 \[ \varepsilon_{a b} \circ (h \times id_a) = f \]
 the one that we set out to derive.
 
+\subsection{Exponential as a representing object}
+
+We can interpret the mapping of an object $x$ to the set $\cat C(x \times a, b)$ as a contravariant functor $H_{a b} \colon \cat C^{op} \to \Set$. If this functor is representable, its representing object is the exponential $b^a$:
+
+\[ H_{a b} x \cong \mathcal{C}(x, b^a)\]
+
+\begin{exercise}
+Define the action of $H_{a b}$ on morphism in order to interpret it as a contravariant functor.
+\end{exercise}
+
 \section{Limits and Colimits}
 
-In the previous section we defined the sum and the product using natural transformations. These were transformations between diagrams defined as functors from a very simple stick-figure category $\mathbf{2}$, one of the functors being the constant functor. 
+In the previous section we defined the sum and the product using natural transformations. These were transformations between diagrams defined as functors from a very simple stick-figure category $\mathbf{2}$; one of the functors being the constant functor. 
 
 Nothing prevents us from replacing the category $\mathbf{2}$ with something more complex. For instance, we could try categories that have non-trivial arrows between objects, or categories with infinitely many objects. 
 
@@ -1014,9 +1128,9 @@ There is a whole vocabulary built around such constructions.
 
 We used objects in the category $\mathbf{2}$ for indexing objects in the category $\mathcal{C}$. We can replace $\mathbf{2}$ with an arbitrary indexing category $\cat J$. A diagram in $\mathcal{C}$ is still defined as a functor $D \colon \cat J \to \mathcal{C}$. It picks objects in $\mathcal{C}$, but it also picks arrows between them.
 
-As the second functor we'll still use the constant functor $\Delta_x \colon \cat J \to \mathcal{C}$.
+As the source functor we'll still use the constant functor $\Delta_x \colon \cat J \to \mathcal{C}$.
 
-A  natural transformation, that is an element of the hom-set
+A  natural transformation $\nu$, that is an element of the hom-set:
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \]
 is now called a \emph{cone}. Its dual, an element of
 \[ [\cat J, \mathcal{C}](D, \Delta_x)  \]
@@ -1026,9 +1140,9 @@ Diagramatically, cones and cocones look like this:
 \[
  \begin{tikzcd}
   & x
-\arrow[ddr, "g"]
- \arrow[ddl, "f"']
- \arrow[ddd, "h"]
+ \arrow[ddl, "\nu_1"']
+ \arrow[ddd, "\nu_3"]
+\arrow[ddr, "\nu_2"]
  \\
 \\
 D 1 
@@ -1044,34 +1158,34 @@ D 1
  D 1
  \arrow[rr, red]
  \arrow[dr, red]
- \arrow[dddr, "f"']
+ \arrow[dddr, "\nu_1"']
  && D 2
 \arrow[dl, red]
- \arrow[dddl, "g"]
+ \arrow[dddl, "\nu_2"]
  \\
  & D 3
- \arrow[dd, "h"]
+ \arrow[dd, "\nu_3"]
  \\
  \\
  & x
  \end{tikzcd}
  \]
 
-Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_x$ shrinks all vertices to one, so naturality squares shrink to triangles. Naturality means that all triangles with $x$ in their apex must now commute. 
+Since the indexing category may now contain arrows, the naturality conditions for these diagrams are no longer trivial. The constant functor $\Delta_x$ shrinks all vertices to one, so naturality squares shrink down to triangles. Naturality means that all triangles with $x$ in their apex must now commute. 
 
 The universal cone, if it exists, is called the \emph{limit} of the diagram $D$, and is written as $\text{Lim}D$. Universality means that it satisfies the following isomorphism, natural in $x$:
 \[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
 For each cone with the apex $x$ there is a unique mapping from $x$ into the limit $ \text{Lim}D$.
 
 A limit of a $\Set$-valued functor has a particularly simple characterization. It's a set of cones with the singleton set at the apex. Indeed, elements of the limit, that is functions from the singleton set to it, are in one-to-one correspondence with such cones:
-\[ [\cat J, \mathcal{C}](\Delta_1, D)  \cong \mathcal{C}(1, \text{Lim}D) \]
+\[ [\cat J, \Set](\Delta_1, D)  \cong \Set(1, \text{Lim}D) \]
 
 
 Dually, the universal cocone is called a \emph{colimit}, and is described by the following natural isomorphism:
 \[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}D, x) \]
 
 
-We can now say that a product is a limit (and a sum, a colimit) of a diagram from the indexing category $\mathbf{2}$.
+We can now say that the product is a limit (and the sum, a colimit) of a diagram from the indexing category $\mathbf{2}$.
 
 Limits and colimits distill the essence of a pattern. 
 
@@ -1083,11 +1197,76 @@ There are many interesting limits and colimits, and we'll see some when we discu
 Show that the limit of a \index{walking arrow, limit}``walking arrow'' category, that is a two-object category with an arrow connecting the two objects, has the same elements as the first object in the diagram (``elements'' are the arrows from the terminal object).
 \end{exercise}
 
+\subsection{Limits and colimits as representing objects}
+
+Cones over a diagram $D$ form a category. A morphism in the cone category is an arrow that connects two apexes (here $h \colon x \to y$), which makes all triangles commute (see, for instance, the blue triangle below).
+\[
+ \begin{tikzcd}
+  x
+ \arrow[rr, dashed, bend left, blue, "h"]
+ \arrow[dd]
+ \arrow[dddr, blue, "\nu_3"' near start]
+\arrow[ddrr ]
+ && y
+ \arrow[ddll]
+ \arrow[dddl, blue, "\mu_3" near start]
+ \arrow[dd]
+\\
+\\
+D 1 
+\arrow[rr, red]
+\arrow[rd, red]
+&& D 2
+\arrow[dl, red]
+\\
+& D 3
+ \end{tikzcd}
+ \]
+ A limit is just a terminal cone in the category of cones over $D$.
+ 
+ The mapping that assigns a set of cones to an apex defines a contravariant functor $H_D \colon \cat C^{op} \to \Set$:
+ \[ H_D x = [\cat J, \mathcal{C}](\Delta_x, D) \]
+An element of this set is a cone---a natural transformation $\nu$, whose components $\nu_i$ form the sides of the cone. 
+
+Functoriality means that we can lift any morphism $h \colon x \to y$ to a function between sets of cones:
+ \[ H_D h \colon H_D y \to H_D x \]
+ In other words, given a cone $\mu \in [\cat J, \mathcal{C}](\Delta_y, D)$, we can construct a cone $\nu \in [\cat J, \mathcal{C}](\Delta_x, D)$. We define the sides of this cone, the components of the natural transformation $\nu$, by precomposition with $h$:
+ \[ \nu_i = \mu_i \circ h \]
+ \[
+ \begin{tikzcd}
+  x
+ \arrow[rr, dashed, bend left, blue, "h"']
+ \arrow[dd, blue,  "\nu_1"']
+\arrow[ddrr, "\nu_2"' near start]
+ && y
+ \arrow[ddll, blue, "\mu_1"' near start]
+ \arrow[dd, "\mu_2"']
+\\
+\\
+D 1 
+\arrow[rr, red, "f"]
+&& D 2
+ \end{tikzcd}
+ \]
+ 
+The commuting conditions for the cone $\nu$ follow from the commuting conditions for the cone $\mu$. For instance, if we precompose the equation $f \circ \mu_1 = \mu_2$ with $h$, we get $f \circ \mu_1 \circ h = \mu_2 \circ h$, which gives us $f \circ \nu_1 = \nu_2$.
+
+We can now define the limit as the representing object for our functor $H_D$:
+
+\[ H_D x  \cong \mathcal{C}(x, \text{Lim}D) \]
+
+
+Similarly, we can define a covariant functor:
+\[ F_D x =  [\cat J, \mathcal{C}](D, \Delta_x)  \]
+that assigns a set of cocones to an object $x$. The representing object for this functor is the colimit:
+\[ F_D x  \cong \mathcal{C}( \text{Colim}D, x) \]
+
+
 \subsection{Equalizers}
 
 A lot of high-school math involves learning how to solve equations or systems of equations. An equation equates the outcomes of two different ways of producing something. If we are allowed to subtract things, we usually shove everything to one side and simplify the problem to the one of calculating the zeros of some expression. In geometry, the same idea is expressed as the intersection of two geometric objects.
 
-In category theory all these patterns are embodied in a single construction called an equalizer. An equalizer is a limit of a diagram whose pattern is given by a stick-figure category with two parallel arrows:
+In category theory all these patterns are embodied in a single construction called an equalizer. An \index{equalizer}\emph{equalizer} is a limit of a diagram whose pattern is given by a stick-figure category with two parallel arrows:
 \[
 \begin{tikzcd}
 i \arrow[r, shift left=0.75ex]
@@ -1158,7 +1337,7 @@ In this case $a$ is an element of $A$ such that $f a = g a$. That's just a way o
 
 What's dual to the idea of equating or intersecting? It's the process of discovering commonalities and organizing things into buckets. For instance, we can distribute integers into even and odd buckets. In category theory, this process of bucketizing is described by coequalizers.
 
-A coequalizer is the colimit of the same diagram that we used to define the equalizer:
+A \index{coequalizer}\emph{coequalizer} is the colimit of the same diagram that we used to define the equalizer:
 \[
 \begin{tikzcd}
 a 
@@ -1191,14 +1370,14 @@ An $x \in A$ is mapped to two elements $f x$ and $g x$ in $B$, but then $q$ must
 
 Universality means that $C$ is a copy of $B$ in which the elements that were produced from the same $x$ have been identified.
 
-Consider an example where $A$ is a set of pairs of integers \hask{(m, n)}, such that either both are even or both are odd.  We want to coequalize two functions that are the two projections \hask{(fst, snd)}. The equalizer set $C$ will have two elements corresponding to two buckets. We'll represent it as \hask{Bool}. The equalizing function \hask{q} selects the bucket:
+Consider an example where $A$ is a set of pairs of integers \hask{(m, n)}, such that either both are even or both are odd.  We want to coequalize two functions that are the two projections \hask{(fst, snd)}. The coequalizer set $C$ will have two elements corresponding to two buckets. We'll represent it as \hask{Bool}. The coequalizing function \hask{q} selects the bucket:
 \begin{haskell}
 q :: Int -> Bool
 q n = n `mod` 2 == 0 
 \end{haskell}
 Any function \hask{q'} that cannot distinguish between the components of our pairs, and is sensitive only to their parity:
 \[ q' \circ \mathvar{fst} = q' \circ \mathvar{snd} \]
- can be uniquely factorized through the function \hask{h}:
+ can be uniquely factorized through the function \hask{h} (which depends on \hask{q'}):
 \begin{haskell}
 h :: (Int -> a) -> Bool -> a
 h q' True  = q' 0
@@ -1215,7 +1394,7 @@ h q' False = q' 1
 \arrow[r, "q"]
 \arrow[rd, "q'"']
 & \text{Bool}
-\arrow[d, dashed, "h"]
+\arrow[d, dashed, "h \, q'"]
 \\
 && A
 \end{tikzcd}
@@ -1708,6 +1887,12 @@ But why not have arrows going all the way? Enter \index{infinity categories}infi
 
 \section{Useful Formulas}
 \begin{itemize}
+\item Exponential:
+\[\mathcal{C}(x \times a, b) \cong \mathcal{C}(x, b^a)\]
+\item Limit:
+\[ [\cat J, \mathcal{C}](\Delta_x, D)  \cong \mathcal{C}(x, \text{Lim}D) \]
+\item Colimit:
+\[ [\cat J, \mathcal{C}](D, \Delta_x)  \cong \mathcal{C}( \text{Colim}D, x) \]
 \item Yoneda lemma for covariant functors:
 \[ [\mathcal{C}, \mathbf{Set}]( \mathcal{C}(a, -), F) \cong F a \]
 \item Yoneda lemma for contravariant functors:

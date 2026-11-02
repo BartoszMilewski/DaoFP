@@ -30,7 +30,11 @@ idWithEnv (a, e) = a
 This strongly suggests the idea that there is a category in which co-Kleisli arrows serve as morphisms. 
 
 \begin{exercise}
-Show that the composition of co-Kleisli arrows using \hask{composeWithEnv} is associative.
+Show that the composition of co-Kleisli arrows using \hask{composeWithEnv} is associative. Hint, use the equivalent form:
+\begin{haskell}
+composeWithEnv g f (a, e) = g (f (a, e), e)
+\end{haskell}
+
 \end{exercise}
 
 \section{Comonads in Programming}
@@ -53,19 +57,34 @@ instance Comonad ((,) e) where
 
 As with monads, co-Kleisli composition may be used in point-free style of programming. But we can also use the dual to \hask{join} called \hask{duplicate}:
 \begin{haskell}
-  duplicate :: w a -> w (w a)
+duplicate :: Comonad w => w a -> w (w a)
+duplicate = id =<= id
 \end{haskell}
 or the dual to bind called \hask{extend}:
 \begin{haskell}
-  extend :: (w a -> b) -> w a -> w b
+extend :: Comonad w => (w a -> b) -> w a -> w b
+extend k = id =<= k
 \end{haskell}
+The trick here is to realize that the compiler can instantiate the polymorphic function \hask{id} at \hask{w a} and reinterpreted it as a co-Kleisli arrow from \hask{a} to \hask{w a}.
+
 Here's how we can implement co-Kleisli composition in terms of \hask{duplicate} and \hask{fmap}:
 \begin{haskell}
    g =<= f = g . fmap f . duplicate
 \end{haskell}
+
+In the Haskell standard library, a comonad is defined using alternatively \hask{duplicate} or \hask{extend}:
+\begin{haskell}
+class Functor w => Comonad w where
+  extract :: w a -> a
+  duplicate :: w a -> w (w a)
+  extend :: (w a -> b) -> w a -> w b
+\end{haskell}
+so \hask{Comonad} instances can be defined by implementing either one.
+
 \begin{exercise}
 Implement \hask{duplicate} in terms of \hask{extend} and vice versa.
 \end{exercise}
+
 \subsection{The \hask{Stream} comonad}
 Interesting examples of comonads deal with larger, sometimes infinite, contexts. Here's an infinite stream:
 \begin{haskell}
@@ -114,6 +133,7 @@ Comonads are useful for structuring computations in spatially or temporally exte
 Sometimes it's convenient to perform calculation on continuous streams of data, postponing the sampling until the very last step. Here's an example of a signal that is a function of time (represented by \hask{Double})
 \begin{haskell}
 data Signal a = Sig (Double -> a) Double
+    deriving Functor
 \end{haskell}
 The first component is a continuous stream of \hask{a}'s implemented as a function of time. The second component is the current time.
 
@@ -121,8 +141,8 @@ This is the \hask{Comonad} instance for the continuous stream:
 \begin{haskell}
 instance Comonad Signal where
   extract (Sig f x) = f x
-  duplicate (Sig f x) = Sig (\y -> Sig f (x - y)) x
-  extend g (Sig f x) = Sig (\y -> g (Sig f (x - y))) x
+  duplicate (Sig f x) = Sig (\y -> Sig f y) x
+  extend g (Sig f x) = Sig (\y -> g (Sig f y)) x
 \end{haskell}
 Here, \hask{extend} convolves the filter 
 \begin{haskell}
@@ -451,13 +471,13 @@ W a
 
 Just like with monad algebras, comonad coalgebras form a category. Given a comonad $(W, \varepsilon, \delta)$ in $\mathcal{C}$, its comonad coalgebras form the category called the Eilenberg-Moore category (sometimes prefixed with co-) $\mathcal{C}^W$.
 
-There is a co-Kleisli subcategory of $\mathcal{C}^W$ denoted by $\mathcal{C}_W$
+There is also a co-Kleisli subcategory of $\mathcal{C}^W$ denoted by $\mathcal{C}_W$, whose morphisms are co-Kleisli arrows of the form $W a \to b$.
 
 Given a comonad $W$, we can construct an adjunction using either $\mathcal{C}^W$ or $\mathcal{C}_W$ that reproduces the comonad $W$. The construction is fully analogous to the one for monads.
 
 \subsection{Lenses}
 
-The coalgebra for the \hask{Store} comonad is of particular interest. We'll do some renaming first. Let's call the carrier \hask{s} and the state \hask{a}. 
+The coalgebra for the \hask{Store} comonad is of particular interest. To align our notation with that of the Haskell lenses, we'll do some renaming first. Let's call the carrier \hask{s} and the state \hask{a}. 
 \begin{haskell}
 data Store a s = St (a -> s) a
 \end{haskell}
@@ -472,9 +492,9 @@ get :: s -> a
 \end{haskell}
 Such a pair is called a lens: \hask{s} is called the source, and \hask{a} is the focus. 
 
-With this interpretation \hask{get} lets us extract the focus, and \hask{set} replaces the focus with a new value to produce a new \hask{s}. 
+With this interpretation \hask{get} lets us extract the focus from the source, and \hask{set} modifies the source by replacing its focus \hask{a} with a new value.
 
-Lenses were first introduced to describe the retrieval and modification of data in database records. Then they found application is working with data structures. A lens objectifies the idea of having read/write access to a part of a larger object. For instance, a lens can focus on one of the components of a pair or a particular component of a record. We'll discuss lenses and optics in the next chapter.
+Lenses were first introduced to describe the retrieval and modification of data in database records. Then they found application in working with data structures. A lens objectifies the idea of having read/write access to a part of a larger object. For instance, a lens can focus on one of the components of a pair or a particular component of a record. We'll discuss lenses and optics in the next chapter.
 
 Let's apply the laws of the comonad coalgebra to a lens. For simplicity, let's omit data constructors from the equations. We get the following simplified definitions:
 \begin{haskell}
@@ -489,7 +509,7 @@ delta (f, a) = (\x -> (f, x), a)
  & W s
  \arrow[l, "\varepsilon_s"']
  \\
- & a
+ & s
  \arrow[ul, "id_s"]
 \arrow[u, red, "\phi"']
  \end{tikzcd}
