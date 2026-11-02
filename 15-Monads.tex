@@ -109,7 +109,7 @@ Conversely, we could implement \hask{join} in terms of \hask{<=<}:
 \begin{haskell}
 join = id <=< id
 \end{haskell}
-The latter definition may not be immediately obvious, until you realize that the rightmost \hask{id} is applided to \hask{m (m a)}, and the leftmost one is applied to \hask{m a}. We re-interpret a Haskell function:
+The latter definition may not be immediately obvious, until you realize that the rightmost \hask{id} is applied to \hask{m (m a)}, and the leftmost one is applied to \hask{m a}. We re-interpret a Haskell function:
 \begin{haskell}
 m (m a) -> m (m a)
 \end{haskell}
