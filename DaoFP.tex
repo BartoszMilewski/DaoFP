@@ -23,29 +23,39 @@
 \usetikzlibrary{backgrounds}
 \usepackage{float}
 \usepackage{xcolor}
-
-\newtheorem{exercise}{Exercise}[section]
-\newcommand{\exinline}[1]{(\refstepcounter{exercise}Exercise~\theexercise\label{#1})}
+\usepackage{stix}
+\usepackage{microtype}
 
 \usepackage{minted}
 \usepackage{etoolbox}
 
-\usepackage{hyperref}
+\usepackage[pdftex, bookmarksnumbered]{hyperref}
+
 \hypersetup{
   colorlinks,
   linkcolor={red!40!black},
   citecolor={red!40!black},
-  urlcolor={blue!40!black}
+  urlcolor={blue!75!black}
 }
 
-\newcommand{\cat}[1]{\mathcal{#1}}%a generic category
-\newcommand{\Cat}[1]{\mathbf{#1}}%a named category
-\newcommand{\Set}{\Cat{Set}}
+\newtheorem{exercise}{Exercise}[section]
+\newcommand{\exinline}[1]{(\refstepcounter{exercise}Exercise~\theexercise\label{#1})}
 
-\newcommand{\hask}[1]{\mintinline{Haskell}{#1}}
+\newcommand{\cat}[1]{\mathcal{#1}} %a generic category
+\newcommand{\Cat}[1]{\mathbf{#1}} %a named category
+\newcommand{\Set}{\Cat{Set}} %category of sets
+\newcommand{\mathvar}[1]{\mathop{\text{#1}}} %multi-character variable names
+
+\DeclareRobustCommand{\hask}[1]{%
+  \ifmmode
+    \text{\texttt{#1}}%
+  \else
+    \mintinline[bgcolor=black!3]{Haskell}{#1}%
+  \fi
+}
 \newenvironment{haskell}
   {\VerbatimEnvironment
-  	%\begin{minted}[escapeinside=??, mathescape=true, frame=single, framesep=5pt, tabsize=1, bgcolor=black!5]{Haskell}}
+         \fvset{formatcom=\upshape} % Use upright shape for this environment
   	\begin{minted}[escapeinside=??, mathescape=true, tabsize=1, bgcolor=black!3, xleftmargin=3pt ]{Haskell}}
   {\end{minted}}
 \makeatletter
@@ -53,6 +63,11 @@
 \patchcmd{\minted@colorbg}{\medskip}{}{}{}
 \patchcmd{\endminted@colorbg}{\medskip}{}{}{}
 \makeatother
+
+% lens brackets for anamorphisms
+\newcommand{\llens}{\mathopen{[\!(}}
+\newcommand{\rlens}{\mathclose{)\!]}}
+
 
 \makeindex
 
@@ -68,7 +83,7 @@
 
 \maketitle
 
-\tableofcontents*
+\tableofcontents
 
 \clearpage
 
@@ -80,7 +95,25 @@ Category theory is the branch of mathematics that provides the abstractions that
 
 When faced with a new categorical concepts I would often look them up on Wikipedia or nLab, or re-read a chapter from Mac Lane or Kelly. These are great sources, but they require some up front familiarity with the topics and the ability to fill in the gaps. One of the goals of this book is to provide the necessary bootstrap to continue studying category theory.
 
-There is a lot of folklore knowledge in category theory and in computer science that is nowhere to be found in the literature. It's very difficult to acquire useful intuitions when going through dry definitions and theorems. I tried, as much as possible, to provide the missing intuitions and explain not only the whats but also the whys.
+There is a lot of folklore knowledge in category theory and in computer science that is nowhere to be found in the literature. It's very difficult to acquire useful intuitions when going through dry definitions and theorems. I tried, as much as possible, to de-formalize mathematics, to provide the missing intuitions and explain not only the whats but also the whys. Once you get familiar with the ideas, it's easy to look up the formal definitions and theorems either in math books or online using Wikipedia, nLab, or one of the LLMs.
+
+The title of this book alludes to Benjamin Hoff's ``The Tao of Pooh'' and to Robert Pirsig's ``Zen and the Art of Motorcycle Maintenance,'' both being attempts by Westerners to assimilate elements of Eastern philosophy. Loosely speaking, the idea is that category theory is to programming as the Dao\footnote{Dao is the more modern spelling of Tao} is to Western philosophy. Many of the definitions of category theory make no sense on first reading but in time you learn to appreciate their deep wisdom. If category theory were to be summarized in one soundbite, it would be: ``Things are defined by their relationship to the Universe.'' 
+
+\subsection{Set theory}
+
+Traditionally, set theory was considered the foundation of mathematics, although more recently type theory is vying for this title. In a sense, set theory is the assembly language of mathematics, and as such contains a lot of implementation details that often obscure  the presentation of high level ideas. 
+
+Category theory is not trying to replace set theory, and it's often used to build abstractions that are later modeled using sets. In fact the fundamental theorem of category theory, the Yoneda lemma, connects categories to their models in set theory. We can find useful intuition in computer graphics, where we build and manipulate abstract worlds only to, at the last moment, project and sample them for a digital display.
+
+It's not necessary to be fluent in set theory in order to study category theory. But some familiarity with the basics is necessary. For instance the idea that sets contain elements. We say that, given a set $S$ and an element $a$, it makes sense to ask whether $a$ is an element of $S$ or not. This statement is written as $a \in S$ ($a$ is a member of $S$). It's also possible to have an empty set that contains no elements. 
+
+The important property of elements of a set is that they can be compared for equality. Given two elements $a \in S$ and $b \in S$, we can ask: Is $a$ equal to $b$? Or we may impose the condition that $a = b$, in case $a$ and $b$ are results of two different recipes for selecting elements of the set $S$. Equality of set elements is the essence of all the commuting diagrams in category theory.
+
+A cartesian product of two sets $S \times T$ is defined as a set of all pairs of elements $\langle s, t\rangle$, such that $s \in S$ and $t \in T$.
+
+A function $f \colon S \to T$, from the source set called the \emph{domain} of $f$ to the target set called the \emph{codomain}, is also defined as a set of pairs. These are the pairs of the form $\langle s, t \rangle$ where $t = f s$. Here $f s$ is the result of the action of the function $f$ on the argument $s$. You might be more familiar with the notation $f(s)$ for function application, but here I'll follow the Haskell convention of omitting the parentheses (and commas, for functions of multiple variables).
+
+In programming we are used to functions being defined by a sequence of instructions. We provide an argument $s$ and apply the instructions to eventually produce the result $t$. We are often worried about how long it may take to evaluate the result, or if the algorithm terminates at all. In mathematics we assume that, for any given argument $s \in S$ the result $t \in T$ is immediately available, and that it's unique. In programming we call such functions pure and total.
 
 \subsection{Conventions}
 
@@ -94,6 +127,8 @@ apply :: (a -> b, a) -> b
 apply (f, x) = f x
 \end{haskell}
 
+Haskell code to accompany this book, including solutions to programming exercises, is available on \href{https://github.com/BartoszMilewski/DaoFP/tree/master/Haskell}{GitHub}.
+
 \mainmatter
 
 \subfile{1-CleanSlate}
@@ -106,16 +141,18 @@ apply (f, x) = f x
 \subfile{8-Functors}
 \subfile{9-NaturalTransformations}
 \subfile{10-Adjunctions}
-\subfile{11-DependentTypes}
-\subfile{12-Algebras}
-\subfile{13-Coalgebras}
-\subfile{14-Monads}
-\subfile{15-MonadsAdjunctions}
-\subfile{16-Comonads}
-\subfile{17-Ends}
-\subfile{18-Tambara}
-\subfile{19-Kan}
-\subfile{20-Enrichment}
+\subfile{11-Algebras}
+\subfile{12-Coalgebras}
+\subfile{13-Effects}
+\subfile{14-Applicatives}
+\subfile{15-Monads}
+\subfile{16-MonadsAdjunctions}
+\subfile{17-Comonads}
+\subfile{18-Ends}
+\subfile{19-Tambara}
+\subfile{20-Kan}
+\subfile{21-Enrichment}
+\subfile{22-DependentTypes}
 
 \printindex
 

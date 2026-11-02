@@ -10,7 +10,7 @@ data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 But if we combine two digits into a single data structure, a two-digit decimal number, we'll be able to encode a hundred numbers. Or, as Lao Tzu would say, with just four digits you can encode ten thousand numbers.
 
-A data type that combines two types in this manner is called a product, or a \emph{cartesian} product. Its defining quality is the elimination rule: there are two arrows coming from $a \times b$; one called ``$\text{fst}$'' goes to $a$, and another called ``$\text{snd}$'' goes to $b$. They are called \emph{projections}. They let us retrive $a$ and $b$ from the product $a \times b$.
+A data type that combines two types in this manner is called a product, or a \index{cartesian product}\emph{cartesian}\footnote{Named after René Descartes, 1596-1650} product. Its defining quality is the elimination rule: there are two arrows coming from $a \times b$; one called ``$\text{fst}$'' goes to $a$, and another called ``$\text{snd}$'' goes to $b$. They are called (cartesian) \index{cartesian projections}\emph{projections}. They let us retrieve $a$ and $b$ from the product $a \times b$.
 
 \[
  \begin{tikzcd}
@@ -23,16 +23,16 @@ a && b
 \]
 
 Suppose that somebody gave you an element of a product, that is an arrow $h$ from the terminal object $1$ to $a \times b$. You can easily retrieve a pair of elements, just by using composition: an element of $a$ given by 
-\[a = \text{fst} \circ h \]
+\[x = \text{fst} \circ h \]
 and an element of $b$ given by
-\[b = \text{snd} \circ h \]
+\[y = \text{snd} \circ h \]
 
 \[
  \begin{tikzcd}
  & 1
 \arrow[d, dashed, "h"]
- \arrow[ddl, bend right, "a"']
- \arrow[ddr, bend left, "b"]
+ \arrow[ddl, bend right, "x"']
+ \arrow[ddr, bend left, "y"]
 \\
 &a \times b
  \arrow[dl,  "\text{fst}"]
@@ -59,7 +59,7 @@ a && b
  \end{tikzcd}
 \]
 
-As we did before with the sum type, we can turn this idea around, and use this diagram to \emph{define} the product type: A pair of functions $f$ and $g$ should be in one-to-one correspondence with a \index{mapping in}\emph{mapping in} from $c$ to $a \times b$. This is the \emph{introduction} rule for the product.
+As we did before with the sum type, we can turn this idea around, and use this diagram to \emph{define} the product type: We impose the condition that a pair of functions $f$ and $g$ be in one-to-one correspondence with a \index{mapping in}\emph{mapping in} from $c$ to $a \times b$. This is the \emph{introduction} rule for the product.
 
 In particular, the mapping out of the terminal object is used in Haskell to define a product type. Given two elements, \hask{a :: A} and \hask{b :: B}, we construct the product 
 
@@ -73,6 +73,49 @@ We should never lose sight of the purpose of programming: to decompose complex p
 \subsection{Logic}
 
 In logic, a product type corresponds to logical conjunction. In order to prove $A \times B$ ($A$ and $B$), you need to provide the proofs of \emph{both} $A$ and $B$. These are the arrows targeting $A$ and $B$. The elimination rule says that if you have a proof of $A \times B$, then you automatically get the proof of $A$ (through $\text{fst}$) and the proof of $B$ (through $\text{snd}$).
+
+\subsection{Type theory}
+In type theory we postulate that, given any pair of types $A$ and $B$, we can construct a new type $A \times B$. This defines the \emph{type constructor} for the product.
+
+The introduction rule takes two terms, $x \colon A$ and $y \colon B$, and constructs the term $(x, y) \colon A \times B$. The notation $(,)$ corresponds to the \emph{data constructor} for the product.
+
+There are two elimination rules. Given a term $z \colon A \times B$ we can extract a term of the type $A$ using $\text{fst}$, and  the term of type $B$ using $\text{snd}$\footnote{These projections are often called $\pi_1$ and $\pi_2$}.
+
+The computation rule tells us that applying an eliminator to a term created using the introduction rule reproduces the corresponding argument. That is  $\text{fst} (x, y) = x$ and  $\text{snd} (x, y) = y$.
+The computation rule can be illustrated in our categorical diagram by the two commuting triangles:
+\[
+ \begin{tikzcd}
+ & 1
+\arrow[d, dashed, "{(x, y)}"]
+ \arrow[ddl, bend right, "x"']
+ \arrow[ddr, bend left, "y"]
+\\
+&A \times B
+ \arrow[dl,  "\text{fst}"]
+ \arrow[dr,   "\text{snd}"']
+\\
+A && B
+ \end{tikzcd}
+\]
+
+Finally, the uniqueness property tells us that introduction \emph{after} elimination reproduces the original. That is, given any $p \colon A \times B$, we have $(\text{fst}\,p, \text{snd}\, p ) = p$.
+
+\subsection{Type theory patterns}
+
+The type-theoretical description of products follows a very general pattern for constructing new types. It starts by defining a type constructor. We've seen type constructors that take zero or more types as arguments. Later we'll see that it's also possible to have type constructors that take values as arguments. These are called \emph{dependent types}.
+
+Introduction and elimination rules tell us how to construct and eliminate terms of the new type. 
+\[ \text{building blocks} \xrightarrow{intro} \text{term of type T} \]
+\[ \text{term of type T} \xrightarrow{elim} \text{building blocks} \]
+
+Computation rules tell us that elimination after introduction produces the same building blocks that were used in the construction. Every term of the type $T$ remembers its creation story.
+\[ \text{building blocks} \xrightarrow{intro} \text{term of type T} \xrightarrow{elim} \text{building blocks} \]
+In programming, the application of a computation rule is called \index{beta-reduction}\emph{beta-reduction}, or \index{$\beta$-reduction}$\beta$-reduction.
+
+
+Optional uniqueness rules close the cycle by asserting that all terms of the new type are in fact the result of applying introduction rules to their constituents. 
+\[ \text{term of type T} \xrightarrow{elim} \text{building blocks} \xrightarrow{intro} \text{term of type T} \]
+In programming, the application of a uniqueness rule is called \index{eta-conversion}\emph{eta-conversion}  (\index{$eta$-conversion}$\eta$-conversion).
 
 \subsection{Tuples and Records}
 
@@ -154,13 +197,15 @@ swap (x, y) = (y, x)
 
 It's important to keep in mind that the product is symmetric only ``up to isomorphism.'' It doesn't mean that swapping the order of pairs won't change the behavior of a program. Symmetry means that the information content of a swapped pair is the same, but access to it needs to be modified.
 
-Here's the diagram that can be used to prove that the terminal object is the unit of the product, $1 \times a \cong a$.
+The terminal object is the unit of the product, $1 \times a \cong a$. The arrow that witnesses the isomorphism between $1 \times a$ and $a$ is called the \emph{left unitor}:
+\[ \lambda \colon 1 \times a \to a \]
+It can be implemented as $\lambda = \text{snd}$. Its inverse $\lambda^{-1}$ is defined as the unique arrow in the following diagram:
 \[
  \begin{tikzcd}
- &x
- \arrow[d, dashed, "h"]
+ &a
+ \arrow[d, dashed, "\lambda^{-1}"]
  \arrow[ddl, bend right, "!"']
- \arrow[ddr, bend left, "f"]
+ \arrow[ddr, bend left, "\text{id}"]
  \\
  & 1 \times a
   \arrow[dl,  "\text{fst}"]
@@ -168,19 +213,29 @@ Here's the diagram that can be used to prove that the terminal object is the uni
  \\
 1 && a
  \end{tikzcd}
- \qquad
+ \]
+The arrow from $a$ to $1$ is called \index{!}$!$ (pronounced, \emph{bang}). This indeed shows that 
+\[\text{snd} \circ \lambda^{-1} = \text{id} \] 
+We still have to prove that $\lambda^{-1}$ is the left inverse of $\text{snd}$. Consider the following diagram:
+\[
  \begin{tikzcd}
- x
- \arrow[dd, "f"]
-\\
-\\
-a
-  \end{tikzcd}
-\]
-The unique arrow from $x$ to $1$ is called \index{!}$!$ (pronounced, \emph{bang}). Because of its uniqueness, the mapping-in, $h$, is totally determined by $f$.
-
-The invertible arrow that witnesses the isomorphism between $1 \times a$ and $a$ is called the \emph{left unitor}:
-\[ \lambda \colon 1 \times a \to a \]
+ &1 \times a
+ \arrow[d, dashed, "h"]
+ \arrow[ddl, bend right, "!"']
+ \arrow[ddr, bend left, "\text{snd}"]
+ \\
+ & 1 \times a
+  \arrow[dl,  "\text{fst}"]
+ \arrow[dr,   "\text{snd}"']
+ \\
+1 && a
+ \end{tikzcd}
+ \]
+ It obviously commutes for $h = id$. It also commutes for $h = \lambda^{-1}  \circ  \text{snd}$, because we have:
+ \[  \text{snd} \circ \lambda^{-1}  \circ  \text{snd} = \text{snd} \]
+ Since $h$ is supposed to be unique, we conclude that:
+\[ \lambda^{-1}  \circ  \text{snd} = \text{id} \]
+This kind of reasoning with universal constructions is pretty standard.
 
 Here are some other isomorphisms written in Haskell (without proofs of having the inverse). This is associativity:
 \begin{haskell}
@@ -227,7 +282,7 @@ Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
 f &\colon a \to a' \\
 g &\colon b \to b'
 \end{align*}
-The composition of these arrows with the projections $\text{fst}$ and $\text{snd}$, respectively, can be used to define the mapping between the products:
+The composition of these arrows with the projections $\text{fst}$ and $\text{snd}$, respectively, can be used to define the mapping $h$ between the products:
 
 \[
  \begin{tikzcd}
@@ -310,7 +365,7 @@ a \times b &\cong b \times a
 \end{align*}
 and is functorial. 
 
-A category in which an operation with these properties is defined is called \emph{symmetric monoidal}. We've seen a similar structure before, when working with sums and the initial object. 
+A category in which an operation with these properties is defined is called \emph{symmetric monoidal}\footnote{Strictly speaking, a product of two objects is defined up to isomorphism, whereas the product in a monoidal category must be defined on the nose. We can get a monoidal category by making a specific choice of a product (assuming the Axiom of Choice).}. We've seen a similar structure before, when working with sums and the initial object. 
 
 A category can have multiple monoidal structures at the same time. When you don't want to name your monoidal structure, you replace the plus sign or the product sign with a tensor sign, and the neutral element with the letter $I$. The rules of a symmetric monoidal category can then be written as:
 \begin{align*}
@@ -339,6 +394,8 @@ g &\colon b \to b'
  to operate on tensor products:
 \[ a \otimes b \xrightarrow{f \otimes g} a' \otimes b' \]
 
+If we think of morphisms as actions, their tensor product corresponds to performing two actions in parallel. Contrast this with the serial composition of morphisms, which suggests their temporal ordering.
+
 You may think of a tensor product as the lowest common denominator of product and sum. It still has an introduction rule, which requires both objects $a$ and $b$; but it has no elimination rule. Once created, a tensor product ``forgets'' how it was created. Unlike a cartesian product, it has no projections. 
 
 Some interesting examples of tensor products are not even symmetric. 
@@ -347,7 +404,7 @@ Some interesting examples of tensor products are not even symmetric.
 
 Monoids are very simple structures equipped with a binary operation and a unit. Natural numbers with addition and zero form a monoid. So do natural numbers with multiplication and one. 
 
-The intuition is that a monoid lets you combine two things to get one thing. There is also one special thing, such that combining it with anything else gives back the same thing. That's the unit. And the combining must be associative. 
+The intuition is that a monoid lets you combine two things to get another thing. There is also one special thing, such that combining it with anything else gives back the same thing. That's the unit. And the combining must be associative. 
 
 What's not assumed is that the combining is symmetric, or that there is an inverse element.
 
@@ -355,19 +412,20 @@ The rules that define a monoid are reminiscent of the rules of a category. The d
 
 A category with a single object is called a monoid. The combining operation is the composition of arrows and the unit is the identity arrow. 
 
-This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
+This is a perfectly valid definition. In practice, however, we are often interested in monoids that are embedded in larger categories. We call such monoids \index{internal monoid}\emph{internal}. In particular, in programming, we want to be able to define monoids inside the category of types and functions. 
 
-In a category, we are forced to define operations in bulk, rather than looking at individual elements. So we start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
+However, in a category, rather than looking at individual elements, we prefer to define operations in bulk. So we start with an object $m$. A binary operation is a function of two arguments. Since elements of a product are pairs of elements, we can characterize a binary operation as an arrow from a product $m \times m$ to $m$:
 \[ \mu \colon m \times m \to m \]
 The unit element can be defined as an arrow from the terminal object $1$:
 \[ \eta \colon 1 \to m \]
 
-We can translate this description directly to Haskell by defining a \index{type class}class of types equipped with two methods, traditionally called \hask{mappend} and \hask{mempty}:
+We could translate this description directly to Haskell by defining a \index{type class}class of types equipped with two methods, traditionally called \hask{mappend} and \hask{mempty}:
 \begin{haskell}
 class Monoid m where
   mappend :: (m, m) -> m
   mempty  :: () -> m
 \end{haskell}
+We'll see the actual Haskell library definition shortly.
 
 The two arrows $\mu$ and $\eta$ have to satisfy monoid laws but, again, we have to formulate them in bulk, without any recourse to elements.
 
@@ -418,7 +476,7 @@ To formulate the law of associativity, we have to start with a triple product an
 
 Notice that we didn't have to assume a lot about the categorical product that we used with the objects $m$ and $1$. In particular we never had to use projections. This suggests that the above definition will work equally well for a tensor product in an arbitrary monoidal category. It doesn't even have to be symmetric. All we have to assume is that: there is a unit object, that the product is functorial, and that it satisfies the unit and associativity laws up to isomorphism.
 
-Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category. 
+Thus if we replace $\times$ with $\otimes$ and $1$ with $I$, we get a definition of a monoid in an arbitrary monoidal category. We can \emph{internalize} a monoid inside a monoidal category.
 
 A \index{monoid}\emph{monoid} in a monoidal category is an object $m$ equipped with two morphisms:
 \[ \mu \colon m \otimes m \to m \]
@@ -457,5 +515,52 @@ satisfying the unit and associativity laws:
  \end{tikzcd}
 \]
 We used the functoriality of $\otimes$ to lift pairs of arrows, as in $\eta \otimes id_m$, $\mu \otimes id_m$, etc.
+
+\subsection{Monoids in Haskell}
+
+Notwithstanding its simplicity, a monoid has several moving parts. It has the unit, the binary operation, and the three laws. 
+
+If we strip it to just the binary operation with no unit and no associativity, we get the primordial structure called a \index{magma}\emph{magma}. A magma with associativity is called a \index{semigroup}\emph{semigroup}. Since in Haskell we have no way to express the laws, we cannot distinguish between a magma and a semigroup. So we define one class with a binary infix operator \hask{<>}:
+\begin{haskell}
+class Semigroup a where
+    (<>) :: a -> a -> a
+\end{haskell}
+
+We can now define a monoid as a semigroup with unit (and unit laws). In Haskell, we express this dependency by requiring that \hask{Semigroup} be a \index{superclass}\emph{superclass} of \hask{Monoid}:
+\begin{haskell}
+class Semigroup a => Monoid a where
+    mempty :: a
+\end{haskell}
+This way \hask{Monoid} inherits the binary operation \hask{<>} from \hask{Semigroup}, and adds to it the unit element \hask{mempty}.
+
+An interesting example of a monoid is provided by endomorphisms, that is morphisms whose source and target are the same:
+\begin{haskell}
+newtype Endo a = Endo (a -> a)
+\end{haskell}
+The binary operation is given by composition:
+\begin{haskell}
+instance Semigroup (Endo a) where
+  (Endo f) <> (Endo g) = Endo (f . g)
+\end{haskell}
+The unit of composition is the identity morphism, so we have:
+\begin{haskell}
+instance Monoid (Endo a) where
+  mempty = Endo id
+\end{haskell}
+
+\begin{exercise}
+Define the \hask{Monoid} instance for booleans using AND as the binary operation. To distinguish it from other monoids over \hask{Bool}, use the \hask{newtype} trick:
+\begin{haskell}
+newtype All = All Bool
+\end{haskell}
+\end{exercise}
+
+\begin{exercise}
+Define the \hask{Monoid} instance for booleans using OR as the binary operation. Use a different  \hask{newtype}:
+\begin{haskell}
+newtype Any = Any Bool
+\end{haskell}
+\end{exercise}
+
 
 \end{document}

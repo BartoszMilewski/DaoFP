@@ -1,6 +1,6 @@
 \documentclass[DaoFP]{subfiles}
 \begin{document}
-\setcounter{chapter}{12}
+\setcounter{chapter}{11}
 
 \chapter{Coalgebras}
 
@@ -8,13 +8,13 @@ Coalgebras are just algebras in the opposite category. End of chapter!
 
 Well, maybe not... As we've seen before, the category in which we're working is not symmetric with respect to duality. In particular, if we compare the terminal and the initial objects, their properties are not symmetric. Our initial object has no incoming arrows, whereas the terminal one, besides having unique incoming arrows, has lots of outgoing arrows. 
 
-Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---their duals, therefore generated from the terminal object---not to be just their mirror images, but to add their own interesting twists.
+Since initial algebras were constructed starting from the initial object, we might expect terminal coalgebras---which are their duals, therefore generated from the terminal object---not to be just their mirror images, but to add their own interesting twists.
 
-We've seen that the main application of algebras was in processing recursive data structures: in folding them. Dually, the main application of coalgebras is in generating, or unfolding, of recursive, tree-like, data structures. The unfolding is done using an anamorphism.
+We've seen that the main application of algebras was in processing recursive data structures: in folding them. Dually, the main application of coalgebras is in generating, or unfolding, the recursive, tree-like, data structures. The unfolding is done using an anamorphism.
 
 We use catamorphisms to chop trees, we use anamorphisms to grow them. 
 
-We cannot produce information from nothing so, in general, both a catamorphism and an anamorphism reduce the amount of information that's contained in their input. 
+We cannot produce information from nothing so, in general, both a catamorphism and an anamorphism tend to reduce the amount of information that's contained in their input. 
 
 After you sum a list of integers, it's impossible to recover the original list. 
 
@@ -26,9 +26,9 @@ A coalgebra for an endofunctor $F$ is a pair consisting of a carrier $a$ and a s
 
 In Haskell, we define:
 \begin{haskell}
- type Coalgebra f a = a -> f a
+type Coalgebra f a = a -> f a
 \end{haskell}
-We often think of the carrier as the type of a seed from which we'll grow the data structure, be it a list or a tree. 
+We often think of the carrier as the type of a seed from which we grow the data structure, be it a list or a tree. 
 
 For instance, here's a functor that can be used to create a binary tree, with integers stored at the nodes:
 \begin{haskell}
@@ -37,7 +37,7 @@ data TreeF x = LeafF | NodeF Int x x
 \end{haskell}
 We don't even have to define the instance of \hask{Functor} for it---the \hask{deriving} clause tells the compiler to generate the canonical one for us (together with the \hask{Show} instance to allow conversion to \hask{String}, if we want to display it).
 
-A coalgebra is a function that takes a seed of the carrier type and produces a functor-ful of new seeds. These new seeds can then be used to generate the subtrees, recursively. 
+A coalgebra is a function that takes a seed of the carrier type and produces a functorful of new seeds. These new seeds can then be used to generate the subtrees, recursively. 
 
 Here's a coalgebra for the functor \hask{TreeF} that takes a list of integers as a seed:
 \begin{haskell}
@@ -112,8 +112,7 @@ In the category of sets, the carrier set of the initial algebra is a subset of t
 
 We'll see later that in Haskell the situation is more subtle, because of lazy evaluation. But, at least for functors that have the leaf component---that is, their action on the initial object is non-trivial---Haskell's fixed point type works as a carrier for both the initial algebra and the terminal coalgebra.
 \begin{haskell}
-data Fix f where
-  In :: f (Fix f) -> Fix f
+newtype Fix f = Fix { unFix :: f (Fix f) }
 \end{haskell}
 
 \begin{exercise}
@@ -143,23 +142,24 @@ The terminal coalgebra $(t, \tau)$ is defined by its universal property: there i
  
  Just like with algebras, we can use the Lambek's lemma to ``solve'' for \hask{h}:
  \[ h = \tau^{-1} \circ F h \circ \alpha \]
+ The solution is called an anamorphism and is sometimes written using \index{lens bracket}\index{$\llens \rlens$}``lens brackets'' as $\llens \alpha \rlens$.
  
  Since the terminal coalgebra (just like the initial algebra) is a fixed point of a functor, the above recursive formula can be translated directly to Haskell as:
  \begin{haskell}
 ana :: Functor f => Coalgebra f a -> a -> Fix f
-ana coa = In . fmap (ana coa) . coa 
+ana coa = Fix . fmap (ana coa) . coa 
 \end{haskell}
 Here's the interpretation of this formula: Given a seed of type \hask{a}, we first act on it with the coalgebra \hask{coa}. This gives us a functorful of seeds. We expand these seeds by recursively applying the anamorphism using \hask{fmap}. We then apply the constructor \hask{In} to get the final result.
  
 As an example, we can apply the anamorphism to the \hask{split} coalgebra we defined earlier: \hask{ana split} takes a list of integers and creates a sorted tree. 
 
-We can then use a catamorphsims to fold this tree into a sorted list. We define an algebra:
+We can then use a catamorphsims to fold this tree into a sorted list. We define the following algebra:
 \begin{haskell}
 toList :: Algebra TreeF [Int]
 toList LeafF = []
 toList (NodeF n ns ms) = ns ++ [n] ++ ms
 \end{haskell}
-that concatenates the left list with the singleton pivot and the right list. To sort a list we combine the anamorphism with the catamorphism:
+It concatenates the left list with the singleton pivot and the right list. To sort a list we combine the anamorphism with the catamorphism:
 \begin{haskell}
 qsort = cata toList . ana split
 \end{haskell}
@@ -189,20 +189,20 @@ Here's a simple coalgebra that uses a single integer \hask{n} as a seed:
 step :: Coalgebra (StreamF Int) Int
 step n = StreamF n (n+1)
 \end{haskell}
-It stores the seed as a payload, and seeds the next budding stream with \hask{n + 1}. 
+It stores the current seed as a payload, and seeds the next budding stream with \hask{n + 1}. 
 
 The anamorphism for this coalgebra, when seeded with zero, generates the stream of all natural numbers.
 \begin{haskell}
 allNats :: Stream Int
 allNats = ana step 0
 \end{haskell}
-In a non-lazy language this anamorphism would run forever, but in Haskell it's instantaneous. The incremental price is paid only when we want to retrive some of the data, for instance, using these accessors:
+In a non-lazy language this anamorphism would run forever, but in Haskell it's instantaneous. The incremental price is paid only when we want to retrieve some of the data, for instance, using these accessors:
 \begin{haskell}
 head :: Stream a -> a
-head (In (StreamF a _)) = a
+head (Fix (StreamF a _)) = a
 
 tail :: Stream a -> Stream a
-tail (In (StreamF _ s)) = s
+tail (Fix (StreamF _ s)) = s
 \end{haskell}
 
 
@@ -258,14 +258,14 @@ The ``bottom'' line is that Haskell code should be treated as an illustration of
 The definition of an anamorphism can be seen as an expression of the universal property of the terminal coalgebra. Here it is, with the universal quantification made explicit:
  \begin{haskell}
 ana :: Functor f => forall a. Coalgebra f a -> (a -> Fix f)
-ana coa = In . fmap (ana coa) . coa 
+ana coa = Fix . fmap (ana coa) . coa 
 \end{haskell}
-It says that, given any coalgebra, there is a mapping from its carrier to the carrier of the terminal coalgebra, \hask{Fix f}. We know, from the Lambek's lemma, that this mapping is in fact a coalgebra morphism.
+What it tells us is that, given any coalgebra, there is a mapping from its carrier to the carrier of the terminal coalgebra, \hask{Fix f}. We know, from the Lambek's lemma, that this mapping is in fact a coalgebra morphism.
 
 Let's uncurry this definition:
 \begin{haskell}
 ana :: Functor f => forall a. (a -> f a, a) -> Fix f
-ana (coa, x) = In (fmap (curry ana coa) (coa x))
+ana (coa, x) = Fix (fmap (curry ana coa) (coa x))
 \end{haskell}
 We can use this formula as the alternative definition of the carrier for the terminal coalgebra. We can replace \hask{Fix f} with the type we are defining---let's call it \hask{Nu f}. The type signature:
 \begin{haskell}
@@ -275,11 +275,11 @@ tells us that we can construct an element of \hask{Nu f} from a pair \hask{(a ->
 
 Data types with a polymorphic constructor are called \index{existential types}\emph{existential} types. In pseudo-code (not actual Haskell) we would define \hask{Nu f} as:
 \begin{haskell}
-data Nu f = Nu (exists a. (Coalgebra f a, a))
+newtype Nu f = Nu (exists a. (Coalgebra f a, a))
 \end{haskell}
 Compare this with the definition of the least fixed point of an algebra:
 \begin{haskell}
-data Mu f = Mu (forall a. Algebra f a -> a)
+newtype Mu f = Mu (forall a. Algebra f a -> a)
 \end{haskell}
 
 
@@ -350,16 +350,16 @@ allNats = Nu nuArgs
 
 \section{Terminal Coalgebra as a Limit}
 
-In category theory we are not afraid of infinitities---we make sense of them. 
+In category theory we are not afraid of infinities---we make sense of them. 
 
 At face value, the idea that we could construct a terminal coalgebra by applying the functor $F$ infinitely many times to some object, let's say the terminal object $1$, makes no sense. But the idea is very convincing: Applying $F$ one more time is like adding one to infinity---it's still infinity. So, naively, this is a fixed point of $F$:
 \[ F (F^{\infty} 1) \cong F^{\infty + 1} 1 \cong F^{\infty} 1\]
 
-To turn this loose reasoning into a rigorous proof, we have to tame the infinity, which means we have to define some kind of a limiting procedure. 
+To turn this loose reasoning into a rigorous proof, we have to tame the infinity, which means we have to define some kind of limiting procedure. 
 
 As an example, let's consider the product functor:
 \[F_a x = a \times x \]
-Its terminal coalgebra is an infinite stream. We'll approximate it it by starting with the terminal object $1$. The next step is:
+Its terminal coalgebra is an infinite stream. We'll approximate it by starting with the terminal object $1$. The next step is:
 \[ F_a 1 = a \times 1 \cong a \]
 which we could imagine is a stream of length one. We can continue with:
 \[ F_a (F_a 1) = a \times (a \times 1) \cong a \times a \]
@@ -367,7 +367,7 @@ a stream of length two, and so on.
 
 This looks promising, but what we need is one object that would combine all these approximations. We need a way to glue the next approximation to the previous one.
 
-Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. This limit has the same elements as the starting object in the diagram. In particular, consider the limit in this diagram:
+Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. This limit has the same elements as the starting object in the diagram. In particular, consider the limit of the single-arrow diagram $D_1$:
 \[
  \begin{tikzcd}
  & Lim D_1
@@ -379,7 +379,7 @@ Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. Th
  \arrow[l, "!"]
  \end{tikzcd}
 \]
-($!$ is the unique morphism targeting the terminal object $1$). This limit has the same elements as $F 1$. Similarly, this limit:
+($!$ is the unique morphism targeting the terminal object $1$). This limit has the same elements as $F 1$. Similarly, the limit of a two-arrow diagram $D_2$:
 \[
  \begin{tikzcd}
  && Lim D_2
@@ -396,7 +396,7 @@ Recall, from an earlier exercise, the limit of the ``walking arrow'' diagram. Th
 \]
 has the same elements as $F(F 1)$.
 
-We can continue extending this diagram to infinity. The limit of the infinite chain is the fixed point carrier of the terminal coalgebra.
+We can continue extending this diagram to infinity. It turns out that the limit of this infinite chain is our fixed point carrier of the terminal coalgebra.
 \[
  \begin{tikzcd}
   && t

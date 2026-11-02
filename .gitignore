@@ -2,6 +2,7 @@
 *.aux
 *.log
 *.pdf
+!DaoFP.pdf
 *.gz
 *.pygtex
 *.pygstyle

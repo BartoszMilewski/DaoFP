@@ -50,7 +50,7 @@ data Bool where
   False :: Bool
 \end{haskell}
 
-We can now define a term of the type \hask{Bool}, for instance
+We can now define a term, or a value, of the type \hask{Bool}, for instance
 \begin{haskell}
 x :: Bool
 x = True
@@ -59,7 +59,7 @@ The first line declares \hask{x} to be an element of \hask{Bool} (secretly a fun
 
 The functions \hask{True} and \hask{False} that we used in the definition of \hask{Bool} are called \index{data constructor}\emph{data constructors}. They can be used to construct specific terms, like in the example above. As a side note, in Haskell, function names start with lower-case letters, except when they are data constructors. 
 
-Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it. We have to be able to define arrows that go out of \hask{Bool}---the \index{mapping out}\emph{mappings ou}t of \hask{Bool}. 
+Our definition of the type \hask{Bool} is still incomplete. We know how to construct a \hask{Bool} term, but we don't know what to do with it, how to ``consume'' it. We have to be able to define arrows that go out of \hask{Bool}---the \index{mapping out}\emph{mappings ou}t of \hask{Bool}. 
 
 The first observation is that, if we have an arrow \hask{h} from \hask{Bool} to some concrete type \hask{A} then we automatically get two arrows \hask{x} and \hask{y} from unit to \hask{A}, just by composition. The following two (distorted) triangles commute:
 
@@ -115,7 +115,8 @@ we define the mapping out
 h :: Bool -> A
 h b = if b then x else y
 \end{haskell}
-Here, \hask{b} is a term of type \hask{Bool}. 
+Here, \hask{b} is a term of the type \hask{Bool}. 
+\subsection{Type theory interpretation}
 
 In general, a data type is created using \index{introduction rule}\emph{introduction} rules and deconstructed using \index{elimination rule}\emph{elimination} rules. The \hask{Bool} data type has two introduction rules, one using \hask{True} and another using \hask{False}. The \hask{if}, \hask{then}, \hask{else} construct defines the elimination rule. 
 
@@ -171,7 +172,7 @@ not :: Bool -> Bool
 not b = if b then False else True
 \end{haskell}
 
-We can also look at functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential object $A^2$, where $2$ is the \hask{Bool} object. Accoording to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra, where numbers actually mean numbers.
+We can also look at functions from \hask{Bool} to \hask{A} as elements of the object of arrows, or the exponential object $A^2$, where $2$ is the \hask{Bool} object. According to our count, we have zero elements in $0^2$, one element in $1^2$, and four elements in $2^2$. This is exactly what we'd expect from high-school algebra, where numbers actually mean numbers.
 
 \begin{exercise}
 Write the implementations of the three other functions \hask{Bool->Bool}.
@@ -232,7 +233,7 @@ These patterns will also work for types with four, five, and more data construct
 data Digit = Zero | One | Two | Three | ... | Nine
 \end{haskell}
 
-There is a giant enumeration of Unicode characters called \hask{Char}. Their constructors are given special names: you write the character itself between two apostrophes, e.g.,
+There is a giant enumeration of Unicode characters called \hask{Char}. Their constructors are given special names: you write the character itself between a pair of apostrophes, e.g.,
 \begin{haskell}
 c :: Char
 c = 'a'
@@ -254,43 +255,6 @@ But why should we stop at that? The type \hask{Int} could be thought of as an en
 In practice, the types \hask{Char} for Unicode characters, \hask{Int} for fixed-precision integers, \hask{Double} for double-precision floating point numbers, and several others, are built into the language.
 
 These are not infinite types. Their elements can be enumerated, even if it would take ten thousand years. The type \hask{Integer} is infinite, though.
-
-\subsection{Short Haskell Digression}
-
-Since we are going to write more Haskell code, we have to establish some preliminaries. To define data types using functions, we need to use the language pragma called \hask{GADTs} (it stands for \emph{Generalized Algebraic Data Types}). The pragma has to be put at the top of the source file. For instance:
-
-\begin{haskell}
-{-# language GADTs #-}
-
-data Bool where
-  True  :: () -> Bool
-  False :: () -> Bool
-\end{haskell}
-
-The \hask{Void} data type can be defined as:
-\begin{haskell}
-data Void where
-\end{haskell}
-with the empty \hask{where} clause (no data constructor!).
-
-The function \hask{absurd} works with any type as its target (it's a \emph{polymorphic} function), so it is parameterized by a \emph{type variable}. Unlike concrete types, type variables must start with a lowercase letter. Here, \hask{a} is such a type variable:
-
-\begin{haskell}
-absurd :: Void -> a
-absurd v = undefined
-\end{haskell}
-We use \hask{undefined} to placate the compiler. In this case, we are absolutely sure that the function \hask{absurd} can never be called, because it's impossible to construct an argument of type \hask{Void}.
-
-You may use \hask{undefined} when you're only interested in compiling, as opposed to running, your code. For instance, you may need to plug a function \hask{f} to check if your definitions work together:
-\begin{haskell}
-f :: a -> x
-f = undefined
-\end{haskell}
-
-If you want to experiment with defining your own versions of standard types, like \hask{Either}, you have to tell the compiler to hide the originals that are defined in the standard library called the \hask{Prelude}. Put this line at the top of the file, after the language pragmas:
-\begin{haskell}
-import Prelude hiding (Either, Left, Right)
-\end{haskell}
 
 
 \section{Sum Types}
@@ -433,7 +397,7 @@ Let's look at the definition of $1 + 0$ and it's mapping out to any object $a$. 
  a
  \end{tikzcd}
 \]
-We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. Since $h$ is determined by the pair $(x, \mbox{!`})$, we can simply assign it to the arrow $x$ originating in $1$. Since there is only one $\mbox{!`}$, the mapping is a bijection. 
+We want to establish a one-to-one mapping between arrows originating in $1+0$ and the ones originating in $1$. The arrow $h$ is determined by the pair $(x, \mbox{!`})$. Since there is only one $\mbox{!`}$, there  is a bijection between $h$'s and $x$'s. 
 
 We define $\beta_a$ to map any $h$ defined by a pair $(x, \mbox{!`})$ to $x$. Conversely, $\beta^{-1}_a$ maps $x$ to the pair $(x, \mbox{!`})$. But is it a natural transformation? 
 
@@ -442,7 +406,7 @@ To answer that, we need to consider what happens when we change focus from $a$ t
 \item Make $h$ switch focus by post-composing both $x$ and $\mbox{!`}$ with $g$. We get a new pair $(y = g \circ x, \mbox{!`})$. Follow it by $\beta_b$.
 \item Use $\beta_a$ to map $(x, \mbox{!`})$ to $x$. Follow it with the post-composition $(g \circ -)$. 
 \end{itemize}
-In both cases we get the same arrow $y = g \circ x$. So the transformation $\beta$ is natural. Therefore $1 + 0$ is isomorphic to $1$.
+In both cases we get the same arrow $y = g \circ x$. So the mapping $\beta$ is natural. Therefore $1 + 0$ is isomorphic to $1$.
 
 In Haskell, we can define the two functions that form the isomorphism, but there is no way of directly expressing the fact that they are the inverse of each other.
 \begin{haskell}
@@ -484,7 +448,7 @@ A very similar argument can be used to show that $a + 0 \cong a$. The following 
 We can translate this argument to Haskell by implementing a (polymorphic) function \hask{h} that works for any type \hask{a}. 
 
 \begin{exercise}
-Implement, in Haskell, the two functions that form the isomorphism between \hask{Either a Void} and \hask{a}.
+Implement, in Haskell, the two functions that form the isomorphism between \hask{(Either a Void)} and \hask{a}.
 \end{exercise}
 
 We could use a similar argument to show that $0 + a \cong a$, but there is a more general property of sum types that obviates that.
@@ -492,7 +456,7 @@ We could use a similar argument to show that $0 + a \cong a$, but there is a mor
 
 There is a nice left-right symmetry in the diagrams that define the sum type, which suggests that it satisfies the commutativity rule, $a + b \cong b + a$. 
 
-Let's consider mappings out of both sides. You can easily see that, for every $h$ that is determined by a pair $(f, g)$ on the left, there is a corresponding $h'$ given by a pair $(g, f)$ on the right. That establishes the bijection of arrows.
+Let's consider mappings out of both sides of this formula. You can easily see that, for every $h$ that is determined by a pair $(f, g)$ on the left, there is a corresponding $h'$ given by a pair $(g, f)$ on the right. That establishes the bijection of arrows.
 
 \[
  \begin{tikzcd}
@@ -528,21 +492,21 @@ Let's consider mappings out of both sides. You can easily see that, for every $h
 Show that the bijection defined above is natural. Hint: Both $f$ and $g$ change focus by post-composition with $k \colon x \to y$.
 \end{exercise}
 \begin{exercise}
-Implement, in Haskell, the function that witnesses the isomorphism between \hask{Either a b} and \hask{Either b a}. Notice that this function is its own inverse.
+Implement, in Haskell, the function that witnesses the isomorphism between \hask{(Either a b)} and \hask{(Either b a)}. Notice that this function is its own inverse.
 \end{exercise}
 
 \subsection{Associativity}
 
 Just like in arithmetic, the sum that we have defined is associative:
 \[(a + b) + c \cong a + (b + c) \]
-It's easy to write the mapping out for the left hand side:
+It's easy to write the mapping out for the left-hand side:
 \begin{haskell}
 h :: Either (Either a b) c -> x
 h (Left (Left a))  = f1 a
 h (Left (Right b)) = f2 b
 h (Right c)        = f3 c
 \end{haskell}
-Notice the use of nested patterns like \hask{(Left (Left a))}, etc. The mapping is fully defined by a triple of functions. The same functions can be used to define the mapping out of the right hand side:
+Notice the use of nested patterns like \hask{(Left (Left a))}, etc. The mapping is fully defined by a triple of functions. The same functions can be used to define the mapping out of the right-hand side:
 \begin{haskell}
 h' :: Either a (Either b c) -> x
 h' (Left a)          = f1 a
@@ -574,7 +538,7 @@ This code can also be displayed in diagrammatical form. Here's the diagram for t
  \end{tikzcd}
 \]
 \subsection{Functoriality}
-Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the foci of the arrows that define the product. But what happens when we move the sources of those arrows? 
+Since the sum is defined by the mapping out property, it was easy to see what happens when we change focus: it changes ``naturally'' with the focus of the arrows that define the coproduct. But what happens when we move the sources of those arrows? 
 
 Suppose that we have arrows that map $a$ and $b$ to some $a'$ and $b'$:
 \begin{align*}f &\colon a \to a' \\
@@ -600,10 +564,10 @@ The composition of these arrows with the constructors $\text{Left}$ and $\text{R
 & a' + b'
  \end{tikzcd}
 \]
-The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon a + b \to a' + b'$.
+The pair of arrows, $(\text{Left} \circ f, \text{Right} \circ g)$ uniquely defines the arrow $h \colon a + b \to a' + b'$. The notation for this arrow is:
+\[ a + b \xrightarrow{\langle f, g \rangle} a' + b' \]
 
-This property of the sum is called \emph{functoriality}. You can imagine it as allowing you to transform the two objects \emph{inside} the sum and get a new sum. We also say that functoriality lets us \index{lifting}\emph{lift} a pair of arrows in order to operate on sums.
-
+This property of lifting a pair of arrows to act on the sum is called the \emph{functoriality} of the sum. You can imagine it as allowing you to transform the two objects \emph{inside} the sum and get a new sum. 
 \begin{exercise}
 Show that functoriality preserves composition. Hint: take two composable arrows, $g \colon b \to b'$ and $g' \colon b' \to b''$ and show that applying $g' \circ g$ gives the same result as first applying $g$ to transform $a + b$ to $a + b'$ and then applying $g'$ to transform $a + b'$ to $a + b''$.
 \end{exercise}
@@ -613,7 +577,7 @@ Show that functoriality preserves identity. Hint: use $id_b$ and show that it is
 \end{exercise}
 
 \subsection{Symmetric Monoidal Category}
-When a child learns addition we call it arithmetics. When a grownup learns addition we call it a cocartesian category.
+When a child learns addition we call it arithmetic. When a grownup learns addition we call it a cocartesian category.
 
 Whether we are adding numbers, composing arrows, or constructing sums of objects, we are re-using the same idea of decomposing complex things into their simpler components.  
 
