@@ -16,3 +16,6 @@ DaoFP.ilg
 *.pyg
 /Haskell/.vscode
 Haskell/CHANGELOG.md
+Haskell/dist-newstyle/build/aarch64-osx/ghc-9.6.7/DaoFP-0.1.0.0/x/DaoFP/build/DaoFP/DaoFP-tmp/Main.hi
+*.o
+/Haskell/dist-newstyle
