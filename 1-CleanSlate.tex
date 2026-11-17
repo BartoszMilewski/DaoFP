@@ -149,7 +149,7 @@ In type theory we postulate the existence of the corresponding types $\mathbb 0$
 
 To make sure that the type $\mathbb 0$ is not inhabited, we provide no rule for constructing values of this type. It has no data constructor or, as it's called in type theory, no \index{introduction rule}\emph{introduction rule}. 
 
-But if that wasn't enough, we also provide an impossible to satisfy elimination rule. The \index{elimination rule}\emph{elimination rule} tells us what we can do with an input of the type in question. Since we are guaranteed that nobody can create an element of $\mathbb 0$, we are free to promise \emph{anything} if somebody comes up with one (they can't!). Give me an element $x \colon \mathbb 0$ and I'll give you back any value of any type. In category theory, this corresponds to the arrow $\mbox{!`}$ we've seen before. 
+But if that wasn't enough, we also provide an impossible-to-satisfy elimination rule. The \index{elimination rule}\emph{elimination rule} tells us what we can do with an input of the type in question. Since we are guaranteed that nobody can create an element of $\mathbb 0$, we are free to promise \emph{anything} if somebody comes up with one (they can't!). Give me an element $x \colon \mathbb 0$ and I'll give you back any value of any type. In category theory, this corresponds to the arrow $\mbox{!`}$ we've seen before.
 
 The $\mathbb 1$ type has a single data constructor, corresponding to the Haskell value \hask{()}, which in type theory is often depicted as $\star$. The introduction rule is simply:
 \[\star \colon \mathbb 1\]
